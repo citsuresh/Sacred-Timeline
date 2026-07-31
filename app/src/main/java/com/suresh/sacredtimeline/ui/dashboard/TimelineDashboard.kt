@@ -242,7 +242,7 @@ fun TimelineContent(state: TimelineUiState.Success) {
 
                     Row(modifier = Modifier.fillMaxSize()) {
                         TimeMarkersColumn()
-                        TimelineColumn(timings = state.nallaNeram, modifier = Modifier.weight(1f))
+                        TimelineColumn(timings = state.nallaNeram + state.specialPeriods, modifier = Modifier.weight(1f))
                         VerticalDivider(thickness = 1.dp, color = Color.LightGray.copy(alpha = 0.3f))
                         TimelineColumn(timings = state.gowriNeram, modifier = Modifier.weight(1f))
                         VerticalDivider(thickness = 1.dp, color = Color.LightGray.copy(alpha = 0.3f))
@@ -295,7 +295,7 @@ fun TimelineHeader() {
             .padding(vertical = 12.dp)
     ) {
         Spacer(modifier = Modifier.width(TIME_COLUMN_WIDTH))
-        Text("Nalla Neram", modifier = Modifier.weight(1f), textAlign = TextAlign.Center, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+        Text("Neram", modifier = Modifier.weight(1f), textAlign = TextAlign.Center, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
         Text("Gowri Neram", modifier = Modifier.weight(1f), textAlign = TextAlign.Center, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
         Text("Hora", modifier = Modifier.weight(1f), textAlign = TextAlign.Center, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
     }
@@ -409,6 +409,7 @@ fun TimingCard(timing: Timing) {
                 is Hora -> timing.name
                 is NallaNeram -> "Nalla"
                 is GowriNeram -> timing.name
+                is SpecialPeriod -> timing.name
             }
             Text(
                 text = label,
@@ -427,6 +428,9 @@ private fun Auspiciousness.toColor(): Color = when (this) {
     Auspiciousness.BLUE -> AuspiciousBlue
     Auspiciousness.RED -> InauspiciousRed
     Auspiciousness.AMBER -> CautionAmber
+    Auspiciousness.DARK_RED -> RahuRed
+    Auspiciousness.ORANGE -> YamaOrange
+    Auspiciousness.GREY -> KuligaiGrey
 }
 
 private fun calculateOffset(time: LocalTime): Dp {

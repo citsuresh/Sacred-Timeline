@@ -19,10 +19,7 @@ import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import com.suresh.sacredtimeline.logic.MockPanchangamProvider
 import com.suresh.sacredtimeline.model.Auspiciousness
-import com.suresh.sacredtimeline.ui.theme.AuspiciousBlue
-import com.suresh.sacredtimeline.ui.theme.AuspiciousGreen
-import com.suresh.sacredtimeline.ui.theme.CautionAmber
-import com.suresh.sacredtimeline.ui.theme.InauspiciousRed
+import com.suresh.sacredtimeline.ui.theme.*
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -32,17 +29,19 @@ class PanchangamWidget : GlanceAppWidget() {
         val provider = MockPanchangamProvider()
         val now = LocalTime.now()
         val date = LocalDate.now()
-        val (nalla, gowri, hora) = provider.getCurrentTimings(date, now)
+        val timings = provider.getCurrentTimings(date, now)
 
         provideContent {
             GlanceTheme {
                 WidgetContent(
-                    nallaLabel = nalla?.let { "Active" } ?: "None",
-                    nallaAusp = nalla?.auspiciousness,
-                    gowriLabel = gowri?.name ?: "None",
-                    gowriAusp = gowri?.auspiciousness,
-                    horaLabel = hora?.name ?: "None",
-                    horaAusp = hora?.auspiciousness
+                    nallaLabel = timings.nallaNeram?.let { "Active" } ?: "None",
+                    nallaAusp = timings.nallaNeram?.auspiciousness,
+                    gowriLabel = timings.gowriNeram?.name ?: "None",
+                    gowriAusp = timings.gowriNeram?.auspiciousness,
+                    horaLabel = timings.hora?.name ?: "None",
+                    horaAusp = timings.hora?.auspiciousness,
+                    specialLabel = timings.specialPeriod?.name ?: "None",
+                    specialAusp = timings.specialPeriod?.auspiciousness
                 )
             }
         }
@@ -52,7 +51,8 @@ class PanchangamWidget : GlanceAppWidget() {
     private fun WidgetContent(
         nallaLabel: String, nallaAusp: Auspiciousness?,
         gowriLabel: String, gowriAusp: Auspiciousness?,
-        horaLabel: String, horaAusp: Auspiciousness?
+        horaLabel: String, horaAusp: Auspiciousness?,
+        specialLabel: String, specialAusp: Auspiciousness?
     ) {
         Row(
             modifier = GlanceModifier
@@ -64,6 +64,7 @@ class PanchangamWidget : GlanceAppWidget() {
             TimingColumn("Nalla", nallaLabel, nallaAusp, GlanceModifier.defaultWeight())
             TimingColumn("Gowri", gowriLabel, gowriAusp, GlanceModifier.defaultWeight())
             TimingColumn("Hora", horaLabel, horaAusp, GlanceModifier.defaultWeight())
+            TimingColumn("Special", specialLabel, specialAusp, GlanceModifier.defaultWeight())
         }
     }
 
@@ -79,6 +80,9 @@ class PanchangamWidget : GlanceAppWidget() {
             Auspiciousness.BLUE -> AuspiciousBlue
             Auspiciousness.RED -> InauspiciousRed
             Auspiciousness.AMBER -> CautionAmber
+            Auspiciousness.DARK_RED -> RahuRed
+            Auspiciousness.ORANGE -> YamaOrange
+            Auspiciousness.GREY -> KuligaiGrey
             null -> Color.Gray
         }
 

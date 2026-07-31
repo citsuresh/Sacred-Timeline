@@ -14,3 +14,7 @@ val AuspiciousGreen = Color(0xFF4CAF50)
 val AuspiciousBlue = Color(0xFF2196F3)
 val InauspiciousRed = Color(0xFFF44336)
 val CautionAmber = Color(0xFFFFC107)
+
+val RahuRed = Color(0xFF8B0000)
+val YamaOrange = Color(0xFFFF8C00)
+val KuligaiGrey = Color(0xFF808080)

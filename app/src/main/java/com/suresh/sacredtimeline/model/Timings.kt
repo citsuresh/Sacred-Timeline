@@ -31,3 +31,10 @@ data class Hora(
     override val endTime: LocalTime,
     override val auspiciousness: Auspiciousness
 ) : Timing
+
+data class SpecialPeriod(
+    val name: String,
+    override val startTime: LocalTime,
+    override val endTime: LocalTime,
+    override val auspiciousness: Auspiciousness
+) : Timing

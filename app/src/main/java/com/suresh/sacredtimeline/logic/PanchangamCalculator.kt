@@ -69,27 +69,32 @@ object PanchangamCalculator {
     )
 
     fun calculateRahuKalam(dayOfWeek: DayOfWeek, sunrise: LocalTime, sunset: LocalTime): SpecialPeriod {
-        return calculateSpecialPeriod(dayOfWeek, sunrise, sunset, RAHU_SEQUENCE)
+        return calculateSpecialPeriod("Rahu", dayOfWeek, sunrise, sunset, RAHU_SEQUENCE, Auspiciousness.DARK_RED)
     }
 
     fun calculateYamagandam(dayOfWeek: DayOfWeek, sunrise: LocalTime, sunset: LocalTime): SpecialPeriod {
-        return calculateSpecialPeriod(dayOfWeek, sunrise, sunset, YAMA_SEQUENCE)
+        return calculateSpecialPeriod("Yama", dayOfWeek, sunrise, sunset, YAMA_SEQUENCE, Auspiciousness.ORANGE)
     }
 
     fun calculateKuligai(dayOfWeek: DayOfWeek, sunrise: LocalTime, sunset: LocalTime): SpecialPeriod {
-        return calculateSpecialPeriod(dayOfWeek, sunrise, sunset, KULI_SEQUENCE)
+        return calculateSpecialPeriod("Kuli", dayOfWeek, sunrise, sunset, KULI_SEQUENCE, Auspiciousness.GREY)
     }
 
-    private fun calculateSpecialPeriod(dayOfWeek: DayOfWeek, sunrise: LocalTime, sunset: LocalTime, sequence: Map<DayOfWeek, Int>): SpecialPeriod {
+    private fun calculateSpecialPeriod(
+        name: String,
+        dayOfWeek: DayOfWeek,
+        sunrise: LocalTime,
+        sunset: LocalTime,
+        sequence: Map<DayOfWeek, Int>,
+        auspiciousness: Auspiciousness
+    ): SpecialPeriod {
         val duration = Duration.between(sunrise, sunset)
         val slotDuration = duration.dividedBy(8)
         val slotIndex = sequence[dayOfWeek] ?: 0
         val start = sunrise.plus(slotDuration.multipliedBy(slotIndex.toLong()))
         val end = sunrise.plus(slotDuration.multipliedBy((slotIndex + 1).toLong()))
-        return SpecialPeriod(start, end)
+        return SpecialPeriod(name, start, end, auspiciousness)
     }
-
-    data class SpecialPeriod(val startTime: LocalTime, val endTime: LocalTime)
 
     private val NALLA_NERAM_DAY_SLOTS = mapOf(
         DayOfWeek.SUNDAY to listOf(1, 3),    // 2nd and 4th slots
@@ -244,7 +249,12 @@ object PanchangamCalculator {
     fun calculateAllTimings(dayOfWeek: DayOfWeek, sunrise: LocalTime, sunset: LocalTime): List<Timing> {
         return calculateNallaNeram(dayOfWeek, sunrise, sunset) +
                 calculateGowriNeram(dayOfWeek, sunrise, sunset) +
-                calculateHora(dayOfWeek, sunrise, sunset)
+                calculateHora(dayOfWeek, sunrise, sunset) +
+                listOf(
+                    calculateRahuKalam(dayOfWeek, sunrise, sunset),
+                    calculateYamagandam(dayOfWeek, sunrise, sunset),
+                    calculateKuligai(dayOfWeek, sunrise, sunset)
+                )
     }
 
 }

@@ -32,12 +32,27 @@ class PanchangamCalculatorTest {
     }
 
     @Test
-    fun testRahuKalamForFriday() {
+    fun testSpecialPeriodsForFriday() {
         val sunrise = LocalTime.of(6, 0)
         val sunset = LocalTime.of(18, 0)
-        val rahu = PanchangamCalculator.calculateRahuKalam(DayOfWeek.FRIDAY, sunrise, sunset)
+        val dayOfWeek = DayOfWeek.FRIDAY
         
+        val rahu = PanchangamCalculator.calculateRahuKalam(dayOfWeek, sunrise, sunset)
+        assertEquals("Rahu", rahu.name)
         assertEquals(LocalTime.of(10, 30), rahu.startTime)
         assertEquals(LocalTime.of(12, 0), rahu.endTime)
+        assertEquals(Auspiciousness.DARK_RED, rahu.auspiciousness)
+        
+        val yama = PanchangamCalculator.calculateYamagandam(dayOfWeek, sunrise, sunset)
+        assertEquals("Yama", yama.name)
+        assertEquals(LocalTime.of(15, 0), yama.startTime)
+        assertEquals(LocalTime.of(16, 30), yama.endTime)
+        assertEquals(Auspiciousness.ORANGE, yama.auspiciousness)
+        
+        val kuli = PanchangamCalculator.calculateKuligai(dayOfWeek, sunrise, sunset)
+        assertEquals("Kuli", kuli.name)
+        assertEquals(LocalTime.of(7, 30), kuli.startTime)
+        assertEquals(LocalTime.of(9, 0), kuli.endTime)
+        assertEquals(Auspiciousness.GREY, kuli.auspiciousness)
     }
 }

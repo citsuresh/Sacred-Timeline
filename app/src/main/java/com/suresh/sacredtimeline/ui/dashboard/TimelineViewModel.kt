@@ -37,11 +37,13 @@ class TimelineViewModel : ViewModel() {
         val nallaNeram = timings.filterIsInstance<NallaNeram>()
         val gowriNeram = timings.filterIsInstance<GowriNeram>()
         val hora = timings.filterIsInstance<Hora>()
+        val specialPeriods = timings.filterIsInstance<SpecialPeriod>()
         
         _uiState.value = TimelineUiState.Success(
             nallaNeram = nallaNeram,
             gowriNeram = gowriNeram,
-            hora = hora
+            hora = hora,
+            specialPeriods = specialPeriods
         )
     }
 }
@@ -51,6 +53,7 @@ sealed interface TimelineUiState {
     data class Success(
         val nallaNeram: List<NallaNeram>,
         val gowriNeram: List<GowriNeram>,
-        val hora: List<Hora>
+        val hora: List<Hora>,
+        val specialPeriods: List<SpecialPeriod>
     ) : TimelineUiState
 }

@@ -56,15 +56,24 @@ class MockPanchangamProvider {
             is NallaNeram -> NallaNeram(start, end, original.auspiciousness)
             is GowriNeram -> GowriNeram(original.name, start, end, original.auspiciousness)
             is Hora -> Hora(original.name, start, end, original.auspiciousness)
+            is SpecialPeriod -> SpecialPeriod(original.name, start, end, original.auspiciousness)
         }
     }
 
-    fun getCurrentTimings(date: LocalDate, time: LocalTime): Triple<NallaNeram?, GowriNeram?, Hora?> {
+    fun getCurrentTimings(date: LocalDate, time: LocalTime): SpecialTimings {
         val timings = getTimings(date)
-        return Triple(
-            timings.filterIsInstance<NallaNeram>().find { it.isCurrent(time) },
-            timings.filterIsInstance<GowriNeram>().find { it.isCurrent(time) },
-            timings.filterIsInstance<Hora>().find { it.isCurrent(time) }
+        return SpecialTimings(
+            nallaNeram = timings.filterIsInstance<NallaNeram>().find { it.isCurrent(time) },
+            gowriNeram = timings.filterIsInstance<GowriNeram>().find { it.isCurrent(time) },
+            hora = timings.filterIsInstance<Hora>().find { it.isCurrent(time) },
+            specialPeriod = timings.filterIsInstance<SpecialPeriod>().find { it.isCurrent(time) }
         )
     }
+
+    data class SpecialTimings(
+        val nallaNeram: NallaNeram?,
+        val gowriNeram: GowriNeram?,
+        val hora: Hora?,
+        val specialPeriod: SpecialPeriod?
+    )
 }
