@@ -18,6 +18,7 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import com.suresh.sacredtimeline.logic.MockPanchangamProvider
+import com.suresh.sacredtimeline.logic.SunriseSunsetProvider
 import com.suresh.sacredtimeline.model.Auspiciousness
 import com.suresh.sacredtimeline.ui.theme.*
 import java.time.LocalDate
@@ -27,9 +28,13 @@ class PanchangamWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val provider = MockPanchangamProvider()
+        val sunProvider = SunriseSunsetProvider()
         val now = LocalTime.now()
         val date = LocalDate.now()
-        val timings = provider.getCurrentTimings(date, now)
+        
+        // Use Coimbatore coords for widget default
+        val sunTimes = sunProvider.getSunTimes(11.0168, 76.9558, date)
+        val timings = provider.getCurrentTimings(date, now, sunTimes.sunrise, sunTimes.sunset)
 
         provideContent {
             GlanceTheme {

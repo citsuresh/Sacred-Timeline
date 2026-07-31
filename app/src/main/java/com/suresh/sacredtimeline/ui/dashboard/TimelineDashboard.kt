@@ -2,6 +2,7 @@ package com.suresh.sacredtimeline.ui.dashboard
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -12,6 +13,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.WbSunny
+import androidx.compose.material.icons.filled.WbTwilight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -220,6 +223,7 @@ fun TimelineContent(state: TimelineUiState.Success) {
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
+        SunTimesHeader(state.sunrise, state.sunset, state.isFallback)
         TimelineHeader()
         
         Box(
@@ -239,6 +243,9 @@ fun TimelineContent(state: TimelineUiState.Success) {
                         .height(HOUR_HEIGHT * (END_HOUR - START_HOUR))
                 ) {
                     TimeGrid()
+                    
+                    // Night Shade (Sunset to Sunrise/End of day)
+                    NightShade(sunrise = state.sunrise, sunset = state.sunset)
 
                     Row(modifier = Modifier.fillMaxSize()) {
                         TimeMarkersColumn()
@@ -250,9 +257,136 @@ fun TimelineContent(state: TimelineUiState.Success) {
                         TimelineColumn(timings = state.hora, modifier = Modifier.weight(1f))
                     }
 
+                    // Sun Markers
+                    SunGridMarker(
+                        time = state.sunrise, 
+                        label = "Sunrise", 
+                        icon = Icons.Default.WbSunny, 
+                        iconTint = Color(0xFFFF9800),
+                        isFallback = state.isFallback
+                    )
+                    SunGridMarker(
+                        time = state.sunset, 
+                        label = "Sunset", 
+                        icon = Icons.Default.WbTwilight, 
+                        iconTint = Color(0xFFFF5722),
+                        isFallback = state.isFallback
+                    )
+
                     // Dynamic Current Time Indicator (inside scrollable area)
                     NowIndicator(currentTime)
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun NightShade(sunrise: LocalTime, sunset: LocalTime) {
+    val sunsetOffset = calculateOffset(sunset)
+    val sunriseOffset = calculateOffset(sunrise)
+    
+    // Part 1: Midnight to Sunrise
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(sunriseOffset)
+            .background(Color.Black.copy(alpha = 0.15f))
+    )
+    
+    // Part 2: Sunset to Midnight (End of Day)
+    val dayEndOffset = calculateOffset(LocalTime.MAX)
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .offset(y = sunsetOffset)
+            .height(dayEndOffset - sunsetOffset)
+            .background(Color.Black.copy(alpha = 0.15f))
+    )
+}
+
+@Composable
+fun SunGridMarker(time: LocalTime, label: String, icon: androidx.compose.ui.graphics.vector.ImageVector, iconTint: Color, isFallback: Boolean) {
+    val topOffset = calculateOffset(time)
+    val formatter = DateTimeFormatter.ofPattern("hh:mm a")
+    val sectionLabel = if (label == "Sunrise") "Day Muhurat" else "Night Muhurat"
+    
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .offset(y = topOffset - 14.dp)
+            .padding(start = 4.dp, end = 4.dp)
+    ) {
+        // Full width separator line with glow
+        Canvas(modifier = Modifier.fillMaxWidth().height(2.dp).offset(y = 14.dp)) {
+            // Subtle glow
+            drawRect(
+                color = iconTint.copy(alpha = 0.3f),
+                topLeft = Offset(0f, -4f),
+                size = androidx.compose.ui.geometry.Size(size.width, 10f)
+            )
+            // Solid line
+            drawLine(
+                color = iconTint,
+                start = Offset.Zero,
+                end = Offset(size.width, 0f),
+                strokeWidth = 4f
+            )
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = TIME_COLUMN_WIDTH, end = 12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Left: Section Label
+            Row(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color.Black.copy(alpha = 0.9f))
+                    .border(2.dp, iconTint.copy(alpha = 0.8f), RoundedCornerShape(8.dp))
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = if (label == "Sunrise") "🌅" else "🌇",
+                    fontSize = 12.sp
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = sectionLabel,
+                    color = Color.White,
+                    style = MaterialTheme.typography.labelSmall,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.ExtraBold
+                )
+            }
+
+            // Right: Time Label
+            Row(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color.Black.copy(alpha = 0.9f))
+                    .border(2.dp, iconTint.copy(alpha = 0.8f), RoundedCornerShape(8.dp))
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    icon, 
+                    contentDescription = null, 
+                    modifier = Modifier.size(14.dp),
+                    tint = iconTint
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = "${if (label == "Sunrise") "🌅" else "🌇"} $label: ${time.format(formatter)}${if (isFallback) " (approx)" else ""}",
+                    color = Color.White,
+                    style = MaterialTheme.typography.labelSmall,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.ExtraBold
+                )
             }
         }
     }
@@ -275,8 +409,8 @@ fun BoxScope.NowIndicator(currentTime: LocalTime) {
         shape = RoundedCornerShape(4.dp),
         modifier = Modifier
             .offset(y = topOffset - 10.dp)
-            .padding(end = 8.dp)
-            .align(Alignment.TopEnd)
+            .padding(start = 8.dp)
+            .align(Alignment.TopStart)
     ) {
         Text(
             text = "NOW",
@@ -284,6 +418,45 @@ fun BoxScope.NowIndicator(currentTime: LocalTime) {
             style = MaterialTheme.typography.labelSmall,
             modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
         )
+    }
+}
+
+@Composable
+fun SunTimesHeader(sunrise: LocalTime, sunset: LocalTime, isFallback: Boolean) {
+    val formatter = DateTimeFormatter.ofPattern("hh:mm a")
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f))
+            .padding(vertical = 4.dp, horizontal = 16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                Icons.Default.WbSunny, 
+                contentDescription = null, 
+                modifier = Modifier.size(16.dp),
+                tint = Color(0xFFFF9800)
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text("🌅 Sunrise: ", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSecondaryContainer)
+            Text(sunrise.format(formatter), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondaryContainer)
+        }
+        if (isFallback) {
+            Text("(approximate)", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.error.copy(alpha = 0.7f), fontSize = 10.sp)
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                Icons.Default.WbTwilight, 
+                contentDescription = null, 
+                modifier = Modifier.size(16.dp),
+                tint = Color(0xFFFF5722) // Deep Orange/Sunset color
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text("🌇 Sunset: ", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSecondaryContainer)
+            Text(sunset.format(formatter), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondaryContainer)
+        }
     }
 }
 
