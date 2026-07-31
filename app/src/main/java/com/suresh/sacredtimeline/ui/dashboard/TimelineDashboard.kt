@@ -22,6 +22,10 @@ import androidx.compose.material.icons.filled.Today
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material.icons.filled.WbTwilight
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.filled.Brightness4
+import androidx.compose.material.icons.filled.Block
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -43,6 +47,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.res.painterResource
+import com.suresh.sacredtimeline.R
 import com.suresh.sacredtimeline.model.*
 import com.suresh.sacredtimeline.ui.theme.*
 import kotlinx.coroutines.delay
@@ -744,28 +751,70 @@ fun TimingCard(timing: Timing) {
     val bottomOffset = calculateOffset(timing.endTime)
     val height = bottomOffset - topOffset
 
+    val containerColor = SacredTimelineColors.getTimingColor(timing)
+    val contentColor = SacredTimelineColors.getContentColor(containerColor)
+
     Card(
         modifier = Modifier
-            .padding(horizontal = 4.dp)
+            .padding(horizontal = 4.dp, vertical = 1.dp)
             .offset(y = topOffset)
-            .height(height)
+            .height(height - 2.dp)
             .fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = timing.auspiciousness.toColor().copy(alpha = 0.9f)
+            containerColor = containerColor
         ),
+        border = BorderStroke(1.dp, CardOuterBorderColor),
         shape = RoundedCornerShape(4.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize().padding(2.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .border(BorderStroke(1.dp, CardBorderColor), RoundedCornerShape(4.dp))
+                .padding(2.dp),
+            contentAlignment = Alignment.Center
         ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+            if (height > 40.dp) {
+                when (timing) {
+                    is NallaNeram -> {
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = null,
+                            modifier = Modifier.size(32.dp),
+                            tint = contentColor.copy(alpha = 0.8f)
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                    }
+                    is SpecialPeriod -> {
+                        val iconPainter = when (timing.name) {
+                            "Rahu" -> painterResource(R.drawable.ic_rahu)
+                            "Kuli Dawn", "Kuli Dusk" -> painterResource(R.drawable.ic_saturn)
+                            else -> null
+                        }
+
+                        if (iconPainter != null) {
+                            Icon(
+                                painter = iconPainter,
+                                contentDescription = null,
+                                modifier = Modifier.size(32.dp),
+                                tint = contentColor.copy(alpha = 0.8f)
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                        }
+                    }
+                    else -> {}
+                }
+            }
+
             val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
             Text(
                 text = "${timing.startTime.format(timeFormatter)} - ${timing.endTime.format(timeFormatter)}",
                 style = MaterialTheme.typography.labelSmall,
-                color = Color.White,
+                color = contentColor,
                 fontSize = 9.sp,
                 maxLines = 1
             )
@@ -779,22 +828,13 @@ fun TimingCard(timing: Timing) {
                 text = label,
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = contentColor,
                 textAlign = TextAlign.Center,
                 maxLines = 1
             )
         }
     }
 }
-
-private fun Auspiciousness.toColor(): Color = when (this) {
-    Auspiciousness.GREEN -> AuspiciousGreen
-    Auspiciousness.BLUE -> AuspiciousBlue
-    Auspiciousness.RED -> InauspiciousRed
-    Auspiciousness.AMBER -> CautionAmber
-    Auspiciousness.DARK_RED -> RahuRed
-    Auspiciousness.ORANGE -> YamaOrange
-    Auspiciousness.GREY -> KuligaiGrey
 }
 
 private fun calculateOffset(time: LocalTime): Dp {

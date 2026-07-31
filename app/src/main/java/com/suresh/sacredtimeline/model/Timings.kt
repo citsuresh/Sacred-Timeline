@@ -13,6 +13,7 @@ sealed interface Timing {
 }
 
 data class NallaNeram(
+    val name: String,
     override val startTime: LocalTime,
     override val endTime: LocalTime,
     override val auspiciousness: Auspiciousness

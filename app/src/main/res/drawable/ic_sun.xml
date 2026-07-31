@@ -1,0 +1,62 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="400"
+    android:viewportHeight="400">
+    <group
+        android:translateX="200"
+        android:translateY="200">
+        <!-- Central Solar Core -->
+        <path
+            android:fillColor="#e67e22"
+            android:pathData="M0,0m-60,0a60,60 0,1 1,120 0a60,60 0,1 1,-120 0" />
+
+        <!-- Primary Pointed Sharp Rays -->
+        <group android:fillColor="#e67e22">
+            <path android:pathData="M-20,-75 L0,-130 L20,-75 Z" />
+            <path android:pathData="M-20,75 L0,130 L20,75 Z" />
+            <path android:pathData="M-75,-20 L-130,0 L-75,20 Z" />
+            <path android:pathData="M75,-20 L130,0 L75,20 Z" />
+            <path android:pathData="M-35,-50 L-85,-85 L-50,-35 Z" />
+            <path android:pathData="M35,-50 L85,-85 L50,-35 Z" />
+            <path android:pathData="M-35,50 L-85,85 L-50,35 Z" />
+            <path android:pathData="M35,50 L85,85 L50,35 Z" />
+        </group>
+
+        <!-- Secondary Wave/Flame Flares -->
+        <group android:fillColor="#d4ac0d">
+            <group android:rotation="22.5">
+                <path android:pathData="M0,-65 C-25,-95 -15,-115 -5,-115 C10,-115 15,-95 0,-65 Z" />
+            </group>
+            <group android:rotation="67.5">
+                <path android:pathData="M0,-65 C-25,-95 -15,-115 -5,-115 C10,-115 15,-95 0,-65 Z" />
+            </group>
+            <group android:rotation="112.5">
+                <path android:pathData="M0,-65 C-25,-95 -15,-115 -5,-115 C10,-115 15,-95 0,-65 Z" />
+            </group>
+            <group android:rotation="157.5">
+                <path android:pathData="M0,-65 C-25,-95 -15,-115 -5,-115 C10,-115 15,-95 0,-65 Z" />
+            </group>
+            <group android:rotation="202.5">
+                <path android:pathData="M0,-65 C-25,-95 -15,-115 -5,-115 C10,-115 15,-95 0,-65 Z" />
+            </group>
+            <group android:rotation="247.5">
+                <path android:pathData="M0,-65 C-25,-95 -15,-115 -5,-115 C10,-115 15,-95 0,-65 Z" />
+            </group>
+            <group android:rotation="292.5">
+                <path android:pathData="M0,-65 C-25,-95 -15,-115 -5,-115 C10,-115 15,-95 0,-65 Z" />
+            </group>
+            <group android:rotation="337.5">
+                <path android:pathData="M0,-65 C-25,-95 -15,-115 -5,-115 C10,-115 15,-95 0,-65 Z" />
+            </group>
+        </group>
+
+        <!-- Central Bindu / Concentric Core Rim -->
+        <path
+            android:fillColor="#d4ac0d"
+            android:pathData="M0,0m-35,0a35,35 0,1 1,70 0a35,35 0,1 1,-70 0" />
+        <path
+            android:fillColor="#b03a2e"
+            android:pathData="M0,0m-15,0a15,15 0,1 1,30 0a15,15 0,1 1,-30 0" />
+    </group>
+</vector>

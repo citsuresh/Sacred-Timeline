@@ -1,0 +1,16 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="400"
+    android:viewportHeight="400">
+    <!-- Yama's Buffalo Mascot -->
+    <path
+        android:fillColor="#111111"
+        android:pathData="M60,110 C100,100 135,135 160,170 C175,160 188,155 200,155 C212,155 225,160 240,170 C265,135 300,100 340,110 C365,115 360,145 330,185 C300,225 270,250 260,270 C245,295 225,325 200,325 C175,325 155,295 140,270 C130,250 100,225 70,185 C40,145 35,115 60,110 Z" />
+    <path
+        android:fillColor="#111111"
+        android:pathData="M125,260 C110,290 90,320 60,330 L120,330 Z" />
+    <path
+        android:fillColor="#111111"
+        android:pathData="M275,260 C290,290 310,320 340,330 L280,330 Z" />
+</vector>

@@ -17,9 +17,12 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
+import androidx.glance.action.actionStartActivity
+import androidx.glance.action.clickable
+import com.suresh.sacredtimeline.MainActivity
 import com.suresh.sacredtimeline.logic.MockPanchangamProvider
 import com.suresh.sacredtimeline.logic.SunriseSunsetProvider
-import com.suresh.sacredtimeline.model.Auspiciousness
+import com.suresh.sacredtimeline.model.*
 import com.suresh.sacredtimeline.ui.theme.*
 import java.time.LocalDate
 import java.time.LocalTime
@@ -31,7 +34,7 @@ class PanchangamWidget : GlanceAppWidget() {
         val sunProvider = SunriseSunsetProvider()
         val now = LocalTime.now()
         val date = LocalDate.now()
-        
+
         // Use Coimbatore coords for widget default
         val sunTimes = sunProvider.getSunTimes(11.0168, 76.9558, date)
         val timings = provider.getCurrentTimings(date, now, sunTimes.sunrise, sunTimes.sunset)
@@ -39,14 +42,10 @@ class PanchangamWidget : GlanceAppWidget() {
         provideContent {
             GlanceTheme {
                 WidgetContent(
-                    nallaLabel = timings.nallaNeram?.let { "Active" } ?: "None",
-                    nallaAusp = timings.nallaNeram?.auspiciousness,
-                    gowriLabel = timings.gowriNeram?.name ?: "None",
-                    gowriAusp = timings.gowriNeram?.auspiciousness,
-                    horaLabel = timings.hora?.name ?: "None",
-                    horaAusp = timings.hora?.auspiciousness,
-                    specialLabel = timings.specialPeriod?.name ?: "None",
-                    specialAusp = timings.specialPeriod?.auspiciousness
+                    nallaNeram = timings.nallaNeram,
+                    gowriNeram = timings.gowriNeram,
+                    hora = timings.hora,
+                    specialPeriod = timings.specialPeriod
                 )
             }
         }
@@ -54,22 +53,31 @@ class PanchangamWidget : GlanceAppWidget() {
 
     @Composable
     private fun WidgetContent(
-        nallaLabel: String, nallaAusp: Auspiciousness?,
-        gowriLabel: String, gowriAusp: Auspiciousness?,
-        horaLabel: String, horaAusp: Auspiciousness?,
-        specialLabel: String, specialAusp: Auspiciousness?
+        nallaNeram: NallaNeram?,
+        gowriNeram: GowriNeram?,
+        hora: Hora?,
+        specialPeriod: SpecialPeriod?
     ) {
         Row(
             modifier = GlanceModifier
                 .fillMaxSize()
-                .background(GlanceTheme.colors.surface),
+                .background(Color.Transparent)
+                .clickable(actionStartActivity<MainActivity>()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            TimingColumn("Nalla", nallaLabel, nallaAusp, GlanceModifier.defaultWeight())
-            TimingColumn("Gowri", gowriLabel, gowriAusp, GlanceModifier.defaultWeight())
-            TimingColumn("Hora", horaLabel, horaAusp, GlanceModifier.defaultWeight())
-            TimingColumn("Special", specialLabel, specialAusp, GlanceModifier.defaultWeight())
+            // First Column: Neram (Nalla or Special)
+            val neramTiming = specialPeriod ?: nallaNeram
+            val neramLabel = specialPeriod?.name ?: nallaNeram?.let { "Nalla" } ?: "None"
+
+            TimingColumn("Neram", neramLabel, neramTiming, GlanceModifier.defaultWeight())
+            TimingColumn(
+                "Gowri",
+                gowriNeram?.name ?: "None",
+                gowriNeram,
+                GlanceModifier.defaultWeight()
+            )
+            TimingColumn("Hora", hora?.name ?: "None", hora, GlanceModifier.defaultWeight())
         }
     }
 
@@ -77,45 +85,55 @@ class PanchangamWidget : GlanceAppWidget() {
     private fun TimingColumn(
         title: String,
         label: String,
-        auspiciousness: Auspiciousness?,
+        timing: Timing?,
         modifier: GlanceModifier = GlanceModifier
     ) {
-        val backgroundColor = when (auspiciousness) {
-            Auspiciousness.GREEN -> AuspiciousGreen
-            Auspiciousness.BLUE -> AuspiciousBlue
-            Auspiciousness.RED -> InauspiciousRed
-            Auspiciousness.AMBER -> CautionAmber
-            Auspiciousness.DARK_RED -> RahuRed
-            Auspiciousness.ORANGE -> YamaOrange
-            Auspiciousness.GREY -> KuligaiGrey
-            null -> Color.Gray
-        }
+        val backgroundColor = timing?.let { SacredTimelineColors.getTimingColor(it) } ?: Color.Gray
+        val contentColor = SacredTimelineColors.getContentColor(backgroundColor)
 
-        Column(
+        Box(
             modifier = modifier
                 .fillMaxHeight()
                 .padding(4.dp)
                 .cornerRadius(8.dp)
-                .background(backgroundColor),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalAlignment = Alignment.CenterVertically
+                .background(CardOuterBorderColor),
+            contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = title,
-                style = TextStyle(
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = ColorProvider(Color.White)
-                )
-            )
-            Spacer(modifier = GlanceModifier.height(4.dp))
-            Text(
-                text = label,
-                style = TextStyle(
-                    fontSize = 14.sp,
-                    color = ColorProvider(Color.White)
-                )
-            )
+            Box(
+                modifier = GlanceModifier
+                    .fillMaxSize()
+                    .padding(1.dp)
+                    .cornerRadius(7.dp)
+                    .background(CardBorderColor),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    modifier = GlanceModifier
+                        .fillMaxSize()
+                        .padding(1.dp)
+                        .cornerRadius(6.dp)
+                        .background(backgroundColor),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = title,
+                        style = TextStyle(
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = ColorProvider(contentColor)
+                        )
+                    )
+                    Spacer(modifier = GlanceModifier.height(4.dp))
+                    Text(
+                        text = label,
+                        style = TextStyle(
+                            fontSize = 14.sp,
+                            color = ColorProvider(contentColor)
+                        )
+                    )
+                }
+            }
         }
     }
 }

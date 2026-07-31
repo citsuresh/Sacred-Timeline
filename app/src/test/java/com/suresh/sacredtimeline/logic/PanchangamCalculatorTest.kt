@@ -50,7 +50,7 @@ class PanchangamCalculatorTest {
         assertEquals(Auspiciousness.ORANGE, yama.auspiciousness)
         
         val kuli = PanchangamCalculator.calculateKuligai(dayOfWeek, sunrise, sunset)
-        assertEquals("Kuli", kuli.name)
+        assertEquals("Kuli Dawn", kuli.name)
         assertEquals(LocalTime.of(7, 30), kuli.startTime)
         assertEquals(LocalTime.of(9, 0), kuli.endTime)
         assertEquals(Auspiciousness.GREY, kuli.auspiciousness)

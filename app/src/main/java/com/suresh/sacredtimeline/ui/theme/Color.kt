@@ -10,12 +10,28 @@ val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
-val AuspiciousGreen = Color(0xFF4CAF50)
-val AuspiciousBlue = Color(0xFF2196F3)
-val InauspiciousRed = Color(0xFFF44336)
-val CautionAmber = Color(0xFFFFC107)
+// Sacred Timeline Palette - Screenshot Accurate
+val NallaMorningGreen = Color(0xFF7CB342)
+val NallaEveningGreen = Color(0xFF33691E)
 
-val RahuRed = Color(0xFF8B0000)
-val YamaOrange = Color(0xFFFF8C00)
-val KuligaiGrey = Color(0xFF808080)
+val GowriStandardGreen = Color(0xFF7CB342)
+val GowriAmridhaBest = Color(0xFF33691E)
+val GowriStandardRed = Color(0xFFD32F2F)
+val GowriUthiBlue = Color(0xFF4FC3F7) // Keeping a distinct blue for Uthi as per initial request, though screenshot shows green.
+
+val HoraSaturn = Color(0xFF616161)
+val HoraJupiter = Color(0xFFFDD835)
+val HoraMars = Color(0xFFB71C1C)
+val HoraSun = Color(0xFFD32F2F)
+val HoraVenus = Color(0xFFF5F5F5)
+val HoraMercury = Color(0xFF43A047)
+val HoraMoon = Color(0xFFFFFFFF)
+
+val RahuBrightRed = Color(0xFFFF0000)
+val YamaMaroon = Color(0xFF800000)
+val KuliDawnGrey = Color(0xFFBDBDBD)
+val KuliDuskGrey = Color(0xFF616161)
+
 val SeparatorGrey = Color(0xFFCCCCCC)
+val CardBorderColor = Color(0xFF000000)
+val CardOuterBorderColor = Color(0xFFFFFFFF)

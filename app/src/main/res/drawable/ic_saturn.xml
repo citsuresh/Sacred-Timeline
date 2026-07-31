@@ -1,0 +1,39 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="400"
+    android:viewportHeight="400">
+    <group
+        android:translateX="200"
+        android:translateY="200">
+        <!-- Back part of the thick ring -->
+        <path
+            android:fillAlpha="0.6"
+            android:fillColor="#2c3e50"
+            android:pathData="M-160,-20 C-120,-60 120,-60 160,-20 C170,-10 150,5 120,5 C60,-15 -60,-15 -120,5 C-150,5 -170,-10 -160,-20 Z" />
+
+        <!-- Central Planet Sphere -->
+        <path
+            android:fillColor="#2c3e50"
+            android:pathData="M0,0m-75,0a75,75 0,1 1,150 0a75,75 0,1 1,-150 0" />
+
+        <!-- 4 Concentric Core Growth Points -->
+        <path
+            android:fillColor="#ffffff"
+            android:pathData="M0,-40m-10,0a10,10 0,1 1,20 0a10,10 0,1 1,-20 0" />
+        <path
+            android:fillColor="#ffffff"
+            android:pathData="M0,40m-10,0a10,10 0,1 1,20 0a10,10 0,1 1,-20 0" />
+        <path
+            android:fillColor="#ffffff"
+            android:pathData="M-40,0m-10,0a10,10 0,1 1,20 0a10,10 0,1 1,-20 0" />
+        <path
+            android:fillColor="#ffffff"
+            android:pathData="M40,0m-10,0a10,10 0,1 1,20 0a10,10 0,1 1,-20 0" />
+
+        <!-- Front part of the thick ring -->
+        <path
+            android:fillColor="#b8860b"
+            android:pathData="M160,-20 C140,30 70,65 0,65 C-70,65 -140,30 -160,-20 C-175,-35 -140,-10 -100,5 C-50,25 50,25 100,5 C140,-10 175,-35 160,-20 Z" />
+    </group>
+</vector>

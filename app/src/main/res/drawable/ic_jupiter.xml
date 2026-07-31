@@ -1,0 +1,35 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="400"
+    android:viewportHeight="400">
+    <group
+        android:translateX="200"
+        android:translateY="200">
+        <!-- Outer Aura -->
+        <path
+            android:strokeAlpha="0.3"
+            android:strokeColor="#e67e22"
+            android:strokeWidth="6"
+            android:pathData="M0,0m-145,0a145,145 0,1 1,290 0a145,145 0,1 1,-290 0" />
+
+        <!-- Radiant Core -->
+        <path
+            android:strokeColor="#d4ac0d"
+            android:strokeWidth="10"
+            android:pathData="M0,0m-120,0a120,120 0,1 1,240 0a120,120 0,1 1,-240 0" />
+
+        <!-- Jupiter Glyph -->
+        <path
+            android:strokeColor="#b03a2e"
+            android:strokeWidth="26"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round"
+            android:pathData="M-50,-65 C-50,-65 -85,-35 -85,0 C-85,35 -55,60 -15,60 L55,60 M15,-65 L15,95 M-15,0 L55,0" />
+
+        <!-- Central Bindu -->
+        <path
+            android:fillColor="#d4ac0d"
+            android:pathData="M15,0m-13,0a13,13 0,1 1,26 0a13,13 0,1 1,-26 0" />
+    </group>
+</vector>

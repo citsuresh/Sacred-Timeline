@@ -77,7 +77,9 @@ object PanchangamCalculator {
     }
 
     fun calculateKuligai(dayOfWeek: DayOfWeek, sunrise: LocalTime, sunset: LocalTime): SpecialPeriod {
-        return calculateSpecialPeriod("Kuli", dayOfWeek, sunrise, sunset, KULI_SEQUENCE, Auspiciousness.GREY)
+        val period = calculateSpecialPeriod("Kuli", dayOfWeek, sunrise, sunset, KULI_SEQUENCE, Auspiciousness.GREY)
+        val name = if (period.startTime.isBefore(LocalTime.NOON)) "Kuli Dawn" else "Kuli Dusk"
+        return period.copy(name = name)
     }
 
     private fun calculateSpecialPeriod(
@@ -153,7 +155,8 @@ object PanchangamCalculator {
                     }
 
                     if (Duration.between(start, end).toMinutes() >= 30) {
-                        result.add(NallaNeram(start, end, Auspiciousness.GREEN))
+                        val name = if (start.isBefore(LocalTime.NOON)) "Morning" else "Evening"
+                        result.add(NallaNeram(name, start, end, Auspiciousness.GREEN))
                     }
                 }
             }

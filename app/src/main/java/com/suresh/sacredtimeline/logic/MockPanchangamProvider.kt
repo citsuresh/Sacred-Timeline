@@ -49,7 +49,7 @@ class MockPanchangamProvider {
 
     private fun createTiming(original: Timing, start: LocalTime, end: LocalTime): Timing {
         return when (original) {
-            is NallaNeram -> NallaNeram(start, end, original.auspiciousness)
+            is NallaNeram -> NallaNeram(original.name, start, end, original.auspiciousness)
             is GowriNeram -> GowriNeram(original.name, start, end, original.auspiciousness)
             is Hora -> Hora(original.name, start, end, original.auspiciousness)
             is SpecialPeriod -> SpecialPeriod(original.name, start, end, original.auspiciousness)
