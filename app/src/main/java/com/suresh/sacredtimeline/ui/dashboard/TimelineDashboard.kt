@@ -242,6 +242,7 @@ fun TimelineContent(state: TimelineUiState.Success) {
 
                     Row(modifier = Modifier.fillMaxSize()) {
                         TimeMarkersColumn()
+                        Box(modifier = Modifier.fillMaxHeight().width(1.dp).background(SeparatorGrey))
                         TimelineColumn(timings = state.nallaNeram + state.specialPeriods, modifier = Modifier.weight(1f))
                         VerticalDivider(thickness = 1.dp, color = Color.LightGray.copy(alpha = 0.3f))
                         TimelineColumn(timings = state.gowriNeram, modifier = Modifier.weight(1f))
@@ -293,8 +294,10 @@ fun TimelineHeader() {
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .padding(vertical = 12.dp)
+            .height(IntrinsicSize.Min)
     ) {
         Spacer(modifier = Modifier.width(TIME_COLUMN_WIDTH))
+        Box(modifier = Modifier.fillMaxHeight().width(1.dp).background(SeparatorGrey))
         Text("Neram", modifier = Modifier.weight(1f), textAlign = TextAlign.Center, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
         Text("Gowri Neram", modifier = Modifier.weight(1f), textAlign = TextAlign.Center, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
         Text("Hora", modifier = Modifier.weight(1f), textAlign = TextAlign.Center, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
@@ -326,8 +329,9 @@ fun TimeMarkersColumn() {
                         .padding(end = 8.dp),
                     textAlign = TextAlign.End,
                     style = MaterialTheme.typography.labelSmall,
-                    color = Color.Gray,
-                    fontSize = 10.sp
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 11.sp
                 )
             }
         }

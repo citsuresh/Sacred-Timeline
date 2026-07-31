@@ -6,9 +6,9 @@
 The Sacred Timeline app is a functional utility for tracking Panchangam timings with a modern, expressive UI.
 
 ## Recently Modified
-- **Timeline Coverage**: Expanded to a full 24-hour vertical scroll.
-- **Gowri Labels**: Refined labels and sequences for all 8 day/night slots.
-- **Auto-Scroll**: Implemented logic to center the timeline on the current time.
+- **Inauspicious Periods**: Added Rahu Kalam, Yamagandam, and Kuligai calculations and UI indicators.
+- **Unified Timeline**: Merged Nalla Neram and Special periods into a single "Neram" column.
+- **Widget Update**: Integrated special periods into the Jetpack Glance Home Screen Widget.
 
 ## Next Focus
 - **Session Persistence**: Storing user preferences and scroll positions.
