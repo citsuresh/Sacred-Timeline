@@ -12,10 +12,17 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.Info
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Today
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material.icons.filled.WbTwilight
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -50,7 +57,7 @@ private val START_HOUR = 0
 private val END_HOUR = 24
 private val TIME_COLUMN_WIDTH = 60.dp
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun TimelineDashboard(
     modifier: Modifier = Modifier,
@@ -162,51 +169,45 @@ fun TimelineDashboard(
         )
     }
 
+    val dates = remember {
+        (-30..30).map { LocalDate.now().plusDays(it.toLong()) }
+    }
+    val initialPage = dates.indexOf(selectedDate).coerceAtLeast(0)
+    val pagerState = rememberPagerState(initialPage = initialPage, pageCount = { dates.size })
+
+    // Sync Pager with selectedDate from external sources (DatePicker, Dial)
+    LaunchedEffect(selectedDate) {
+        val page = dates.indexOf(selectedDate)
+        if (page != -1 && page != pagerState.currentPage) {
+            pagerState.animateScrollToPage(page)
+        }
+    }
+
+    // Sync selectedDate with Pager swipe
+    LaunchedEffect(pagerState.currentPage) {
+        val date = dates[pagerState.currentPage]
+        if (date != selectedDate) {
+            viewModel.updateDate(date)
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { 
-                    Column {
-                        Text("Sacred Timeline", style = MaterialTheme.typography.titleLarge)
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.clickable { 
-                                if (uiState is TimelineUiState.Success) {
-                                    manualLocationName = (uiState as TimelineUiState.Success).locationName
-                                    showLocationDialog = true
-                                }
-                            }
-                        ) {
-                            Text(
-                                text = selectedDate.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")),
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                            if (uiState is TimelineUiState.Success) {
-                                val successState = uiState as TimelineUiState.Success
-                                val isUnknown = successState.locationName == "Unknown Location"
-                                
-                                Text(
-                                    text = " • ${if (successState.isLocationAuto) "📍" else "✎"} ${successState.locationName}",
-                                    style = if (successState.isLocationAuto) MaterialTheme.typography.bodySmall else MaterialTheme.typography.bodySmall.copy(fontStyle = androidx.compose.ui.text.font.FontStyle.Italic),
-                                    color = if (isUnknown) MaterialTheme.colorScheme.error.copy(alpha = 0.8f) else MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-                                )
-                                
-                                if (isUnknown) {
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Icon(
-                                        imageVector = Icons.Default.Info,
-                                        contentDescription = "Location Info",
-                                        modifier = Modifier.size(12.dp),
-                                        tint = MaterialTheme.colorScheme.error.copy(alpha = 0.7f)
-                                    )
-                                }
-                            }
-                        }
-                    }
+                    Text(
+                        text = "Sacred Timeline",
+                        style = MaterialTheme.typography.titleLarge,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 },
                 actions = {
+                    IconButton(onClick = { viewModel.updateDate(LocalDate.now()) }) {
+                        Icon(Icons.Filled.Today, contentDescription = "Today")
+                    }
                     IconButton(onClick = { showDatePicker = true }) {
-                        Icon(Icons.Default.CalendarToday, contentDescription = "Select Date")
+                        Icon(Icons.Default.CalendarMonth, contentDescription = "Select Date")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -218,8 +219,46 @@ fun TimelineDashboard(
         }
     ) { padding ->
         Column(modifier = modifier.padding(padding)) {
+            // Dedicated Date & Location Info Row
+            Surface(
+                color = MaterialTheme.colorScheme.primaryContainer,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        text = selectedDate.format(DateTimeFormatter.ofPattern("MMM dd, yyyy")),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        maxLines = 1,
+                        modifier = Modifier.clickable { showDatePicker = true }
+                    )
+                    if (uiState is TimelineUiState.Success) {
+                        val successState = uiState as TimelineUiState.Success
+                        val isUnknown = successState.locationName == "Unknown Location"
+                        
+                        Text(
+                            text = " • ${if (successState.isLocationAuto) "📍" else "✎"} ${successState.locationName}",
+                            style = if (successState.isLocationAuto) MaterialTheme.typography.labelLarge else MaterialTheme.typography.labelLarge.copy(fontStyle = androidx.compose.ui.text.font.FontStyle.Italic),
+                            color = if (isUnknown) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier
+                                .weight(1f, fill = false)
+                                .clickable { 
+                                    manualLocationName = successState.locationName
+                                    showLocationDialog = true 
+                                }
+                        )
+                    }
+                }
+            }
+
             HorizontalDateDial(
                 selectedDate = selectedDate,
+                dates = dates,
                 onDateSelected = { viewModel.updateDate(it) }
             )
             
@@ -229,7 +268,20 @@ fun TimelineDashboard(
                         CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                     }
                     is TimelineUiState.Success -> {
-                        TimelineContent(state)
+                        HorizontalPager(
+                            state = pagerState,
+                            modifier = Modifier.fillMaxSize()
+                        ) { page ->
+                            val date = dates[page]
+                            val dayData = state.days[date]
+                            if (dayData != null) {
+                                TimelineContent(date, dayData)
+                            } else {
+                                Box(modifier = Modifier.fillMaxSize()) {
+                                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -240,12 +292,10 @@ fun TimelineDashboard(
 @Composable
 fun HorizontalDateDial(
     selectedDate: LocalDate,
+    dates: List<LocalDate>,
     onDateSelected: (LocalDate) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val dates = remember {
-        (-30..30).map { LocalDate.now().plusDays(it.toLong()) }
-    }
     val scrollState = rememberLazyListState()
 
     LaunchedEffect(selectedDate) {
@@ -255,21 +305,45 @@ fun HorizontalDateDial(
         }
     }
 
-    LazyRow(
-        state = scrollState,
+    Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
-            .padding(vertical = 8.dp),
-        contentPadding = PaddingValues(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        items(dates) { date ->
-            DateItem(
-                date = date,
-                isSelected = date == selectedDate,
-                onClick = { onDateSelected(date) }
+        IconButton(onClick = { onDateSelected(selectedDate.minusDays(1)) }) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Previous Day",
+                modifier = Modifier.size(20.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
+
+        LazyRow(
+            state = scrollState,
+            modifier = Modifier
+                .weight(1f)
+                .padding(vertical = 8.dp),
+            contentPadding = PaddingValues(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            items(dates) { date ->
+                DateItem(
+                    date = date,
+                    isSelected = date == selectedDate,
+                    onClick = { onDateSelected(date) }
+                )
+            }
+        }
+
+        IconButton(onClick = { onDateSelected(selectedDate.plusDays(1)) }) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                contentDescription = "Next Day",
+                modifier = Modifier.size(20.dp),
+                tint = MaterialTheme.colorScheme.primary
             )
         }
     }
@@ -307,23 +381,26 @@ fun DateItem(
 }
 
 @Composable
-fun TimelineContent(state: TimelineUiState.Success) {
+fun TimelineContent(date: LocalDate, dayData: DayData) {
     val scrollState = rememberScrollState()
     val density = LocalDensity.current
     var containerHeight by remember { mutableStateOf(0) }
     
     var currentTime by remember { mutableStateOf(LocalTime.now()) }
+    val isToday = date == LocalDate.now()
     
-    LaunchedEffect(Unit) {
-        while (true) {
-            currentTime = LocalTime.now()
-            delay(60000 - (System.currentTimeMillis() % 60000))
+    LaunchedEffect(isToday) {
+        if (isToday) {
+            while (true) {
+                currentTime = LocalTime.now()
+                delay(60000 - (System.currentTimeMillis() % 60000))
+            }
         }
     }
     
-    // Auto-scroll to current time on first launch
+    // Auto-scroll to current time on first launch for today
     LaunchedEffect(containerHeight) {
-        if (containerHeight > 0) {
+        if (containerHeight > 0 && isToday) {
             val nowOffset = with(density) { calculateOffset(currentTime).toPx() }
             val centerOffset = containerHeight / 2
             scrollState.scrollTo((nowOffset - centerOffset).toInt().coerceAtLeast(0))
@@ -331,7 +408,7 @@ fun TimelineContent(state: TimelineUiState.Success) {
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        SunTimesHeader(state.sunrise, state.sunset, state.isFallback)
+        SunTimesHeader(dayData.sunrise, dayData.sunset, dayData.isFallback)
         TimelineHeader()
         
         Box(
@@ -353,36 +430,38 @@ fun TimelineContent(state: TimelineUiState.Success) {
                     TimeGrid()
                     
                     // Night Shade (Sunset to Sunrise/End of day)
-                    NightShade(sunrise = state.sunrise, sunset = state.sunset)
+                    NightShade(sunrise = dayData.sunrise, sunset = dayData.sunset)
 
                     Row(modifier = Modifier.fillMaxSize()) {
                         TimeMarkersColumn()
                         Box(modifier = Modifier.fillMaxHeight().width(1.dp).background(SeparatorGrey))
-                        TimelineColumn(timings = state.nallaNeram + state.specialPeriods, modifier = Modifier.weight(1f))
+                        TimelineColumn(timings = dayData.nallaNeram + dayData.specialPeriods, modifier = Modifier.weight(1f))
                         VerticalDivider(thickness = 1.dp, color = Color.LightGray.copy(alpha = 0.3f))
-                        TimelineColumn(timings = state.gowriNeram, modifier = Modifier.weight(1f))
+                        TimelineColumn(timings = dayData.gowriNeram, modifier = Modifier.weight(1f))
                         VerticalDivider(thickness = 1.dp, color = Color.LightGray.copy(alpha = 0.3f))
-                        TimelineColumn(timings = state.hora, modifier = Modifier.weight(1f))
+                        TimelineColumn(timings = dayData.hora, modifier = Modifier.weight(1f))
                     }
 
                     // Sun Markers
                     SunGridMarker(
-                        time = state.sunrise, 
+                        time = dayData.sunrise, 
                         label = "Sunrise", 
                         icon = Icons.Default.WbSunny, 
                         iconTint = Color(0xFFFF9800),
-                        isFallback = state.isFallback
+                        isFallback = dayData.isFallback
                     )
                     SunGridMarker(
-                        time = state.sunset, 
+                        time = dayData.sunset, 
                         label = "Sunset", 
                         icon = Icons.Default.WbTwilight, 
                         iconTint = Color(0xFFFF5722),
-                        isFallback = state.isFallback
+                        isFallback = dayData.isFallback
                     )
 
                     // Dynamic Current Time Indicator (inside scrollable area)
-                    NowIndicator(currentTime)
+                    if (isToday) {
+                        NowIndicator(currentTime)
+                    }
                 }
             }
         }

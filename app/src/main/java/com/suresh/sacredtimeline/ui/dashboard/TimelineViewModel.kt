@@ -37,10 +37,12 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
     private val _uiState = MutableStateFlow<TimelineUiState>(TimelineUiState.Loading)
     val uiState: StateFlow<TimelineUiState> = _uiState
 
+    private val cachedDays = mutableMapOf<LocalDate, DayData>()
+
     init {
         viewModelScope.launch {
             selectedDate.collect { date ->
-                loadData(date)
+                preloadData(date)
             }
         }
     }
@@ -58,7 +60,8 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
                     currentLocation = Pair(location.latitude, location.longitude)
                     locationName = getAddressFromLocation(location.latitude, location.longitude)
                     isLocationAuto = locationName != "Unknown Location"
-                    loadData(selectedDate.value)
+                    cachedDays.clear() // Clear cache on location change
+                    preloadData(selectedDate.value)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -85,48 +88,66 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
     fun updateManualLocation(name: String) {
         locationName = name
         isLocationAuto = false
-        loadData(selectedDate.value)
+        cachedDays.clear() // Clear cache on location change
+        preloadData(selectedDate.value)
     }
 
-    private fun loadData(date: LocalDate) {
+    private fun preloadData(centerDate: LocalDate) {
         viewModelScope.launch {
-            _uiState.value = TimelineUiState.Loading
+            // Ensure at least the current date is loading if no data
+            if (cachedDays.isEmpty()) {
+                _uiState.value = TimelineUiState.Loading
+            }
+
+            // Fetch range: -3 to +3 days
+            val datesToLoad = (-3..3).map { centerDate.plusDays(it.toLong()) }
             
-            val (lat, lng) = currentLocation
-            
-            val sunResult = sunProvider.getSunTimes(lat, lng, date)
-            val timings = provider.getTimings(date, sunResult.sunrise, sunResult.sunset)
-            
-            val nallaNeram = timings.filterIsInstance<NallaNeram>()
-            val gowriNeram = timings.filterIsInstance<GowriNeram>()
-            val hora = timings.filterIsInstance<Hora>()
-            val specialPeriods = timings.filterIsInstance<SpecialPeriod>()
-            
+            datesToLoad.forEach { date ->
+                if (!cachedDays.containsKey(date)) {
+                    val dayData = fetchDayData(date)
+                    cachedDays[date] = dayData
+                }
+            }
+
             _uiState.value = TimelineUiState.Success(
-                nallaNeram = nallaNeram,
-                gowriNeram = gowriNeram,
-                hora = hora,
-                specialPeriods = specialPeriods,
-                sunrise = sunResult.sunrise,
-                sunset = sunResult.sunset,
-                isFallback = sunResult.isFallback,
+                days = cachedDays.toMap(),
                 locationName = locationName,
                 isLocationAuto = isLocationAuto
             )
         }
     }
+
+    private suspend fun fetchDayData(date: LocalDate): DayData {
+        val (lat, lng) = currentLocation
+        val sunResult = sunProvider.getSunTimes(lat, lng, date)
+        val timings = provider.getTimings(date, sunResult.sunrise, sunResult.sunset)
+        
+        return DayData(
+            nallaNeram = timings.filterIsInstance<NallaNeram>(),
+            gowriNeram = timings.filterIsInstance<GowriNeram>(),
+            hora = timings.filterIsInstance<Hora>(),
+            specialPeriods = timings.filterIsInstance<SpecialPeriod>(),
+            sunrise = sunResult.sunrise,
+            sunset = sunResult.sunset,
+            isFallback = sunResult.isFallback
+        )
+    }
 }
+
+data class DayData(
+    val nallaNeram: List<NallaNeram>,
+    val gowriNeram: List<GowriNeram>,
+    val hora: List<Hora>,
+    val specialPeriods: List<SpecialPeriod>,
+    val sunrise: LocalTime,
+    val sunset: LocalTime,
+    val isFallback: Boolean
+)
 
 sealed interface TimelineUiState {
     data object Loading : TimelineUiState
     data class Success(
-        val nallaNeram: List<NallaNeram>,
-        val gowriNeram: List<GowriNeram>,
-        val hora: List<Hora>,
-        val specialPeriods: List<SpecialPeriod>,
-        val sunrise: LocalTime,
-        val sunset: LocalTime,
-        val isFallback: Boolean,
+        val days: Map<LocalDate, DayData>,
         val locationName: String,
         val isLocationAuto: Boolean
     ) : TimelineUiState
