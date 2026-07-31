@@ -38,58 +38,127 @@ object PanchangamCalculator {
         DayOfWeek.SATURDAY to listOf(GowriCategory.LABAM, GowriCategory.DHANAM, GowriCategory.SUGAM, GowriCategory.SORAM, GowriCategory.VISHAM, GowriCategory.UTHI, GowriCategory.AMRIDHA, GowriCategory.ROGAM)
     )
 
-    fun calculateNallaNeram(dayOfWeek: DayOfWeek, sunrise: LocalTime, sunset: LocalTime): List<NallaNeram> {
-        val offset = Duration.between(LocalTime.of(6, 0), sunrise)
+    private val RAHU_SEQUENCE = mapOf(
+        DayOfWeek.SUNDAY to 7,
+        DayOfWeek.MONDAY to 1,
+        DayOfWeek.TUESDAY to 6,
+        DayOfWeek.WEDNESDAY to 4,
+        DayOfWeek.THURSDAY to 5,
+        DayOfWeek.FRIDAY to 3,
+        DayOfWeek.SATURDAY to 2
+    )
+
+    private val YAMA_SEQUENCE = mapOf(
+        DayOfWeek.SUNDAY to 4,
+        DayOfWeek.MONDAY to 3,
+        DayOfWeek.TUESDAY to 2,
+        DayOfWeek.WEDNESDAY to 1,
+        DayOfWeek.THURSDAY to 0,
+        DayOfWeek.FRIDAY to 6,
+        DayOfWeek.SATURDAY to 5
+    )
+
+    private val KULI_SEQUENCE = mapOf(
+        DayOfWeek.SUNDAY to 6,
+        DayOfWeek.MONDAY to 5,
+        DayOfWeek.TUESDAY to 4,
+        DayOfWeek.WEDNESDAY to 3,
+        DayOfWeek.THURSDAY to 2,
+        DayOfWeek.FRIDAY to 1,
+        DayOfWeek.SATURDAY to 0
+    )
+
+    fun calculateRahuKalam(dayOfWeek: DayOfWeek, sunrise: LocalTime, sunset: LocalTime): SpecialPeriod {
+        return calculateSpecialPeriod(dayOfWeek, sunrise, sunset, RAHU_SEQUENCE)
+    }
+
+    fun calculateYamagandam(dayOfWeek: DayOfWeek, sunrise: LocalTime, sunset: LocalTime): SpecialPeriod {
+        return calculateSpecialPeriod(dayOfWeek, sunrise, sunset, YAMA_SEQUENCE)
+    }
+
+    fun calculateKuligai(dayOfWeek: DayOfWeek, sunrise: LocalTime, sunset: LocalTime): SpecialPeriod {
+        return calculateSpecialPeriod(dayOfWeek, sunrise, sunset, KULI_SEQUENCE)
+    }
+
+    private fun calculateSpecialPeriod(dayOfWeek: DayOfWeek, sunrise: LocalTime, sunset: LocalTime, sequence: Map<DayOfWeek, Int>): SpecialPeriod {
+        val duration = Duration.between(sunrise, sunset)
+        val slotDuration = duration.dividedBy(8)
+        val slotIndex = sequence[dayOfWeek] ?: 0
+        val start = sunrise.plus(slotDuration.multipliedBy(slotIndex.toLong()))
+        val end = sunrise.plus(slotDuration.multipliedBy((slotIndex + 1).toLong()))
+        return SpecialPeriod(start, end)
+    }
+
+    data class SpecialPeriod(val startTime: LocalTime, val endTime: LocalTime)
+
+    private val NALLA_NERAM_DAY_SLOTS = mapOf(
+        DayOfWeek.SUNDAY to listOf(1, 3),    // 2nd and 4th slots
+        DayOfWeek.MONDAY to listOf(0, 6),    // 1st and 7th slots
+        DayOfWeek.TUESDAY to listOf(1, 7),   // 2nd and 8th slots
+        DayOfWeek.WEDNESDAY to listOf(2, 6), // 3rd and 7th slots
+        DayOfWeek.THURSDAY to listOf(3, 4),  // 4th and 5th slots
+        DayOfWeek.FRIDAY to listOf(2, 7),    // 3rd and 8th slots
+        DayOfWeek.SATURDAY to listOf(1, 7)   // 2nd and 8th slots
+    )
+
+    fun calculateNallaNeram(
+        dayOfWeek: DayOfWeek,
+        sunrise: LocalTime,
+        sunset: LocalTime,
+        offsetMinutes: Long = 15,
+        durationMinutes: Long = 60
+    ): List<NallaNeram> {
+        val gowriSlots = calculateGowriNeram(dayOfWeek, sunrise, sunset)
+        val dayGowri = gowriSlots.filter { 
+            !it.startTime.isBefore(sunrise) && !it.endTime.isAfter(sunset) 
+        }
         
-        // Typical Nalla Neram slots (Morning and Evening/Night)
-        val fixedWindows = when (dayOfWeek) {
-            DayOfWeek.MONDAY -> listOf(
-                LocalTime.of(6, 15) to LocalTime.of(7, 15), 
-                LocalTime.of(15, 15) to LocalTime.of(16, 15),
-                LocalTime.of(18, 0) to LocalTime.of(19, 0),
-                LocalTime.of(21, 0) to LocalTime.of(22, 0)
-            )
-            DayOfWeek.TUESDAY -> listOf(
-                LocalTime.of(7, 45) to LocalTime.of(8, 45), 
-                LocalTime.of(16, 45) to LocalTime.of(17, 45), 
-                LocalTime.of(18, 15) to LocalTime.of(19, 15),
-                LocalTime.of(20, 0) to LocalTime.of(21, 0)
-            )
-            DayOfWeek.WEDNESDAY -> listOf(
-                LocalTime.of(9, 15) to LocalTime.of(10, 15), 
-                LocalTime.of(15, 15) to LocalTime.of(16, 15),
-                LocalTime.of(18, 15) to LocalTime.of(19, 15),
-                LocalTime.of(20, 0) to LocalTime.of(21, 0)
-            )
-            DayOfWeek.THURSDAY -> listOf(
-                LocalTime.of(10, 45) to LocalTime.of(11, 45), 
-                LocalTime.of(12, 15) to LocalTime.of(13, 15), 
-                LocalTime.of(18, 15) to LocalTime.of(19, 15),
-                LocalTime.of(20, 0) to LocalTime.of(21, 0)
-            )
-            DayOfWeek.FRIDAY -> listOf(
-                LocalTime.of(9, 15) to LocalTime.of(10, 15), 
-                LocalTime.of(16, 45) to LocalTime.of(17, 45), 
-                LocalTime.of(18, 15) to LocalTime.of(19, 15),
-                LocalTime.of(20, 0) to LocalTime.of(21, 0)
-            )
-            DayOfWeek.SATURDAY -> listOf(
-                LocalTime.of(7, 45) to LocalTime.of(8, 45), 
-                LocalTime.of(16, 45) to LocalTime.of(17, 45), 
-                LocalTime.of(18, 15) to LocalTime.of(19, 15),
-                LocalTime.of(20, 0) to LocalTime.of(21, 0)
-            )
-            DayOfWeek.SUNDAY -> listOf(
-                LocalTime.of(7, 45) to LocalTime.of(8, 45), 
-                LocalTime.of(10, 45) to LocalTime.of(11, 45),
-                LocalTime.of(15, 15) to LocalTime.of(16, 15),
-                LocalTime.of(20, 0) to LocalTime.of(21, 0)
-            )
+        val rahu = calculateRahuKalam(dayOfWeek, sunrise, sunset)
+        val yama = calculateYamagandam(dayOfWeek, sunrise, sunset)
+        val kuli = calculateKuligai(dayOfWeek, sunrise, sunset)
+        
+        val inauspiciousPeriods = listOf(rahu, yama, kuli)
+        val primarySlots = NALLA_NERAM_DAY_SLOTS[dayOfWeek] ?: emptyList()
+
+        val result = mutableListOf<NallaNeram>()
+
+        dayGowri.forEachIndexed { index, gowri ->
+            // Match traditional Nalla Neram slots for the day
+            if (primarySlots.contains(index)) {
+                // Also verify it's auspicious in Gowri (should be, by definition)
+                if (gowri.auspiciousness == Auspiciousness.GREEN || gowri.auspiciousness == Auspiciousness.BLUE) {
+                    var start = gowri.startTime.plusMinutes(offsetMinutes)
+                    var end = start.plusMinutes(durationMinutes)
+                    
+                    if (end.isAfter(gowri.endTime)) {
+                        end = gowri.endTime
+                    }
+
+                    // Trimming overlaps with Rahu, Yama, Kuli
+                    inauspiciousPeriods.forEach { bad ->
+                        if (overlaps(start, end, bad.startTime, bad.endTime)) {
+                            if (start.isBefore(bad.startTime) && end.isAfter(bad.startTime)) {
+                                end = bad.startTime
+                            } else if (start.isBefore(bad.endTime) && end.isAfter(bad.endTime)) {
+                                start = bad.endTime
+                            } else if (start.isAfter(bad.startTime) && end.isBefore(bad.endTime)) {
+                                start = end // Skip if fully inside
+                            }
+                        }
+                    }
+
+                    if (Duration.between(start, end).toMinutes() >= 30) {
+                        result.add(NallaNeram(start, end, Auspiciousness.GREEN))
+                    }
+                }
+            }
         }
 
-        return fixedWindows.map { (start, end) ->
-            NallaNeram(start.plus(offset), end.plus(offset), Auspiciousness.GREEN)
-        }
+        return result.sortedBy { it.startTime }
+    }
+
+    private fun overlaps(s1: LocalTime, e1: LocalTime, s2: LocalTime, e2: LocalTime): Boolean {
+        return s1.isBefore(e2) && s2.isBefore(e1)
     }
 
     fun calculateGowriNeram(dayOfWeek: DayOfWeek, sunrise: LocalTime, sunset: LocalTime): List<GowriNeram> {

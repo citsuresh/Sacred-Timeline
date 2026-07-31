@@ -7,8 +7,9 @@ import java.time.LocalTime
 
 class MockPanchangamProvider {
     fun getTimings(date: LocalDate): List<Timing> {
+        // Using standard 6:00 AM sunrise to align with Tamil Panchangam reference examples
         val sunrise = LocalTime.of(6, 0)
-        val sunset = LocalTime.of(18, 15)
+        val sunset = LocalTime.of(18, 0)
         
         // Use yesterday's cycle to fill 00:00 to Today's Sunrise
         val yesterdayCycle = PanchangamCalculator.calculateAllTimings(date.minusDays(1).dayOfWeek, sunrise, sunset)
