@@ -1,0 +1,4 @@
+<resources>
+
+    <style name="Theme.SacredTimeline" parent="Theme.MaterialComponents.Light" />
+</resources>
