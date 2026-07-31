@@ -40,12 +40,12 @@ The app uses a modern Compose-first architecture:
 - **TimelineDashboard**: The central screen of the app.
     - **HorizontalDateDial**: A scrolling list of dates for quick navigation.
     - **TimelineContent**: A vertically scrollable 24-hour grid.
-    - **TimingCard**: Visual representation of a timing slot, color-coded by its `Auspiciousness`.
-- **Theme**: Material 3 theme (`SacredTimelineTheme`) with expressive colors for auspiciousness indicators.
+    - **TimingCard**: Visual representation of a timing slot, featuring high-contrast double borders and a dynamic text-contrast engine.
+- **Theme**: Material 3 theme (`SacredTimelineTheme`) using a centralized color mapping engine (`SacredTimelineColors`) for screenshot-accurate palette consistency.
 
 ## Home Screen Widget: Glance
 
 The `PanchangamWidget` (`com.suresh.sacredtimeline.widget`) is built using **Jetpack Glance**. It provides a real-time summary of the current Nalla Neram, Gowri Neram, and Hora status.
 
-- **Updates**: Managed by `WidgetUpdateWorker` using `WorkManager`, ensuring the widget remains accurate throughout the day.
-- **Provider**: `MockPanchangamProvider` acts as a facade for the calculator to supply data to both the UI and the Widget.
+- **Updates**: Managed by `WidgetUpdateWorker` using `WorkManager`, synchronizing refreshes precisely with time-slot transitions.
+- **Layout**: Simplified 3-column architecture (Neram, Gowri, Hora) with a transparent background and app-launch action.
