@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material.icons.filled.WbTwilight
 import androidx.compose.material3.*
@@ -32,6 +33,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import com.suresh.sacredtimeline.model.*
 import com.suresh.sacredtimeline.ui.theme.*
 import kotlinx.coroutines.delay
@@ -46,7 +50,7 @@ private val START_HOUR = 0
 private val END_HOUR = 24
 private val TIME_COLUMN_WIDTH = 60.dp
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun TimelineDashboard(
     modifier: Modifier = Modifier,
@@ -55,7 +59,22 @@ fun TimelineDashboard(
     val uiState by viewModel.uiState.collectAsState()
     val selectedDate by viewModel.selectedDate.collectAsState()
     
+    val locationPermissionState = rememberPermissionState(
+        android.Manifest.permission.ACCESS_COARSE_LOCATION
+    )
+
+    LaunchedEffect(locationPermissionState.status) {
+        if (locationPermissionState.status.isGranted) {
+            viewModel.onLocationPermissionGranted()
+        } else {
+            locationPermissionState.launchPermissionRequest()
+        }
+    }
+    
     var showDatePicker by remember { mutableStateOf(false) }
+    var showLocationDialog by remember { mutableStateOf(false) }
+    var manualLocationName by remember { mutableStateOf("") }
+    
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = selectedDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
     )
@@ -84,16 +103,105 @@ fun TimelineDashboard(
         }
     }
 
+    if (showLocationDialog) {
+        AlertDialog(
+            onDismissRequest = { showLocationDialog = false },
+            title = { Text("Change Location") },
+            text = {
+                Column {
+                    Text("Enter city or area name manually for display.", style = MaterialTheme.typography.bodySmall)
+                    Spacer(modifier = Modifier.height(12.dp))
+                    OutlinedTextField(
+                        value = manualLocationName,
+                        onValueChange = { manualLocationName = it },
+                        label = { Text("Location Name") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Surface(
+                        color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.4f),
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Info,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp),
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Note: This only changes the display name. Timings remain calculated based on your current GPS location.",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onErrorContainer
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    if (manualLocationName.isNotBlank()) {
+                        viewModel.updateManualLocation(manualLocationName)
+                    }
+                    showLocationDialog = false
+                }) {
+                    Text("Update")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLocationDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { 
                     Column {
                         Text("Sacred Timeline", style = MaterialTheme.typography.titleLarge)
-                        Text(
-                            text = selectedDate.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")),
-                            style = MaterialTheme.typography.bodySmall
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.clickable { 
+                                if (uiState is TimelineUiState.Success) {
+                                    manualLocationName = (uiState as TimelineUiState.Success).locationName
+                                    showLocationDialog = true
+                                }
+                            }
+                        ) {
+                            Text(
+                                text = selectedDate.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")),
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                            if (uiState is TimelineUiState.Success) {
+                                val successState = uiState as TimelineUiState.Success
+                                val isUnknown = successState.locationName == "Unknown Location"
+                                
+                                Text(
+                                    text = " • ${if (successState.isLocationAuto) "📍" else "✎"} ${successState.locationName}",
+                                    style = if (successState.isLocationAuto) MaterialTheme.typography.bodySmall else MaterialTheme.typography.bodySmall.copy(fontStyle = androidx.compose.ui.text.font.FontStyle.Italic),
+                                    color = if (isUnknown) MaterialTheme.colorScheme.error.copy(alpha = 0.8f) else MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                                )
+                                
+                                if (isUnknown) {
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Icon(
+                                        imageVector = Icons.Default.Info,
+                                        contentDescription = "Location Info",
+                                        modifier = Modifier.size(12.dp),
+                                        tint = MaterialTheme.colorScheme.error.copy(alpha = 0.7f)
+                                    )
+                                }
+                            }
+                        }
                     }
                 },
                 actions = {
