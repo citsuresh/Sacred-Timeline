@@ -6,9 +6,10 @@
 The Sacred Timeline app is a functional utility for tracking Panchangam timings with a modern, expressive UI.
 
 ## Recently Modified
-- **Inauspicious Periods**: Added Rahu Kalam, Yamagandam, and Kuligai calculations and UI indicators.
-- **Unified Timeline**: Merged Nalla Neram and Special periods into a single "Neram" column.
-- **Widget Update**: Integrated special periods into the Jetpack Glance Home Screen Widget.
+- **Multi-day Navigation**: Implemented `HorizontalPager` for seamless day-to-day swiping.
+- **Preloading Engine**: Added background data fetching for +/- 3 days to eliminate loading lag.
+- **Header Restructuring**: Decoupled App Bar from Date/Location info to fix clipping and overlap issues.
+- **Interactive Info Row**: Made Date and Location individually clickable for quick access to picker and settings.
 
 ## Next Focus
 - **Session Persistence**: Storing user preferences and scroll positions.
