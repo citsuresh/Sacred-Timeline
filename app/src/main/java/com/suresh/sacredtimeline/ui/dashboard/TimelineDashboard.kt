@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -30,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.suresh.sacredtimeline.model.*
 import com.suresh.sacredtimeline.ui.theme.*
+import kotlinx.coroutines.delay
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
@@ -39,6 +41,7 @@ import java.time.format.DateTimeFormatter
 private val HOUR_HEIGHT = 160.dp
 private val START_HOUR = 0
 private val END_HOUR = 24
+private val TIME_COLUMN_WIDTH = 60.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -198,11 +201,19 @@ fun TimelineContent(state: TimelineUiState.Success) {
     val density = LocalDensity.current
     var containerHeight by remember { mutableStateOf(0) }
     
+    var currentTime by remember { mutableStateOf(LocalTime.now()) }
+    
+    LaunchedEffect(Unit) {
+        while (true) {
+            currentTime = LocalTime.now()
+            delay(60000 - (System.currentTimeMillis() % 60000))
+        }
+    }
+    
     // Auto-scroll to current time on first launch
     LaunchedEffect(containerHeight) {
         if (containerHeight > 0) {
-            val now = LocalTime.now()
-            val nowOffset = with(density) { calculateOffset(now).toPx() }
+            val nowOffset = with(density) { calculateOffset(currentTime).toPx() }
             val centerOffset = containerHeight / 2
             scrollState.scrollTo((nowOffset - centerOffset).toInt().coerceAtLeast(0))
         }
@@ -230,38 +241,48 @@ fun TimelineContent(state: TimelineUiState.Success) {
                     TimeGrid()
 
                     Row(modifier = Modifier.fillMaxSize()) {
+                        TimeMarkersColumn()
                         TimelineColumn(timings = state.nallaNeram, modifier = Modifier.weight(1f))
                         VerticalDivider(thickness = 1.dp, color = Color.LightGray.copy(alpha = 0.3f))
                         TimelineColumn(timings = state.gowriNeram, modifier = Modifier.weight(1f))
                         VerticalDivider(thickness = 1.dp, color = Color.LightGray.copy(alpha = 0.3f))
                         TimelineColumn(timings = state.hora, modifier = Modifier.weight(1f))
                     }
+
+                    // Dynamic Current Time Indicator (inside scrollable area)
+                    NowIndicator(currentTime)
                 }
             }
-
-            // Fixed horizontal line at center (Current Time Indicator)
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(2.dp)
-                    .background(Color.Red)
-                    .align(Alignment.Center)
-            )
-            
-            // Label for the fixed line
-            Surface(
-                color = Color.Red,
-                shape = RoundedCornerShape(4.dp),
-                modifier = Modifier.align(Alignment.CenterEnd).padding(end = 8.dp)
-            ) {
-                Text(
-                    text = "NOW",
-                    color = Color.White,
-                    style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
-                )
-            }
         }
+    }
+}
+
+@Composable
+fun BoxScope.NowIndicator(currentTime: LocalTime) {
+    val topOffset = calculateOffset(currentTime)
+    
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .offset(y = topOffset - 1.dp)
+            .height(2.dp)
+            .background(Color.Red)
+    )
+    
+    Surface(
+        color = Color.Red,
+        shape = RoundedCornerShape(4.dp),
+        modifier = Modifier
+            .offset(y = topOffset - 10.dp)
+            .padding(end = 8.dp)
+            .align(Alignment.TopEnd)
+    ) {
+        Text(
+            text = "NOW",
+            color = Color.White,
+            style = MaterialTheme.typography.labelSmall,
+            modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+        )
     }
 }
 
@@ -273,9 +294,43 @@ fun TimelineHeader() {
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .padding(vertical = 12.dp)
     ) {
+        Spacer(modifier = Modifier.width(TIME_COLUMN_WIDTH))
         Text("Nalla Neram", modifier = Modifier.weight(1f), textAlign = TextAlign.Center, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
         Text("Gowri Neram", modifier = Modifier.weight(1f), textAlign = TextAlign.Center, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
         Text("Hora", modifier = Modifier.weight(1f), textAlign = TextAlign.Center, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+    }
+}
+
+@Composable
+fun TimeMarkersColumn() {
+    val context = LocalContext.current
+    val is24Hour = android.text.format.DateFormat.is24HourFormat(context)
+    val pattern = if (is24Hour) "HH:mm" else "h:mm a"
+    val formatter = DateTimeFormatter.ofPattern(pattern)
+
+    Box(
+        modifier = Modifier
+            .width(TIME_COLUMN_WIDTH)
+            .fillMaxHeight()
+    ) {
+        for (hour in START_HOUR until END_HOUR) {
+            for (minute in listOf(0, 30)) {
+                val time = LocalTime.of(hour, minute)
+                val topOffset = calculateOffset(time)
+                
+                Text(
+                    text = time.format(formatter),
+                    modifier = Modifier
+                        .offset(y = topOffset - 8.dp)
+                        .fillMaxWidth()
+                        .padding(end = 8.dp),
+                    textAlign = TextAlign.End,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.Gray,
+                    fontSize = 10.sp
+                )
+            }
+        }
     }
 }
 
@@ -284,14 +339,25 @@ fun TimeGrid() {
     Canvas(modifier = Modifier.fillMaxSize()) {
         val strokeWidth = 1.dp.toPx()
         for (hour in START_HOUR..END_HOUR) {
-            val y = (hour - START_HOUR) * HOUR_HEIGHT.toPx()
+            // Hour line
+            val yHour = (hour - START_HOUR) * HOUR_HEIGHT.toPx()
             drawLine(
                 color = Color.LightGray.copy(alpha = 0.5f),
-                start = Offset(0f, y),
-                end = Offset(size.width, y),
+                start = Offset(0f, yHour),
+                end = Offset(size.width, yHour),
                 strokeWidth = strokeWidth
             )
-            // Hour labels could be added here if needed, but for 3 columns it might be cramped
+            
+            // 30-min line
+            if (hour < END_HOUR) {
+                val yHalf = yHour + (HOUR_HEIGHT.toPx() / 2)
+                drawLine(
+                    color = Color.LightGray.copy(alpha = 0.2f),
+                    start = Offset(0f, yHalf),
+                    end = Offset(size.width, yHalf),
+                    strokeWidth = strokeWidth
+                )
+            }
         }
     }
 }
