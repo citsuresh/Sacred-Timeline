@@ -12,6 +12,8 @@ import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
+import androidx.glance.Image
+import androidx.glance.ImageProvider
 import androidx.glance.layout.*
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
@@ -19,6 +21,7 @@ import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
+import com.suresh.sacredtimeline.R
 import com.suresh.sacredtimeline.MainActivity
 import com.suresh.sacredtimeline.logic.MockPanchangamProvider
 import com.suresh.sacredtimeline.logic.SunriseSunsetProvider
@@ -128,6 +131,15 @@ class PanchangamWidget : GlanceAppWidget() {
                             color = ColorProvider(contentColor.copy(alpha = 0.8f))
                         )
                     )
+                    
+                    if (timing is SpecialPeriod && timing.name == "Yama") {
+                        Image(
+                            provider = ImageProvider(R.drawable.ic_yama_bull),
+                            contentDescription = null,
+                            modifier = GlanceModifier.size(32.dp)
+                        )
+                    }
+
                     Text(
                         text = label,
                         style = TextStyle(

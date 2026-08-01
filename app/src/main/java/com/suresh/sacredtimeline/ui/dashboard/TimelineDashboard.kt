@@ -1,6 +1,7 @@
 package com.suresh.sacredtimeline.ui.dashboard
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -734,7 +735,7 @@ fun TimeMarkersColumn() {
                         .padding(end = 8.dp),
                     textAlign = TextAlign.End,
                     style = MaterialTheme.typography.labelSmall,
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                     fontWeight = FontWeight.Bold,
                     fontSize = 11.sp
                 )
@@ -818,29 +819,37 @@ fun TimingCard(timing: Timing, onClick: () -> Unit) {
             ) {
                 // ICON LOGIC - Unified and explicitly handling Yama
                 if (height > 40.dp) {
-                    val iconPainter = when {
-                        timing is SpecialPeriod && timing.name == "Rahu" -> painterResource(R.drawable.ic_rahu)
-                        timing is SpecialPeriod && (timing.name == "Kuli Dawn" || timing.name == "Kuli Dusk") -> painterResource(R.drawable.ic_saturn)
-                        timing is SpecialPeriod && timing.name == "Yama" -> painterResource(R.drawable.ic_yama_buffalo)
-                        else -> null
-                    }
+                    if (timing is SpecialPeriod && timing.name == "Yama") {
+                        Image(
+                            painter = painterResource(R.drawable.ic_yama_bull),
+                            contentDescription = null,
+                            modifier = Modifier.size(if (height > 80.dp) 32.dp else 24.dp)
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                    } else {
+                        val iconPainter = when {
+                            timing is SpecialPeriod && timing.name == "Rahu" -> painterResource(R.drawable.ic_rahu)
+                            timing is SpecialPeriod && (timing.name == "Kuli Dawn" || timing.name == "Kuli Dusk") -> painterResource(R.drawable.ic_saturn)
+                            else -> null
+                        }
 
-                    if (iconPainter != null) {
-                        Icon(
-                            painter = iconPainter,
-                            contentDescription = null,
-                            modifier = Modifier.size(if (height > 80.dp) 32.dp else 24.dp),
-                            tint = contentColor.copy(alpha = 0.9f)
-                        )
-                        Spacer(modifier = Modifier.height(2.dp))
-                    } else if (timing is NallaNeram) {
-                        Icon(
-                            imageVector = Icons.Default.Star,
-                            contentDescription = null,
-                            modifier = Modifier.size(if (height > 80.dp) 24.dp else 16.dp),
-                            tint = contentColor.copy(alpha = 0.8f)
-                        )
-                        Spacer(modifier = Modifier.height(2.dp))
+                        if (iconPainter != null) {
+                            Icon(
+                                painter = iconPainter,
+                                contentDescription = null,
+                                modifier = Modifier.size(if (height > 80.dp) 32.dp else 24.dp),
+                                tint = contentColor.copy(alpha = 0.9f)
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                        } else if (timing is NallaNeram) {
+                            Icon(
+                                imageVector = Icons.Default.Star,
+                                contentDescription = null,
+                                modifier = Modifier.size(if (height > 80.dp) 24.dp else 16.dp),
+                                tint = contentColor.copy(alpha = 0.8f)
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                        }
                     }
                 }
 
@@ -936,16 +945,23 @@ fun TimingDetailSheet(
                             is Hora -> Icon(Icons.Default.Today, contentDescription = null, tint = contentColor)
                             is GowriNeram -> Icon(Icons.Default.Brightness4, contentDescription = null, tint = contentColor)
                             is SpecialPeriod -> {
-                                val iconPainter = when (timing.name) {
-                                    "Rahu" -> painterResource(R.drawable.ic_rahu)
-                                    "Kuli Dawn", "Kuli Dusk" -> painterResource(R.drawable.ic_saturn)
-                                    "Yama" -> painterResource(R.drawable.ic_yama_buffalo)
-                                    else -> null
-                                }
-                                if (iconPainter != null) {
-                                    Icon(iconPainter, contentDescription = null, tint = contentColor, modifier = Modifier.size(32.dp))
+                                if (timing.name == "Yama") {
+                                    Image(
+                                        painter = painterResource(R.drawable.ic_yama_bull),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(32.dp)
+                                    )
                                 } else {
-                                    Icon(Icons.Default.Warning, contentDescription = null, tint = contentColor)
+                                    val iconPainter = when (timing.name) {
+                                        "Rahu" -> painterResource(R.drawable.ic_rahu)
+                                        "Kuli Dawn", "Kuli Dusk" -> painterResource(R.drawable.ic_saturn)
+                                        else -> null
+                                    }
+                                    if (iconPainter != null) {
+                                        Icon(iconPainter, contentDescription = null, tint = contentColor, modifier = Modifier.size(32.dp))
+                                    } else {
+                                        Icon(Icons.Default.Warning, contentDescription = null, tint = contentColor)
+                                    }
                                 }
                             }
                             else -> Icon(Icons.Default.Info, contentDescription = null, tint = contentColor)
