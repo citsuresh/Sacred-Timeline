@@ -467,7 +467,7 @@ fun TimelineContent(
                     NightShade(sunrise = dayData.sunrise, sunset = dayData.sunset)
 
                     Row(modifier = Modifier.fillMaxSize()) {
-                        TimeMarkersColumn()
+                        TimeMarkersColumn(sunrise = dayData.sunrise, sunset = dayData.sunset)
                         Box(modifier = Modifier.fillMaxHeight().width(1.dp).background(SeparatorGrey))
                         TimelineColumn(
                             timings = dayData.nallaNeram + dayData.specialPeriods, 
@@ -711,7 +711,7 @@ fun TimelineHeader() {
 }
 
 @Composable
-fun TimeMarkersColumn() {
+fun TimeMarkersColumn(sunrise: LocalTime, sunset: LocalTime) {
     val context = LocalContext.current
     val is24Hour = android.text.format.DateFormat.is24HourFormat(context)
     val pattern = if (is24Hour) "HH:mm" else "h:mm a"
@@ -727,6 +727,9 @@ fun TimeMarkersColumn() {
                 val time = LocalTime.of(hour, minute)
                 val topOffset = calculateOffset(time)
                 
+                // Determine if this marker is in the "Night" region (sunset to sunrise)
+                val isNight = time.isBefore(sunrise) || !time.isBefore(sunset)
+                
                 Text(
                     text = time.format(formatter),
                     modifier = Modifier
@@ -735,7 +738,7 @@ fun TimeMarkersColumn() {
                         .padding(end = 8.dp),
                     textAlign = TextAlign.End,
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                    color = if (isNight) Color.White else MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
                     fontSize = 11.sp
                 )
