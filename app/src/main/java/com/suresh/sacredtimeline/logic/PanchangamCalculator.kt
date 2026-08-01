@@ -79,7 +79,7 @@ object PanchangamCalculator {
     fun calculateKuligai(dayOfWeek: DayOfWeek, sunrise: LocalTime, sunset: LocalTime): SpecialPeriod {
         val period = calculateSpecialPeriod("Kuli", dayOfWeek, sunrise, sunset, KULI_SEQUENCE, Auspiciousness.GREY)
         val name = if (period.startTime.isBefore(LocalTime.NOON)) "Kuli Dawn" else "Kuli Dusk"
-        return period.copy(name = name)
+        return period.copy(name = name, tamilName = Metadata.SPECIAL_TAMIL_NAMES[name] ?: period.tamilName)
     }
 
     private fun calculateSpecialPeriod(
@@ -95,7 +95,14 @@ object PanchangamCalculator {
         val slotIndex = sequence[dayOfWeek] ?: 0
         val start = sunrise.plus(slotDuration.multipliedBy(slotIndex.toLong()))
         val end = sunrise.plus(slotDuration.multipliedBy((slotIndex + 1).toLong()))
-        return SpecialPeriod(name, start, end, auspiciousness)
+        return SpecialPeriod(
+            name = name,
+            tamilName = Metadata.SPECIAL_TAMIL_NAMES[name] ?: name,
+            startTime = start,
+            endTime = end,
+            auspiciousness = auspiciousness,
+            description = Metadata.SPECIAL_DESCRIPTIONS[name] ?: ""
+        )
     }
 
     private val NALLA_NERAM_DAY_SLOTS = mapOf(
@@ -156,7 +163,14 @@ object PanchangamCalculator {
 
                     if (Duration.between(start, end).toMinutes() >= 30) {
                         val name = if (start.isBefore(LocalTime.NOON)) "Morning" else "Evening"
-                        result.add(NallaNeram(name, start, end, Auspiciousness.GREEN))
+                        result.add(NallaNeram(
+                            name = name,
+                            tamilName = Metadata.SPECIAL_TAMIL_NAMES["Nalla"] ?: "நல்ல நேரம்",
+                            startTime = start,
+                            endTime = end,
+                            auspiciousness = Auspiciousness.GREEN,
+                            description = "Most auspicious time of the day for important activities."
+                        ))
                     }
                 }
             }
@@ -177,7 +191,14 @@ object PanchangamCalculator {
         val daySlots = daySequence.mapIndexed { index, category ->
             val start = sunrise.plus(daySlotDuration.multipliedBy(index.toLong()))
             val end = sunrise.plus(daySlotDuration.multipliedBy((index + 1).toLong()))
-            GowriNeram(category.name, start, end, category.toAuspiciousness())
+            GowriNeram(
+                name = category.name,
+                tamilName = Metadata.GOWRI_TAMIL_NAMES[category.name] ?: category.name,
+                startTime = start,
+                endTime = end,
+                auspiciousness = category.toAuspiciousness(),
+                description = Metadata.GOWRI_DESCRIPTIONS[category.name] ?: ""
+            )
         }
 
         // Night slots (from sunset to next sunrise)
@@ -191,7 +212,14 @@ object PanchangamCalculator {
         val nightSlots = nightSequence.mapIndexed { index, category ->
             val start = sunset.plus(nightSlotDuration.multipliedBy(index.toLong()))
             val end = sunset.plus(nightSlotDuration.multipliedBy((index + 1).toLong()))
-            GowriNeram(category.name, start, end, category.toAuspiciousness())
+            GowriNeram(
+                name = category.name,
+                tamilName = Metadata.GOWRI_TAMIL_NAMES[category.name] ?: category.name,
+                startTime = start,
+                endTime = end,
+                auspiciousness = category.toAuspiciousness(),
+                description = Metadata.GOWRI_DESCRIPTIONS[category.name] ?: ""
+            )
         }
 
         return daySlots + nightSlots
@@ -229,7 +257,15 @@ object PanchangamCalculator {
                 "Saturn", "Mars" -> Auspiciousness.RED
                 else -> Auspiciousness.AMBER
             }
-            Hora(planet, start, end, auspiciousness)
+            Hora(
+                name = planet,
+                tamilName = Metadata.PLANET_TAMIL_NAMES[planet] ?: planet,
+                startTime = start,
+                endTime = end,
+                auspiciousness = auspiciousness,
+                description = Metadata.PLANET_QUALITIES[planet] ?: "",
+                compatibility = getHoraCompatibility(planet, dayOfWeek)
+            )
         }
 
         val nightHoras = (0 until 12).map { i ->
@@ -243,10 +279,59 @@ object PanchangamCalculator {
                 "Saturn", "Mars" -> Auspiciousness.RED
                 else -> Auspiciousness.AMBER
             }
-            Hora(planet, start, end, auspiciousness)
+            Hora(
+                name = planet,
+                tamilName = Metadata.PLANET_TAMIL_NAMES[planet] ?: planet,
+                startTime = start,
+                endTime = end,
+                auspiciousness = auspiciousness,
+                description = Metadata.PLANET_QUALITIES[planet] ?: "",
+                compatibility = getHoraCompatibility(planet, dayOfWeek)
+            )
         }
 
         return dayHoras + nightHoras
+    }
+
+    fun getHoraCompatibility(planet: String, dayOfWeek: DayOfWeek): HoraCompatibility {
+        return when (planet) {
+            "Sun" -> when (dayOfWeek) {
+                DayOfWeek.SUNDAY, DayOfWeek.THURSDAY, DayOfWeek.TUESDAY -> HoraCompatibility.FAVORABLE
+                DayOfWeek.SATURDAY, DayOfWeek.FRIDAY -> HoraCompatibility.CONFLICTING
+                else -> HoraCompatibility.NEUTRAL
+            }
+            "Moon" -> when (dayOfWeek) {
+                DayOfWeek.MONDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY -> HoraCompatibility.FAVORABLE
+                DayOfWeek.SATURDAY, DayOfWeek.TUESDAY -> HoraCompatibility.CONFLICTING
+                else -> HoraCompatibility.NEUTRAL
+            }
+            "Mars" -> when (dayOfWeek) {
+                DayOfWeek.TUESDAY, DayOfWeek.SUNDAY, DayOfWeek.THURSDAY -> HoraCompatibility.FAVORABLE
+                DayOfWeek.WEDNESDAY -> HoraCompatibility.CONFLICTING
+                else -> HoraCompatibility.NEUTRAL
+            }
+            "Mercury" -> when (dayOfWeek) {
+                DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY -> HoraCompatibility.FAVORABLE
+                DayOfWeek.MONDAY -> HoraCompatibility.CONFLICTING
+                else -> HoraCompatibility.NEUTRAL
+            }
+            "Jupiter" -> when (dayOfWeek) {
+                DayOfWeek.THURSDAY, DayOfWeek.SUNDAY, DayOfWeek.MONDAY, DayOfWeek.TUESDAY -> HoraCompatibility.FAVORABLE
+                DayOfWeek.FRIDAY, DayOfWeek.WEDNESDAY -> HoraCompatibility.CONFLICTING
+                else -> HoraCompatibility.NEUTRAL
+            }
+            "Venus" -> when (dayOfWeek) {
+                DayOfWeek.FRIDAY, DayOfWeek.WEDNESDAY, DayOfWeek.SATURDAY -> HoraCompatibility.FAVORABLE
+                DayOfWeek.SUNDAY, DayOfWeek.MONDAY -> HoraCompatibility.CONFLICTING
+                else -> HoraCompatibility.NEUTRAL
+            }
+            "Saturn" -> when (dayOfWeek) {
+                DayOfWeek.SATURDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY -> HoraCompatibility.FAVORABLE
+                DayOfWeek.SUNDAY, DayOfWeek.MONDAY, DayOfWeek.TUESDAY -> HoraCompatibility.CONFLICTING
+                else -> HoraCompatibility.NEUTRAL
+            }
+            else -> HoraCompatibility.NEUTRAL
+        }
     }
 
     fun calculateAllTimings(dayOfWeek: DayOfWeek, sunrise: LocalTime, sunset: LocalTime): List<Timing> {

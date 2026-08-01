@@ -68,7 +68,11 @@ class PanchangamWidget : GlanceAppWidget() {
         ) {
             // First Column: Neram (Nalla or Special)
             val neramTiming = specialPeriod ?: nallaNeram
-            val neramLabel = specialPeriod?.name ?: nallaNeram?.let { "Nalla" } ?: "None"
+            val neramLabel = when {
+                specialPeriod != null -> specialPeriod.name
+                nallaNeram != null -> "Nalla"
+                else -> "None"
+            }
 
             TimingColumn("Neram", neramLabel, neramTiming, GlanceModifier.defaultWeight())
             TimingColumn(
@@ -119,19 +123,58 @@ class PanchangamWidget : GlanceAppWidget() {
                     Text(
                         text = title,
                         style = TextStyle(
-                            fontSize = 12.sp,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = ColorProvider(contentColor.copy(alpha = 0.8f))
+                        )
+                    )
+                    Text(
+                        text = label,
+                        style = TextStyle(
+                            fontSize = 13.sp,
                             fontWeight = FontWeight.Bold,
                             color = ColorProvider(contentColor)
                         )
                     )
-                    Spacer(modifier = GlanceModifier.height(4.dp))
-                    Text(
-                        text = label,
-                        style = TextStyle(
-                            fontSize = 14.sp,
-                            color = ColorProvider(contentColor)
+                    timing?.tamilName?.let { tamil ->
+                        Text(
+                            text = tamil,
+                            style = TextStyle(
+                                fontSize = 10.sp,
+                                color = ColorProvider(contentColor)
+                            )
                         )
-                    )
+                    }
+                }
+
+                // Compatibility Icon for Hora
+                if (timing is Hora) {
+                    Box(
+                        modifier = GlanceModifier.fillMaxSize().padding(4.dp),
+                        contentAlignment = Alignment.TopEnd
+                    ) {
+                        val (symbol, color) = when (timing.compatibility) {
+                            HoraCompatibility.FAVORABLE -> "✓" to CompatibilityFavorable
+                            HoraCompatibility.CONFLICTING -> "✕" to CompatibilityConflicting
+                            HoraCompatibility.NEUTRAL -> "○" to CompatibilityNeutral
+                        }
+                        Box(
+                            modifier = GlanceModifier
+                                .size(28.dp)
+                                .cornerRadius(14.dp)
+                                .background(Color.White),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = symbol,
+                                style = TextStyle(
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = ColorProvider(color)
+                                )
+                            )
+                        }
+                    }
                 }
             }
         }

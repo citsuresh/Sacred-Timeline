@@ -2,10 +2,17 @@ package com.suresh.sacredtimeline.model
 
 import java.time.LocalTime
 
+enum class HoraCompatibility {
+    FAVORABLE, CONFLICTING, NEUTRAL
+}
+
 sealed interface Timing {
+    val name: String
     val startTime: LocalTime
     val endTime: LocalTime
     val auspiciousness: Auspiciousness
+    val tamilName: String
+    val description: String
 
     fun isCurrent(time: LocalTime): Boolean {
         return !time.isBefore(startTime) && time.isBefore(endTime)
@@ -13,29 +20,38 @@ sealed interface Timing {
 }
 
 data class NallaNeram(
-    val name: String,
+    override val name: String,
+    override val tamilName: String,
     override val startTime: LocalTime,
     override val endTime: LocalTime,
-    override val auspiciousness: Auspiciousness
+    override val auspiciousness: Auspiciousness,
+    override val description: String = ""
 ) : Timing
 
 data class GowriNeram(
-    val name: String,
+    override val name: String,
+    override val tamilName: String,
     override val startTime: LocalTime,
     override val endTime: LocalTime,
-    override val auspiciousness: Auspiciousness
+    override val auspiciousness: Auspiciousness,
+    override val description: String = ""
 ) : Timing
 
 data class Hora(
-    val name: String,
+    override val name: String,
+    override val tamilName: String,
     override val startTime: LocalTime,
     override val endTime: LocalTime,
-    override val auspiciousness: Auspiciousness
+    override val auspiciousness: Auspiciousness,
+    override val description: String = "",
+    val compatibility: HoraCompatibility = HoraCompatibility.NEUTRAL
 ) : Timing
 
 data class SpecialPeriod(
-    val name: String,
+    override val name: String,
+    override val tamilName: String,
     override val startTime: LocalTime,
     override val endTime: LocalTime,
-    override val auspiciousness: Auspiciousness
+    override val auspiciousness: Auspiciousness,
+    override val description: String = ""
 ) : Timing

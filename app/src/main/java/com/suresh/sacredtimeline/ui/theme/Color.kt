@@ -19,8 +19,8 @@ val GowriAmridhaBest = Color(0xFF33691E)
 val GowriStandardRed = Color(0xFFD32F2F)
 val GowriUthiBlue = Color(0xFF4FC3F7) // Keeping a distinct blue for Uthi as per initial request, though screenshot shows green.
 
-val HoraSaturn = Color(0xFF616161)
-val HoraJupiter = Color(0xFFFDD835)
+val HoraSaturn = Color(0xFF6D4C41) // Greyish-Red/Brown
+val HoraJupiter = Color(0xFFAFB42B) // Yellow-Green
 val HoraMars = Color(0xFFB71C1C)
 val HoraSun = Color(0xFFD32F2F)
 val HoraVenus = Color(0xFFF5F5F5)
@@ -35,3 +35,7 @@ val KuliDuskGrey = Color(0xFF616161)
 val SeparatorGrey = Color(0xFFCCCCCC)
 val CardBorderColor = Color(0xFF000000)
 val CardOuterBorderColor = Color(0xFFFFFFFF)
+
+val CompatibilityFavorable = Color(0xFF4CAF50)
+val CompatibilityConflicting = Color(0xFFF44336)
+val CompatibilityNeutral = Color(0xFF9E9E9E)

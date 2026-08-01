@@ -26,6 +26,9 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Brightness4
 import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -89,6 +92,18 @@ fun TimelineDashboard(
     var showLocationDialog by remember { mutableStateOf(false) }
     var manualLocationName by remember { mutableStateOf("") }
     
+    var selectedTimingForDetail by remember { mutableStateOf<Timing?>(null) }
+    val sheetState = rememberModalBottomSheetState()
+    var showSheet by remember { mutableStateOf(false) }
+
+    if (showSheet && selectedTimingForDetail != null) {
+        TimingDetailSheet(
+            timing = selectedTimingForDetail!!,
+            sheetState = sheetState,
+            onDismiss = { showSheet = false }
+        )
+    }
+
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = selectedDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
     )
@@ -282,7 +297,14 @@ fun TimelineDashboard(
                             val date = dates[page]
                             val dayData = state.days[date]
                             if (dayData != null) {
-                                TimelineContent(date, dayData)
+                                TimelineContent(
+                                    date = date, 
+                                    dayData = dayData,
+                                    onTimingClick = { timing ->
+                                        selectedTimingForDetail = timing
+                                        showSheet = true
+                                    }
+                                )
                             } else {
                                 Box(modifier = Modifier.fillMaxSize()) {
                                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
@@ -388,7 +410,11 @@ fun DateItem(
 }
 
 @Composable
-fun TimelineContent(date: LocalDate, dayData: DayData) {
+fun TimelineContent(
+    date: LocalDate, 
+    dayData: DayData,
+    onTimingClick: (Timing) -> Unit
+) {
     val scrollState = rememberScrollState()
     val density = LocalDensity.current
     var containerHeight by remember { mutableStateOf(0) }
@@ -442,11 +468,23 @@ fun TimelineContent(date: LocalDate, dayData: DayData) {
                     Row(modifier = Modifier.fillMaxSize()) {
                         TimeMarkersColumn()
                         Box(modifier = Modifier.fillMaxHeight().width(1.dp).background(SeparatorGrey))
-                        TimelineColumn(timings = dayData.nallaNeram + dayData.specialPeriods, modifier = Modifier.weight(1f))
+                        TimelineColumn(
+                            timings = dayData.nallaNeram + dayData.specialPeriods, 
+                            onTimingClick = onTimingClick,
+                            modifier = Modifier.weight(1f)
+                        )
                         VerticalDivider(thickness = 1.dp, color = Color.LightGray.copy(alpha = 0.3f))
-                        TimelineColumn(timings = dayData.gowriNeram, modifier = Modifier.weight(1f))
+                        TimelineColumn(
+                            timings = dayData.gowriNeram, 
+                            onTimingClick = onTimingClick,
+                            modifier = Modifier.weight(1f)
+                        )
                         VerticalDivider(thickness = 1.dp, color = Color.LightGray.copy(alpha = 0.3f))
-                        TimelineColumn(timings = dayData.hora, modifier = Modifier.weight(1f))
+                        TimelineColumn(
+                            timings = dayData.hora, 
+                            onTimingClick = onTimingClick,
+                            modifier = Modifier.weight(1f)
+                        )
                     }
 
                     // Sun Markers
@@ -736,17 +774,18 @@ fun TimeGrid() {
 @Composable
 fun TimelineColumn(
     timings: List<Timing>,
+    onTimingClick: (Timing) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier.fillMaxHeight()) {
         timings.forEach { timing ->
-            TimingCard(timing = timing)
+            TimingCard(timing = timing, onClick = { onTimingClick(timing) })
         }
     }
 }
 
 @Composable
-fun TimingCard(timing: Timing) {
+fun TimingCard(timing: Timing, onClick: () -> Unit) {
     val topOffset = calculateOffset(timing.startTime)
     val bottomOffset = calculateOffset(timing.endTime)
     val height = bottomOffset - topOffset
@@ -759,10 +798,9 @@ fun TimingCard(timing: Timing) {
             .padding(horizontal = 4.dp, vertical = 1.dp)
             .offset(y = topOffset)
             .height(height - 2.dp)
-            .fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = containerColor
-        ),
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        colors = CardDefaults.cardColors(containerColor = containerColor),
         border = BorderStroke(1.dp, CardOuterBorderColor),
         shape = RoundedCornerShape(4.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -778,63 +816,244 @@ fun TimingCard(timing: Timing) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-            if (height > 40.dp) {
-                when (timing) {
-                    is NallaNeram -> {
+                // ICON LOGIC - Unified and explicitly handling Yama
+                if (height > 40.dp) {
+                    val iconPainter = when {
+                        timing is SpecialPeriod && timing.name == "Rahu" -> painterResource(R.drawable.ic_rahu)
+                        timing is SpecialPeriod && (timing.name == "Kuli Dawn" || timing.name == "Kuli Dusk") -> painterResource(R.drawable.ic_saturn)
+                        timing is SpecialPeriod && timing.name == "Yama" -> painterResource(R.drawable.ic_yama_buffalo)
+                        else -> null
+                    }
+
+                    if (iconPainter != null) {
+                        Icon(
+                            painter = iconPainter,
+                            contentDescription = null,
+                            modifier = Modifier.size(if (height > 80.dp) 32.dp else 24.dp),
+                            tint = contentColor.copy(alpha = 0.9f)
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                    } else if (timing is NallaNeram) {
                         Icon(
                             imageVector = Icons.Default.Star,
                             contentDescription = null,
-                            modifier = Modifier.size(32.dp),
+                            modifier = Modifier.size(if (height > 80.dp) 24.dp else 16.dp),
                             tint = contentColor.copy(alpha = 0.8f)
                         )
                         Spacer(modifier = Modifier.height(2.dp))
                     }
-                    is SpecialPeriod -> {
-                        val iconPainter = when (timing.name) {
-                            "Rahu" -> painterResource(R.drawable.ic_rahu)
-                            "Kuli Dawn", "Kuli Dusk" -> painterResource(R.drawable.ic_saturn)
-                            else -> null
-                        }
+                }
 
-                        if (iconPainter != null) {
-                            Icon(
-                                painter = iconPainter,
-                                contentDescription = null,
-                                modifier = Modifier.size(32.dp),
-                                tint = contentColor.copy(alpha = 0.8f)
-                            )
-                            Spacer(modifier = Modifier.height(2.dp))
-                        }
-                    }
-                    else -> {}
+                val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+                Text(
+                    text = "${timing.startTime.format(timeFormatter)} - ${timing.endTime.format(timeFormatter)}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = contentColor,
+                    fontSize = 9.sp,
+                    maxLines = 1
+                )
+
+                val label = when (timing) {
+                    is Hora -> timing.name
+                    is NallaNeram -> "Nalla"
+                    is GowriNeram -> timing.name
+                    is SpecialPeriod -> timing.name
+                }
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = contentColor,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1
+                )
+
+                if (height > 50.dp && timing.tamilName.isNotEmpty()) {
+                    Text(
+                        text = timing.tamilName,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = contentColor.copy(alpha = 0.7f),
+                        fontSize = 9.sp,
+                        maxLines = 1
+                    )
                 }
             }
-
-            val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-            Text(
-                text = "${timing.startTime.format(timeFormatter)} - ${timing.endTime.format(timeFormatter)}",
-                style = MaterialTheme.typography.labelSmall,
-                color = contentColor,
-                fontSize = 9.sp,
-                maxLines = 1
-            )
-            val label = when (timing) {
-                is Hora -> timing.name
-                is NallaNeram -> "Nalla"
-                is GowriNeram -> timing.name
-                is SpecialPeriod -> timing.name
+            
+            // Compatibility Icon for Hora
+            if (timing is Hora) {
+                Box(modifier = Modifier.fillMaxSize().padding(2.dp), contentAlignment = Alignment.TopEnd) {
+                    val (icon, tint) = when (timing.compatibility) {
+                        HoraCompatibility.FAVORABLE -> Icons.Default.CheckCircle to CompatibilityFavorable
+                        HoraCompatibility.CONFLICTING -> Icons.Default.Cancel to CompatibilityConflicting
+                        HoraCompatibility.NEUTRAL -> Icons.Default.RadioButtonUnchecked to CompatibilityNeutral
+                    }
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        modifier = Modifier.size(if (height > 60.dp) 20.dp else 14.dp).background(Color.White, RoundedCornerShape(10.dp)),
+                        tint = tint
+                    )
+                }
             }
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.Bold,
-                color = contentColor,
-                textAlign = TextAlign.Center,
-                maxLines = 1
-            )
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TimingDetailSheet(
+    timing: Timing,
+    sheetState: SheetState,
+    onDismiss: () -> Unit
+) {
+    val timeFormatter = DateTimeFormatter.ofPattern("hh:mm a")
+    val containerColor = SacredTimelineColors.getTimingColor(timing)
+    val contentColor = SacredTimelineColors.getContentColor(containerColor)
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        dragHandle = { BottomSheetDefaults.DragHandle() }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 32.dp, start = 24.dp, end = 24.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Surface(
+                    color = containerColor,
+                    shape = RoundedCornerShape(8.dp),
+                    border = BorderStroke(1.dp, Color.Black.copy(alpha = 0.1f)),
+                    modifier = Modifier.size(48.dp)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        when (timing) {
+                            is NallaNeram -> Icon(Icons.Default.Star, contentDescription = null, tint = contentColor)
+                            is Hora -> Icon(Icons.Default.Today, contentDescription = null, tint = contentColor)
+                            is GowriNeram -> Icon(Icons.Default.Brightness4, contentDescription = null, tint = contentColor)
+                            is SpecialPeriod -> {
+                                val iconPainter = when (timing.name) {
+                                    "Rahu" -> painterResource(R.drawable.ic_rahu)
+                                    "Kuli Dawn", "Kuli Dusk" -> painterResource(R.drawable.ic_saturn)
+                                    "Yama" -> painterResource(R.drawable.ic_yama_buffalo)
+                                    else -> null
+                                }
+                                if (iconPainter != null) {
+                                    Icon(iconPainter, contentDescription = null, tint = contentColor, modifier = Modifier.size(32.dp))
+                                } else {
+                                    Icon(Icons.Default.Warning, contentDescription = null, tint = contentColor)
+                                }
+                            }
+                            else -> Icon(Icons.Default.Info, contentDescription = null, tint = contentColor)
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.width(16.dp))
+                Column {
+                    Text(
+                        text = timing.tamilName,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = when (timing) {
+                            is Hora -> "${timing.name} Hora"
+                            is GowriNeram -> "${timing.name} Gowri"
+                            else -> timing.name
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            HorizontalDivider()
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
+                    Text("From", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(timing.startTime.format(timeFormatter), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                }
+                Column(horizontalAlignment = Alignment.End) {
+                    Text("To", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(timing.endTime.format(timeFormatter), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                }
+            }
+            
+            if (timing is Hora) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Surface(
+                    color = when (timing.compatibility) {
+                        HoraCompatibility.FAVORABLE -> CompatibilityFavorable.copy(alpha = 0.1f)
+                        HoraCompatibility.CONFLICTING -> CompatibilityConflicting.copy(alpha = 0.1f)
+                        HoraCompatibility.NEUTRAL -> CompatibilityNeutral.copy(alpha = 0.1f)
+                    },
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        val (icon, tint) = when (timing.compatibility) {
+                            HoraCompatibility.FAVORABLE -> Icons.Default.CheckCircle to CompatibilityFavorable
+                            HoraCompatibility.CONFLICTING -> Icons.Default.Cancel to CompatibilityConflicting
+                            HoraCompatibility.NEUTRAL -> Icons.Default.RadioButtonUnchecked to CompatibilityNeutral
+                        }
+                        Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(20.dp).padding(top = 2.dp))
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text(
+                            text = Metadata.getHoraGuidance(timing.name, timing.compatibility),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+                Text("Strategic Activities", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+                Spacer(modifier = Modifier.height(8.dp))
+                val activities = Metadata.getHoraStrategicActivities(timing.name, timing.compatibility)
+                activities.forEach { activity ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = activity, style = MaterialTheme.typography.bodyLarge)
+                    }
+                }
+            }
+            
+            if (timing.description.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(24.dp))
+                Text("Significance", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = timing.description,
+                    style = MaterialTheme.typography.bodyLarge,
+                    lineHeight = 24.sp
+                )
+            }
+        }
+    }
 }
 
 private fun calculateOffset(time: LocalTime): Dp {
