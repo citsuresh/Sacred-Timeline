@@ -278,12 +278,40 @@ fun PortraitTimelineLayout(
         topBar = {
             TopAppBar(
                 title = { 
-                    Text(
-                        text = "Sacred Timeline",
-                        style = MaterialTheme.typography.titleLarge,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    Column {
+                        Text(
+                            text = "Sacred Timeline",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = selectedDate.format(DateTimeFormatter.ofPattern("MMM dd, yyyy")),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
+                                modifier = Modifier.clickable { onDateClick() }
+                            )
+                            if (uiState is TimelineUiState.Success) {
+                                Text(
+                                    text = " • ",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f)
+                                )
+                                Text(
+                                    text = "${if (uiState.isLocationAuto) "📍" else "✎"} ${uiState.locationName}",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.clickable { onLocationClick(uiState.locationName) }
+                                )
+                            }
+                        }
+                    }
                 },
                 actions = {
                     IconButton(onClick = onTodayClick) {
@@ -302,13 +330,6 @@ fun PortraitTimelineLayout(
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
-            LocationDateRow(
-                selectedDate = selectedDate,
-                uiState = uiState,
-                onDateClick = onDateClick,
-                onLocationClick = onLocationClick
-            )
-
             HorizontalDateDial(
                 selectedDate = selectedDate,
                 dates = dates,
@@ -361,12 +382,24 @@ fun LandscapeTimelineLayout(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = "Sacred Timeline",
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "Sacred Timeline",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                            if (uiState is TimelineUiState.Success) {
+                                Text(
+                                    text = "${if (uiState.isLocationAuto) "📍" else "✎"} ${uiState.locationName}",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.clickable { onLocationClick(uiState.locationName) }
+                                )
+                            }
+                        }
                         Row {
                             IconButton(onClick = onTodayClick, modifier = Modifier.size(32.dp)) {
                                 Icon(Icons.Filled.Today, contentDescription = "Today", modifier = Modifier.size(18.dp))
@@ -377,14 +410,14 @@ fun LandscapeTimelineLayout(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                     
-                    LocationDateRow(
-                        selectedDate = selectedDate,
-                        uiState = uiState,
-                        onDateClick = onDateClick,
-                        onLocationClick = onLocationClick,
-                        isLandscape = true
+                    Text(
+                        text = selectedDate.format(DateTimeFormatter.ofPattern("EEE, MMM dd, yyyy")),
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.clickable { onDateClick() }
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
@@ -438,67 +471,6 @@ fun LandscapeTimelineLayout(
     }
 }
 
-@Composable
-fun LocationDateRow(
-    selectedDate: LocalDate,
-    uiState: TimelineUiState,
-    onDateClick: () -> Unit,
-    onLocationClick: (String) -> Unit,
-    isLandscape: Boolean = false
-) {
-    Surface(
-        color = if (isLandscape) Color.Transparent else MaterialTheme.colorScheme.primaryContainer,
-        modifier = Modifier.fillMaxWidth(),
-        shape = if (isLandscape) RoundedCornerShape(8.dp) else RoundedCornerShape(0.dp),
-        border = if (isLandscape) BorderStroke(1.dp, MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.2f)) else null
-    ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    Icons.Default.CalendarMonth,
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = selectedDate.format(DateTimeFormatter.ofPattern("MMM dd, yyyy")),
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    maxLines = 1,
-                    modifier = Modifier.clickable { onDateClick() }
-                )
-            }
-            
-            if (uiState is TimelineUiState.Success) {
-                val isUnknown = uiState.locationName == "Unknown Location"
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(top = 2.dp)
-                ) {
-                    Text(
-                        text = "${if (uiState.isLocationAuto) "📍" else "✎"} ",
-                        fontSize = 12.sp
-                    )
-                    Text(
-                        text = uiState.locationName,
-                        style = if (uiState.isLocationAuto) MaterialTheme.typography.labelMedium else MaterialTheme.typography.labelMedium.copy(fontStyle = androidx.compose.ui.text.font.FontStyle.Italic),
-                        color = if (isUnknown) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier
-                            .clickable { onLocationClick(uiState.locationName) }
-                    )
-                }
-            }
-        }
-    }
-}
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
