@@ -17,13 +17,17 @@ class WidgetUpdateWorker(
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
-        // 1. Update the widget immediately
-        PanchangamWidget().updateAll(applicationContext)
+        return try {
+            // 1. Update the widget immediately
+            PanchangamWidget().updateAll(applicationContext)
 
-        // 2. Schedule the next transition-based update
-        scheduleNextTransition(applicationContext)
+            // 2. Schedule the next transition-based update
+            scheduleNextTransition(applicationContext)
 
-        return Result.success()
+            Result.success()
+        } catch (e: Exception) {
+            Result.retry()
+        }
     }
 
     private suspend fun scheduleNextTransition(context: Context) {
@@ -60,6 +64,20 @@ class WidgetUpdateWorker(
 
     companion object {
         private const val WORK_NAME = "PanchangamWidgetUpdateWorker"
+        private const val IMMEDIATE_WORK_NAME = "ImmediateWidgetUpdate"
+
+        fun triggerImmediateUpdate(context: Context) {
+            val workRequest = OneTimeWorkRequestBuilder<WidgetUpdateWorker>()
+                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                .addTag("ImmediateUpdate")
+                .build()
+
+            WorkManager.getInstance(context).enqueueUniqueWork(
+                IMMEDIATE_WORK_NAME,
+                ExistingWorkPolicy.REPLACE,
+                workRequest
+            )
+        }
 
         fun enqueuePeriodicWork(context: Context) {
             val workRequest = PeriodicWorkRequestBuilder<WidgetUpdateWorker>(
