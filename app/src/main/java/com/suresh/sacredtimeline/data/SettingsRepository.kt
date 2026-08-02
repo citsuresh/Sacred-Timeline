@@ -17,6 +17,8 @@ class SettingsRepository(private val context: Context) {
         val SINGLE_VIEW_SCALE = floatPreferencesKey("single_view_scale")
         val COLUMN_VISIBILITY = stringSetPreferencesKey("column_visibility")
         val COLUMN_ORDER = stringPreferencesKey("column_order")
+        val WIDGET_COLUMN_VISIBILITY = stringSetPreferencesKey("widget_column_visibility")
+        val WIDGET_COLUMN_ORDER = stringPreferencesKey("widget_column_order")
         val DEFAULT_LAUNCH_VIEW = stringPreferencesKey("default_launch_view")
         val TIME_FORMAT_24H = booleanPreferencesKey("time_format_24h")
         val SHOW_NOW_LINE = booleanPreferencesKey("show_now_line")
@@ -27,6 +29,8 @@ class SettingsRepository(private val context: Context) {
         val MANUAL_CITY_NAME = stringPreferencesKey("manual_city_name")
         val MANUAL_LATITUDE = doublePreferencesKey("manual_latitude")
         val MANUAL_LONGITUDE = doublePreferencesKey("manual_longitude")
+        val LAST_KNOWN_LATITUDE = doublePreferencesKey("last_known_latitude")
+        val LAST_KNOWN_LONGITUDE = doublePreferencesKey("last_known_longitude")
         val PRELOAD_DAYS = intPreferencesKey("preload_days")
     }
 
@@ -39,6 +43,15 @@ class SettingsRepository(private val context: Context) {
 
     val columnOrder: Flow<List<String>> = context.dataStore.data.map { 
         val orderString = it[Keys.COLUMN_ORDER] ?: "NERAM,GOWRI,HORA"
+        orderString.split(",").filter { it.isNotBlank() }
+    }
+
+    val widgetColumnVisibility: Flow<Set<String>> = context.dataStore.data.map { 
+        it[Keys.WIDGET_COLUMN_VISIBILITY] ?: setOf("NERAM", "GOWRI", "HORA")
+    }
+
+    val widgetColumnOrder: Flow<List<String>> = context.dataStore.data.map { 
+        val orderString = it[Keys.WIDGET_COLUMN_ORDER] ?: "NERAM,GOWRI,HORA"
         orderString.split(",").filter { it.isNotBlank() }
     }
 
@@ -55,6 +68,9 @@ class SettingsRepository(private val context: Context) {
     val manualCityName: Flow<String> = context.dataStore.data.map { it[Keys.MANUAL_CITY_NAME] ?: "Coimbatore" }
     val manualLatitude: Flow<Double> = context.dataStore.data.map { it[Keys.MANUAL_LATITUDE] ?: 11.0168 }
     val manualLongitude: Flow<Double> = context.dataStore.data.map { it[Keys.MANUAL_LONGITUDE] ?: 76.9558 }
+
+    val lastKnownLatitude: Flow<Double> = context.dataStore.data.map { it[Keys.LAST_KNOWN_LATITUDE] ?: 11.0168 }
+    val lastKnownLongitude: Flow<Double> = context.dataStore.data.map { it[Keys.LAST_KNOWN_LONGITUDE] ?: 76.9558 }
 
     val widgetRefreshMinutes: Flow<Int> = context.dataStore.data.map { it[Keys.WIDGET_REFRESH_MINUTES] ?: 30 }
     
@@ -79,6 +95,19 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun updateColumnOrder(order: List<String>) {
         context.dataStore.edit { it[Keys.COLUMN_ORDER] = order.joinToString(",") }
+    }
+
+    suspend fun updateWidgetColumnVisibility(column: String, visible: Boolean) {
+        context.dataStore.edit { prefs ->
+            val current = prefs[Keys.WIDGET_COLUMN_VISIBILITY] ?: setOf("NERAM", "GOWRI", "HORA")
+            val newSet = current.toMutableSet()
+            if (visible) newSet.add(column) else newSet.remove(column)
+            prefs[Keys.WIDGET_COLUMN_VISIBILITY] = newSet
+        }
+    }
+
+    suspend fun updateWidgetColumnOrder(order: List<String>) {
+        context.dataStore.edit { it[Keys.WIDGET_COLUMN_ORDER] = order.joinToString(",") }
     }
 
     suspend fun setDefaultLaunchView(mode: ViewMode) {
@@ -109,6 +138,13 @@ class SettingsRepository(private val context: Context) {
         context.dataStore.edit { 
             it[Keys.MANUAL_LATITUDE] = lat
             it[Keys.MANUAL_LONGITUDE] = lng
+        }
+    }
+
+    suspend fun updateLastKnownCoordinates(lat: Double, lng: Double) {
+        context.dataStore.edit { 
+            it[Keys.LAST_KNOWN_LATITUDE] = lat
+            it[Keys.LAST_KNOWN_LONGITUDE] = lng
         }
     }
 

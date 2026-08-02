@@ -26,57 +26,72 @@ import androidx.glance.action.clickable
 import androidx.glance.appwidget.action.actionRunCallback
 import com.suresh.sacredtimeline.R
 import com.suresh.sacredtimeline.MainActivity
+import com.suresh.sacredtimeline.data.CacheManager
+import com.suresh.sacredtimeline.data.SettingsRepository
 import com.suresh.sacredtimeline.logic.MockPanchangamProvider
 import com.suresh.sacredtimeline.logic.SunriseSunsetProvider
 import com.suresh.sacredtimeline.model.*
 import com.suresh.sacredtimeline.ui.theme.*
+import kotlinx.coroutines.flow.first
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 class PanchangamWidget : GlanceAppWidget() {
     
-    private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-
     override suspend fun provideGlance(context: Context, id: GlanceId) {
+        val repository = SettingsRepository(context)
+        val cacheManager = CacheManager(context)
         val provider = MockPanchangamProvider()
         val sunProvider = SunriseSunsetProvider()
+        
         val now = LocalTime.now()
         val date = LocalDate.now()
 
-        // Use Coimbatore coords for widget default
-        val sunTimes = sunProvider.getSunTimes(11.0168, 76.9558, date)
-        val allTimings = provider.getTimings(date, sunTimes.sunrise, sunTimes.sunset)
-        val current = provider.getCurrentTimings(date, now, sunTimes.sunrise, sunTimes.sunset)
+        // 1. Fetch Settings
+        val mode = repository.locationMode.first()
+        val is24Hour = repository.timeFormat24h.first()
+        val columnVisibility = repository.widgetColumnVisibility.first()
+        val columnOrder = repository.widgetColumnOrder.first()
+        val lat: Double
+        val lng: Double
+        
+        if (mode == "AUTO") {
+            lat = 11.0168
+            lng = 76.9558
+        } else {
+            lat = repository.manualLatitude.first()
+            lng = repository.manualLongitude.first()
+        }
 
-        // Calculate next timings
-        val nextNalla = allTimings.filterIsInstance<NallaNeram>()
-            .filter { it.startTime.isAfter(now) }
-            .minByOrNull { it.startTime }
-        
-        val nextGowri = allTimings.filterIsInstance<GowriNeram>()
-            .filter { it.startTime.isAfter(now) }
-            .minByOrNull { it.startTime }
-        
-        val nextHora = allTimings.filterIsInstance<Hora>()
-            .filter { it.startTime.isAfter(now) }
-            .minByOrNull { it.startTime }
-        
-        val nextSpecial = allTimings.filterIsInstance<SpecialPeriod>()
-            .filter { it.startTime.isAfter(now) }
-            .minByOrNull { it.startTime }
+        // 2. Fetch Data (Cache or Network)
+        val cache = cacheManager.loadCache(lat, lng)
+        val dayData: DayData = if (cache?.containsKey(date) == true) {
+            cache[date]!!
+        } else {
+            val sunResult = sunProvider.getSunTimes(lat, lng, date)
+            val timings = provider.getTimings(date, sunResult.sunrise, sunResult.sunset)
+            DayData(
+                nallaNeram = timings.filterIsInstance<NallaNeram>(),
+                gowriNeram = timings.filterIsInstance<GowriNeram>(),
+                hora = timings.filterIsInstance<Hora>(),
+                specialPeriods = timings.filterIsInstance<SpecialPeriod>(),
+                sunrise = sunResult.sunrise,
+                sunset = sunResult.sunset,
+                isFallback = sunResult.isFallback
+            )
+        }
+
+        val timeFormatter = DateTimeFormatter.ofPattern(if (is24Hour) "HH:mm" else "hh:mm a")
 
         provideContent {
             GlanceTheme {
                 WidgetContent(
-                    nallaNeram = current.nallaNeram,
-                    gowriNeram = current.gowriNeram,
-                    hora = current.hora,
-                    specialPeriod = current.specialPeriod,
-                    nextNalla = nextNalla,
-                    nextGowri = nextGowri,
-                    nextHora = nextHora,
-                    nextSpecial = nextSpecial
+                    dayData = dayData,
+                    now = now,
+                    columnVisibility = columnVisibility,
+                    columnOrder = columnOrder,
+                    timeFormatter = timeFormatter
                 )
             }
         }
@@ -84,14 +99,11 @@ class PanchangamWidget : GlanceAppWidget() {
 
     @Composable
     private fun WidgetContent(
-        nallaNeram: NallaNeram?,
-        gowriNeram: GowriNeram?,
-        hora: Hora?,
-        specialPeriod: SpecialPeriod?,
-        nextNalla: NallaNeram?,
-        nextGowri: GowriNeram?,
-        nextHora: Hora?,
-        nextSpecial: SpecialPeriod?
+        dayData: DayData,
+        now: LocalTime,
+        columnVisibility: Set<String>,
+        columnOrder: List<String>,
+        timeFormatter: DateTimeFormatter
     ) {
         Box(
             modifier = GlanceModifier
@@ -105,30 +117,42 @@ class PanchangamWidget : GlanceAppWidget() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // First Column: Neram (Nalla or Special)
-                val neramTiming = specialPeriod ?: nallaNeram
-                val neramLabel = when {
-                    specialPeriod != null -> specialPeriod.name
-                    nallaNeram != null -> "Nalla"
-                    else -> "None"
+                columnOrder.forEach { colId ->
+                    if (columnVisibility.contains(colId)) {
+                        when (colId) {
+                            "NERAM" -> {
+                                val currentNalla = dayData.nallaNeram.find { it.isCurrent(now) }
+                                val currentSpecial = dayData.specialPeriods.find { it.isCurrent(now) }
+                                val nextNalla = dayData.nallaNeram.filter { it.startTime.isAfter(now) }.minByOrNull { it.startTime }
+                                val nextSpecial = dayData.specialPeriods.filter { it.startTime.isAfter(now) }.minByOrNull { it.startTime }
+                                
+                                val timing = currentSpecial ?: currentNalla
+                                val label = when {
+                                    currentSpecial != null -> currentSpecial.name
+                                    currentNalla != null -> "Nalla"
+                                    else -> "None"
+                                }
+                                val next = if (nextSpecial != null && (nextNalla == null || nextSpecial.startTime.isBefore(nextNalla.startTime))) {
+                                    nextSpecial
+                                } else {
+                                    nextNalla
+                                }
+                                
+                                TimingColumn("Neram", label, timing, next, timeFormatter, GlanceModifier.defaultWeight())
+                            }
+                            "GOWRI" -> {
+                                val currentGowri = dayData.gowriNeram.find { it.isCurrent(now) }
+                                val nextGowri = dayData.gowriNeram.filter { it.startTime.isAfter(now) }.minByOrNull { it.startTime }
+                                TimingColumn("Gowri", currentGowri?.name ?: "None", currentGowri, nextGowri, timeFormatter, GlanceModifier.defaultWeight())
+                            }
+                            "HORA" -> {
+                                val currentHora = dayData.hora.find { it.isCurrent(now) }
+                                val nextHora = dayData.hora.filter { it.startTime.isAfter(now) }.minByOrNull { it.startTime }
+                                TimingColumn("Hora", currentHora?.name ?: "None", currentHora, nextHora, timeFormatter, GlanceModifier.defaultWeight())
+                            }
+                        }
+                    }
                 }
-                
-                // For Neram column, prioritize next Special if it's coming soon, else next Nalla
-                val nextNeram = if (nextSpecial != null && (nextNalla == null || nextSpecial.startTime.isBefore(nextNalla.startTime))) {
-                    nextSpecial
-                } else {
-                    nextNalla
-                }
-
-                TimingColumn("Neram", neramLabel, neramTiming, nextNeram, GlanceModifier.defaultWeight())
-                TimingColumn(
-                    "Gowri",
-                    gowriNeram?.name ?: "None",
-                    gowriNeram,
-                    nextGowri,
-                    GlanceModifier.defaultWeight()
-                )
-                TimingColumn("Hora", hora?.name ?: "None", hora, nextHora, GlanceModifier.defaultWeight())
             }
 
             // Refresh Button Overlay
@@ -161,6 +185,7 @@ class PanchangamWidget : GlanceAppWidget() {
         label: String,
         timing: Timing?,
         nextTiming: Timing?,
+        timeFormatter: DateTimeFormatter,
         modifier: GlanceModifier = GlanceModifier
     ) {
         val backgroundColor = timing?.let { SacredTimelineColors.getTimingColor(it) } ?: Color.Gray

@@ -7,6 +7,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.suresh.sacredtimeline.data.CacheManager
 import com.suresh.sacredtimeline.data.SettingsRepository
 import com.suresh.sacredtimeline.logic.MockPanchangamProvider
 import com.suresh.sacredtimeline.logic.SunriseSunsetProvider
@@ -30,6 +31,7 @@ import java.util.Locale
 
 class TimelineViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = SettingsRepository(application)
+    private val cacheManager = CacheManager(application)
     private val provider = MockPanchangamProvider()
     private val sunProvider = SunriseSunsetProvider()
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(application)
@@ -91,18 +93,30 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
                 val hasChanged = if (mode == "MANUAL") {
                     _locationName.value != city || currentLocation != coords || _isLocationAuto.value
                 } else {
-                    // For AUTO, we let onLocationPermissionGranted handle the diffing
                     false 
                 }
 
-                if (mode == "MANUAL" && hasChanged) {
+                if (mode == "MANUAL") {
                     _locationName.value = city
                     _isLocationAuto.value = false
                     currentLocation = coords
-                    cacheMutex.withLock { cachedDays.clear() }
-                    preloadData(selectedDate.value, repository.preloadDays.first())
+                    
+                    if (hasChanged) {
+                        cacheMutex.withLock { cachedDays.clear() }
+                        preloadData(selectedDate.value, repository.preloadDays.first())
+                    } else if (cachedDays.isEmpty()) {
+                        // Cold start in Manual Mode: Try to load from disk
+                        val diskData = cacheManager.loadCache(coords.first, coords.second)
+                        if (diskData != null) {
+                            cacheMutex.withLock {
+                                cachedDays.putAll(diskData)
+                            }
+                            updateSuccessState()
+                        }
+                        // Refresh/Preload silently
+                        preloadData(selectedDate.value, repository.preloadDays.first())
+                    }
                 } else if (mode == "AUTO") {
-                    // Trigger GPS update when switching to AUTO
                     onLocationPermissionGranted()
                 }
             }
@@ -155,10 +169,30 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
                     
                     if (distanceMoved > 0.001 || !_isLocationAuto.value) {
                         currentLocation = newCoords
+                        repository.updateLastKnownCoordinates(newCoords.first, newCoords.second)
+                        
                         val name = getAddressFromLocation(location.latitude, location.longitude)
                         _locationName.value = name
                         _isLocationAuto.value = name != "Unknown Location"
-                        cacheMutex.withLock { cachedDays.clear() } // Clear cache on location change
+                        
+                        // Try disk cache for new location if we haven't already
+                        val diskData = cacheManager.loadCache(newCoords.first, newCoords.second)
+                        cacheMutex.withLock {
+                            cachedDays.clear()
+                            if (diskData != null) {
+                                cachedDays.putAll(diskData)
+                            }
+                        }
+                        if (diskData != null) updateSuccessState()
+                        
+                        preloadData(selectedDate.value, repository.preloadDays.first())
+                    } else if (cachedDays.isEmpty()) {
+                        // Cold start in Auto Mode: Already has coords but no data
+                        val diskData = cacheManager.loadCache(newCoords.first, newCoords.second)
+                        if (diskData != null) {
+                            cacheMutex.withLock { cachedDays.putAll(diskData) }
+                            updateSuccessState()
+                        }
                         preloadData(selectedDate.value, repository.preloadDays.first())
                     }
                 }
@@ -191,6 +225,17 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    private fun updateSuccessState() {
+        viewModelScope.launch {
+            val snapshot = cacheMutex.withLock { cachedDays.toMap() }
+            _uiState.value = TimelineUiState.Success(
+                days = snapshot,
+                locationName = _locationName.value,
+                isLocationAuto = _isLocationAuto.value
+            )
+        }
+    }
+
     private fun preloadData(centerDate: LocalDate, rangeDays: Int = 3) {
         viewModelScope.launch {
             // Ensure at least the current date is loading if no data
@@ -216,6 +261,9 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
                 locationName = _locationName.value,
                 isLocationAuto = _isLocationAuto.value
             )
+            
+            // Save to disk
+            cacheManager.saveCache(currentLocation.first, currentLocation.second, snapshot)
         }
     }
 
@@ -235,16 +283,6 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
         )
     }
 }
-
-data class DayData(
-    val nallaNeram: List<NallaNeram>,
-    val gowriNeram: List<GowriNeram>,
-    val hora: List<Hora>,
-    val specialPeriods: List<SpecialPeriod>,
-    val sunrise: LocalTime,
-    val sunset: LocalTime,
-    val isFallback: Boolean
-)
 
 sealed interface TimelineUiState {
     data object Loading : TimelineUiState

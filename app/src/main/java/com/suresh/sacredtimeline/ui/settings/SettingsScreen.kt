@@ -30,6 +30,8 @@ fun SettingsScreen(
     val pinchToZoomEnabled by viewModel.pinchToZoomEnabled.collectAsState()
     val columnVisibility by viewModel.columnVisibility.collectAsState()
     val columnOrder by viewModel.columnOrder.collectAsState()
+    val widgetColumnVisibility by viewModel.widgetColumnVisibility.collectAsState()
+    val widgetColumnOrder by viewModel.widgetColumnOrder.collectAsState()
 
     Scaffold(
         topBar = {
@@ -195,7 +197,7 @@ fun SettingsScreen(
             }
 
             item {
-                SettingsSection(title = "Widget") {
+                SettingsSection(title = "Widget Management") {
                     val refreshMinutes by viewModel.widgetRefreshMinutes.collectAsState()
                     SettingsDropdownItem(
                         label = "Widget Refresh Duration",
@@ -216,6 +218,27 @@ fun SettingsScreen(
                             viewModel.setWidgetRefreshMinutes(mins)
                         }
                     )
+                    
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), thickness = 0.5.dp)
+                    
+                    Text(
+                        "Column Management (Widget)",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                    
+                    widgetColumnOrder.forEachIndexed { index, colId ->
+                        val isVisible = widgetColumnVisibility.contains(colId)
+                        ColumnOrderItem(
+                            name = colId,
+                            isVisible = isVisible,
+                            onToggleVisibility = { viewModel.updateWidgetColumnVisibility(colId, it) },
+                            onMoveUp = if (index > 0) { { viewModel.moveWidgetColumn(colId, -1) } } else null,
+                            onMoveDown = if (index < widgetColumnOrder.size - 1) { { viewModel.moveWidgetColumn(colId, 1) } } else null
+                        )
+                        if (index < widgetColumnOrder.size - 1) HorizontalDivider(modifier = Modifier.padding(horizontal = 8.dp), thickness = 0.5.dp)
+                    }
                 }
             }
 
@@ -231,7 +254,7 @@ fun SettingsScreen(
                         }
                     )
                     Button(
-                        onClick = { /* In-memory cache clears on restart; Room implementation future */ },
+                        onClick = { viewModel.clearCache() },
                         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                     ) {

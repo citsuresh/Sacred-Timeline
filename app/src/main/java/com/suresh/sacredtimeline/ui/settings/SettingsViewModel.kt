@@ -5,6 +5,7 @@ import android.location.Address
 import android.location.Geocoder
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.suresh.sacredtimeline.data.CacheManager
 import com.suresh.sacredtimeline.data.SettingsRepository
 import com.suresh.sacredtimeline.ui.navigation.ViewMode
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +20,7 @@ import java.util.Locale
 
 class SettingsViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = SettingsRepository(application)
+    private val cacheManager = CacheManager(application)
 
     init {
         // Automatically reschedule widget work when interval changes
@@ -42,6 +44,14 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     )
 
     val columnOrder: StateFlow<List<String>> = repository.columnOrder.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), listOf("NERAM", "GOWRI", "HORA")
+    )
+
+    val widgetColumnVisibility: StateFlow<Set<String>> = repository.widgetColumnVisibility.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), setOf("NERAM", "GOWRI", "HORA")
+    )
+
+    val widgetColumnOrder: StateFlow<List<String>> = repository.widgetColumnOrder.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), listOf("NERAM", "GOWRI", "HORA")
     )
 
@@ -100,6 +110,22 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             currentOrder.removeAt(index)
             currentOrder.add(newIndex, column)
             viewModelScope.launch { repository.updateColumnOrder(currentOrder) }
+        }
+    }
+
+    fun updateWidgetColumnVisibility(column: String, visible: Boolean) {
+        viewModelScope.launch { repository.updateWidgetColumnVisibility(column, visible) }
+    }
+
+    fun moveWidgetColumn(column: String, direction: Int) {
+        val currentOrder = widgetColumnOrder.value.toMutableList()
+        val index = currentOrder.indexOf(column)
+        if (index == -1) return
+        val newIndex = index + direction
+        if (newIndex in 0 until currentOrder.size) {
+            currentOrder.removeAt(index)
+            currentOrder.add(newIndex, column)
+            viewModelScope.launch { repository.updateWidgetColumnOrder(currentOrder) }
         }
     }
 
@@ -174,6 +200,10 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
     fun setPreloadDays(days: Int) {
         viewModelScope.launch { repository.setPreloadDays(days) }
+    }
+
+    fun clearCache() {
+        cacheManager.clearCache()
     }
 }
 

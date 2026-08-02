@@ -29,8 +29,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.suresh.sacredtimeline.model.DayData
 import com.suresh.sacredtimeline.model.Timing
-import com.suresh.sacredtimeline.ui.dashboard.DayData
 import com.suresh.sacredtimeline.ui.dashboard.TimelineUiState
 import com.suresh.sacredtimeline.ui.navigation.ViewMode
 import com.suresh.sacredtimeline.ui.theme.SeparatorGrey
