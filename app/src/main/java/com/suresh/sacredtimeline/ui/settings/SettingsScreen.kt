@@ -1,6 +1,9 @@
 package com.suresh.sacredtimeline.ui.settings
 
 import android.location.Address
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -10,6 +13,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -92,26 +98,6 @@ fun SettingsScreen(
             }
 
             item {
-                SettingsSection(title = "Timeline Density") {
-                    SettingsSliderItem(
-                        label = "Composite View Zoom",
-                        value = compositeScale,
-                        onValueChange = { viewModel.updateCompositeScale(it) }
-                    )
-                    SettingsSliderItem(
-                        label = "Single View Zoom",
-                        value = singleViewScale,
-                        onValueChange = { viewModel.updateSingleViewScale(it) }
-                    )
-                    SettingsToggleItem(
-                        label = "Enable Pinch-to-Zoom",
-                        checked = pinchToZoomEnabled,
-                        onCheckedChange = { viewModel.setPinchToZoomEnabled(it) }
-                    )
-                }
-            }
-
-            item {
                 SettingsSection(title = "Location") {
                     val locationMode by viewModel.locationMode.collectAsState()
                     val manualCityName by viewModel.manualCityName.collectAsState()
@@ -129,7 +115,6 @@ fun SettingsScreen(
                     if (locationMode == "MANUAL") {
                         var localInput by remember { mutableStateOf(manualCityName) }
                         
-                        // Sync local input when the verified city name changes from the ViewModel
                         LaunchedEffect(manualCityName) {
                             if (localInput != manualCityName) {
                                 localInput = manualCityName
@@ -243,6 +228,82 @@ fun SettingsScreen(
             }
 
             item {
+                SettingsSection(title = "Timeline Density") {
+                    SettingsSliderItem(
+                        label = "Composite View Zoom",
+                        value = compositeScale,
+                        onValueChange = { viewModel.updateCompositeScale(it) }
+                    )
+                    SettingsSliderItem(
+                        label = "Single View Zoom",
+                        value = singleViewScale,
+                        onValueChange = { viewModel.updateSingleViewScale(it) }
+                    )
+                    SettingsToggleItem(
+                        label = "Enable Pinch-to-Zoom",
+                        checked = pinchToZoomEnabled,
+                        onCheckedChange = { viewModel.setPinchToZoomEnabled(it) }
+                    )
+                }
+            }
+
+            item {
+                SettingsSection(title = "Timeline Indicators") {
+                    val nowLineColor by viewModel.nowLineColor.collectAsState()
+                    val nowLineThickness by viewModel.nowLineThickness.collectAsState()
+
+                    SettingsToggleItem(
+                        label = "Show NOW Line",
+                        checked = showNowLine,
+                        onCheckedChange = { viewModel.setShowNowLine(it) }
+                    )
+                    
+                    if (showNowLine) {
+                        Text(
+                            "Line Color",
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            val colors = listOf(
+                                Color.Red, 
+                                Color(0xFFFF5722), // Saffron/Orange
+                                Color(0xFFFFC107), // Gold
+                                Color.White,
+                                Color(0xFF4CAF50), // Green
+                                Color(0xFF2196F3)  // Blue
+                            )
+                            colors.forEach { color ->
+                                val isSelected = nowLineColor == color.toArgb()
+                                Box(
+                                    modifier = Modifier
+                                        .size(32.dp)
+                                        .clip(androidx.compose.foundation.shape.CircleShape)
+                                        .background(color)
+                                        .border(
+                                            width = if (isSelected) 3.dp else 1.dp,
+                                            color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Gray.copy(alpha = 0.5f),
+                                            shape = androidx.compose.foundation.shape.CircleShape
+                                        )
+                                        .clickable { viewModel.setNowLineColor(color.toArgb()) }
+                                )
+                            }
+                        }
+
+                        SettingsSliderItem(
+                            label = "Line Thickness",
+                            value = nowLineThickness,
+                            onValueChange = { viewModel.setNowLineThickness(it) },
+                            valueRange = 1f..10f
+                        )
+                    }
+                }
+            }
+
+            item {
                 SettingsSection(title = "Advanced (Cache)") {
                     val preloadDays by viewModel.preloadDays.collectAsState()
                     SettingsDropdownItem(
@@ -260,16 +321,6 @@ fun SettingsScreen(
                     ) {
                         Text("Clear Cache")
                     }
-                }
-            }
-
-            item {
-                SettingsSection(title = "Timeline Indicators") {
-                    SettingsToggleItem(
-                        label = "Show NOW Line",
-                        checked = showNowLine,
-                        onCheckedChange = { viewModel.setShowNowLine(it) }
-                    )
                 }
             }
         }
@@ -361,7 +412,8 @@ fun SettingsToggleItem(
 fun SettingsSliderItem(
     label: String,
     value: Float,
-    onValueChange: (Float) -> Unit
+    onValueChange: (Float) -> Unit,
+    valueRange: ClosedFloatingPointRange<Float> = 0.2f..3.0f
 ) {
     Column(modifier = Modifier.padding(vertical = 8.dp)) {
         Row(
@@ -369,12 +421,12 @@ fun SettingsSliderItem(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(label, style = MaterialTheme.typography.bodyLarge)
-            Text("${String.format(Locale.US, "%.1f", value)}x", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+            Text("${String.format(Locale.US, "%.1f", value)}${if (valueRange.start == 0.2f) "x" else "dp"}", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
         }
         Slider(
             value = value,
             onValueChange = onValueChange,
-            valueRange = 0.2f..3.0f,
+            valueRange = valueRange,
             modifier = Modifier.fillMaxWidth()
         )
     }

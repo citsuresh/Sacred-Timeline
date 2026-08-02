@@ -56,6 +56,8 @@ fun TimelinePager(
     pinchToZoomEnabled: Boolean,
     is24Hour: Boolean,
     showNowLine: Boolean,
+    nowLineColor: Int,
+    nowLineThickness: Float,
     columnVisibility: Set<String>,
     columnOrder: List<String>,
     onScaleChange: (Float) -> Unit,
@@ -124,6 +126,8 @@ fun TimelinePager(
                             isLandscape = isLandscape,
                             is24Hour = is24Hour,
                             showNowLine = showNowLine,
+                            nowLineColor = nowLineColor,
+                            nowLineThickness = nowLineThickness,
                             columnVisibility = columnVisibility,
                             columnOrder = columnOrder
                         )
@@ -171,6 +175,8 @@ fun TimelineContent(
     isLandscape: Boolean = false,
     is24Hour: Boolean = false,
     showNowLine: Boolean = true,
+    nowLineColor: Int = 0xFFFF0000.toInt(),
+    nowLineThickness: Float = 2.0f,
     columnVisibility: Set<String> = setOf("NERAM", "GOWRI", "HORA"),
     columnOrder: List<String> = listOf("NERAM", "GOWRI", "HORA")
 ) {
@@ -277,7 +283,12 @@ fun TimelineContent(
                     )
 
                     if (isToday && showNowLine) {
-                        NowIndicator(currentTime, hourHeight = hourHeight)
+                        NowIndicator(
+                            currentTime, 
+                            hourHeight = hourHeight, 
+                            color = Color(nowLineColor), 
+                            thickness = nowLineThickness.dp
+                        )
                     }
                 }
             }

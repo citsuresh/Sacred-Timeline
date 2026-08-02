@@ -36,6 +36,8 @@ fun TimelineDashboard(
     val pinchToZoomEnabled by viewModel.pinchToZoomEnabled.collectAsState(initial = true)
     val timeFormat24h by viewModel.timeFormat24h.collectAsState(initial = false)
     val showNowLine by viewModel.showNowLine.collectAsState()
+    val nowLineColor by viewModel.nowLineColor.collectAsState()
+    val nowLineThickness by viewModel.nowLineThickness.collectAsState()
     val columnVisibility by viewModel.columnVisibility.collectAsState(initial = setOf("NERAM", "GOWRI", "HORA"))
     val columnOrder by viewModel.columnOrder.collectAsState(initial = listOf("NERAM", "GOWRI", "HORA"))
     
@@ -169,6 +171,8 @@ fun TimelineDashboard(
             pinchToZoomEnabled = pinchToZoomEnabled,
             is24Hour = timeFormat24h,
             showNowLine = showNowLine,
+            nowLineColor = nowLineColor,
+            nowLineThickness = nowLineThickness,
             columnVisibility = columnVisibility,
             columnOrder = columnOrder,
             onMenuClick = onMenuClick,
@@ -199,6 +203,8 @@ fun TimelineDashboard(
             pinchToZoomEnabled = pinchToZoomEnabled,
             is24Hour = timeFormat24h,
             showNowLine = showNowLine,
+            nowLineColor = nowLineColor,
+            nowLineThickness = nowLineThickness,
             columnVisibility = columnVisibility,
             columnOrder = columnOrder,
             onMenuClick = onMenuClick,

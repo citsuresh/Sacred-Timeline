@@ -59,6 +59,14 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
     val showNowLine: StateFlow<Boolean> = repository.showNowLine.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), true
     )
+
+    val nowLineColor: StateFlow<Int> = repository.nowLineColor.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), 0xFFFF0000.toInt()
+    )
+
+    val nowLineThickness: StateFlow<Float> = repository.nowLineThickness.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), 2.0f
+    )
     
     val pinchToZoomEnabled = repository.pinchToZoomEnabled
 

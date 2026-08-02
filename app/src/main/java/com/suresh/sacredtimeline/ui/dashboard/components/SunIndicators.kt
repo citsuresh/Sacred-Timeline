@@ -174,19 +174,19 @@ fun SunGridMarker(time: LocalTime, label: String, icon: ImageVector, iconTint: C
 }
 
 @Composable
-fun BoxScope.NowIndicator(currentTime: LocalTime, hourHeight: Dp) {
+fun BoxScope.NowIndicator(currentTime: LocalTime, hourHeight: Dp, color: Color = Color.Red, thickness: Dp = 2.dp) {
     val topOffset = calculateOffset(currentTime, hourHeight)
     
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .offset(y = topOffset - 1.dp)
-            .height(2.dp)
-            .background(Color.Red)
+            .offset(y = topOffset - (thickness / 2))
+            .height(thickness)
+            .background(color)
     )
     
     Surface(
-        color = Color.Red,
+        color = color,
         shape = RoundedCornerShape(4.dp),
         modifier = Modifier
             .offset(y = topOffset - 10.dp)
@@ -195,7 +195,7 @@ fun BoxScope.NowIndicator(currentTime: LocalTime, hourHeight: Dp) {
     ) {
         Text(
             text = "NOW",
-            color = Color.White,
+            color = if (color == Color.White) Color.Black else Color.White,
             style = MaterialTheme.typography.labelSmall,
             modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
         )

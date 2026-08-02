@@ -22,8 +22,9 @@ class SettingsRepository(private val context: Context) {
         val DEFAULT_LAUNCH_VIEW = stringPreferencesKey("default_launch_view")
         val TIME_FORMAT_24H = booleanPreferencesKey("time_format_24h")
         val SHOW_NOW_LINE = booleanPreferencesKey("show_now_line")
-        val PINCH_TO_ZOOM_ENABLED = booleanPreferencesKey("pinch_to_zoom_enabled")
         val NOW_LINE_COLOR = intPreferencesKey("now_line_color")
+        val NOW_LINE_THICKNESS = floatPreferencesKey("now_line_thickness")
+        val PINCH_TO_ZOOM_ENABLED = booleanPreferencesKey("pinch_to_zoom_enabled")
         val WIDGET_REFRESH_MINUTES = intPreferencesKey("widget_refresh_minutes")
         val LOCATION_MODE = stringPreferencesKey("location_mode")
         val MANUAL_CITY_NAME = stringPreferencesKey("manual_city_name")
@@ -62,6 +63,8 @@ class SettingsRepository(private val context: Context) {
 
     val timeFormat24h: Flow<Boolean> = context.dataStore.data.map { it[Keys.TIME_FORMAT_24H] ?: false }
     val showNowLine: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_NOW_LINE] ?: true }
+    val nowLineColor: Flow<Int> = context.dataStore.data.map { it[Keys.NOW_LINE_COLOR] ?: 0xFFFF0000.toInt() } // Default Red
+    val nowLineThickness: Flow<Float> = context.dataStore.data.map { it[Keys.NOW_LINE_THICKNESS] ?: 2.0f }
     val pinchToZoomEnabled: Flow<Boolean> = context.dataStore.data.map { it[Keys.PINCH_TO_ZOOM_ENABLED] ?: true }
 
     val locationMode: Flow<String> = context.dataStore.data.map { it[Keys.LOCATION_MODE] ?: "AUTO" }
@@ -120,6 +123,14 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun setShowNowLine(show: Boolean) {
         context.dataStore.edit { it[Keys.SHOW_NOW_LINE] = show }
+    }
+
+    suspend fun setNowLineColor(color: Int) {
+        context.dataStore.edit { it[Keys.NOW_LINE_COLOR] = color }
+    }
+
+    suspend fun setNowLineThickness(thickness: Float) {
+        context.dataStore.edit { it[Keys.NOW_LINE_THICKNESS] = thickness }
     }
 
     suspend fun setPinchToZoomEnabled(enabled: Boolean) {

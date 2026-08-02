@@ -67,6 +67,14 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         viewModelScope, SharingStarted.WhileSubscribed(5000), true
     )
 
+    val nowLineColor: StateFlow<Int> = repository.nowLineColor.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), 0xFFFF0000.toInt()
+    )
+
+    val nowLineThickness: StateFlow<Float> = repository.nowLineThickness.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), 2.0f
+    )
+
     val pinchToZoomEnabled: StateFlow<Boolean> = repository.pinchToZoomEnabled.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), true
     )
@@ -139,6 +147,14 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
     fun setShowNowLine(show: Boolean) {
         viewModelScope.launch { repository.setShowNowLine(show) }
+    }
+
+    fun setNowLineColor(color: Int) {
+        viewModelScope.launch { repository.setNowLineColor(color) }
+    }
+
+    fun setNowLineThickness(thickness: Float) {
+        viewModelScope.launch { repository.setNowLineThickness(thickness) }
     }
 
     fun setPinchToZoomEnabled(enabled: Boolean) {
