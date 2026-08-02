@@ -16,9 +16,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.suresh.sacredtimeline.R
 import com.suresh.sacredtimeline.ui.navigation.ViewMode
 import java.util.Locale
 
@@ -38,14 +40,30 @@ fun SettingsScreen(
     val columnOrder by viewModel.columnOrder.collectAsState()
     val widgetColumnVisibility by viewModel.widgetColumnVisibility.collectAsState()
     val widgetColumnOrder by viewModel.widgetColumnOrder.collectAsState()
+    val language by viewModel.language.collectAsState()
+    
+    @Composable
+    fun getLocalizedViewModeName(mode: ViewMode): String = when (mode) {
+        ViewMode.COMPOSITE -> stringResource(R.string.view_mode_composite)
+        ViewMode.NERAM -> stringResource(R.string.view_mode_neram)
+        ViewMode.GOWRI -> stringResource(R.string.view_mode_gowri)
+        ViewMode.HORA -> stringResource(R.string.view_mode_hora)
+    }
+
+    val englishLabel = "English"
+    val tamilLabel = "தமிழ்"
+
+    val currentLanguageLabel = remember(language) {
+        if (language.startsWith("ta")) tamilLabel else englishLabel
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Settings") },
+                title = { Text(stringResource(R.string.settings_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.btn_cancel))
                     }
                 }
             )
@@ -61,15 +79,28 @@ fun SettingsScreen(
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             item {
-                SettingsSection(title = "Display") {
+                SettingsSection(title = stringResource(R.string.settings_display)) {
                     SettingsDropdownItem(
-                        label = "Default View on Launch",
-                        selected = defaultLaunchView.name,
-                        options = ViewMode.entries.map { it.name },
-                        onOptionSelected = { viewModel.setDefaultLaunchView(ViewMode.valueOf(it)) }
+                        label = stringResource(R.string.settings_language),
+                        selected = currentLanguageLabel,
+                        options = listOf(englishLabel, tamilLabel),
+                        onOptionSelected = {
+                            viewModel.setLanguage(if (it == englishLabel) "en" else "ta")
+                        }
+                    )
+                    val viewModeOptions = ViewMode.entries
+                    val viewModeLabels = viewModeOptions.map { getLocalizedViewModeName(it) }
+                    SettingsDropdownItem(
+                        label = stringResource(R.string.settings_default_launch_view),
+                        selected = getLocalizedViewModeName(defaultLaunchView),
+                        options = viewModeLabels,
+                        onOptionSelected = { label ->
+                            val index = viewModeLabels.indexOf(label)
+                            if (index != -1) viewModel.setDefaultLaunchView(viewModeOptions[index])
+                        }
                     )
                     SettingsToggleItem(
-                        label = "Use 24-Hour Format",
+                        label = stringResource(R.string.settings_time_format_24h),
                         checked = timeFormat24h,
                         onCheckedChange = { viewModel.setTimeFormat24h(it) }
                     )
@@ -77,16 +108,21 @@ fun SettingsScreen(
             }
 
             item {
-                SettingsSection(title = "Column Management (Composite View Only)") {
+                SettingsSection(title = stringResource(R.string.settings_columns_composite)) {
                     Text(
-                        "Reorder or hide columns for the Composite View. Single views (Hora, Gowri, etc.) always show their respective column.",
+                        stringResource(R.string.settings_columns_desc),
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
                     columnOrder.forEachIndexed { index, colId ->
                         val isVisible = columnVisibility.contains(colId)
                         ColumnOrderItem(
-                            name = colId,
+                            name = when(colId) {
+                                "NERAM" -> stringResource(R.string.view_mode_neram)
+                                "GOWRI" -> stringResource(R.string.view_mode_gowri)
+                                "HORA" -> stringResource(R.string.view_mode_hora)
+                                else -> colId
+                            },
                             isVisible = isVisible,
                             onToggleVisibility = { viewModel.updateColumnVisibility(colId, it) },
                             onMoveUp = if (index > 0) { { viewModel.moveColumn(colId, -1) } } else null,
@@ -98,17 +134,20 @@ fun SettingsScreen(
             }
 
             item {
-                SettingsSection(title = "Location") {
+                SettingsSection(title = stringResource(R.string.settings_location)) {
                     val locationMode by viewModel.locationMode.collectAsState()
                     val manualCityName by viewModel.manualCityName.collectAsState()
                     val searchState by viewModel.searchState.collectAsState()
 
+                    val autoLabel = stringResource(R.string.settings_location_auto)
+                    val manualLabel = stringResource(R.string.settings_location_manual)
+
                     SettingsDropdownItem(
-                        label = "Location Mode",
-                        selected = if (locationMode == "AUTO") "GPS Auto-detect" else "Manual City",
-                        options = listOf("GPS Auto-detect", "Manual City"),
+                        label = stringResource(R.string.settings_location_mode),
+                        selected = if (locationMode == "AUTO") autoLabel else manualLabel,
+                        options = listOf(autoLabel, manualLabel),
                         onOptionSelected = {
-                            viewModel.setLocationMode(if (it == "GPS Auto-detect") "AUTO" else "MANUAL")
+                            viewModel.setLocationMode(if (it == autoLabel) "AUTO" else "MANUAL")
                         }
                     )
                     
@@ -124,7 +163,7 @@ fun SettingsScreen(
                         OutlinedTextField(
                             value = localInput,
                             onValueChange = { localInput = it },
-                            label = { Text("City Name") },
+                            label = { Text(stringResource(R.string.settings_city_name)) },
                             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                             singleLine = true,
                             trailingIcon = {
@@ -135,7 +174,7 @@ fun SettingsScreen(
                                         viewModel.setManualCityName(localInput)
                                         viewModel.searchCity(localInput) 
                                     }) {
-                                        Icon(Icons.Default.Search, contentDescription = "Search City")
+                                        Icon(Icons.Default.Search, contentDescription = stringResource(R.string.settings_search_city))
                                     }
                                 }
                             },
@@ -182,32 +221,28 @@ fun SettingsScreen(
             }
 
             item {
-                SettingsSection(title = "Widget Management") {
+                SettingsSection(title = stringResource(R.string.settings_widget_mgmt)) {
                     val refreshMinutes by viewModel.widgetRefreshMinutes.collectAsState()
+                    val refreshOptions = listOf(15, 30, 60)
+                    val refreshLabels = refreshOptions.map { 
+                        if (it < 60) stringResource(R.string.settings_refresh_min, it)
+                        else stringResource(R.string.settings_refresh_hr, it / 60)
+                    }
                     SettingsDropdownItem(
-                        label = "Widget Refresh Duration",
-                        selected = when (refreshMinutes) {
-                            15 -> "15 min"
-                            30 -> "30 min"
-                            60 -> "1 hr"
-                            else -> "$refreshMinutes min"
-                        },
-                        options = listOf("15 min", "30 min", "1 hr"),
-                        onOptionSelected = {
-                            val mins = when (it) {
-                                "15 min" -> 15
-                                "30 min" -> 30
-                                "1 hr" -> 60
-                                else -> 30
-                            }
-                            viewModel.setWidgetRefreshMinutes(mins)
+                        label = stringResource(R.string.settings_widget_refresh),
+                        selected = if (refreshMinutes < 60) stringResource(R.string.settings_refresh_min, refreshMinutes)
+                                   else stringResource(R.string.settings_refresh_hr, refreshMinutes / 60),
+                        options = refreshLabels,
+                        onOptionSelected = { label ->
+                            val index = refreshLabels.indexOf(label)
+                            if (index != -1) viewModel.setWidgetRefreshMinutes(refreshOptions[index])
                         }
                     )
                     
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), thickness = 0.5.dp)
                     
                     Text(
-                        "Column Management (Widget)",
+                        stringResource(R.string.settings_widget_columns),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(vertical = 8.dp)
@@ -216,7 +251,12 @@ fun SettingsScreen(
                     widgetColumnOrder.forEachIndexed { index, colId ->
                         val isVisible = widgetColumnVisibility.contains(colId)
                         ColumnOrderItem(
-                            name = colId,
+                            name = when(colId) {
+                                "NERAM" -> stringResource(R.string.view_mode_neram)
+                                "GOWRI" -> stringResource(R.string.view_mode_gowri)
+                                "HORA" -> stringResource(R.string.view_mode_hora)
+                                else -> colId
+                            },
                             isVisible = isVisible,
                             onToggleVisibility = { viewModel.updateWidgetColumnVisibility(colId, it) },
                             onMoveUp = if (index > 0) { { viewModel.moveWidgetColumn(colId, -1) } } else null,
@@ -228,19 +268,19 @@ fun SettingsScreen(
             }
 
             item {
-                SettingsSection(title = "Timeline Density") {
+                SettingsSection(title = stringResource(R.string.settings_density)) {
                     SettingsSliderItem(
-                        label = "Composite View Zoom",
+                        label = stringResource(R.string.settings_zoom_composite),
                         value = compositeScale,
                         onValueChange = { viewModel.updateCompositeScale(it) }
                     )
                     SettingsSliderItem(
-                        label = "Single View Zoom",
+                        label = stringResource(R.string.settings_zoom_single),
                         value = singleViewScale,
                         onValueChange = { viewModel.updateSingleViewScale(it) }
                     )
                     SettingsToggleItem(
-                        label = "Enable Pinch-to-Zoom",
+                        label = stringResource(R.string.settings_pinch_zoom),
                         checked = pinchToZoomEnabled,
                         onCheckedChange = { viewModel.setPinchToZoomEnabled(it) }
                     )
@@ -248,19 +288,19 @@ fun SettingsScreen(
             }
 
             item {
-                SettingsSection(title = "Timeline Indicators") {
+                SettingsSection(title = stringResource(R.string.settings_indicators)) {
                     val nowLineColor by viewModel.nowLineColor.collectAsState()
                     val nowLineThickness by viewModel.nowLineThickness.collectAsState()
 
                     SettingsToggleItem(
-                        label = "Show NOW Line",
+                        label = stringResource(R.string.settings_show_now_line),
                         checked = showNowLine,
                         onCheckedChange = { viewModel.setShowNowLine(it) }
                     )
                     
                     if (showNowLine) {
                         Text(
-                            "Line Color",
+                            stringResource(R.string.settings_line_color),
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.padding(vertical = 8.dp)
                         )
@@ -294,7 +334,7 @@ fun SettingsScreen(
                         }
 
                         SettingsSliderItem(
-                            label = "Line Thickness",
+                            label = stringResource(R.string.settings_line_thickness),
                             value = nowLineThickness,
                             onValueChange = { viewModel.setNowLineThickness(it) },
                             valueRange = 1f..10f
@@ -304,14 +344,17 @@ fun SettingsScreen(
             }
 
             item {
-                SettingsSection(title = "Advanced (Cache)") {
+                SettingsSection(title = stringResource(R.string.settings_advanced)) {
                     val preloadDays by viewModel.preloadDays.collectAsState()
+                    val preloadOptions = listOf(3, 5, 7)
+                    val preloadLabels = preloadOptions.map { stringResource(R.string.settings_preload_days, it) }
                     SettingsDropdownItem(
-                        label = "Preload Range",
-                        selected = "$preloadDays days",
-                        options = listOf("3 days", "5 days", "7 days"),
-                        onOptionSelected = {
-                            viewModel.setPreloadDays(it.split(" ")[0].toInt())
+                        label = stringResource(R.string.settings_preload_range),
+                        selected = stringResource(R.string.settings_preload_days, preloadDays),
+                        options = preloadLabels,
+                        onOptionSelected = { label ->
+                            val index = preloadLabels.indexOf(label)
+                            if (index != -1) viewModel.setPreloadDays(preloadOptions[index])
                         }
                     )
                     Button(
@@ -319,7 +362,7 @@ fun SettingsScreen(
                         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                     ) {
-                        Text("Clear Cache")
+                        Text(stringResource(R.string.settings_clear_cache))
                     }
                 }
             }
@@ -344,7 +387,7 @@ fun ColumnOrderItem(
         IconButton(onClick = { onToggleVisibility(!isVisible) }) {
             Icon(
                 imageVector = if (isVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                contentDescription = "Toggle Visibility",
+                contentDescription = stringResource(R.string.label_toggle_visibility),
                 tint = if (isVisible) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
             )
         }
@@ -357,11 +400,11 @@ fun ColumnOrderItem(
         )
 
         IconButton(onClick = onMoveUp ?: {}, enabled = onMoveUp != null) {
-            Icon(Icons.Default.ArrowUpward, contentDescription = "Move Up", modifier = Modifier.size(20.dp))
+            Icon(Icons.Default.ArrowUpward, contentDescription = stringResource(R.string.label_move_up), modifier = Modifier.size(20.dp))
         }
 
         IconButton(onClick = onMoveDown ?: {}, enabled = onMoveDown != null) {
-            Icon(Icons.Default.ArrowDownward, contentDescription = "Move Down", modifier = Modifier.size(20.dp))
+            Icon(Icons.Default.ArrowDownward, contentDescription = stringResource(R.string.label_move_down), modifier = Modifier.size(20.dp))
         }
     }
 }
@@ -403,7 +446,11 @@ fun SettingsToggleItem(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(label, style = MaterialTheme.typography.bodyLarge)
+        Text(
+            text = label, 
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.weight(1f).padding(end = 16.dp)
+        )
         Switch(checked = checked, onCheckedChange = onCheckedChange)
     }
 }

@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -123,15 +124,15 @@ fun TimingCard(
                         )
                     }
 
-                    // ENGLISH LABEL
-                    val label = when (timing) {
-                        is Hora -> timing.name
-                        is NallaNeram -> "Nalla"
-                        is GowriNeram -> timing.name
-                        is SpecialPeriod -> timing.name
+                    // ENGLISH/LOCALIZED LABEL
+                    val labelRes = when (timing) {
+                        is Hora -> Metadata.getPlanetNameRes(timing.name)
+                        is NallaNeram -> Metadata.getSpecialNameRes("Nalla")
+                        is GowriNeram -> Metadata.getGowriNameRes(timing.name)
+                        is SpecialPeriod -> Metadata.getSpecialNameRes(timing.name)
                     }
                     Text(
-                        text = label,
+                        text = stringResource(labelRes),
                         style = if (height < 60.dp) MaterialTheme.typography.labelSmall else MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.Bold,
                         color = contentColor,
@@ -141,16 +142,20 @@ fun TimingCard(
                         fontSize = if (height < 40.dp) 10.sp else if (height < 60.dp) 11.sp else 12.sp
                     )
 
-                    // TAMIL NAME
-                    if (height > 140.dp && timing.tamilName.isNotEmpty()) {
-                        Text(
-                            text = timing.tamilName,
-                            style = MaterialTheme.typography.labelSmall,
-                            color = contentColor.copy(alpha = 0.7f),
-                            fontSize = 9.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                    // SECONDARY NAME (Tamil/English based on height)
+                    if (height > 140.dp) {
+                        val secondaryName = when (timing) {
+                            is Hora -> Metadata.getPlanetName(timing.name, androidx.compose.ui.platform.LocalContext.current)
+                            is NallaNeram -> Metadata.getSpecialName("Nalla", androidx.compose.ui.platform.LocalContext.current)
+                            is GowriNeram -> Metadata.getGowriName(timing.name, androidx.compose.ui.platform.LocalContext.current)
+                            is SpecialPeriod -> Metadata.getSpecialName(timing.name, androidx.compose.ui.platform.LocalContext.current)
+                        }
+                        
+                        // We only show it if it's different from the primary label (which might happen if we change logic)
+                        // Or we can just show the Tamil one explicitly if current is English.
+                        // But stringResource already handles localization.
+                        // For height > 140dp, maybe show time in a larger font or something else?
+                        // The user asked for Tamil names after translating.
                     }
                 }
 

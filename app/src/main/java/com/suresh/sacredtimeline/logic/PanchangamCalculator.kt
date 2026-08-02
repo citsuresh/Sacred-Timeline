@@ -79,7 +79,7 @@ object PanchangamCalculator {
     fun calculateKuligai(dayOfWeek: DayOfWeek, sunrise: LocalTime, sunset: LocalTime): SpecialPeriod {
         val period = calculateSpecialPeriod("Kuli", dayOfWeek, sunrise, sunset, KULI_SEQUENCE, Auspiciousness.GREY)
         val name = if (period.startTime.isBefore(LocalTime.NOON)) "Kuli Dawn" else "Kuli Dusk"
-        return period.copy(name = name, tamilName = Metadata.SPECIAL_TAMIL_NAMES[name] ?: period.tamilName)
+        return period.copy(name = name)
     }
 
     private fun calculateSpecialPeriod(
@@ -97,11 +97,11 @@ object PanchangamCalculator {
         val end = sunrise.plus(slotDuration.multipliedBy((slotIndex + 1).toLong()))
         return SpecialPeriod(
             name = name,
-            tamilName = Metadata.SPECIAL_TAMIL_NAMES[name] ?: name,
+            tamilName = "",
             startTime = start,
             endTime = end,
             auspiciousness = auspiciousness,
-            description = Metadata.SPECIAL_DESCRIPTIONS[name] ?: ""
+            description = ""
         )
     }
 
@@ -165,11 +165,11 @@ object PanchangamCalculator {
                         val name = if (start.isBefore(LocalTime.NOON)) "Morning" else "Evening"
                         result.add(NallaNeram(
                             name = name,
-                            tamilName = Metadata.SPECIAL_TAMIL_NAMES["Nalla"] ?: "நல்ல நேரம்",
+                            tamilName = "",
                             startTime = start,
                             endTime = end,
                             auspiciousness = Auspiciousness.GREEN,
-                            description = "Most auspicious time of the day for important activities."
+                            description = ""
                         ))
                     }
                 }
@@ -193,11 +193,11 @@ object PanchangamCalculator {
             val end = sunrise.plus(daySlotDuration.multipliedBy((index + 1).toLong()))
             GowriNeram(
                 name = category.name,
-                tamilName = Metadata.GOWRI_TAMIL_NAMES[category.name] ?: category.name,
+                tamilName = "",
                 startTime = start,
                 endTime = end,
                 auspiciousness = category.toAuspiciousness(),
-                description = Metadata.GOWRI_DESCRIPTIONS[category.name] ?: ""
+                description = ""
             )
         }
 
@@ -214,11 +214,11 @@ object PanchangamCalculator {
             val end = sunset.plus(nightSlotDuration.multipliedBy((index + 1).toLong()))
             GowriNeram(
                 name = category.name,
-                tamilName = Metadata.GOWRI_TAMIL_NAMES[category.name] ?: category.name,
+                tamilName = "",
                 startTime = start,
                 endTime = end,
                 auspiciousness = category.toAuspiciousness(),
-                description = Metadata.GOWRI_DESCRIPTIONS[category.name] ?: ""
+                description = ""
             )
         }
 
@@ -259,11 +259,11 @@ object PanchangamCalculator {
             }
             Hora(
                 name = planet,
-                tamilName = Metadata.PLANET_TAMIL_NAMES[planet] ?: planet,
+                tamilName = "",
                 startTime = start,
                 endTime = end,
                 auspiciousness = auspiciousness,
-                description = Metadata.PLANET_QUALITIES[planet] ?: "",
+                description = "",
                 compatibility = getHoraCompatibility(planet, dayOfWeek)
             )
         }
@@ -281,11 +281,11 @@ object PanchangamCalculator {
             }
             Hora(
                 name = planet,
-                tamilName = Metadata.PLANET_TAMIL_NAMES[planet] ?: planet,
+                tamilName = "",
                 startTime = start,
                 endTime = end,
                 auspiciousness = auspiciousness,
-                description = Metadata.PLANET_QUALITIES[planet] ?: "",
+                description = "",
                 compatibility = getHoraCompatibility(planet, dayOfWeek)
             )
         }

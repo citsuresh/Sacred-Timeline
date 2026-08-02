@@ -17,10 +17,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.suresh.sacredtimeline.R
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Composable
 fun HorizontalDateDial(
@@ -47,7 +50,7 @@ fun HorizontalDateDial(
         IconButton(onClick = { onDateSelected(selectedDate.minusDays(1)) }) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Previous Day",
+                contentDescription = stringResource(R.string.label_prev_day),
                 modifier = Modifier.size(20.dp),
                 tint = MaterialTheme.colorScheme.primary
             )
@@ -74,7 +77,7 @@ fun HorizontalDateDial(
         IconButton(onClick = { onDateSelected(selectedDate.plusDays(1)) }) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = "Next Day",
+                contentDescription = stringResource(R.string.label_next_day),
                 modifier = Modifier.size(20.dp),
                 tint = MaterialTheme.colorScheme.primary
             )
@@ -121,8 +124,8 @@ fun DateItem(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val dayFormatter = DateTimeFormatter.ofPattern("EEE")
-    val dateFormatter = DateTimeFormatter.ofPattern("dd")
+    val dayFormatter = DateTimeFormatter.ofPattern("EEE", Locale.getDefault())
+    val dateFormatter = DateTimeFormatter.ofPattern("dd", Locale.getDefault())
     
     Column(
         modifier = Modifier

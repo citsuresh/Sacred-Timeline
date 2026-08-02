@@ -1,3 +1,289 @@
 <resources>
-    <string name="app_name">SacredTimeline</string>
+    <string name="app_name">Sacred Timeline</string>
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_composite">Composite View</string>
+    <string name="nav_nalla_neram">Nalla Neram</string>
+    <string name="nav_gowri_neram">Gowri Neram</string>
+    <string name="nav_hora">Hora</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Timing Names -->
+    <string name="timing_rahu">Rahu Kalam</string>
+    <string name="timing_yama">Yamagandam</string>
+    <string name="timing_kuli">Kuligai</string>
+    <string name="timing_nalla">Nalla Neram</string>
+    <string name="timing_morning">Morning</string>
+    <string name="timing_evening">Evening</string>
+
+    <!-- Gowri Categories -->
+    <string name="gowri_amridha">Amridha</string>
+    <string name="gowri_uthi">Uthi</string>
+    <string name="gowri_labam">Labam</string>
+    <string name="gowri_dhanam">Dhanam</string>
+    <string name="gowri_sugam">Sugam</string>
+    <string name="gowri_soram">Soram</string>
+    <string name="gowri_visham">Visham</string>
+    <string name="gowri_rogam">Rogam</string>
+
+    <!-- Planets -->
+    <string name="planet_sun">Sun</string>
+    <string name="planet_moon">Moon</string>
+    <string name="planet_mars">Mars</string>
+    <string name="planet_mercury">Mercury</string>
+    <string name="planet_jupiter">Jupiter</string>
+    <string name="planet_venus">Venus</string>
+    <string name="planet_saturn">Saturn</string>
+
+    <!-- Panchangam Labels -->
+    <string name="label_tithi">Tithi</string>
+    <string name="label_nakshatra">Nakshatra</string>
+    <string name="label_rasi">Rasi</string>
+    <string name="label_yoga">Yoga</string>
+    <string name="label_chandrashtamam">Chandrashtamam</string>
+    <string name="label_now_line">NOW</string>
+    <string name="label_from">From</string>
+    <string name="label_to">To</string>
+    <string name="label_sunrise">Sunrise</string>
+    <string name="label_sunset">Sunset</string>
+    <string name="label_approximate">(approximate)</string>
+    <string name="label_day_muhurat">Day Muhurat</string>
+    <string name="label_night_muhurat">Night Muhurat</string>
+    <string name="label_today">Today</string>
+    <string name="label_select_date">Select Date</string>
+    <string name="label_menu">Menu</string>
+    <string name="label_prev_day">Previous Day</string>
+    <string name="label_next_day">Next Day</string>
+    <string name="label_zoom_in">Zoom In</string>
+    <string name="label_zoom_out">Zoom Out</string>
+    <string name="label_strategic_activities">Strategic Activities</string>
+    <string name="label_significance">Significance</string>
+    <string name="label_toggle_visibility">Toggle Visibility</string>
+    <string name="label_move_up">Move Up</string>
+    <string name="label_move_down">Move Down</string>
+    <string name="label_unknown_location">Unknown Location</string>
+    <string name="label_city_not_found">City not found</string>
+
+    <!-- Settings Labels -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_display">Display</string>
+    <string name="settings_language">App Language</string>
+    <string name="settings_default_launch_view">Default View on Launch</string>
+    <string name="settings_time_format_24h">Use 24-Hour Format</string>
+    <string name="settings_columns_composite">Column Management (Composite View Only)</string>
+    <string name="settings_columns_desc">Reorder or hide columns for the Composite View. Single views (Hora, Gowri, etc.) always show their respective column.</string>
+    <string name="settings_location">Location</string>
+    <string name="settings_location_mode">Location Mode</string>
+    <string name="settings_location_auto">GPS Auto-detect</string>
+    <string name="settings_location_manual">Manual City</string>
+    <string name="settings_city_name">City Name</string>
+    <string name="settings_search_city">Search City</string>
+    <string name="settings_widget_mgmt">Widget Management</string>
+    <string name="settings_widget_refresh">Widget Refresh Duration</string>
+    <string name="settings_widget_columns">Column Management (Widget)</string>
+    <string name="settings_refresh_min">%1$d min</string>
+    <string name="settings_refresh_hr">%1$d hr</string>
+    <string name="settings_preload_days">%1$d days</string>
+    <string name="settings_density">Timeline Density</string>
+    <string name="settings_zoom_composite">Composite View Zoom</string>
+    <string name="settings_zoom_single">Single View Zoom</string>
+    <string name="settings_pinch_zoom">Enable Pinch-to-Zoom</string>
+    <string name="settings_indicators">Timeline Indicators</string>
+    <string name="settings_show_now_line">Show NOW Line</string>
+    <string name="settings_line_color">Line Color</string>
+    <string name="settings_line_thickness">Line Thickness</string>
+    <string name="settings_advanced">Advanced (Cache)</string>
+    <string name="settings_preload_range">Preload Range</string>
+    <string name="settings_clear_cache">Clear Cache</string>
+
+    <string name="lang_english">English</string>
+    <string name="lang_tamil">Tamil</string>
+
+    <string name="label_am">AM</string>
+    <string name="label_pm">PM</string>
+    <string name="label_zoom_value">Zoom: %1$.1fx</string>
+
+    <!-- View Modes -->
+    <string name="view_mode_composite">Composite</string>
+    <string name="view_mode_neram">Nalla Neram</string>
+    <string name="view_mode_gowri">Gowri Neram</string>
+    <string name="view_mode_hora">Hora</string>
+
+    <!-- Common UI -->
+    <string name="btn_ok">OK</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_update">Update</string>
+    <string name="btn_search">Search</string>
+    <string name="dialog_change_location">Change Location</string>
+    <string name="dialog_location_hint">Enter city or area name manually for display.</string>
+    <string name="unknown_route">Unknown route</string>
+
+    <!-- Metadata: Gowri Descriptions -->
+    <string name="desc_gowri_amridha">Extremely auspicious. Best for starting any work, travels, and new ventures.</string>
+    <string name="desc_gowri_uthi">Progressive and favorable. Good for growth, expansion, and administrative work.</string>
+    <string name="desc_gowri_labam">Profitable. Ideal for business deals, financial transactions, and trade.</string>
+    <string name="desc_gowri_dhanam">Wealth creating. Favorable for investments and purchasing assets.</string>
+    <string name="desc_gowri_sugam">Comfortable. Good for peace-related activities and domestic matters.</string>
+    <string name="desc_gowri_soram">Theft/Loss risk. Avoid handling large cash or starting high-risk work.</string>
+    <string name="desc_gowri_visham">Poisonous/Toxic. Avoid medical treatments or starting new projects.</string>
+    <string name="desc_gowri_rogam">Disease/Sickness. Inauspicious; avoid health-related activities or travel.</string>
+
+    <!-- Metadata: Special Descriptions -->
+    <string name="desc_timing_rahu">Inauspicious period. Avoid starting new ventures, major purchases, or important meetings.\n\nDo: Routine tasks, cleaning, spiritual practices.\nDon\'t: Travel, signing contracts, buying assets.</string>
+    <string name="desc_timing_yama">Inauspicious period. Often associated with loss or obstacles. Avoid beginning anything new.\n\nDo: Repaying debts, finishing pending work, letting go.\nDon\'t: New projects, medical treatments, long journeys.</string>
+    <string name="desc_timing_kuli">Expansion period. What is done during this time tends to repeat. Good for buying assets, not for bad deeds.\n\nDo: Charity, investments, starting positive habits.\nDon\'t: Incurring debt, funeral rituals, negative behaviors.</string>
+    <string name="desc_timing_nalla">Most auspicious time of the day for important activities.</string>
+
+    <!-- Metadata: Planet Qualities -->
+    <string name="quality_sun">Authority, Vitality, Leadership. Focus on administration and meetings with superiors.</string>
+    <string name="quality_moon">Emotion, Nurture, Change. Good for creative work and home-related matters.</string>
+    <string name="quality_mars">Energy, Action, Courage. Focus on physical tasks, but watch for conflicts.</string>
+    <string name="quality_mercury">Intellect, Communication, Trade. Ideal for study, writing, and business.</string>
+    <string name="quality_jupiter">Wisdom, Expansion, Luck. Best for learning, teaching, and rituals.</string>
+    <string name="quality_venus">Beauty, Harmony, Luxury. Good for arts, romance, and socializing.</string>
+    <string name="quality_saturn">Discipline, Delay, Hard work. Focus on routine tasks and clearing backlogs.</string>
+
+    <!-- Hora Guidance -->
+    <string name="guidance_sun_fav">Highly auspicious for leadership and power. Best for meetings with authorities, starting new roles, and seeking government favors.</string>
+    <string name="guidance_sun_conf">Conflicting solar energy. Ego clashes possible. Avoid stubbornness or confrontations with superiors. Stick to individual tasks.</string>
+    <string name="guidance_sun_neut">Steady vitality. Good for administration and planning. Focus on your health and maintaining a disciplined schedule.</string>
+
+    <string name="guidance_moon_fav">Emotionally harmonious. Ideal for domestic work, creative arts, and connecting with family. Mind is calm and focused.</string>
+    <string name="guidance_moon_conf">Fluctuating moods. Avoid making major decisions based on emotion. Not a good time for deep emotional conversations.</string>
+    <string name="guidance_moon_neut">Gentle energy. Suitable for regular chores, cooking, and minor changes. Good for small social interactions.</string>
+
+    <string name="guidance_mars_fav">High energy and courage. Best for physical labor, sports, and competitive tasks. Bold actions bring success.</string>
+    <string name="guidance_mars_conf">High friction. Risk of accidents or arguments. Avoid rushing, sharp tools, or aggressive negotiations. Be patient.</string>
+    <string name="guidance_mars_neut">Active energy. Focus on technical work or home repairs. Keep physical activity moderate to avoid burnout.</string>
+
+    <string name="guidance_mercury_fav">Intellectually sharp. Excellent for business deals, writing, learning new skills, and all forms of communication.</string>
+    <string name="guidance_mercury_conf">Information overload. Communication errors likely. Double-check all emails and documents. Avoid starting new studies now.</string>
+    <string name="guidance_mercury_neut">Mental clarity. Good for organization, record-keeping, and catching up on correspondence. A practical time for logic.</string>
+
+    <string name="guidance_jupiter_fav">Highly auspicious. Best for starting new education, major financial investments, or spiritual ceremonies. Expansion is favored.</string>
+    <string name="guidance_jupiter_conf">Conflicting energies. Venus (pleasure) and Jupiter (wisdom) may clash. Avoid over-indulgence or making impulsive luxury purchases.</string>
+    <string name="guidance_jupiter_neut">A good time for learning and general growth. Focus on steady progress rather than big leaps.</string>
+
+    <string name="guidance_venus_fav">Harmonious and creative. Perfect for arts, social gatherings, buying jewelry/clothes, and romantic activities.</string>
+    <string name="guidance_venus_conf">Emotional extravagance. Risk of overspending on luxuries. Aesthetic choices made now might be regretted later.</string>
+    <string name="guidance_venus_neut">Pleasant atmosphere. Good for minor beautification and relaxing. Focus on building relationships gently.</string>
+
+    <string name="guidance_saturn_fav">Solid foundation. Best for long-term planning, clearing debts, and tasks requiring intense discipline and endurance.</string>
+    <string name="guidance_saturn_conf">Heavy delays. Frustration likely with slow progress. Avoid starting anything that needs quick results. Rest is advised.</string>
+    <string name="guidance_saturn_neut">Pragmatic energy. Focus on routine work, cleaning, and organized labor. Persistence will pay off later.</string>
+
+    <string name="guidance_default">A time for balanced action and mindfulness.</string>
+
+    <!-- Strategic Activities -->
+    <string-array name="activities_sun_fav">
+        <item>Meet with supervisors</item>
+        <item>Apply for permits</item>
+        <item>Lead a team project</item>
+    </string-array>
+    <string-array name="activities_sun_conf">
+        <item>Solo focused work</item>
+        <item>Meditation</item>
+        <item>Reviewing documents</item>
+    </string-array>
+    <string-array name="activities_sun_neut">
+        <item>Organize schedule</item>
+        <item>Health checkup</item>
+        <item>Administrative tasks</item>
+    </string-array>
+
+    <string-array name="activities_moon_fav">
+        <item>Family dinner</item>
+        <item>Creative writing</item>
+        <item>Gardening</item>
+    </string-array>
+    <string-array name="activities_moon_conf">
+        <item>Routine chores</item>
+        <item>Quiet reflection</item>
+        <item>Light reading</item>
+    </string-array>
+    <string-array name="activities_moon_neut">
+        <item>Kitchen organization</item>
+        <item>Planning social events</item>
+        <item>Shopping for home</item>
+    </string-array>
+
+    <string-array name="activities_mars_fav">
+        <item>Intense workout</item>
+        <item>Starting construction</item>
+        <item>Competitive sports</item>
+    </string-array>
+    <string-array name="activities_mars_conf">
+        <item>Safety audits</item>
+        <item>Cleaning equipment</item>
+        <item>Yoga</item>
+    </string-array>
+    <string-array name="activities_mars_neut">
+        <item>Home repairs</item>
+        <item>Logical problem solving</item>
+        <item>Technical drafting</item>
+    </string-array>
+
+    <string-array name="activities_mercury_fav">
+        <item>Sign contracts</item>
+        <item>Give a presentation</item>
+        <item>Start a course</item>
+    </string-array>
+    <string-array name="activities_mercury_conf">
+        <item>Proofread documents</item>
+        <item>Data entry</item>
+        <item>Cleaning desk</item>
+    </string-array>
+    <string-array name="activities_mercury_neut">
+        <item>Archive emails</item>
+        <item>Balance accounts</item>
+        <item>Short distance travel</item>
+    </string-array>
+
+    <string-array name="activities_jupiter_fav">
+        <item>Invest in stocks</item>
+        <item>Spiritual worship</item>
+        <item>Educational enrollment</item>
+    </string-array>
+    <string-array name="activities_jupiter_conf">
+        <item>Review budget</item>
+        <item>Philosophical reading</item>
+        <item>Internal audit</item>
+    </string-array>
+    <string-array name="activities_jupiter_neut">
+        <item>Consulting a mentor</item>
+        <item>General research</item>
+        <item>Long-term goal setting</item>
+    </string-array>
+
+    <string-array name="activities_venus_fav">
+        <item>Art exhibition</item>
+        <item>Date night</item>
+        <item>Shopping for fashion</item>
+    </string-array>
+    <string-array name="activities_venus_conf">
+        <item>Financial planning</item>
+        <item>Self-care</item>
+        <item>Interior cleaning</item>
+    </string-array>
+    <string-array name="activities_venus_neut">
+        <item>Listening to music</item>
+        <item>Flower arrangement</item>
+        <item>Social networking</item>
+    </string-array>
+
+    <string-array name="activities_saturn_fav">
+        <item>Legacy planning</item>
+        <item>Paying off loans</item>
+        <item>Deep research</item>
+    </string-array>
+    <string-array name="activities_saturn_conf">
+        <item>Routine maintenance</item>
+        <item>Early sleep</item>
+        <item>Filing taxes</item>
+    </string-array>
+    <string-array name="activities_saturn_neut">
+        <item>Cleaning storage</item>
+        <item>Manual labor</item>
+        <item>Endurance training</item>
+    </string-array>
+
 </resources>

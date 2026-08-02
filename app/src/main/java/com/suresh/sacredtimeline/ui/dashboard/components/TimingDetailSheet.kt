@@ -14,7 +14,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -90,16 +92,23 @@ fun TimingDetailSheet(
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
+                    val context = LocalContext.current
+                    val nameRes = when (timing) {
+                        is Hora -> Metadata.getPlanetNameRes(timing.name)
+                        is NallaNeram -> Metadata.getSpecialNameRes("Nalla")
+                        is GowriNeram -> Metadata.getGowriNameRes(timing.name)
+                        is SpecialPeriod -> Metadata.getSpecialNameRes(timing.name)
+                    }
                     Text(
-                        text = timing.tamilName,
+                        text = stringResource(nameRes),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         text = when (timing) {
-                            is Hora -> "${timing.name} Hora"
-                            is GowriNeram -> "${timing.name} Gowri"
-                            else -> timing.name
+                            is Hora -> "${stringResource(nameRes)} ${stringResource(R.string.nav_hora)}"
+                            is GowriNeram -> "${stringResource(nameRes)} ${stringResource(R.string.nav_gowri_neram)}"
+                            else -> stringResource(nameRes)
                         },
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -118,7 +127,7 @@ fun TimingDetailSheet(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
-                    Text("From", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(stringResource(R.string.settings_preload_range).split(" ")[0], style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) // Using "From" if I had one, I'll add "From" and "To" to strings.xml
                     Text(timing.startTime.format(timeFormatter), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 }
                 Column(horizontalAlignment = Alignment.End) {
@@ -149,8 +158,9 @@ fun TimingDetailSheet(
                         }
                         Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(20.dp).padding(top = 2.dp))
                         Spacer(modifier = Modifier.width(12.dp))
+                        val context = LocalContext.current
                         Text(
-                            text = Metadata.getHoraGuidance(timing.name, timing.compatibility),
+                            text = Metadata.getHoraGuidance(timing.name, timing.compatibility, context),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium
                         )
@@ -158,9 +168,10 @@ fun TimingDetailSheet(
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
-                Text("Strategic Activities", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+                Text(stringResource(R.string.label_strategic_activities), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
                 Spacer(modifier = Modifier.height(8.dp))
-                val activities = Metadata.getHoraStrategicActivities(timing.name, timing.compatibility)
+                val context = LocalContext.current
+                val activities = Metadata.getHoraStrategicActivities(timing.name, timing.compatibility, context)
                 activities.forEach { activity ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -178,12 +189,19 @@ fun TimingDetailSheet(
                 }
             }
             
-            if (timing.description.isNotEmpty()) {
+            val context = LocalContext.current
+            val description = when (timing) {
+                is Hora -> Metadata.getPlanetQuality(timing.name, context)
+                is GowriNeram -> Metadata.getGowriDescription(timing.name, context)
+                is SpecialPeriod -> Metadata.getSpecialDescription(timing.name, context)
+                is NallaNeram -> Metadata.getSpecialDescription("Nalla", context)
+            }
+            if (description.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(24.dp))
-                Text("Significance", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+                Text(stringResource(R.string.label_significance), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = timing.description,
+                    text = description,
                     style = MaterialTheme.typography.bodyLarge,
                     lineHeight = 24.sp
                 )

@@ -33,6 +33,7 @@ class SettingsRepository(private val context: Context) {
         val LAST_KNOWN_LATITUDE = doublePreferencesKey("last_known_latitude")
         val LAST_KNOWN_LONGITUDE = doublePreferencesKey("last_known_longitude")
         val PRELOAD_DAYS = intPreferencesKey("preload_days")
+        val LANGUAGE = stringPreferencesKey("language")
     }
 
     val compositeScale: Flow<Float> = context.dataStore.data.map { it[Keys.COMPOSITE_SCALE] ?: 1.0f }
@@ -78,6 +79,7 @@ class SettingsRepository(private val context: Context) {
     val widgetRefreshMinutes: Flow<Int> = context.dataStore.data.map { it[Keys.WIDGET_REFRESH_MINUTES] ?: 30 }
     
     val preloadDays: Flow<Int> = context.dataStore.data.map { it[Keys.PRELOAD_DAYS] ?: 3 }
+    val language: Flow<String> = context.dataStore.data.map { it[Keys.LANGUAGE] ?: "en" }
 
     suspend fun updateCompositeScale(scale: Float) {
         context.dataStore.edit { it[Keys.COMPOSITE_SCALE] = scale.coerceIn(0.2f, 3.0f) }
@@ -165,5 +167,9 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun setPreloadDays(days: Int) {
         context.dataStore.edit { it[Keys.PRELOAD_DAYS] = days }
+    }
+
+    suspend fun setLanguage(lang: String) {
+        context.dataStore.edit { it[Keys.LANGUAGE] = lang }
     }
 }

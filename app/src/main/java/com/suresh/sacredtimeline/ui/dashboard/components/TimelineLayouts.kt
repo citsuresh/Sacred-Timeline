@@ -12,14 +12,17 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.suresh.sacredtimeline.R
 import com.suresh.sacredtimeline.model.Timing
 import com.suresh.sacredtimeline.ui.dashboard.TimelineUiState
 import com.suresh.sacredtimeline.ui.navigation.ViewMode
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -53,13 +56,13 @@ fun PortraitTimelineLayout(
             TopAppBar(
                 navigationIcon = {
                     IconButton(onClick = onMenuClick) {
-                        Icon(Icons.Default.Menu, contentDescription = "Menu")
+                        Icon(Icons.Default.Menu, contentDescription = stringResource(R.string.label_menu))
                     }
                 },
                 title = { 
                     Column {
                         Text(
-                            text = "Sacred Timeline",
+                            text = stringResource(R.string.app_name),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             maxLines = 1,
@@ -69,7 +72,7 @@ fun PortraitTimelineLayout(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = selectedDate.format(DateTimeFormatter.ofPattern("MMM dd, yyyy")),
+                                text = selectedDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
                                 modifier = Modifier.clickable { onDateClick() }
@@ -80,8 +83,9 @@ fun PortraitTimelineLayout(
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f)
                                 )
+                                val displayLocation = if (uiState.locationName == "Unknown Location") stringResource(R.string.label_unknown_location) else uiState.locationName
                                 Text(
-                                    text = "${if (uiState.isLocationAuto) "📍" else "✎"} ${uiState.locationName}",
+                                    text = "${if (uiState.isLocationAuto) "📍" else "✎"} $displayLocation",
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
                                     maxLines = 1,
@@ -94,10 +98,10 @@ fun PortraitTimelineLayout(
                 },
                 actions = {
                     IconButton(onClick = onTodayClick) {
-                        Icon(Icons.Filled.Today, contentDescription = "Today")
+                        Icon(Icons.Filled.Today, contentDescription = stringResource(R.string.label_today))
                     }
                     IconButton(onClick = onCalendarClick) {
-                        Icon(Icons.Default.CalendarMonth, contentDescription = "Select Date")
+                        Icon(Icons.Default.CalendarMonth, contentDescription = stringResource(R.string.label_select_date))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -188,14 +192,15 @@ fun LandscapeTimelineLayout(
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "Sacred Timeline",
+                                text = stringResource(R.string.app_name),
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer
                             )
                             if (uiState is TimelineUiState.Success) {
+                                val displayLocation = if (uiState.locationName == "Unknown Location") stringResource(R.string.label_unknown_location) else uiState.locationName
                                 Text(
-                                    text = "${if (uiState.isLocationAuto) "📍" else "✎"} ${uiState.locationName}",
+                                    text = "${if (uiState.isLocationAuto) "📍" else "✎"} $displayLocation",
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
                                     maxLines = 1,
@@ -206,13 +211,13 @@ fun LandscapeTimelineLayout(
                         }
                         Row {
                             IconButton(onClick = onMenuClick, modifier = Modifier.size(32.dp)) {
-                                Icon(Icons.Default.Menu, contentDescription = "Menu", modifier = Modifier.size(18.dp))
+                                Icon(Icons.Default.Menu, contentDescription = stringResource(R.string.label_menu), modifier = Modifier.size(18.dp))
                             }
                             IconButton(onClick = onTodayClick, modifier = Modifier.size(32.dp)) {
-                                Icon(Icons.Filled.Today, contentDescription = "Today", modifier = Modifier.size(18.dp))
+                                Icon(Icons.Filled.Today, contentDescription = stringResource(R.string.label_today), modifier = Modifier.size(18.dp))
                             }
                             IconButton(onClick = onCalendarClick, modifier = Modifier.size(32.dp)) {
-                                Icon(Icons.Default.CalendarMonth, contentDescription = "Select Date", modifier = Modifier.size(18.dp))
+                                Icon(Icons.Default.CalendarMonth, contentDescription = stringResource(R.string.label_select_date), modifier = Modifier.size(18.dp))
                             }
                         }
                     }
@@ -220,7 +225,7 @@ fun LandscapeTimelineLayout(
                     Spacer(modifier = Modifier.height(4.dp))
                     
                     Text(
-                        text = selectedDate.format(DateTimeFormatter.ofPattern("EEE, MMM dd, yyyy")),
+                        text = selectedDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL)),
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -247,7 +252,7 @@ fun LandscapeTimelineLayout(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = "SELECT DATE",
+                        text = stringResource(R.string.label_select_date).uppercase(),
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f),

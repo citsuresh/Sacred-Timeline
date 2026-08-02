@@ -1,6 +1,7 @@
 package com.suresh.sacredtimeline.widget
 
 import android.content.Context
+import android.content.res.Configuration
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -36,6 +37,7 @@ import kotlinx.coroutines.flow.first
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 class PanchangamWidget : GlanceAppWidget() {
     
@@ -49,6 +51,13 @@ class PanchangamWidget : GlanceAppWidget() {
         val date = LocalDate.now()
 
         // 1. Fetch Settings
+        val language = repository.language.first()
+        val localizedContext = context.createConfigurationContext(
+            Configuration(context.resources.configuration).apply {
+                setLocale(Locale.forLanguageTag(language))
+            }
+        )
+        
         val mode = repository.locationMode.first()
         val is24Hour = repository.timeFormat24h.first()
         val columnVisibility = repository.widgetColumnVisibility.first()
@@ -87,6 +96,7 @@ class PanchangamWidget : GlanceAppWidget() {
         provideContent {
             GlanceTheme {
                 WidgetContent(
+                    context = localizedContext,
                     dayData = dayData,
                     now = now,
                     columnVisibility = columnVisibility,
@@ -99,6 +109,7 @@ class PanchangamWidget : GlanceAppWidget() {
 
     @Composable
     private fun WidgetContent(
+        context: Context,
         dayData: DayData,
         now: LocalTime,
         columnVisibility: Set<String>,
@@ -127,28 +138,32 @@ class PanchangamWidget : GlanceAppWidget() {
                                 val nextSpecial = dayData.specialPeriods.filter { it.startTime.isAfter(now) }.minByOrNull { it.startTime }
                                 
                                 val timing = currentSpecial ?: currentNalla
-                                val label = when {
-                                    currentSpecial != null -> currentSpecial.name
-                                    currentNalla != null -> "Nalla"
-                                    else -> "None"
+                                val labelRes = when {
+                                    currentSpecial != null -> Metadata.getSpecialNameRes(currentSpecial.name)
+                                    currentNalla != null -> Metadata.getSpecialNameRes("Nalla")
+                                    else -> R.string.app_name // Placeholder
                                 }
+                                val label = if (timing != null) context.getString(labelRes) else "None"
+                                
                                 val next = if (nextSpecial != null && (nextNalla == null || nextSpecial.startTime.isBefore(nextNalla.startTime))) {
                                     nextSpecial
                                 } else {
                                     nextNalla
                                 }
                                 
-                                TimingColumn("Neram", label, timing, next, timeFormatter, GlanceModifier.defaultWeight())
+                                TimingColumn(context.getString(R.string.nav_nalla_neram), label, timing, next, timeFormatter, GlanceModifier.defaultWeight())
                             }
                             "GOWRI" -> {
                                 val currentGowri = dayData.gowriNeram.find { it.isCurrent(now) }
                                 val nextGowri = dayData.gowriNeram.filter { it.startTime.isAfter(now) }.minByOrNull { it.startTime }
-                                TimingColumn("Gowri", currentGowri?.name ?: "None", currentGowri, nextGowri, timeFormatter, GlanceModifier.defaultWeight())
+                                val label = currentGowri?.let { context.getString(Metadata.getGowriNameRes(it.name)) } ?: "None"
+                                TimingColumn(context.getString(R.string.nav_gowri_neram), label, currentGowri, nextGowri, timeFormatter, GlanceModifier.defaultWeight())
                             }
                             "HORA" -> {
                                 val currentHora = dayData.hora.find { it.isCurrent(now) }
                                 val nextHora = dayData.hora.filter { it.startTime.isAfter(now) }.minByOrNull { it.startTime }
-                                TimingColumn("Hora", currentHora?.name ?: "None", currentHora, nextHora, timeFormatter, GlanceModifier.defaultWeight())
+                                val label = currentHora?.let { context.getString(Metadata.getPlanetNameRes(it.name)) } ?: "None"
+                                TimingColumn(context.getString(R.string.nav_hora), label, currentHora, nextHora, timeFormatter, GlanceModifier.defaultWeight())
                             }
                         }
                     }
@@ -241,15 +256,6 @@ class PanchangamWidget : GlanceAppWidget() {
                             color = ColorProvider(contentColor)
                         )
                     )
-                    timing?.tamilName?.let { tamil ->
-                        Text(
-                            text = tamil,
-                            style = TextStyle(
-                                fontSize = 12.sp,
-                                color = ColorProvider(contentColor)
-                            )
-                        )
-                    }
 
                     timing?.let {
                         Text(
@@ -263,9 +269,8 @@ class PanchangamWidget : GlanceAppWidget() {
 
                     // Next Upcoming Timing
                     nextTiming?.let { next ->
-                        val nextName = if (next is NallaNeram) "Nalla" else next.name
                         Text(
-                            text = "($nextName starts at ${next.startTime.format(timeFormatter)})",
+                            text = "(${next.startTime.format(timeFormatter)})",
                             style = TextStyle(
                                 fontSize = 12.sp,
                                 color = ColorProvider(contentColor.copy(alpha = 0.8f)),

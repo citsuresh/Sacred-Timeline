@@ -8,12 +8,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.suresh.sacredtimeline.R
 import com.suresh.sacredtimeline.model.Timing
 import com.suresh.sacredtimeline.ui.dashboard.components.*
 import com.suresh.sacredtimeline.ui.navigation.ViewMode
@@ -41,6 +43,10 @@ fun TimelineDashboard(
     val columnVisibility by viewModel.columnVisibility.collectAsState(initial = setOf("NERAM", "GOWRI", "HORA"))
     val columnOrder by viewModel.columnOrder.collectAsState(initial = listOf("NERAM", "GOWRI", "HORA"))
     
+    LaunchedEffect(viewMode) {
+        viewModel.setViewMode(viewMode)
+    }
+
     val locationPermissionState = rememberPermissionState(
         android.Manifest.permission.ACCESS_COARSE_LOCATION
     )
@@ -85,12 +91,12 @@ fun TimelineDashboard(
                     }
                     showDatePicker = false
                 }) {
-                    Text("OK")
+                    Text(stringResource(R.string.btn_ok))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDatePicker = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.btn_cancel))
                 }
             }
         ) {
@@ -101,15 +107,15 @@ fun TimelineDashboard(
     if (showLocationDialog) {
         AlertDialog(
             onDismissRequest = { showLocationDialog = false },
-            title = { Text("Change Location") },
+            title = { Text(stringResource(R.string.dialog_change_location)) },
             text = {
                 Column {
-                    Text("Enter city or area name manually for display.", style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.dialog_location_hint), style = MaterialTheme.typography.bodySmall)
                     Spacer(modifier = Modifier.height(12.dp))
                     OutlinedTextField(
                         value = manualLocationName,
                         onValueChange = { manualLocationName = it },
-                        label = { Text("Location Name") },
+                        label = { Text(stringResource(R.string.settings_city_name)) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -122,12 +128,12 @@ fun TimelineDashboard(
                     }
                     showLocationDialog = false
                 }) {
-                    Text("Update")
+                    Text(stringResource(R.string.btn_update))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showLocationDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.btn_cancel))
                 }
             }
         )

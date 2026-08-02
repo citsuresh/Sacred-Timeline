@@ -1,0 +1,289 @@
+<resources>
+    <string name="app_name">புனித காலவரிசை</string>
+    <string name="nav_dashboard">டாஷ்போர்டு</string>
+    <string name="nav_composite">கூட்டுப் பார்வை</string>
+    <string name="nav_nalla_neram">நல்ல நேரம்</string>
+    <string name="nav_gowri_neram">கௌரி நேரம்</string>
+    <string name="nav_hora">ஹோரை</string>
+    <string name="nav_settings">அமைப்புகள்</string>
+
+    <!-- Timing Names -->
+    <string name="timing_rahu">ராகு காலம்</string>
+    <string name="timing_yama">எமகண்டம்</string>
+    <string name="timing_kuli">குளிகை</string>
+    <string name="timing_nalla">நல்ல நேரம்</string>
+    <string name="timing_morning">காலை</string>
+    <string name="timing_evening">மாலை</string>
+
+    <!-- Gowri Categories -->
+    <string name="gowri_amridha">அமிர்தம்</string>
+    <string name="gowri_uthi">உத்தி</string>
+    <string name="gowri_labam">லாபம்</string>
+    <string name="gowri_dhanam">தனம்</string>
+    <string name="gowri_sugam">சுகம்</string>
+    <string name="gowri_soram">சோரம்</string>
+    <string name="gowri_visham">விஷம்</string>
+    <string name="gowri_rogam">ரோகம்</string>
+
+    <!-- Planets -->
+    <string name="planet_sun">சூரியன்</string>
+    <string name="planet_moon">சந்திரன்</string>
+    <string name="planet_mars">செவ்வாய்</string>
+    <string name="planet_mercury">புதன்</string>
+    <string name="planet_jupiter">குரு</string>
+    <string name="planet_venus">சுக்கிரன்</string>
+    <string name="planet_saturn">சனி</string>
+
+    <!-- Panchangam Labels -->
+    <string name="label_tithi">திதி</string>
+    <string name="label_nakshatra">நட்சத்திரம்</string>
+    <string name="label_rasi">ராசி</string>
+    <string name="label_yoga">யோகம்</string>
+    <string name="label_chandrashtamam">சந்திராஷ்டமம்</string>
+    <string name="label_now_line">இப்போது</string>
+    <string name="label_from">தொடக்கம்</string>
+    <string name="label_to">முடிவு</string>
+    <string name="label_sunrise">சூரிய உதயம்</string>
+    <string name="label_sunset">சூரிய அஸ்தமனம்</string>
+    <string name="label_approximate">(தோராயமாக)</string>
+    <string name="label_day_muhurat">பகல் முஹூர்த்தம்</string>
+    <string name="label_night_muhurat">இரவு முஹூர்த்தம்</string>
+    <string name="label_today">இன்று</string>
+    <string name="label_select_date">தேதியைத் தேர்ந்தெடு</string>
+    <string name="label_menu">மெனு</string>
+    <string name="label_prev_day">முந்தைய நாள்</string>
+    <string name="label_next_day">அடுத்த நாள்</string>
+    <string name="label_zoom_in">பெரிதாக்கு</string>
+    <string name="label_zoom_out">சிறிதாக்கு</string>
+    <string name="label_strategic_activities">மூலோபாய நடவடிக்கைகள்</string>
+    <string name="label_significance">முக்கியத்துவம்</string>
+    <string name="label_toggle_visibility">பார்வையை நிலைமாற்று</string>
+    <string name="label_move_up">மேலே நகர்த்து</string>
+    <string name="label_move_down">கீழே நகர்த்து</string>
+    <string name="label_unknown_location">தெரியாத இடம்</string>
+    <string name="label_city_not_found">நகரம் கிடைக்கவில்லை</string>
+
+    <!-- Settings Labels -->
+    <string name="settings_title">அமைப்புகள்</string>
+    <string name="settings_display">காட்சி</string>
+    <string name="settings_language">பயன்பாட்டு மொழி</string>
+    <string name="settings_default_launch_view">தொடக்கத்தில் இயல்புநிலை பார்வை</string>
+    <string name="settings_time_format_24h">24-மணிநேர வடிவத்தைப் பயன்படுத்தவும்</string>
+    <string name="settings_columns_composite">நெடுவரிசை மேலாண்மை (கூட்டுப் பார்வை மட்டும்)</string>
+    <string name="settings_columns_desc">கூட்டுப் பார்வைக்கான நெடுவரிசைகளை மறுவரிசைப்படுத்தவும் அல்லது மறைக்கவும். ஒற்றைப் பார்வைகள் (ஹோரை, கௌரி போன்றவை) எப்போதும் அவற்றின் நெடுவரிசையைக் காட்டும்.</string>
+    <string name="settings_location">இருப்பிடம்</string>
+    <string name="settings_location_mode">இருப்பிட முறை</string>
+    <string name="settings_location_auto">ஜிபிஎஸ் தானாக கண்டறிதல்</string>
+    <string name="settings_location_manual">கையேடு நகரம்</string>
+    <string name="settings_city_name">நகரத்தின் பெயர்</string>
+    <string name="settings_search_city">நகரத்தைத் தேடு</string>
+    <string name="settings_widget_mgmt">விட்ஜெட் மேலாண்மை</string>
+    <string name="settings_widget_refresh">விட்ஜெட் புதுப்பிப்பு காலம்</string>
+    <string name="settings_widget_columns">நெடுவரிசை மேலாண்மை (விட்ஜெட்)</string>
+    <string name="settings_refresh_min">%1$d நிமி</string>
+    <string name="settings_refresh_hr">%1$d மணி</string>
+    <string name="settings_preload_days">%1$d நாட்கள்</string>
+    <string name="settings_density">காலவரிசை அடர்த்தி</string>
+    <string name="settings_zoom_composite">கூட்டுப் பார்வை பெரிதாக்கம்</string>
+    <string name="settings_zoom_single">ஒற்றைப் பார்வை பெரிதாக்கம்</string>
+    <string name="settings_pinch_zoom">கிள்ளு-பெரிதாக்கலை இயக்கு</string>
+    <string name="settings_indicators">காலவரிசை குறிகாட்டிகள்</string>
+    <string name="settings_show_now_line">இப்போது கோட்டைக் காட்டு</string>
+    <string name="settings_line_color">கோட்டின் நிறம்</string>
+    <string name="settings_line_thickness">கோட்டின் தடிமன்</string>
+    <string name="settings_advanced">மேம்பட்ட (கேச்)</string>
+    <string name="settings_preload_range">முன்பதிவு வரம்பு</string>
+    <string name="settings_clear_cache">கேச் அழிக்கவும்</string>
+
+    <string name="lang_english">English</string>
+    <string name="lang_tamil">தமிழ்</string>
+
+    <string name="label_am">மு.ப</string>
+    <string name="label_pm">பி.ப</string>
+    <string name="label_zoom_value">பெரிதாக்கம்: %1$.1fx</string>
+
+    <!-- View Modes -->
+    <string name="view_mode_composite">கூட்டுப் பார்வை</string>
+    <string name="view_mode_neram">நல்ல நேரம்</string>
+    <string name="view_mode_gowri">கௌரி நேரம்</string>
+    <string name="view_mode_hora">ஹோரை</string>
+
+    <!-- Common UI -->
+    <string name="btn_ok">சரி</string>
+    <string name="btn_cancel">ரத்துசெய்</string>
+    <string name="btn_update">புதுப்பிப்பு</string>
+    <string name="btn_search">தேடு</string>
+    <string name="dialog_change_location">இருப்பிடத்தை மாற்றவும்</string>
+    <string name="dialog_location_hint">காட்சிக்கு நகரத்தின் பெயர் அல்லது பகுதி பெயரை கைமுறையாக உள்ளிடவும்.</string>
+    <string name="unknown_route">தெரியாத பாதை</string>
+
+    <!-- Metadata: Gowri Descriptions -->
+    <string name="desc_gowri_amridha">மிகவும் மங்களகரமானது. எந்தவொரு பணியையும் தொடங்குவதற்கும், பயணங்களுக்கும், புதிய முயற்சிகளுக்கும் சிறந்தது.</string>
+    <string name="desc_gowri_uthi">முற்போக்கான மற்றும் சாதகமானது. வளர்ச்சி, விரிவாக்கம் மற்றும் நிர்வாகப் பணிகளுக்கு நல்லது.</string>
+    <string name="desc_gowri_labam">இலாபகரமானது. வணிக ஒப்பந்தங்கள், நிதி பரிவர்த்தனைகள் மற்றும் வர்த்தகத்திற்கு ஏற்றது.</string>
+    <string name="desc_gowri_dhanam">செல்வத்தை உருவாக்குதல். முதலீடுகள் மற்றும் சொத்துக்களை வாங்குவதற்கு சாதகமானது.</string>
+    <string name="desc_gowri_sugam">வசதியானது. அமைதி தொடர்பான நடவடிக்கைகள் மற்றும் உள்நாட்டு விஷயங்களுக்கு நல்லது.</string>
+    <string name="desc_gowri_soram">திருட்டு/இழப்பு அபாயம். பெரிய பணத்தைக் கையாளுவதையோ அல்லது அதிக ஆபத்துள்ள வேலையைத் தொடங்குவதையோ தவிர்க்கவும்.</string>
+    <string name="desc_gowri_visham">விஷமானது/நச்சுத்தன்மை வாய்ந்தது. மருத்துவ சிகிச்சைகள் அல்லது புதிய திட்டங்களைத் தொடங்குவதைத் தவிர்க்கவும்.</string>
+    <string name="desc_gowri_rogam">நோய்/வியாதி. அசுபமானது; உடல்நலம் தொடர்பான நடவடிக்கைகள் அல்லது பயணத்தைத் தவிர்க்கவும்.</string>
+
+    <!-- Metadata: Special Descriptions -->
+    <string name="desc_timing_rahu">அசுப காலம். புதிய முயற்சிகள், முக்கிய கொள்முதல் அல்லது முக்கியமான கூட்டங்களைத் தொடங்குவதைத் தவிர்க்கவும்.\n\nசெய்யுங்கள்: வழக்கமான பணிகள், சுத்தம் செய்தல், ஆன்மீகப் பயிற்சிகள்.\nவேண்டாம்: பயணம், ஒப்பந்தங்களில் கையெழுத்திடுதல், சொத்துக்களை வாங்குதல்.</string>
+    <string name="desc_timing_yama">அசுப காலம். பெரும்பாலும் இழப்பு அல்லது தடைகளுடன் தொடர்புடையது. எதையும் புதிதாகத் தொடங்குவதைத் தவிர்க்கவும்.\n\nசெய்யுங்கள்: கடன்களைத் திருப்பிச் செலுத்துதல், நிலுவையில் உள்ள வேலையை முடித்தல், விடுவித்தல்.\nவேண்டாம்: புதிய திட்டங்கள், மருத்துவ சிகிச்சைகள், நீண்ட பயணங்கள்.</string>
+    <string name="desc_timing_kuli">விரிவாக்க காலம். இந்த நேரத்தில் செய்வது மீண்டும் நிகழும். சொத்துக்களை வாங்குவதற்கு நல்லது, தீய செயல்களுக்கு அல்ல.\n\nசெய்யுங்கள்: தொண்டு, முதலீடுகள், நேர்மறையான பழக்கங்களைத் தொடங்குதல்.\nவேண்டாம்: கடன் வாங்குதல், இறுதிச் சடங்குகள், எதிர்மறையான நடத்தைகள்.</string>
+    <string name="desc_timing_nalla">முக்கியமான நடவடிக்கைகளுக்கு நாளின் மிகவும் மங்களகரமான நேரம்.</string>
+
+    <!-- Metadata: Planet Qualities -->
+    <string name="quality_sun">அதிகாரம், உயிர்ச்சக்தி, தலைமைத்துவம். நிர்வாகம் மற்றும் மேலதிகாரிகளுடனான கூட்டங்களில் கவனம் செலுத்துங்கள்.</string>
+    <string name="quality_moon">உணர்ச்சி, வளர்ப்பு, மாற்றம். ஆக்கபூர்வமான வேலை மற்றும் வீடு தொடர்பான விஷயங்களுக்கு நல்லது.</string>
+    <string name="quality_mars">ஆற்றல், செயல், தைரியம். உடல் ரீதியான பணிகளில் கவனம் செலுத்துங்கள், ஆனால் மோதல்களைக் கவனியுங்கள்.</string>
+    <string name="quality_mercury">அறிவு, தொடர்பு, வர்த்தகம். படிப்பு, எழுதுதல் மற்றும் வணிகத்திற்கு ஏற்றது.</string>
+    <string name="quality_jupiter">ஞானம், விரிவாக்கம், அதிர்ஷ்டம். கற்றல், கற்பித்தல் மற்றும் சடங்குகளுக்கு சிறந்தது.</string>
+    <string name="quality_venus">அழகு, நல்லிணக்கம், ஆடம்பரம். கலை, காதல் மற்றும் சமூகமயமாக்கலுக்கு நல்லது.</string>
+    <string name="quality_saturn">ஒழுக்கம், தாமதம், கடின உழைப்பு. வழக்கமான பணிகளில் கவனம் செலுத்துங்கள் மற்றும் நிலுவையில் உள்ளவற்றை முடித்தல்.</string>
+
+    <!-- Hora Guidance -->
+    <string name="guidance_sun_fav">தலைமைத்துவம் மற்றும் அதிகாரத்திற்கு மிகவும் மங்களகரமானது. மேலதிகாரிகளுடனான கூட்டங்கள், புதிய பாத்திரங்களைத் தொடங்குதல் மற்றும் அரசாங்க உதவிகளைப் பெறுவதற்கு சிறந்தது.</string>
+    <string name="guidance_sun_conf">முரண்பட்ட சூரிய ஆற்றல். ஈகோ மோதல்கள் சாத்தியம். பிடிவாதம் அல்லது மேலதிகாரிகளுடனான மோதல்களைத் தவிர்க்கவும். தனிப்பட்ட பணிகளில் ஒட்டிக்கொள்ளுங்கள்.</string>
+    <string name="guidance_sun_neut">நிலையான உயிர்ச்சக்தி. நிர்வாகம் மற்றும் திட்டமிடலுக்கு நல்லது. உங்கள் ஆரோக்கியம் மற்றும் ஒழுக்கமான அட்டவணையை பராமரிப்பதில் கவனம் செலுத்துங்கள்.</string>
+
+    <string name="guidance_moon_fav">உணர்ச்சி ரீதியாக இணக்கமானது. உள்நாட்டு வேலைகள், ஆக்கபூர்வமான கலைகள் மற்றும் குடும்பத்துடன் இணைவதற்கு ஏற்றது. மனம் அமைதியாகவும் கவனமாகவும் இருக்கிறது.</string>
+    <string name="guidance_moon_conf">ஏற்ற இறக்கமான மனநிலைகள். உணர்ச்சியின் அடிப்படையில் முக்கிய முடிவுகளை எடுப்பதைத் தவிர்க்கவும். ஆழமான உணர்ச்சி ரீதியான உரையாடல்களுக்கு இது நல்ல நேரமல்ல.</string>
+    <string name="guidance_moon_neut">மென்மையான ஆற்றல். வழக்கமான வேலைகள், சமையல் மற்றும் சிறிய மாற்றங்களுக்கு ஏற்றது. சிறிய சமூக தொடர்புகளுக்கு நல்லது.</string>
+
+    <string name="guidance_mars_fav">அதிக ஆற்றல் மற்றும் தைரியம். உடல் உழைப்பு, விளையாட்டு மற்றும் போட்டிப் பணிகளுக்கு சிறந்தது. தைரியமான செயல்கள் வெற்றியைக் கொண்டுவரும்.</string>
+    <string name="guidance_mars_conf">அதிக உராய்வு. விபத்துக்கள் அல்லது வாதங்களின் அபாயம். அவசரப்படுதல், கூர்மையான கருவிகள் அல்லது ஆக்ரோஷமான பேச்சுவார்த்தைகளைத் தவிர்க்கவும். பொறுமையாக இருங்கள்.</string>
+    <string name="guidance_mars_neut">செயலில் உள்ள ஆற்றல். தொழில்நுட்ப வேலை அல்லது வீட்டு பழுதுபார்ப்புகளில் கவனம் செலுத்துங்கள். சோர்வைத் தவிர்க்க உடல் செயல்பாடுகளை மிதமாக வைத்திருங்கள்.</string>
+
+    <string name="guidance_mercury_fav">அறிவுப்பூர்வமாக கூர்மையானது. வணிக ஒப்பந்தங்கள், எழுதுதல், புதிய திறன்களைக் கற்றல் மற்றும் அனைத்து வகையான தொடர்புகளுக்கும் சிறந்தது.</string>
+    <string name="guidance_mercury_conf">தகவல் சுமை. தொடர்பு பிழைகள் ஏற்பட வாய்ப்புள்ளது. அனைத்து மின்னஞ்சல்கள் மற்றும் ஆவணங்களை இருமுறை சரிபார்க்கவும். இப்போது புதிய ஆய்வுகளைத் தொடங்குவதைத் தவிர்க்கவும்.</string>
+    <string name="guidance_mercury_neut">மன தெளிவு. அமைப்பு, பதிவு பராமரிப்பு மற்றும் கடிதப் பரிமாற்றத்தைப் பிடிப்பதற்கு நல்லது. தர்க்கத்திற்கான நடைமுறை நேரம்.</string>
+
+    <string name="guidance_jupiter_fav">மிகவும் மங்களகரமானது. புதிய கல்வி, முக்கிய நிதி முதலீடுகள் அல்லது ஆன்மீக சடங்குகளைத் தொடங்குவதற்கு சிறந்தது. விரிவாக்கம் சாதகமானது.</string>
+    <string name="guidance_jupiter_conf">முரண்பட்ட ஆற்றல்கள். சுக்கிரன் (இன்பம்) மற்றும் குரு (ஞானம்) மோதலாம். அதிகப்படியான ஈடுபாடு அல்லது மனக்கிளர்ச்சியுடன் ஆடம்பர கொள்முதல் செய்வதைத் தவிர்க்கவும்.</string>
+    <string name="guidance_jupiter_neut">கற்றல் மற்றும் பொதுவான வளர்ச்சிக்கு ஒரு நல்ல நேரம். பெரிய பாய்ச்சல்களை விட நிலையான முன்னேற்றத்தில் கவனம் செலுத்துங்கள்.</string>
+
+    <string name="guidance_venus_fav">இணக்கமான மற்றும் ஆக்கபூர்வமான. கலைகள், சமூகக் கூட்டங்கள், நகைகள்/துணிகள் வாங்குதல் மற்றும் காதல் நடவடிக்கைகளுக்கு ஏற்றது.</string>
+    <string name="guidance_venus_conf">உணர்ச்சி ரீதியான ஆடம்பரம். ஆடம்பரங்களுக்கு அதிக பணம் செலவழிக்கும் அபாயம். இப்போது எடுக்கப்பட்ட அழகியல் தேர்வுகள் பின்னர் வருந்தப்படலாம்.</string>
+    <string name="guidance_venus_neut">இதமான சூழல். சிறிய அழகுபடுத்தல் மற்றும் தளர்வுக்கு நல்லது. உறவுகளை மென்மையாக வளர்ப்பதில் கவனம் செலுத்துங்கள்.</string>
+
+    <string name="guidance_saturn_fav">திடமான அடித்தளம். நீண்ட கால திட்டமிடல், கடன்களை அடைத்தல் மற்றும் தீவிர ஒழுக்கம் மற்றும் சகிப்புத்தன்மை தேவைப்படும் பணிகளுக்கு சிறந்தது.</string>
+    <string name="guidance_saturn_conf">கடுமையான தாமதங்கள். மெதுவான முன்னேற்றத்தால் விரக்தி ஏற்பட வாய்ப்புள்ளது. விரைவான முடிவுகள் தேவைப்படும் எதையும் தொடங்குவதைத் தவிர்க்கவும். ஓய்வு அறிவுறுத்தப்படுகிறது.</string>
+    <string name="guidance_saturn_neut">நடைமுறை ஆற்றல். வழக்கமான வேலை, சுத்தம் செய்தல் மற்றும் ஒழுங்கமைக்கப்பட்ட உழைப்பில் கவனம் செலுத்துங்கள். விடாமுயற்சி பின்னர் பலன் தரும்.</string>
+
+    <string name="guidance_default">சமநிலையான செயல் மற்றும் நினைவாற்றலுக்கான நேரம்.</string>
+
+    <!-- Strategic Activities -->
+    <string-array name="activities_sun_fav">
+        <item>மேலதிகாரிகளை சந்திக்கவும்</item>
+        <item>அனுமதிகளுக்கு விண்ணப்பிக்கவும்</item>
+        <item>ஒரு குழு திட்டத்தை வழிநடத்தவும்</item>
+    </string-array>
+    <string-array name="activities_sun_conf">
+        <item>தனிப்பட்ட கவனம் செலுத்திய வேலை</item>
+        <item>தியானம்</item>
+        <item>ஆவணங்களை மதிப்பாய்வு செய்தல்</item>
+    </string-array>
+    <string-array name="activities_sun_neut">
+        <item>அட்டவணையை ஒழுங்கமைக்கவும்</item>
+        <item>உடல்நல பரிசோதனை</item>
+        <item>நிர்வாக பணிகள்</item>
+    </string-array>
+
+    <string-array name="activities_moon_fav">
+        <item>குடும்ப இரவு உணவு</item>
+        <item>ஆக்கபூர்வமான எழுதுதல்</item>
+        <item>தோட்டம் வளர்ப்பு</item>
+    </string-array>
+    <string-array name="activities_moon_conf">
+        <item>வழக்கமான வேலைகள்</item>
+        <item>அமைதியான பிரதிபலிப்பு</item>
+        <item>இலகுவான வாசிப்பு</item>
+    </string-array>
+    <string-array name="activities_moon_neut">
+        <item>சமையலறை அமைப்பு</item>
+        <item>சமூக நிகழ்வுகளைத் திட்டமிடுதல்</item>
+        <item>வீட்டிற்கு ஷாப்பிங்</item>
+    </string-array>
+
+    <string-array name="activities_mars_fav">
+        <item>தீவிர பயிற்சி</item>
+        <item>கட்டுமானத்தைத் தொடங்குதல்</item>
+        <item>போட்டி விளையாட்டுகள்</item>
+    </string-array>
+    <string-array name="activities_mars_conf">
+        <item>பாதுகாப்பு தணிக்கைகள்</item>
+        <item>கருவிகளை சுத்தம் செய்தல்</item>
+        <item>யோகா</item>
+    </string-array>
+    <string-array name="activities_mars_neut">
+        <item>வீட்டு பழுதுபார்ப்பு</item>
+        <item>தர்க்கரீதியான சிக்கலைத் தீர்ப்பது</item>
+        <item>தொழில்நுட்ப வரைவு</item>
+    </string-array>
+
+    <string-array name="activities_mercury_fav">
+        <item>ஒப்பந்தங்களில் கையெழுத்திடுங்கள்</item>
+        <item>ஒரு விளக்கக்காட்சியை வழங்கவும்</item>
+        <item>ஒரு பாடத்திட்டத்தைத் தொடங்குங்கள்</item>
+    </string-array>
+    <string-array name="activities_mercury_conf">
+        <item>ஆவணங்களை சரிபார்க்கவும்</item>
+        <item>தரவு உள்ளீடு</item>
+        <item>மேசையை சுத்தம் செய்தல்</item>
+    </string-array>
+    <string-array name="activities_mercury_neut">
+        <item>மின்னஞ்சல்களை காப்பகப்படுத்தவும்</item>
+        <item>கணக்குகளை சமநிலைப்படுத்துங்கள்</item>
+        <item>குறுகிய தூர பயணம்</item>
+    </string-array>
+
+    <string-array name="activities_jupiter_fav">
+        <item>பங்குகளில் முதலீடு செய்யுங்கள்</item>
+        <item>ஆன்மீக வழிபாடு</item>
+        <item>கல்வி சேர்க்கை</item>
+    </string-array>
+    <string-array name="activities_jupiter_conf">
+        <item>பட்ஜெட்டை மதிப்பாய்வு செய்யவும்</item>
+        <item>தத்துவ வாசிப்பு</item>
+        <item>உள் தணிக்கை</item>
+    </string-array>
+    <string-array name="activities_jupiter_neut">
+        <item>ஒரு வழிகாட்டியை அணுகுதல்</item>
+        <item>பொதுவான ஆராய்ச்சி</item>
+        <item>நீண்ட கால இலக்கு அமைத்தல்</item>
+    </string-array>
+
+    <string-array name="activities_venus_fav">
+        <item>கலை கண்காட்சி</item>
+        <item>இரவு சந்திப்பு</item>
+        <item>பேஷன் ஷாப்பிங்</item>
+    </string-array>
+    <string-array name="activities_venus_conf">
+        <item>நிதி திட்டமிடல்</item>
+        <item>சுய பாதுகாப்பு</item>
+        <item>உள் சுத்தம்</item>
+    </string-array>
+    <string-array name="activities_venus_neut">
+        <item>இசை கேட்பது</item>
+        <item>மலர் ஏற்பாடு</item>
+        <item>சமூக வலைப்பின்னல்</item>
+    </string-array>
+
+    <string-array name="activities_saturn_fav">
+        <item>பரம்பரை திட்டமிடல்</item>
+        <item>கடன்களை அடைத்தல்</item>
+        <item>ஆழ்ந்த ஆராய்ச்சி</item>
+    </string-array>
+    <string-array name="activities_saturn_conf">
+        <item>வழக்கமான பராமரிப்பு</item>
+        <item>ஆரம்ப தூக்கம்</item>
+        <item>வரிகளை தாக்கல் செய்தல்</item>
+    </string-array>
+    <string-array name="activities_saturn_neut">
+        <item>கிடங்கு சுத்தம்</item>
+        <item>உடல் உழைப்பு</item>
+        <item>சகிப்புத்தன்மை பயிற்சி</item>
+    </string-array>
+
+</resources>

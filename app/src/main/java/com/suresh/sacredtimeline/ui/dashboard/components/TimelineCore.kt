@@ -25,10 +25,12 @@ import androidx.compose.foundation.gestures.calculateZoom
 import kotlin.math.abs
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.suresh.sacredtimeline.R
 import com.suresh.sacredtimeline.model.DayData
 import com.suresh.sacredtimeline.model.Timing
 import com.suresh.sacredtimeline.ui.dashboard.TimelineUiState
@@ -42,7 +44,7 @@ import java.util.*
 private val BASE_HOUR_HEIGHT = 160.dp
 private const val START_HOUR = 0
 private const val END_HOUR = 24
-private val TIME_COLUMN_WIDTH = 60.dp
+private val TIME_COLUMN_WIDTH = 65.dp
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -152,7 +154,7 @@ fun TimelinePager(
                 border = BorderStroke(1.dp, Color.White.copy(alpha = 0.2f))
             ) {
                 Text(
-                    text = "${String.format(Locale.US, "%.1f", timelineScale)}x Density",
+                    text = stringResource(R.string.label_zoom_value, timelineScale),
                     color = Color.White,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     style = MaterialTheme.typography.labelLarge,
@@ -268,7 +270,6 @@ fun TimelineContent(
                         label = "Sunrise", 
                         icon = Icons.Default.WbSunny, 
                         iconTint = Color(0xFFFF9800),
-                        isFallback = dayData.isFallback,
                         hourHeight = hourHeight,
                         is24Hour = is24Hour
                     )
@@ -277,7 +278,6 @@ fun TimelineContent(
                         label = "Sunset", 
                         icon = Icons.Default.WbTwilight, 
                         iconTint = Color(0xFFFF5722),
-                        isFallback = dayData.isFallback,
                         hourHeight = hourHeight,
                         is24Hour = is24Hour
                     )
@@ -309,7 +309,7 @@ fun TimelineContent(
                     border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Icon(Icons.Default.Add, contentDescription = "Zoom In", modifier = Modifier.size(20.dp))
+                        Icon(Icons.Default.Add, contentDescription = stringResource(R.string.label_zoom_in), modifier = Modifier.size(20.dp))
                     }
                 }
                 
@@ -321,7 +321,7 @@ fun TimelineContent(
                     border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Icon(Icons.Default.Remove, contentDescription = "Zoom Out", modifier = Modifier.size(20.dp))
+                        Icon(Icons.Default.Remove, contentDescription = stringResource(R.string.label_zoom_out), modifier = Modifier.size(20.dp))
                     }
                 }
             }
@@ -344,29 +344,29 @@ fun TimelineHeader(viewMode: ViewMode, columnVisibility: Set<String> = emptySet(
         if (viewMode == ViewMode.COMPOSITE) {
             columnOrder.forEach { colId ->
                 if (columnVisibility.contains(colId)) {
-                    val label = when (colId) {
-                        "NERAM" -> "Neram"
-                        "GOWRI" -> "Gowri Neram"
-                        "HORA" -> "Hora"
-                        else -> colId
+                    val labelRes = when (colId) {
+                        "NERAM" -> R.string.nav_nalla_neram
+                        "GOWRI" -> R.string.nav_gowri_neram
+                        "HORA" -> R.string.nav_hora
+                        else -> R.string.app_name
                     }
                     Text(
-                        text = label,
+                        text = stringResource(labelRes),
                         modifier = Modifier.weight(1f),
                         textAlign = TextAlign.Center,
-                        style = if (colId == "NERAM") MaterialTheme.typography.labelSmall else MaterialTheme.typography.titleSmall,
+                        style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold
                     )
                 }
             }
         } else {
-            val label = when (viewMode) {
-                ViewMode.NERAM -> "Nalla Neram"
-                ViewMode.GOWRI -> "Gowri Neram"
-                ViewMode.HORA -> "Hora Timings"
-                else -> ""
+            val labelRes = when (viewMode) {
+                ViewMode.NERAM -> R.string.nav_nalla_neram
+                ViewMode.GOWRI -> R.string.nav_gowri_neram
+                ViewMode.HORA -> R.string.nav_hora
+                else -> R.string.app_name
             }
-            Text(label, modifier = Modifier.weight(1f), textAlign = TextAlign.Center, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(stringResource(labelRes), modifier = Modifier.weight(1f), textAlign = TextAlign.Center, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         }
     }
 }

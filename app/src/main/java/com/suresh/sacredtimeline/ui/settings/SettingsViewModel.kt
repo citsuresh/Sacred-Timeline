@@ -3,8 +3,10 @@ package com.suresh.sacredtimeline.ui.settings
 import android.app.Application
 import android.location.Address
 import android.location.Geocoder
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.suresh.sacredtimeline.R
 import com.suresh.sacredtimeline.data.CacheManager
 import com.suresh.sacredtimeline.data.SettingsRepository
 import com.suresh.sacredtimeline.ui.navigation.ViewMode
@@ -94,6 +96,14 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     val preloadDays: StateFlow<Int> = repository.preloadDays.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), 3)
 
+    val language: StateFlow<String> = repository.language.stateIn(
+        viewModelScope, 
+        SharingStarted.WhileSubscribed(5000), 
+        AppCompatDelegate.getApplicationLocales().let { locales ->
+            if (locales.isEmpty()) "en" else locales.toLanguageTags().split(",")[0]
+        }
+    )
+
     private val _searchState = MutableStateFlow<SearchState>(SearchState.Idle)
     val searchState: StateFlow<SearchState> = _searchState
 
@@ -181,7 +191,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
                 }
                 
                 if (addresses.isNullOrEmpty()) {
-                    _searchState.value = SearchState.Error("City not found")
+                    _searchState.value = SearchState.Error(getApplication<Application>().getString(R.string.label_city_not_found))
                 } else {
                     _searchState.value = SearchState.Results(addresses)
                 }
@@ -216,6 +226,10 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
     fun setPreloadDays(days: Int) {
         viewModelScope.launch { repository.setPreloadDays(days) }
+    }
+
+    fun setLanguage(lang: String) {
+        viewModelScope.launch { repository.setLanguage(lang) }
     }
 
     fun clearCache() {
