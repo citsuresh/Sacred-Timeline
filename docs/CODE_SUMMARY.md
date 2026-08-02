@@ -1,8 +1,10 @@
-# Code Summary
+# Code Summary & Structural Map
 
-This document provides an overview of the core logic and architecture of the Sacred Timeline project.
+Technical overview of the project architecture and data flow.
 
-## Architecture Overview
+## 1. Module & Data Flow
+- **:app**: Monolithic module containing all features.
+- **Architecture**: MVI-lite (StateFlow driven UI).
 
 ```mermaid
 graph TD
@@ -20,32 +22,29 @@ graph TD
     WidgetUpdateWorker --> PanchangamWidget
 ```
 
-## Core Logic: Panchangam Calculation
+## 2. Layer Responsibilities
 
-The `PanchangamCalculator` (`com.suresh.sacredtimeline.logic`) is the engine of the application. It computes various auspicious and inauspicious time windows:
+### Domain/Logic (`logic/`)
+- `PanchangamCalculator`: Core engine for Nalla Neram (sunrise-relative), Gowri Neram (8 slots), and Hora (planetary hours).
 
-- **Nalla Neram**: Fixed windows of "Good Time" that shift based on the day's sunrise.
-- **Gowri Neram**: Divided into 8 equal slots for day and 8 for night, following specific planetary sequences (Amridha, Uthi, Labam, etc.) based on the day of the week.
-- **Hora**: Planetary hours, dividing day and night into 12 slots each. The sequence starts with the planet associated with the day of the week.
+### UI (`ui/`)
+- `ui/dashboard`: 24h vertical timeline, `TimelinePager` (multi-day swipe), `TimingCard` (sticker-look blocks).
+- `ui/settings`: Persistence-linked preferences (Locale, Zoom, Column mgmt).
+- **Navigation**: Navigation 3 (backstack-as-state).
 
-### Key Models
-- `Timing`: Base class for all time-based events.
-- `Auspiciousness`: Enum representing the quality of time (GREEN, BLUE, AMBER, RED).
+### Data (`data/`)
+- `SettingsRepository`: Jetpack DataStore for user preferences.
+- `CacheManager`: Shared JSON caching for App/Widget offline support.
 
-## UI Structure: Jetpack Compose
+## 3. Infrastructure
+- **Background**: `WorkManager` synchronized with time-slot transitions.
+- **Localization**: `AppCompatDelegate` for dynamic English/Tamil switching.
 
-The app uses a modern Compose-first architecture:
-
-- **Navigation 3**: Implementation uses `androidx.navigation3`. Navigation state is managed via a `backStack` in `MainActivity`.
-- **TimelineDashboard**: The central screen of the app.
-    - **HorizontalDateDial**: A scrolling list of dates for quick navigation.
-    - **TimelineContent**: A vertically scrollable 24-hour grid.
-    - **TimingCard**: Visual representation of a timing slot, featuring high-contrast double borders and a dynamic text-contrast engine.
-- **Theme**: Material 3 theme (`SacredTimelineTheme`) using a centralized color mapping engine (`SacredTimelineColors`) for screenshot-accurate palette consistency.
-
-## Home Screen Widget: Glance
-
-The `PanchangamWidget` (`com.suresh.sacredtimeline.widget`) is built using **Jetpack Glance**. It provides a real-time summary of the current Nalla Neram, Gowri Neram, and Hora status.
-
-- **Updates**: Managed by `WidgetUpdateWorker` using `WorkManager`, synchronizing refreshes precisely with time-slot transitions.
-- **Layout**: Simplified 3-column architecture (Neram, Gowri, Hora) with a transparent background and app-launch action.
+## 4. Symbol Index
+| Class | Responsibility |
+| :--- | :--- |
+| `PanchangamCalculator` | Math for all time slots. |
+| `MainActivity` | App lifecycle & Navigation host. |
+| `SettingsRepository` | Source of truth for preferences. |
+| `PanchangamWidget` | Glance-based Home Screen summary. |
+| `Metadata` | UI mapping for localized strings/icons. |

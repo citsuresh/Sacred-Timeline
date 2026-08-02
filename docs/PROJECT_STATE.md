@@ -1,25 +1,21 @@
 # Project State
 
-**Current Phase**: Alpha/Stable
+**Phase**: Alpha/Stable (Phase 2 Complete)
 
-## Summary
-The Sacred Timeline app is a functional utility for tracking Panchangam timings with a modern, expressive UI.
+## 1. Recently Implemented
+- **Multi-Language Support**: Persistent English/Tamil switching via `AppCompatDelegate`.
+- **UI Optimization**: Shortened/stacked Tamil AM/PM markers, dynamic wrapping for sun indicators.
+- **Stability Fixes**: Resolved Navigation 3 dispatcher crashes and Activity recreation loops.
+- **Advanced Settings**: Per-view zoom levels, 24h format toggle, and column reordering.
+- **Widget Reliability**: Transition-synchronized refreshes and shared JSON cache.
 
-## Recently Modified
-- **Shaded Color System**: Implemented screenshot-accurate HEX colors for all Panchangam timings (Gowri, Hora, etc.).
-- **Custom Astrological Icons**: Added specialized vector symbols for Rahu (North Node), Yama (Buffalo mascot), and Kuligai (Saturn Matrix).
-- **High-Contrast Borders**: Added "Double Border" (White Outer, Black Inner) to all timing cards for maximum definition on any background.
-- **Dynamic Contrast Engine**: Integrated luminance-aware text coloring that automatically flips between black and white.
-- **Widget Evolution**: Streamlined to 3 columns with a transparent background and interactive app-launch trigger.
-- **Refresh Optimization**: Updated `WidgetUpdateWorker` to synchronize updates precisely with time-slot transitions.
-- **Multi-day Navigation**: Implemented `HorizontalPager` for seamless day-to-day swiping.
+## 2. Technical Stack
+- **UI**: Kotlin, Jetpack Compose (Material 3), Jetpack Glance (Widgets).
+- **Navigation**: Navigation 3.
+- **Persistence**: DataStore (Settings), Disk JSON (Cache).
+- **Minimum SDK**: 26 (Android 8.0).
+- **Target SDK**: 34 (Android 14).
 
-## Next Focus
-- **Session Persistence**: Storing user preferences and scroll positions.
-- **Documentation**: Refining project memory and technical guides.
-
-## Technical Specifications
-- **UI**: Jetpack Compose (Material 3)
-- **Navigation**: Navigation 3
-- **Widgets**: Jetpack Glance
-- **Logic**: Custom Panchangam Engine
+## 3. Next Focus
+- **Tamil Month/Year**: Integration of the traditional Tamil calendar system.
+- **User Thresholds**: Customizable auspiciousness levels.
