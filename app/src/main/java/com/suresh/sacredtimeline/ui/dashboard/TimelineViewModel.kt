@@ -1,7 +1,5 @@
 package com.suresh.sacredtimeline.ui.dashboard
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import android.annotation.SuppressLint
 import android.app.Application
 import android.location.Geocoder
@@ -9,12 +7,17 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.suresh.sacredtimeline.data.SettingsRepository
 import com.suresh.sacredtimeline.logic.MockPanchangamProvider
 import com.suresh.sacredtimeline.logic.SunriseSunsetProvider
 import com.suresh.sacredtimeline.model.*
+import com.suresh.sacredtimeline.ui.navigation.ViewMode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -23,6 +26,7 @@ import java.time.LocalTime
 import java.util.Locale
 
 class TimelineViewModel(application: Application) : AndroidViewModel(application) {
+    private val repository = SettingsRepository(application)
     private val provider = MockPanchangamProvider()
     private val sunProvider = SunriseSunsetProvider()
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(application)
@@ -37,9 +41,40 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
     private val _uiState = MutableStateFlow<TimelineUiState>(TimelineUiState.Loading)
     val uiState: StateFlow<TimelineUiState> = _uiState
 
+    private val _viewMode = MutableStateFlow(ViewMode.COMPOSITE)
+    
+    private val _timelineScale = MutableStateFlow(1.0f)
+    val timelineScale: StateFlow<Float> = _timelineScale
+
     private val cachedDays = mutableMapOf<LocalDate, DayData>()
 
+    val timeFormat24h = repository.timeFormat24h
+    
+    val showNowLine: StateFlow<Boolean> = repository.showNowLine.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), true
+    )
+    
+    val pinchToZoomEnabled = repository.pinchToZoomEnabled
+
+    val columnVisibility: StateFlow<Set<String>> = repository.columnVisibility.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), setOf("NERAM", "GOWRI", "HORA")
+    )
+
+    val columnOrder: StateFlow<List<String>> = repository.columnOrder.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), listOf("NERAM", "GOWRI", "HORA")
+    )
+
     init {
+        // Observe scale settings based on view mode
+        viewModelScope.launch {
+            combine(repository.compositeScale, repository.singleViewScale, _viewMode) { composite, single, mode ->
+                if (mode == ViewMode.COMPOSITE) composite else single
+            }.collect {
+                _timelineScale.value = it
+            }
+        }
+
+        // Observe date changes and preload
         viewModelScope.launch {
             selectedDate.collect { date ->
                 preloadData(date)
@@ -47,8 +82,22 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    fun setViewMode(mode: ViewMode) {
+        _viewMode.value = mode
+    }
+
     fun updateDate(date: LocalDate) {
         _selectedDate.value = date
+    }
+
+    fun updateTimelineScale(scale: Float) {
+        viewModelScope.launch {
+            if (_viewMode.value == ViewMode.COMPOSITE) {
+                repository.updateCompositeScale(scale)
+            } else {
+                repository.updateSingleViewScale(scale)
+            }
+        }
     }
 
     @SuppressLint("MissingPermission")

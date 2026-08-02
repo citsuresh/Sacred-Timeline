@@ -54,8 +54,19 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Remove
+import androidx.compose.foundation.gestures.calculateZoom
+import java.util.Locale
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.ui.res.painterResource
 import com.suresh.sacredtimeline.R
+import com.suresh.sacredtimeline.ui.navigation.ViewMode
+import androidx.compose.material.icons.filled.Menu
 import com.suresh.sacredtimeline.model.*
 import com.suresh.sacredtimeline.ui.theme.*
 import kotlinx.coroutines.delay
@@ -65,7 +76,7 @@ import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-private val HOUR_HEIGHT = 160.dp
+private val BASE_HOUR_HEIGHT = 160.dp
 private val START_HOUR = 0
 private val END_HOUR = 24
 private val TIME_COLUMN_WIDTH = 60.dp
@@ -74,10 +85,18 @@ private val TIME_COLUMN_WIDTH = 60.dp
 @Composable
 fun TimelineDashboard(
     modifier: Modifier = Modifier,
-    viewModel: TimelineViewModel = viewModel()
+    viewModel: TimelineViewModel = viewModel(),
+    viewMode: ViewMode = ViewMode.COMPOSITE,
+    onMenuClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val selectedDate by viewModel.selectedDate.collectAsState()
+    val timelineScale by viewModel.timelineScale.collectAsState()
+    val pinchToZoomEnabled by viewModel.pinchToZoomEnabled.collectAsState(initial = true)
+    val timeFormat24h by viewModel.timeFormat24h.collectAsState(initial = false)
+    val showNowLine by viewModel.showNowLine.collectAsState()
+    val columnVisibility by viewModel.columnVisibility.collectAsState(initial = setOf("NERAM", "GOWRI", "HORA"))
+    val columnOrder by viewModel.columnOrder.collectAsState(initial = listOf("NERAM", "GOWRI", "HORA"))
     
     val locationPermissionState = rememberPermissionState(
         android.Manifest.permission.ACCESS_COARSE_LOCATION
@@ -225,6 +244,17 @@ fun TimelineDashboard(
             selectedDate = selectedDate,
             dates = dates,
             pagerState = pagerState,
+            viewMode = viewMode,
+            timelineScale = timelineScale,
+            pinchToZoomEnabled = pinchToZoomEnabled,
+            is24Hour = timeFormat24h,
+            showNowLine = showNowLine,
+            columnVisibility = columnVisibility,
+            columnOrder = columnOrder,
+            onMenuClick = onMenuClick,
+            onZoomIn = { viewModel.updateTimelineScale(timelineScale + 0.1f) },
+            onZoomOut = { viewModel.updateTimelineScale(timelineScale - 0.1f) },
+            onScaleChange = { viewModel.updateTimelineScale(it) },
             onDateSelected = { viewModel.updateDate(it) },
             onDateClick = { showDatePicker = true },
             onLocationClick = { name ->
@@ -244,6 +274,17 @@ fun TimelineDashboard(
             selectedDate = selectedDate,
             dates = dates,
             pagerState = pagerState,
+            viewMode = viewMode,
+            timelineScale = timelineScale,
+            pinchToZoomEnabled = pinchToZoomEnabled,
+            is24Hour = timeFormat24h,
+            showNowLine = showNowLine,
+            columnVisibility = columnVisibility,
+            columnOrder = columnOrder,
+            onMenuClick = onMenuClick,
+            onZoomIn = { viewModel.updateTimelineScale(timelineScale + 0.1f) },
+            onZoomOut = { viewModel.updateTimelineScale(timelineScale - 0.1f) },
+            onScaleChange = { viewModel.updateTimelineScale(it) },
             onDateSelected = { viewModel.updateDate(it) },
             onDateClick = { showDatePicker = true },
             onLocationClick = { name ->
@@ -267,6 +308,17 @@ fun PortraitTimelineLayout(
     selectedDate: LocalDate,
     dates: List<LocalDate>,
     pagerState: androidx.compose.foundation.pager.PagerState,
+    viewMode: ViewMode,
+    timelineScale: Float,
+    pinchToZoomEnabled: Boolean,
+    is24Hour: Boolean,
+    showNowLine: Boolean,
+    columnVisibility: Set<String>,
+    columnOrder: List<String>,
+    onMenuClick: () -> Unit,
+    onZoomIn: () -> Unit,
+    onZoomOut: () -> Unit,
+    onScaleChange: (Float) -> Unit,
     onDateSelected: (LocalDate) -> Unit,
     onDateClick: () -> Unit,
     onLocationClick: (String) -> Unit,
@@ -277,6 +329,11 @@ fun PortraitTimelineLayout(
     Scaffold(
         topBar = {
             TopAppBar(
+                navigationIcon = {
+                    IconButton(onClick = onMenuClick) {
+                        Icon(Icons.Default.Menu, contentDescription = "Menu")
+                    }
+                },
                 title = { 
                     Column {
                         Text(
@@ -341,6 +398,16 @@ fun PortraitTimelineLayout(
                     uiState = uiState,
                     dates = dates,
                     pagerState = pagerState,
+                    viewMode = viewMode,
+                    timelineScale = timelineScale,
+                    pinchToZoomEnabled = pinchToZoomEnabled,
+                    is24Hour = is24Hour,
+                    showNowLine = showNowLine,
+                    columnVisibility = columnVisibility,
+                    columnOrder = columnOrder,
+                    onScaleChange = onScaleChange,
+                    onZoomIn = onZoomIn,
+                    onZoomOut = onZoomOut,
                     onTimingClick = onTimingClick,
                     isLandscape = false
                 )
@@ -356,6 +423,17 @@ fun LandscapeTimelineLayout(
     selectedDate: LocalDate,
     dates: List<LocalDate>,
     pagerState: androidx.compose.foundation.pager.PagerState,
+    viewMode: ViewMode,
+    timelineScale: Float,
+    pinchToZoomEnabled: Boolean,
+    is24Hour: Boolean,
+    showNowLine: Boolean,
+    columnVisibility: Set<String>,
+    columnOrder: List<String>,
+    onMenuClick: () -> Unit,
+    onZoomIn: () -> Unit,
+    onZoomOut: () -> Unit,
+    onScaleChange: (Float) -> Unit,
     onDateSelected: (LocalDate) -> Unit,
     onDateClick: () -> Unit,
     onLocationClick: (String) -> Unit,
@@ -401,6 +479,9 @@ fun LandscapeTimelineLayout(
                             }
                         }
                         Row {
+                            IconButton(onClick = onMenuClick, modifier = Modifier.size(32.dp)) {
+                                Icon(Icons.Default.Menu, contentDescription = "Menu", modifier = Modifier.size(18.dp))
+                            }
                             IconButton(onClick = onTodayClick, modifier = Modifier.size(32.dp)) {
                                 Icon(Icons.Filled.Today, contentDescription = "Today", modifier = Modifier.size(18.dp))
                             }
@@ -429,7 +510,8 @@ fun LandscapeTimelineLayout(
                                 sunrise = dayData.sunrise,
                                 sunset = dayData.sunset,
                                 isFallback = dayData.isFallback,
-                                isLandscape = true
+                                isLandscape = true,
+                                is24Hour = is24Hour
                             )
                         }
                     }
@@ -463,6 +545,16 @@ fun LandscapeTimelineLayout(
                     uiState = uiState,
                     dates = dates,
                     pagerState = pagerState,
+                    viewMode = viewMode,
+                    timelineScale = timelineScale,
+                    pinchToZoomEnabled = pinchToZoomEnabled,
+                    is24Hour = is24Hour,
+                    showNowLine = showNowLine,
+                    columnVisibility = columnVisibility,
+                    columnOrder = columnOrder,
+                    onScaleChange = onScaleChange,
+                    onZoomIn = onZoomIn,
+                    onZoomOut = onZoomOut,
                     onTimingClick = onTimingClick,
                     isLandscape = true
                 )
@@ -479,10 +571,58 @@ fun TimelinePager(
     dates: List<LocalDate>,
     pagerState: androidx.compose.foundation.pager.PagerState,
     onTimingClick: (Timing) -> Unit,
+    viewMode: ViewMode,
+    timelineScale: Float,
+    pinchToZoomEnabled: Boolean,
+    is24Hour: Boolean,
+    showNowLine: Boolean,
+    columnVisibility: Set<String>,
+    columnOrder: List<String>,
+    onScaleChange: (Float) -> Unit,
+    onZoomIn: () -> Unit,
+    onZoomOut: () -> Unit,
     isLandscape: Boolean
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        when (val state = uiState) {
+    val hourHeight = BASE_HOUR_HEIGHT * timelineScale
+    
+    var showScaleIndicator by remember { mutableStateOf(false) }
+    var indicatorTimer by remember { mutableStateOf(0L) }
+
+    LaunchedEffect(timelineScale) {
+        showScaleIndicator = true
+        indicatorTimer = System.currentTimeMillis()
+        delay(1500)
+        if (System.currentTimeMillis() - indicatorTimer >= 1500) {
+            showScaleIndicator = false
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .pointerInput(timelineScale, pinchToZoomEnabled) {
+                if (pinchToZoomEnabled) {
+                    awaitPointerEventScope {
+                        while (true) {
+                            val event = awaitPointerEvent(PointerEventPass.Initial)
+                            val changes = event.changes
+                            if (changes.size >= 2) {
+                                val zoom = event.calculateZoom()
+                                if (Math.abs(zoom - 1f) > 0.005f) { // Added threshold for stability
+                                    val newScale = (timelineScale * zoom).coerceIn(0.2f, 3.0f)
+                                    if (newScale != timelineScale) {
+                                        onScaleChange(newScale)
+                                        // Consume all changes to prevent scrolling/paging
+                                        changes.forEach { it.consume() }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+    ) {
+        when (val res = uiState) {
             is TimelineUiState.Loading -> {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
@@ -492,13 +632,21 @@ fun TimelinePager(
                     modifier = Modifier.fillMaxSize()
                 ) { page ->
                     val date = dates[page]
-                    val dayData = state.days[date]
+                    val dayData = res.days[date]
                     if (dayData != null) {
                         TimelineContent(
                             date = date, 
                             dayData = dayData,
                             onTimingClick = onTimingClick,
-                            isLandscape = isLandscape
+                            viewMode = viewMode,
+                            hourHeight = hourHeight,
+                            onZoomIn = onZoomIn,
+                            onZoomOut = onZoomOut,
+                            isLandscape = isLandscape,
+                            is24Hour = is24Hour,
+                            showNowLine = showNowLine,
+                            columnVisibility = columnVisibility,
+                            columnOrder = columnOrder
                         )
                     } else {
                         Box(modifier = Modifier.fillMaxSize()) {
@@ -506,6 +654,28 @@ fun TimelinePager(
                         }
                     }
                 }
+            }
+        }
+
+        // Scale Indicator Overlay
+        AnimatedVisibility(
+            visible = showScaleIndicator,
+            enter = fadeIn(),
+            exit = fadeOut(),
+            modifier = Modifier.align(Alignment.TopCenter).padding(top = 16.dp)
+        ) {
+            Surface(
+                color = Color.Black.copy(alpha = 0.7f),
+                shape = RoundedCornerShape(20.dp),
+                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.2f))
+            ) {
+                Text(
+                    text = "${String.format(Locale.US, "%.1f", timelineScale)}x Density",
+                    color = Color.White,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }
@@ -642,7 +812,15 @@ fun TimelineContent(
     date: LocalDate, 
     dayData: DayData,
     onTimingClick: (Timing) -> Unit,
-    isLandscape: Boolean = false
+    viewMode: ViewMode,
+    hourHeight: Dp,
+    onZoomIn: () -> Unit,
+    onZoomOut: () -> Unit,
+    isLandscape: Boolean = false,
+    is24Hour: Boolean = false,
+    showNowLine: Boolean = true,
+    columnVisibility: Set<String> = setOf("NERAM", "GOWRI", "HORA"),
+    columnOrder: List<String> = listOf("NERAM", "GOWRI", "HORA")
 ) {
     val scrollState = rememberScrollState()
     val density = LocalDensity.current
@@ -663,7 +841,7 @@ fun TimelineContent(
     // Auto-scroll to current time on first launch for today
     LaunchedEffect(containerHeight) {
         if (containerHeight > 0 && isToday) {
-            val nowOffset = with(density) { calculateOffset(currentTime).toPx() }
+            val nowOffset = with(density) { calculateOffset(currentTime, hourHeight).toPx() }
             val centerOffset = containerHeight / 2
             scrollState.scrollTo((nowOffset - centerOffset).toInt().coerceAtLeast(0))
         }
@@ -671,9 +849,9 @@ fun TimelineContent(
 
     Column(modifier = Modifier.fillMaxSize()) {
         if (!isLandscape) {
-            SunTimesDisplay(dayData.sunrise, dayData.sunset, dayData.isFallback, isLandscape = false)
+            SunTimesDisplay(dayData.sunrise, dayData.sunset, dayData.isFallback, isLandscape = false, is24Hour = is24Hour)
         }
-        TimelineHeader()
+        TimelineHeader(viewMode = viewMode, columnVisibility = columnVisibility, columnOrder = columnOrder)
         
         Box(
             modifier = Modifier
@@ -689,33 +867,47 @@ fun TimelineContent(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(HOUR_HEIGHT * (END_HOUR - START_HOUR))
+                        .height(hourHeight * (END_HOUR - START_HOUR))
                 ) {
-                    TimeGrid()
+                    TimeGrid(hourHeight = hourHeight)
                     
                     // Night Shade (Sunset to Sunrise/End of day)
-                    NightShade(sunrise = dayData.sunrise, sunset = dayData.sunset)
+                    NightShade(sunrise = dayData.sunrise, sunset = dayData.sunset, hourHeight = hourHeight)
 
                     Row(modifier = Modifier.fillMaxSize()) {
-                        TimeMarkersColumn(sunrise = dayData.sunrise, sunset = dayData.sunset)
+                        TimeMarkersColumn(sunrise = dayData.sunrise, sunset = dayData.sunset, hourHeight = hourHeight, is24Hour = is24Hour)
                         Box(modifier = Modifier.fillMaxHeight().width(1.dp).background(SeparatorGrey))
-                        TimelineColumn(
-                            timings = dayData.nallaNeram + dayData.specialPeriods, 
-                            onTimingClick = onTimingClick,
-                            modifier = Modifier.weight(1f)
-                        )
-                        VerticalDivider(thickness = 1.dp, color = Color.LightGray.copy(alpha = 0.3f))
-                        TimelineColumn(
-                            timings = dayData.gowriNeram, 
-                            onTimingClick = onTimingClick,
-                            modifier = Modifier.weight(1f)
-                        )
-                        VerticalDivider(thickness = 1.dp, color = Color.LightGray.copy(alpha = 0.3f))
-                        TimelineColumn(
-                            timings = dayData.hora, 
-                            onTimingClick = onTimingClick,
-                            modifier = Modifier.weight(1f)
-                        )
+                        
+                        if (viewMode == ViewMode.COMPOSITE) {
+                            columnOrder.forEachIndexed { index, colId ->
+                                if (columnVisibility.contains(colId)) {
+                                    val timings = when (colId) {
+                                        "NERAM" -> dayData.nallaNeram + dayData.specialPeriods
+                                        "GOWRI" -> dayData.gowriNeram
+                                        "HORA" -> dayData.hora
+                                        else -> emptyList()
+                                    }
+                                    TimelineColumn(
+                                        timings = timings, 
+                                        onTimingClick = onTimingClick,
+                                        hourHeight = hourHeight,
+                                        is24Hour = is24Hour,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    if (index < columnOrder.size - 1 && columnVisibility.count { it in columnOrder.drop(index + 1) } > 0) {
+                                        VerticalDivider(thickness = 1.dp, color = Color.LightGray.copy(alpha = 0.3f))
+                                    }
+                                }
+                            }
+                        } else {
+                            // Single View Mode logic remains same but adapted to weights
+                            when (viewMode) {
+                                ViewMode.NERAM -> TimelineColumn(dayData.nallaNeram + dayData.specialPeriods, onTimingClick, hourHeight, is24Hour, Modifier.weight(1f))
+                                ViewMode.GOWRI -> TimelineColumn(dayData.gowriNeram, onTimingClick, hourHeight, is24Hour, Modifier.weight(1f))
+                                ViewMode.HORA -> TimelineColumn(dayData.hora, onTimingClick, hourHeight, is24Hour, Modifier.weight(1f))
+                                else -> {}
+                            }
+                        }
                     }
 
                     // Sun Markers
@@ -724,19 +916,57 @@ fun TimelineContent(
                         label = "Sunrise", 
                         icon = Icons.Default.WbSunny, 
                         iconTint = Color(0xFFFF9800),
-                        isFallback = dayData.isFallback
+                        isFallback = dayData.isFallback,
+                        hourHeight = hourHeight,
+                        is24Hour = is24Hour
                     )
                     SunGridMarker(
                         time = dayData.sunset, 
                         label = "Sunset", 
                         icon = Icons.Default.WbTwilight, 
                         iconTint = Color(0xFFFF5722),
-                        isFallback = dayData.isFallback
+                        isFallback = dayData.isFallback,
+                        hourHeight = hourHeight,
+                        is24Hour = is24Hour
                     )
 
                     // Dynamic Current Time Indicator (inside scrollable area)
-                    if (isToday) {
-                        NowIndicator(currentTime)
+                    if (isToday && showNowLine) {
+                        NowIndicator(currentTime, hourHeight = hourHeight)
+                    }
+                }
+            }
+
+            // FIXED ZOOM RAIL OVERLAY
+            Column(
+                modifier = Modifier
+                    .width(TIME_COLUMN_WIDTH)
+                    .fillMaxHeight()
+                    .padding(vertical = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                Surface(
+                    onClick = onZoomIn,
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f),
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.size(36.dp).align(Alignment.CenterHorizontally),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(Icons.Default.Add, contentDescription = "Zoom In", modifier = Modifier.size(20.dp))
+                    }
+                }
+                
+                Surface(
+                    onClick = onZoomOut,
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f),
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.size(36.dp).align(Alignment.CenterHorizontally),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(Icons.Default.Remove, contentDescription = "Zoom Out", modifier = Modifier.size(20.dp))
                     }
                 }
             }
@@ -745,9 +975,9 @@ fun TimelineContent(
 }
 
 @Composable
-fun NightShade(sunrise: LocalTime, sunset: LocalTime) {
-    val sunsetOffset = calculateOffset(sunset)
-    val sunriseOffset = calculateOffset(sunrise)
+fun NightShade(sunrise: LocalTime, sunset: LocalTime, hourHeight: Dp) {
+    val sunsetOffset = calculateOffset(sunset, hourHeight)
+    val sunriseOffset = calculateOffset(sunrise, hourHeight)
     
     // Part 1: Midnight to Sunrise
     Box(
@@ -758,7 +988,7 @@ fun NightShade(sunrise: LocalTime, sunset: LocalTime) {
     )
     
     // Part 2: Sunset to Midnight (End of Day)
-    val dayEndOffset = calculateOffset(LocalTime.MAX)
+    val dayEndOffset = calculateOffset(LocalTime.MAX, hourHeight)
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -769,9 +999,10 @@ fun NightShade(sunrise: LocalTime, sunset: LocalTime) {
 }
 
 @Composable
-fun SunGridMarker(time: LocalTime, label: String, icon: androidx.compose.ui.graphics.vector.ImageVector, iconTint: Color, isFallback: Boolean) {
-    val topOffset = calculateOffset(time)
-    val formatter = DateTimeFormatter.ofPattern("hh:mm a")
+fun SunGridMarker(time: LocalTime, label: String, icon: androidx.compose.ui.graphics.vector.ImageVector, iconTint: Color, isFallback: Boolean, hourHeight: Dp, is24Hour: Boolean) {
+    val topOffset = calculateOffset(time, hourHeight)
+    val pattern = if (is24Hour) "HH:mm" else "hh:mm a"
+    val formatter = DateTimeFormatter.ofPattern(pattern)
     val sectionLabel = if (label == "Sunrise") "Day Muhurat" else "Night Muhurat"
     
     Box(
@@ -856,8 +1087,8 @@ fun SunGridMarker(time: LocalTime, label: String, icon: androidx.compose.ui.grap
 }
 
 @Composable
-fun BoxScope.NowIndicator(currentTime: LocalTime) {
-    val topOffset = calculateOffset(currentTime)
+fun BoxScope.NowIndicator(currentTime: LocalTime, hourHeight: Dp) {
+    val topOffset = calculateOffset(currentTime, hourHeight)
     
     Box(
         modifier = Modifier
@@ -885,8 +1116,9 @@ fun BoxScope.NowIndicator(currentTime: LocalTime) {
 }
 
 @Composable
-fun SunTimesDisplay(sunrise: LocalTime, sunset: LocalTime, isFallback: Boolean, isLandscape: Boolean) {
-    val formatter = DateTimeFormatter.ofPattern("hh:mm a")
+fun SunTimesDisplay(sunrise: LocalTime, sunset: LocalTime, isFallback: Boolean, isLandscape: Boolean, is24Hour: Boolean) {
+    val pattern = if (is24Hour) "HH:mm" else "hh:mm a"
+    val formatter = DateTimeFormatter.ofPattern(pattern)
     
     if (isLandscape) {
         Surface(
@@ -955,7 +1187,7 @@ fun SunTimesDisplay(sunrise: LocalTime, sunset: LocalTime, isFallback: Boolean, 
 }
 
 @Composable
-fun TimelineHeader() {
+fun TimelineHeader(viewMode: ViewMode, columnVisibility: Set<String> = emptySet(), columnOrder: List<String> = emptyList()) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -965,18 +1197,44 @@ fun TimelineHeader() {
     ) {
         Spacer(modifier = Modifier.width(TIME_COLUMN_WIDTH))
         Box(modifier = Modifier.fillMaxHeight().width(1.dp).background(SeparatorGrey))
-        Text("Neram", modifier = Modifier.weight(1f), textAlign = TextAlign.Center, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
-        Text("Gowri Neram", modifier = Modifier.weight(1f), textAlign = TextAlign.Center, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
-        Text("Hora", modifier = Modifier.weight(1f), textAlign = TextAlign.Center, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+        
+        if (viewMode == ViewMode.COMPOSITE) {
+            columnOrder.forEach { colId ->
+                if (columnVisibility.contains(colId)) {
+                    val label = when (colId) {
+                        "NERAM" -> "Neram"
+                        "GOWRI" -> "Gowri Neram"
+                        "HORA" -> "Hora"
+                        else -> colId
+                    }
+                    Text(
+                        text = label,
+                        modifier = Modifier.weight(1f),
+                        textAlign = TextAlign.Center,
+                        style = if (colId == "NERAM") MaterialTheme.typography.labelSmall else MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+        } else {
+            val label = when (viewMode) {
+                ViewMode.NERAM -> "Nalla Neram"
+                ViewMode.GOWRI -> "Gowri Neram"
+                ViewMode.HORA -> "Hora Timings"
+                else -> ""
+            }
+            Text(label, modifier = Modifier.weight(1f), textAlign = TextAlign.Center, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        }
     }
 }
 
 @Composable
-fun TimeMarkersColumn(sunrise: LocalTime, sunset: LocalTime) {
-    val context = LocalContext.current
-    val is24Hour = android.text.format.DateFormat.is24HourFormat(context)
+fun TimeMarkersColumn(sunrise: LocalTime, sunset: LocalTime, hourHeight: Dp, is24Hour: Boolean) {
     val pattern = if (is24Hour) "HH:mm" else "h:mm a"
     val formatter = DateTimeFormatter.ofPattern(pattern)
+    
+    // Hide half-hour markers if density is too high (zoom < 0.4x approximately)
+    val showHalfHour = hourHeight >= 60.dp
 
     Box(
         modifier = Modifier
@@ -984,9 +1242,10 @@ fun TimeMarkersColumn(sunrise: LocalTime, sunset: LocalTime) {
             .fillMaxHeight()
     ) {
         for (hour in START_HOUR until END_HOUR) {
-            for (minute in listOf(0, 30)) {
+            val minutes = if (showHalfHour) listOf(0, 30) else listOf(0)
+            for (minute in minutes) {
                 val time = LocalTime.of(hour, minute)
-                val topOffset = calculateOffset(time)
+                val topOffset = calculateOffset(time, hourHeight)
                 
                 // Determine if this marker is in the "Night" region (sunset to sunrise)
                 val isNight = time.isBefore(sunrise) || !time.isBefore(sunset)
@@ -1009,12 +1268,14 @@ fun TimeMarkersColumn(sunrise: LocalTime, sunset: LocalTime) {
 }
 
 @Composable
-fun TimeGrid() {
+fun TimeGrid(hourHeight: Dp) {
+    val showHalfHourLine = hourHeight >= 50.dp
+    
     Canvas(modifier = Modifier.fillMaxSize()) {
         val strokeWidth = 1.dp.toPx()
         for (hour in START_HOUR..END_HOUR) {
             // Hour line
-            val yHour = (hour - START_HOUR) * HOUR_HEIGHT.toPx()
+            val yHour = (hour - START_HOUR) * hourHeight.toPx()
             drawLine(
                 color = Color.LightGray.copy(alpha = 0.5f),
                 start = Offset(0f, yHour),
@@ -1023,8 +1284,8 @@ fun TimeGrid() {
             )
             
             // 30-min line
-            if (hour < END_HOUR) {
-                val yHalf = yHour + (HOUR_HEIGHT.toPx() / 2)
+            if (hour < END_HOUR && showHalfHourLine) {
+                val yHalf = yHour + (hourHeight.toPx() / 2)
                 drawLine(
                     color = Color.LightGray.copy(alpha = 0.2f),
                     start = Offset(0f, yHalf),
@@ -1040,19 +1301,21 @@ fun TimeGrid() {
 fun TimelineColumn(
     timings: List<Timing>,
     onTimingClick: (Timing) -> Unit,
+    hourHeight: Dp,
+    is24Hour: Boolean,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier.fillMaxHeight()) {
         timings.forEach { timing ->
-            TimingCard(timing = timing, onClick = { onTimingClick(timing) })
+            TimingCard(timing = timing, hourHeight = hourHeight, is24Hour = is24Hour, onClick = { onTimingClick(timing) })
         }
     }
 }
 
 @Composable
-fun TimingCard(timing: Timing, onClick: () -> Unit) {
-    val topOffset = calculateOffset(timing.startTime)
-    val bottomOffset = calculateOffset(timing.endTime)
+fun TimingCard(timing: Timing, hourHeight: Dp, is24Hour: Boolean, onClick: () -> Unit) {
+    val topOffset = calculateOffset(timing.startTime, hourHeight)
+    val bottomOffset = calculateOffset(timing.endTime, hourHeight)
     val height = bottomOffset - topOffset
 
     val timingColor = SacredTimelineColors.getTimingColor(timing)
@@ -1084,15 +1347,16 @@ fun TimingCard(timing: Timing, onClick: () -> Unit) {
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.padding(horizontal = 2.dp)
                 ) {
-                    // ICON LOGIC - Unified and explicitly handling Yama
-                    if (height > 40.dp) {
+                    // ICON LOGIC - Only show if enough vertical space
+                    if (height > 80.dp) {
                         if (timing is SpecialPeriod && timing.name == "Yama") {
                             Image(
                                 painter = painterResource(R.drawable.ic_yama_bull),
                                 contentDescription = null,
-                                modifier = Modifier.size(if (height > 80.dp) 32.dp else 24.dp)
+                                modifier = Modifier.size(if (height > 110.dp) 32.dp else 24.dp)
                             )
                             Spacer(modifier = Modifier.height(2.dp))
                         } else {
@@ -1106,7 +1370,7 @@ fun TimingCard(timing: Timing, onClick: () -> Unit) {
                                 Icon(
                                     painter = iconPainter,
                                     contentDescription = null,
-                                    modifier = Modifier.size(if (height > 80.dp) 32.dp else 24.dp),
+                                    modifier = Modifier.size(if (height > 110.dp) 32.dp else 24.dp),
                                     tint = contentColor.copy(alpha = 0.9f)
                                 )
                                 Spacer(modifier = Modifier.height(2.dp))
@@ -1114,7 +1378,7 @@ fun TimingCard(timing: Timing, onClick: () -> Unit) {
                                 Icon(
                                     imageVector = Icons.Default.Star,
                                     contentDescription = null,
-                                    modifier = Modifier.size(if (height > 80.dp) 24.dp else 16.dp),
+                                    modifier = Modifier.size(if (height > 110.dp) 24.dp else 16.dp),
                                     tint = contentColor.copy(alpha = 0.8f)
                                 )
                                 Spacer(modifier = Modifier.height(2.dp))
@@ -1122,15 +1386,21 @@ fun TimingCard(timing: Timing, onClick: () -> Unit) {
                         }
                     }
 
-                    val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-                    Text(
-                        text = "${timing.startTime.format(timeFormatter)} - ${timing.endTime.format(timeFormatter)}",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = contentColor,
-                        fontSize = 9.sp,
-                        maxLines = 1
-                    )
+                    // TIME RANGE - Only show if height is sufficient (hidden at low density)
+                    if (height > 70.dp) {
+                        val pattern = if (is24Hour) "HH:mm" else "h:mm"
+                        val timeFormatter = DateTimeFormatter.ofPattern(pattern)
+                        Text(
+                            text = "${timing.startTime.format(timeFormatter)} - ${timing.endTime.format(timeFormatter)}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = contentColor,
+                            fontSize = 8.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
 
+                    // ENGLISH LABEL (Priority)
                     val label = when (timing) {
                         is Hora -> timing.name
                         is NallaNeram -> "Nalla"
@@ -1139,26 +1409,30 @@ fun TimingCard(timing: Timing, onClick: () -> Unit) {
                     }
                     Text(
                         text = label,
-                        style = MaterialTheme.typography.labelMedium,
+                        style = if (height < 60.dp) MaterialTheme.typography.labelSmall else MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.Bold,
                         color = contentColor,
                         textAlign = TextAlign.Center,
-                        maxLines = 1
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        fontSize = if (height < 40.dp) 10.sp else if (height < 60.dp) 11.sp else 12.sp
                     )
 
-                    if (height > 50.dp && timing.tamilName.isNotEmpty()) {
+                    // TAMIL NAME - Only show if extremely zoomed in
+                    if (height > 140.dp && timing.tamilName.isNotEmpty()) {
                         Text(
                             text = timing.tamilName,
                             style = MaterialTheme.typography.labelSmall,
                             color = contentColor.copy(alpha = 0.7f),
                             fontSize = 9.sp,
-                            maxLines = 1
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
 
-                // Compatibility Icon for Hora
-                if (timing is Hora) {
+                // Compatibility Icon for Hora - Scale with height
+                if (timing is Hora && height > 30.dp) {
                     Box(modifier = Modifier.fillMaxSize().padding(2.dp), contentAlignment = Alignment.TopEnd) {
                         val (icon, tint) = when (timing.compatibility) {
                             HoraCompatibility.FAVORABLE -> Icons.Default.CheckCircle to CompatibilityFavorable
@@ -1183,9 +1457,12 @@ fun TimingCard(timing: Timing, onClick: () -> Unit) {
 fun TimingDetailSheet(
     timing: Timing,
     sheetState: SheetState,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    viewModel: TimelineViewModel = viewModel()
 ) {
-    val timeFormatter = DateTimeFormatter.ofPattern("hh:mm a")
+    val timeFormat24h by viewModel.timeFormat24h.collectAsState(initial = false)
+    val pattern = if (timeFormat24h) "HH:mm" else "hh:mm a"
+    val timeFormatter = DateTimeFormatter.ofPattern(pattern)
     val containerColor = SacredTimelineColors.getTimingColor(timing)
     val contentColor = SacredTimelineColors.getContentColor(containerColor)
 
@@ -1342,9 +1619,9 @@ fun TimingDetailSheet(
     }
 }
 
-private fun calculateOffset(time: LocalTime): Dp {
+private fun calculateOffset(time: LocalTime, hourHeight: Dp): Dp {
     val fraction = (time.hour - START_HOUR) + time.minute / 60f + time.second / 3600f
-    return HOUR_HEIGHT * fraction
+    return hourHeight * fraction
 }
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
