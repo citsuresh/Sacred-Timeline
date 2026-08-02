@@ -17,10 +17,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.Locale
@@ -32,8 +35,8 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(application)
     
     private var currentLocation: Pair<Double, Double> = Pair(11.0168, 76.9558) // Default to Coimbatore
-    private var locationName: String = "Coimbatore"
-    private var isLocationAuto: Boolean = false
+    private val _locationName = MutableStateFlow("Coimbatore")
+    private val _isLocationAuto = MutableStateFlow(false)
 
     private val _selectedDate = MutableStateFlow(LocalDate.now())
     val selectedDate: StateFlow<LocalDate> = _selectedDate
@@ -47,6 +50,7 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
     val timelineScale: StateFlow<Float> = _timelineScale
 
     private val cachedDays = mutableMapOf<LocalDate, DayData>()
+    private val cacheMutex = Mutex()
 
     val timeFormat24h = repository.timeFormat24h
     
@@ -74,10 +78,42 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
             }
         }
 
+        // Observe Location Settings
+        viewModelScope.launch {
+            combine(
+                repository.locationMode, 
+                repository.manualCityName,
+                repository.manualLatitude,
+                repository.manualLongitude
+            ) { mode, city, lat, lng ->
+                Triple(mode, city, lat to lng)
+            }.collect { (mode, city, coords) ->
+                val hasChanged = if (mode == "MANUAL") {
+                    _locationName.value != city || currentLocation != coords || _isLocationAuto.value
+                } else {
+                    // For AUTO, we let onLocationPermissionGranted handle the diffing
+                    false 
+                }
+
+                if (mode == "MANUAL" && hasChanged) {
+                    _locationName.value = city
+                    _isLocationAuto.value = false
+                    currentLocation = coords
+                    cacheMutex.withLock { cachedDays.clear() }
+                    preloadData(selectedDate.value, repository.preloadDays.first())
+                } else if (mode == "AUTO") {
+                    // Trigger GPS update when switching to AUTO
+                    onLocationPermissionGranted()
+                }
+            }
+        }
+
         // Observe date changes and preload
         viewModelScope.launch {
-            selectedDate.collect { date ->
-                preloadData(date)
+            combine(selectedDate, repository.preloadDays) { date, days ->
+                date to days
+            }.collect { (date, days) ->
+                preloadData(date, days)
             }
         }
     }
@@ -104,13 +140,27 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
     fun onLocationPermissionGranted() {
         viewModelScope.launch {
             try {
+                // Only act if mode is AUTO
+                val mode = repository.locationMode.first()
+                if (mode != "AUTO") return@launch
+
                 val location = fusedLocationClient.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, null).await()
                 if (location != null) {
-                    currentLocation = Pair(location.latitude, location.longitude)
-                    locationName = getAddressFromLocation(location.latitude, location.longitude)
-                    isLocationAuto = locationName != "Unknown Location"
-                    cachedDays.clear() // Clear cache on location change
-                    preloadData(selectedDate.value)
+                    val newCoords = Pair(location.latitude, location.longitude)
+                    
+                    // GUARD: Only reload if location has moved significantly (approx > 100m)
+                    // Or if we were previously in Manual mode
+                    val distanceMoved = Math.abs(currentLocation.first - newCoords.first) + 
+                                      Math.abs(currentLocation.second - newCoords.second)
+                    
+                    if (distanceMoved > 0.001 || !_isLocationAuto.value) {
+                        currentLocation = newCoords
+                        val name = getAddressFromLocation(location.latitude, location.longitude)
+                        _locationName.value = name
+                        _isLocationAuto.value = name != "Unknown Location"
+                        cacheMutex.withLock { cachedDays.clear() } // Clear cache on location change
+                        preloadData(selectedDate.value, repository.preloadDays.first())
+                    }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -135,33 +185,36 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun updateManualLocation(name: String) {
-        locationName = name
-        isLocationAuto = false
-        cachedDays.clear() // Clear cache on location change
-        preloadData(selectedDate.value)
+        viewModelScope.launch {
+            repository.setLocationMode("MANUAL")
+            repository.setManualCityName(name)
+        }
     }
 
-    private fun preloadData(centerDate: LocalDate) {
+    private fun preloadData(centerDate: LocalDate, rangeDays: Int = 3) {
         viewModelScope.launch {
             // Ensure at least the current date is loading if no data
-            if (cachedDays.isEmpty()) {
+            val isEmpty = cacheMutex.withLock { cachedDays.isEmpty() }
+            if (isEmpty) {
                 _uiState.value = TimelineUiState.Loading
             }
 
-            // Fetch range: -3 to +3 days
-            val datesToLoad = (-3..3).map { centerDate.plusDays(it.toLong()) }
+            // Fetch range: -rangeDays to +rangeDays
+            val datesToLoad = (-rangeDays..rangeDays).map { centerDate.plusDays(it.toLong()) }
             
             datesToLoad.forEach { date ->
-                if (!cachedDays.containsKey(date)) {
+                val alreadyCached = cacheMutex.withLock { cachedDays.containsKey(date) }
+                if (!alreadyCached) {
                     val dayData = fetchDayData(date)
-                    cachedDays[date] = dayData
+                    cacheMutex.withLock { cachedDays[date] = dayData }
                 }
             }
 
+            val snapshot = cacheMutex.withLock { cachedDays.toMap() }
             _uiState.value = TimelineUiState.Success(
-                days = cachedDays.toMap(),
-                locationName = locationName,
-                isLocationAuto = isLocationAuto
+                days = snapshot,
+                locationName = _locationName.value,
+                isLocationAuto = _isLocationAuto.value
             )
         }
     }

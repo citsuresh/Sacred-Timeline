@@ -79,14 +79,14 @@ class WidgetUpdateWorker(
             )
         }
 
-        fun enqueuePeriodicWork(context: Context) {
+        fun enqueuePeriodicWork(context: Context, intervalMinutes: Long = 30) {
             val workRequest = PeriodicWorkRequestBuilder<WidgetUpdateWorker>(
-                15, TimeUnit.MINUTES
+                intervalMinutes, TimeUnit.MINUTES
             ).build()
 
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 WORK_NAME,
-                ExistingPeriodicWorkPolicy.KEEP,
+                ExistingPeriodicWorkPolicy.UPDATE,
                 workRequest
             )
         }

@@ -25,6 +25,8 @@ class SettingsRepository(private val context: Context) {
         val WIDGET_REFRESH_MINUTES = intPreferencesKey("widget_refresh_minutes")
         val LOCATION_MODE = stringPreferencesKey("location_mode")
         val MANUAL_CITY_NAME = stringPreferencesKey("manual_city_name")
+        val MANUAL_LATITUDE = doublePreferencesKey("manual_latitude")
+        val MANUAL_LONGITUDE = doublePreferencesKey("manual_longitude")
         val PRELOAD_DAYS = intPreferencesKey("preload_days")
     }
 
@@ -48,6 +50,15 @@ class SettingsRepository(private val context: Context) {
     val timeFormat24h: Flow<Boolean> = context.dataStore.data.map { it[Keys.TIME_FORMAT_24H] ?: false }
     val showNowLine: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_NOW_LINE] ?: true }
     val pinchToZoomEnabled: Flow<Boolean> = context.dataStore.data.map { it[Keys.PINCH_TO_ZOOM_ENABLED] ?: true }
+
+    val locationMode: Flow<String> = context.dataStore.data.map { it[Keys.LOCATION_MODE] ?: "AUTO" }
+    val manualCityName: Flow<String> = context.dataStore.data.map { it[Keys.MANUAL_CITY_NAME] ?: "Coimbatore" }
+    val manualLatitude: Flow<Double> = context.dataStore.data.map { it[Keys.MANUAL_LATITUDE] ?: 11.0168 }
+    val manualLongitude: Flow<Double> = context.dataStore.data.map { it[Keys.MANUAL_LONGITUDE] ?: 76.9558 }
+
+    val widgetRefreshMinutes: Flow<Int> = context.dataStore.data.map { it[Keys.WIDGET_REFRESH_MINUTES] ?: 30 }
+    
+    val preloadDays: Flow<Int> = context.dataStore.data.map { it[Keys.PRELOAD_DAYS] ?: 3 }
 
     suspend fun updateCompositeScale(scale: Float) {
         context.dataStore.edit { it[Keys.COMPOSITE_SCALE] = scale.coerceIn(0.2f, 3.0f) }
@@ -84,5 +95,28 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun setPinchToZoomEnabled(enabled: Boolean) {
         context.dataStore.edit { it[Keys.PINCH_TO_ZOOM_ENABLED] = enabled }
+    }
+
+    suspend fun setLocationMode(mode: String) {
+        context.dataStore.edit { it[Keys.LOCATION_MODE] = mode }
+    }
+
+    suspend fun setManualCityName(name: String) {
+        context.dataStore.edit { it[Keys.MANUAL_CITY_NAME] = name }
+    }
+
+    suspend fun updateManualCoordinates(lat: Double, lng: Double) {
+        context.dataStore.edit { 
+            it[Keys.MANUAL_LATITUDE] = lat
+            it[Keys.MANUAL_LONGITUDE] = lng
+        }
+    }
+
+    suspend fun setWidgetRefreshMinutes(minutes: Int) {
+        context.dataStore.edit { it[Keys.WIDGET_REFRESH_MINUTES] = minutes }
+    }
+
+    suspend fun setPreloadDays(days: Int) {
+        context.dataStore.edit { it[Keys.PRELOAD_DAYS] = days }
     }
 }

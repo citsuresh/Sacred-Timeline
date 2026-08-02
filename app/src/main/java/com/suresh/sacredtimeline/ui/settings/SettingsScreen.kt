@@ -1,13 +1,11 @@
 package com.suresh.sacredtimeline.ui.settings
 
+import android.location.Address
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -48,7 +46,9 @@ fun SettingsScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding),
+                .padding(padding)
+                .consumeWindowInsets(padding)
+                .imePadding(),
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
@@ -69,9 +69,9 @@ fun SettingsScreen(
             }
 
             item {
-                SettingsSection(title = "Column Management") {
+                SettingsSection(title = "Column Management (Composite View Only)") {
                     Text(
-                        "Drag-and-drop or use arrows to reorder columns in Composite view. Toggle visibility to hide/show.",
+                        "Reorder or hide columns for the Composite View. Single views (Hora, Gowri, etc.) always show their respective column.",
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
@@ -106,6 +106,137 @@ fun SettingsScreen(
                         checked = pinchToZoomEnabled,
                         onCheckedChange = { viewModel.setPinchToZoomEnabled(it) }
                     )
+                }
+            }
+
+            item {
+                SettingsSection(title = "Location") {
+                    val locationMode by viewModel.locationMode.collectAsState()
+                    val manualCityName by viewModel.manualCityName.collectAsState()
+                    val searchState by viewModel.searchState.collectAsState()
+
+                    SettingsDropdownItem(
+                        label = "Location Mode",
+                        selected = if (locationMode == "AUTO") "GPS Auto-detect" else "Manual City",
+                        options = listOf("GPS Auto-detect", "Manual City"),
+                        onOptionSelected = {
+                            viewModel.setLocationMode(if (it == "GPS Auto-detect") "AUTO" else "MANUAL")
+                        }
+                    )
+                    
+                    if (locationMode == "MANUAL") {
+                        var localInput by remember { mutableStateOf(manualCityName) }
+                        
+                        // Sync local input when the verified city name changes from the ViewModel
+                        LaunchedEffect(manualCityName) {
+                            if (localInput != manualCityName) {
+                                localInput = manualCityName
+                            }
+                        }
+
+                        OutlinedTextField(
+                            value = localInput,
+                            onValueChange = { localInput = it },
+                            label = { Text("City Name") },
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                            singleLine = true,
+                            trailingIcon = {
+                                if (searchState == SearchState.Searching) {
+                                    CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                                } else {
+                                    IconButton(onClick = { 
+                                        viewModel.setManualCityName(localInput)
+                                        viewModel.searchCity(localInput) 
+                                    }) {
+                                        Icon(Icons.Default.Search, contentDescription = "Search City")
+                                    }
+                                }
+                            },
+                            isError = searchState is SearchState.Error
+                        )
+                        
+                        if (searchState is SearchState.Error) {
+                            Text(
+                                text = (searchState as SearchState.Error).message,
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.labelSmall,
+                                modifier = Modifier.padding(start = 4.dp)
+                            )
+                        }
+
+                        if (searchState is SearchState.Results) {
+                            val results = (searchState as SearchState.Results).addresses
+                            Surface(
+                                modifier = Modifier.fillMaxWidth(),
+                                tonalElevation = 8.dp,
+                                shadowElevation = 4.dp,
+                                shape = MaterialTheme.shapes.small
+                            ) {
+                                Column {
+                                    results.forEach { address ->
+                                        DropdownMenuItem(
+                                            text = {
+                                                Column {
+                                                    Text(address.locality ?: address.featureName ?: "Unknown")
+                                                    Text(
+                                                        "${address.adminArea ?: ""}, ${address.countryName ?: ""}",
+                                                        style = MaterialTheme.typography.labelSmall
+                                                    )
+                                                }
+                                            },
+                                            onClick = { viewModel.selectCity(address) }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            item {
+                SettingsSection(title = "Widget") {
+                    val refreshMinutes by viewModel.widgetRefreshMinutes.collectAsState()
+                    SettingsDropdownItem(
+                        label = "Widget Refresh Duration",
+                        selected = when (refreshMinutes) {
+                            15 -> "15 min"
+                            30 -> "30 min"
+                            60 -> "1 hr"
+                            else -> "$refreshMinutes min"
+                        },
+                        options = listOf("15 min", "30 min", "1 hr"),
+                        onOptionSelected = {
+                            val mins = when (it) {
+                                "15 min" -> 15
+                                "30 min" -> 30
+                                "1 hr" -> 60
+                                else -> 30
+                            }
+                            viewModel.setWidgetRefreshMinutes(mins)
+                        }
+                    )
+                }
+            }
+
+            item {
+                SettingsSection(title = "Advanced (Cache)") {
+                    val preloadDays by viewModel.preloadDays.collectAsState()
+                    SettingsDropdownItem(
+                        label = "Preload Range",
+                        selected = "$preloadDays days",
+                        options = listOf("3 days", "5 days", "7 days"),
+                        onOptionSelected = {
+                            viewModel.setPreloadDays(it.split(" ")[0].toInt())
+                        }
+                    )
+                    Button(
+                        onClick = { /* In-memory cache clears on restart; Room implementation future */ },
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                    ) {
+                        Text("Clear Cache")
+                    }
                 }
             }
 
