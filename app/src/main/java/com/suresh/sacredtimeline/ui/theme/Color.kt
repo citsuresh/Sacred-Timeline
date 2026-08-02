@@ -11,20 +11,20 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 // Sacred Timeline Palette - Screenshot Accurate
-val NallaMorningGreen = Color(0xFF7CB342)
-val NallaEveningGreen = Color(0xFF33691E)
+val NallaMorningGreen = Color(0xFF388E3C)
+val NallaEveningGreen = Color(0xFF388E3C)
 
 val GowriStandardGreen = Color(0xFF7CB342)
-val GowriAmridhaBest = Color(0xFF33691E)
+val GowriAmridhaBest = Color(0xFF388E3C)
 val GowriStandardRed = Color(0xFFD32F2F)
-val GowriUthiBlue = Color(0xFF4FC3F7) // Keeping a distinct blue for Uthi as per initial request, though screenshot shows green.
+val GowriUthiBlue = Color(0xFF7CB342) 
 
-val HoraSaturn = Color(0xFF6D4C41) // Greyish-Red/Brown
-val HoraJupiter = Color(0xFFAFB42B) // Yellow-Green
+val HoraSaturn = Color(0xFF616161) // Dark Grey
+val HoraJupiter = Color(0xFFFBC02D) // Yellow
 val HoraMars = Color(0xFFB71C1C)
 val HoraSun = Color(0xFFD32F2F)
-val HoraVenus = Color(0xFFF5F5F5)
-val HoraMercury = Color(0xFF43A047)
+val HoraVenus = Color(0xFFFFFFFF)
+val HoraMercury = Color(0xFF7CB342)
 val HoraMoon = Color(0xFFFFFFFF)
 
 val RahuBrightRed = Color(0xFFFF0000)

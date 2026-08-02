@@ -47,6 +47,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalConfiguration
+import android.content.res.Configuration
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -214,6 +216,64 @@ fun TimelineDashboard(
         }
     }
 
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    if (isLandscape) {
+        LandscapeTimelineLayout(
+            uiState = uiState,
+            selectedDate = selectedDate,
+            dates = dates,
+            pagerState = pagerState,
+            onDateSelected = { viewModel.updateDate(it) },
+            onDateClick = { showDatePicker = true },
+            onLocationClick = { name ->
+                manualLocationName = name
+                showLocationDialog = true
+            },
+            onTimingClick = { timing ->
+                selectedTimingForDetail = timing
+                showSheet = true
+            },
+            onTodayClick = { viewModel.updateDate(LocalDate.now()) },
+            onCalendarClick = { showDatePicker = true }
+        )
+    } else {
+        PortraitTimelineLayout(
+            uiState = uiState,
+            selectedDate = selectedDate,
+            dates = dates,
+            pagerState = pagerState,
+            onDateSelected = { viewModel.updateDate(it) },
+            onDateClick = { showDatePicker = true },
+            onLocationClick = { name ->
+                manualLocationName = name
+                showLocationDialog = true
+            },
+            onTimingClick = { timing ->
+                selectedTimingForDetail = timing
+                showSheet = true
+            },
+            onTodayClick = { viewModel.updateDate(LocalDate.now()) },
+            onCalendarClick = { showDatePicker = true }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@Composable
+fun PortraitTimelineLayout(
+    uiState: TimelineUiState,
+    selectedDate: LocalDate,
+    dates: List<LocalDate>,
+    pagerState: androidx.compose.foundation.pager.PagerState,
+    onDateSelected: (LocalDate) -> Unit,
+    onDateClick: () -> Unit,
+    onLocationClick: (String) -> Unit,
+    onTimingClick: (Timing) -> Unit,
+    onTodayClick: () -> Unit,
+    onCalendarClick: () -> Unit
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -226,10 +286,10 @@ fun TimelineDashboard(
                     )
                 },
                 actions = {
-                    IconButton(onClick = { viewModel.updateDate(LocalDate.now()) }) {
+                    IconButton(onClick = onTodayClick) {
                         Icon(Icons.Filled.Today, contentDescription = "Today")
                     }
-                    IconButton(onClick = { showDatePicker = true }) {
+                    IconButton(onClick = onCalendarClick) {
                         Icon(Icons.Default.CalendarMonth, contentDescription = "Select Date")
                     }
                 },
@@ -241,80 +301,275 @@ fun TimelineDashboard(
             )
         }
     ) { padding ->
-        Column(modifier = modifier.padding(padding)) {
-            // Dedicated Date & Location Info Row
-            Surface(
-                color = MaterialTheme.colorScheme.primaryContainer,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                ) {
-                    Text(
-                        text = selectedDate.format(DateTimeFormatter.ofPattern("MMM dd, yyyy")),
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        maxLines = 1,
-                        modifier = Modifier.clickable { showDatePicker = true }
-                    )
-                    if (uiState is TimelineUiState.Success) {
-                        val successState = uiState as TimelineUiState.Success
-                        val isUnknown = successState.locationName == "Unknown Location"
-                        
-                        Text(
-                            text = " • ${if (successState.isLocationAuto) "📍" else "✎"} ${successState.locationName}",
-                            style = if (successState.isLocationAuto) MaterialTheme.typography.labelLarge else MaterialTheme.typography.labelLarge.copy(fontStyle = androidx.compose.ui.text.font.FontStyle.Italic),
-                            color = if (isUnknown) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier
-                                .weight(1f, fill = false)
-                                .clickable { 
-                                    manualLocationName = successState.locationName
-                                    showLocationDialog = true 
-                                }
-                        )
-                    }
-                }
-            }
+        Column(modifier = Modifier.padding(padding)) {
+            LocationDateRow(
+                selectedDate = selectedDate,
+                uiState = uiState,
+                onDateClick = onDateClick,
+                onLocationClick = onLocationClick
+            )
 
             HorizontalDateDial(
                 selectedDate = selectedDate,
                 dates = dates,
-                onDateSelected = { viewModel.updateDate(it) }
+                onDateSelected = onDateSelected
             )
             
             Box(modifier = Modifier.weight(1f)) {
-                when (val state = uiState) {
-                    is TimelineUiState.Loading -> {
-                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                    }
-                    is TimelineUiState.Success -> {
-                        HorizontalPager(
-                            state = pagerState,
-                            modifier = Modifier.fillMaxSize()
-                        ) { page ->
-                            val date = dates[page]
-                            val dayData = state.days[date]
-                            if (dayData != null) {
-                                TimelineContent(
-                                    date = date, 
-                                    dayData = dayData,
-                                    onTimingClick = { timing ->
-                                        selectedTimingForDetail = timing
-                                        showSheet = true
-                                    }
-                                )
-                            } else {
-                                Box(modifier = Modifier.fillMaxSize()) {
-                                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                                }
+                TimelinePager(
+                    uiState = uiState,
+                    dates = dates,
+                    pagerState = pagerState,
+                    onTimingClick = onTimingClick,
+                    isLandscape = false
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun LandscapeTimelineLayout(
+    uiState: TimelineUiState,
+    selectedDate: LocalDate,
+    dates: List<LocalDate>,
+    pagerState: androidx.compose.foundation.pager.PagerState,
+    onDateSelected: (LocalDate) -> Unit,
+    onDateClick: () -> Unit,
+    onLocationClick: (String) -> Unit,
+    onTimingClick: (Timing) -> Unit,
+    onTodayClick: () -> Unit,
+    onCalendarClick: () -> Unit
+) {
+    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+        Row(modifier = Modifier.fillMaxSize()) {
+            // Left Side Panel
+            Surface(
+                modifier = Modifier
+                    .width(220.dp)
+                    .fillMaxHeight(),
+                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.9f),
+                tonalElevation = 4.dp
+            ) {
+                Column(
+                    modifier = Modifier.padding(12.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Sacred Timeline",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                        Row {
+                            IconButton(onClick = onTodayClick, modifier = Modifier.size(32.dp)) {
+                                Icon(Icons.Filled.Today, contentDescription = "Today", modifier = Modifier.size(18.dp))
                             }
+                            IconButton(onClick = onCalendarClick, modifier = Modifier.size(32.dp)) {
+                                Icon(Icons.Default.CalendarMonth, contentDescription = "Select Date", modifier = Modifier.size(18.dp))
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    LocationDateRow(
+                        selectedDate = selectedDate,
+                        uiState = uiState,
+                        onDateClick = onDateClick,
+                        onLocationClick = onLocationClick,
+                        isLandscape = true
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    if (uiState is TimelineUiState.Success) {
+                        val dayData = uiState.days[selectedDate]
+                        if (dayData != null) {
+                            SunTimesDisplay(
+                                sunrise = dayData.sunrise,
+                                sunset = dayData.sunset,
+                                isFallback = dayData.isFallback,
+                                isLandscape = true
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.2f))
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "SELECT DATE",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f),
+                        modifier = Modifier.fillMaxWidth().padding(start = 4.dp)
+                    )
+                    
+                    Spacer(modifier = Modifier.height(4.dp))
+                    
+                    VerticalDateDial(
+                        selectedDate = selectedDate,
+                        dates = dates,
+                        onDateSelected = onDateSelected,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+
+            // Right Main Content
+            Column(modifier = Modifier.weight(1f)) {
+                TimelinePager(
+                    uiState = uiState,
+                    dates = dates,
+                    pagerState = pagerState,
+                    onTimingClick = onTimingClick,
+                    isLandscape = true
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun LocationDateRow(
+    selectedDate: LocalDate,
+    uiState: TimelineUiState,
+    onDateClick: () -> Unit,
+    onLocationClick: (String) -> Unit,
+    isLandscape: Boolean = false
+) {
+    Surface(
+        color = if (isLandscape) Color.Transparent else MaterialTheme.colorScheme.primaryContainer,
+        modifier = Modifier.fillMaxWidth(),
+        shape = if (isLandscape) RoundedCornerShape(8.dp) else RoundedCornerShape(0.dp),
+        border = if (isLandscape) BorderStroke(1.dp, MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.2f)) else null
+    ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    Icons.Default.CalendarMonth,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp),
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = selectedDate.format(DateTimeFormatter.ofPattern("MMM dd, yyyy")),
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    maxLines = 1,
+                    modifier = Modifier.clickable { onDateClick() }
+                )
+            }
+            
+            if (uiState is TimelineUiState.Success) {
+                val isUnknown = uiState.locationName == "Unknown Location"
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 2.dp)
+                ) {
+                    Text(
+                        text = "${if (uiState.isLocationAuto) "📍" else "✎"} ",
+                        fontSize = 12.sp
+                    )
+                    Text(
+                        text = uiState.locationName,
+                        style = if (uiState.isLocationAuto) MaterialTheme.typography.labelMedium else MaterialTheme.typography.labelMedium.copy(fontStyle = androidx.compose.ui.text.font.FontStyle.Italic),
+                        color = if (isUnknown) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .clickable { onLocationClick(uiState.locationName) }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun TimelinePager(
+    uiState: TimelineUiState,
+    dates: List<LocalDate>,
+    pagerState: androidx.compose.foundation.pager.PagerState,
+    onTimingClick: (Timing) -> Unit,
+    isLandscape: Boolean
+) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        when (val state = uiState) {
+            is TimelineUiState.Loading -> {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
+            is TimelineUiState.Success -> {
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.fillMaxSize()
+                ) { page ->
+                    val date = dates[page]
+                    val dayData = state.days[date]
+                    if (dayData != null) {
+                        TimelineContent(
+                            date = date, 
+                            dayData = dayData,
+                            onTimingClick = onTimingClick,
+                            isLandscape = isLandscape
+                        )
+                    } else {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                         }
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun VerticalDateDial(
+    selectedDate: LocalDate,
+    dates: List<LocalDate>,
+    onDateSelected: (LocalDate) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val scrollState = rememberLazyListState()
+
+    LaunchedEffect(selectedDate) {
+        val index = dates.indexOf(selectedDate)
+        if (index != -1) {
+            // In landscape vertical dial, we want the selected item near the top 
+            // but not pushed off by large offsets. 0 is safest for the small viewport.
+            scrollState.animateScrollToItem(index)
+        }
+    }
+
+    androidx.compose.foundation.lazy.LazyColumn(
+        state = scrollState,
+        modifier = modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        items(dates) { date ->
+            DateItem(
+                date = date,
+                isSelected = date == selectedDate,
+                onClick = { onDateSelected(date) }
+            )
         }
     }
 }
@@ -414,7 +669,8 @@ fun DateItem(
 fun TimelineContent(
     date: LocalDate, 
     dayData: DayData,
-    onTimingClick: (Timing) -> Unit
+    onTimingClick: (Timing) -> Unit,
+    isLandscape: Boolean = false
 ) {
     val scrollState = rememberScrollState()
     val density = LocalDensity.current
@@ -442,7 +698,9 @@ fun TimelineContent(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        SunTimesHeader(dayData.sunrise, dayData.sunset, dayData.isFallback)
+        if (!isLandscape) {
+            SunTimesDisplay(dayData.sunrise, dayData.sunset, dayData.isFallback, isLandscape = false)
+        }
         TimelineHeader()
         
         Box(
@@ -655,40 +913,71 @@ fun BoxScope.NowIndicator(currentTime: LocalTime) {
 }
 
 @Composable
-fun SunTimesHeader(sunrise: LocalTime, sunset: LocalTime, isFallback: Boolean) {
+fun SunTimesDisplay(sunrise: LocalTime, sunset: LocalTime, isFallback: Boolean, isLandscape: Boolean) {
     val formatter = DateTimeFormatter.ofPattern("hh:mm a")
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f))
-            .padding(vertical = 4.dp, horizontal = 16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                Icons.Default.WbSunny, 
-                contentDescription = null, 
-                modifier = Modifier.size(16.dp),
-                tint = Color(0xFFFF9800)
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            Text("🌅 Sunrise: ", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSecondaryContainer)
-            Text(sunrise.format(formatter), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondaryContainer)
+    
+    if (isLandscape) {
+        Surface(
+            color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f),
+            shape = RoundedCornerShape(8.dp),
+            modifier = Modifier.fillMaxWidth(),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.1f))
+        ) {
+            Column(
+                modifier = Modifier.padding(8.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.WbSunny, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color(0xFFFF9800))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Sunrise: ", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                    Text(sunrise.format(formatter), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.WbTwilight, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color(0xFFFF5722))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Sunset:  ", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                    Text(sunset.format(formatter), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                }
+                if (isFallback) {
+                    Text("(approximate)", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.error.copy(alpha = 0.7f), fontSize = 9.sp)
+                }
+            }
         }
-        if (isFallback) {
-            Text("(approximate)", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.error.copy(alpha = 0.7f), fontSize = 10.sp)
-        }
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                Icons.Default.WbTwilight, 
-                contentDescription = null, 
-                modifier = Modifier.size(16.dp),
-                tint = Color(0xFFFF5722) // Deep Orange/Sunset color
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            Text("🌇 Sunset: ", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSecondaryContainer)
-            Text(sunset.format(formatter), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondaryContainer)
+    } else {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f))
+                .padding(vertical = 4.dp, horizontal = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    Icons.Default.WbSunny, 
+                    contentDescription = null, 
+                    modifier = Modifier.size(16.dp),
+                    tint = Color(0xFFFF9800)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text("🌅 Sunrise: ", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                Text(sunrise.format(formatter), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondaryContainer)
+            }
+            if (isFallback) {
+                Text("(approximate)", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.error.copy(alpha = 0.7f), fontSize = 10.sp)
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    Icons.Default.WbTwilight, 
+                    contentDescription = null, 
+                    modifier = Modifier.size(16.dp),
+                    tint = Color(0xFFFF5722)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text("🌇 Sunset: ", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                Text(sunset.format(formatter), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondaryContainer)
+            }
         }
     }
 }
@@ -794,8 +1083,8 @@ fun TimingCard(timing: Timing, onClick: () -> Unit) {
     val bottomOffset = calculateOffset(timing.endTime)
     val height = bottomOffset - topOffset
 
-    val containerColor = SacredTimelineColors.getTimingColor(timing)
-    val contentColor = SacredTimelineColors.getContentColor(containerColor)
+    val timingColor = SacredTimelineColors.getTimingColor(timing)
+    val contentColor = SacredTimelineColors.getContentColor(timingColor)
 
     Card(
         modifier = Modifier
@@ -804,107 +1093,113 @@ fun TimingCard(timing: Timing, onClick: () -> Unit) {
             .height(height - 2.dp)
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = containerColor),
-        border = BorderStroke(1.dp, CardOuterBorderColor),
-        shape = RoundedCornerShape(4.dp),
+        colors = CardDefaults.cardColors(containerColor = CardOuterBorderColor),
+        shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .border(BorderStroke(1.dp, CardBorderColor), RoundedCornerShape(4.dp))
-                .padding(2.dp),
-            contentAlignment = Alignment.Center
+                .padding(1.dp)
+                .background(CardBorderColor, RoundedCornerShape(7.dp))
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(1.dp)
+                    .background(timingColor, RoundedCornerShape(6.dp)),
+                contentAlignment = Alignment.Center
             ) {
-                // ICON LOGIC - Unified and explicitly handling Yama
-                if (height > 40.dp) {
-                    if (timing is SpecialPeriod && timing.name == "Yama") {
-                        Image(
-                            painter = painterResource(R.drawable.ic_yama_bull),
-                            contentDescription = null,
-                            modifier = Modifier.size(if (height > 80.dp) 32.dp else 24.dp)
-                        )
-                        Spacer(modifier = Modifier.height(2.dp))
-                    } else {
-                        val iconPainter = when {
-                            timing is SpecialPeriod && timing.name == "Rahu" -> painterResource(R.drawable.ic_rahu)
-                            timing is SpecialPeriod && (timing.name == "Kuli Dawn" || timing.name == "Kuli Dusk") -> painterResource(R.drawable.ic_saturn)
-                            else -> null
-                        }
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    // ICON LOGIC - Unified and explicitly handling Yama
+                    if (height > 40.dp) {
+                        if (timing is SpecialPeriod && timing.name == "Yama") {
+                            Image(
+                                painter = painterResource(R.drawable.ic_yama_bull),
+                                contentDescription = null,
+                                modifier = Modifier.size(if (height > 80.dp) 32.dp else 24.dp)
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                        } else {
+                            val iconPainter = when {
+                                timing is SpecialPeriod && timing.name == "Rahu" -> painterResource(R.drawable.ic_rahu)
+                                timing is SpecialPeriod && (timing.name == "Kuli Dawn" || timing.name == "Kuli Dusk") -> painterResource(R.drawable.ic_saturn)
+                                else -> null
+                            }
 
-                        if (iconPainter != null) {
-                            Icon(
-                                painter = iconPainter,
-                                contentDescription = null,
-                                modifier = Modifier.size(if (height > 80.dp) 32.dp else 24.dp),
-                                tint = contentColor.copy(alpha = 0.9f)
-                            )
-                            Spacer(modifier = Modifier.height(2.dp))
-                        } else if (timing is NallaNeram) {
-                            Icon(
-                                imageVector = Icons.Default.Star,
-                                contentDescription = null,
-                                modifier = Modifier.size(if (height > 80.dp) 24.dp else 16.dp),
-                                tint = contentColor.copy(alpha = 0.8f)
-                            )
-                            Spacer(modifier = Modifier.height(2.dp))
+                            if (iconPainter != null) {
+                                Icon(
+                                    painter = iconPainter,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(if (height > 80.dp) 32.dp else 24.dp),
+                                    tint = contentColor.copy(alpha = 0.9f)
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                            } else if (timing is NallaNeram) {
+                                Icon(
+                                    imageVector = Icons.Default.Star,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(if (height > 80.dp) 24.dp else 16.dp),
+                                    tint = contentColor.copy(alpha = 0.8f)
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                            }
                         }
                     }
-                }
 
-                val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-                Text(
-                    text = "${timing.startTime.format(timeFormatter)} - ${timing.endTime.format(timeFormatter)}",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = contentColor,
-                    fontSize = 9.sp,
-                    maxLines = 1
-                )
-
-                val label = when (timing) {
-                    is Hora -> timing.name
-                    is NallaNeram -> "Nalla"
-                    is GowriNeram -> timing.name
-                    is SpecialPeriod -> timing.name
-                }
-                Text(
-                    text = label,
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = contentColor,
-                    textAlign = TextAlign.Center,
-                    maxLines = 1
-                )
-
-                if (height > 50.dp && timing.tamilName.isNotEmpty()) {
+                    val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
                     Text(
-                        text = timing.tamilName,
+                        text = "${timing.startTime.format(timeFormatter)} - ${timing.endTime.format(timeFormatter)}",
                         style = MaterialTheme.typography.labelSmall,
-                        color = contentColor.copy(alpha = 0.7f),
+                        color = contentColor,
                         fontSize = 9.sp,
                         maxLines = 1
                     )
-                }
-            }
-            
-            // Compatibility Icon for Hora
-            if (timing is Hora) {
-                Box(modifier = Modifier.fillMaxSize().padding(2.dp), contentAlignment = Alignment.TopEnd) {
-                    val (icon, tint) = when (timing.compatibility) {
-                        HoraCompatibility.FAVORABLE -> Icons.Default.CheckCircle to CompatibilityFavorable
-                        HoraCompatibility.CONFLICTING -> Icons.Default.Cancel to CompatibilityConflicting
-                        HoraCompatibility.NEUTRAL -> Icons.Default.RadioButtonUnchecked to CompatibilityNeutral
+
+                    val label = when (timing) {
+                        is Hora -> timing.name
+                        is NallaNeram -> "Nalla"
+                        is GowriNeram -> timing.name
+                        is SpecialPeriod -> timing.name
                     }
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = null,
-                        modifier = Modifier.size(if (height > 60.dp) 20.dp else 14.dp).background(Color.White, RoundedCornerShape(10.dp)),
-                        tint = tint
+                    Text(
+                        text = label,
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = contentColor,
+                        textAlign = TextAlign.Center,
+                        maxLines = 1
                     )
+
+                    if (height > 50.dp && timing.tamilName.isNotEmpty()) {
+                        Text(
+                            text = timing.tamilName,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = contentColor.copy(alpha = 0.7f),
+                            fontSize = 9.sp,
+                            maxLines = 1
+                        )
+                    }
+                }
+
+                // Compatibility Icon for Hora
+                if (timing is Hora) {
+                    Box(modifier = Modifier.fillMaxSize().padding(2.dp), contentAlignment = Alignment.TopEnd) {
+                        val (icon, tint) = when (timing.compatibility) {
+                            HoraCompatibility.FAVORABLE -> Icons.Default.CheckCircle to CompatibilityFavorable
+                            HoraCompatibility.CONFLICTING -> Icons.Default.Cancel to CompatibilityConflicting
+                            HoraCompatibility.NEUTRAL -> Icons.Default.RadioButtonUnchecked to CompatibilityNeutral
+                        }
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = null,
+                            modifier = Modifier.size(if (height > 60.dp) 20.dp else 14.dp).background(Color.White, RoundedCornerShape(10.dp)),
+                            tint = tint
+                        )
+                    }
                 }
             }
         }
