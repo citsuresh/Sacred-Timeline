@@ -78,6 +78,26 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
         viewModelScope, SharingStarted.WhileSubscribed(5000), listOf("NERAM", "GOWRI", "HORA")
     )
 
+    val enabledTithis: StateFlow<Set<String>> = repository.enabledTithis.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), emptySet()
+    )
+
+    val enabledNakshatras: StateFlow<Set<String>> = repository.enabledNakshatras.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), emptySet()
+    )
+
+    val showTamilDate: StateFlow<Boolean> = repository.showTamilDate.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), true
+    )
+
+    val showTamilYear: StateFlow<Boolean> = repository.showTamilYear.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), true
+    )
+
+    val showPirai: StateFlow<Boolean> = repository.showPirai.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), true
+    )
+
     init {
         // Observe scale settings based on view mode
         viewModelScope.launch {
@@ -136,6 +156,16 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
                 date to days
             }.collect { (date, days) ->
                 preloadData(date, days)
+            }
+        }
+
+        // Observe settings changes and clear cache to force re-calculation of filtered IDs
+        viewModelScope.launch {
+            combine(repository.enabledTithis, repository.enabledNakshatras) { tithis, stars ->
+                tithis to stars
+            }.collect {
+                cacheMutex.withLock { cachedDays.clear() }
+                preloadData(selectedDate.value, repository.preloadDays.first())
             }
         }
     }
@@ -281,6 +311,19 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
         val timings = provider.getTimings(date, sunResult.sunrise, sunResult.sunset)
         
         val tamilCalendar = com.suresh.sacredtimeline.logic.TamilCalendarUtils.getTamilDate(date)
+        val lunarInfo = com.suresh.sacredtimeline.logic.LunarCalendarUtils.getLunarInfo(date)
+        val festivals = com.suresh.sacredtimeline.logic.TamilCalendarUtils.getSpecialEvents(tamilCalendar, lunarInfo)
+        val holidays = com.suresh.sacredtimeline.data.VerifiedHolidays.getHolidays(date)
+        
+        val brahma = com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculateBrahmaMuhurtham(sunResult.sunrise)
+        val abhijit = com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculateAbhijitMuhurtham(sunResult.sunrise, sunResult.sunset)
+
+        // Filter Tithi and Nakshatra based on user preferences
+        val enabledTithisVal = repository.enabledTithis.first()
+        val enabledStarsVal = repository.enabledNakshatras.first()
+        
+        val tithiId = "TITHI_${lunarInfo.tithi}"
+        val starId = "STAR_${lunarInfo.nakshatra}"
 
         return DayData(
             nallaNeram = timings.filterIsInstance<NallaNeram>(),
@@ -292,7 +335,16 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
             isFallback = sunResult.isFallback,
             tamilDay = tamilCalendar.day,
             tamilMonthResId = tamilCalendar.monthResId,
-            tamilYearResId = tamilCalendar.yearResId
+            tamilYearResId = tamilCalendar.yearResId,
+            pakshaResId = lunarInfo.pakshaResId,
+            pakshaDay = lunarInfo.pakshaDay,
+            tithiValue = lunarInfo.tithi,
+            tithiResId = if (enabledTithisVal.contains(tithiId)) lunarInfo.tithiResId else 0,
+            nakshatraResId = if (enabledStarsVal.contains(starId)) lunarInfo.nakshatraResId else 0,
+            specialEvents = holidays + festivals,
+            isSubhaMuhurtham = com.suresh.sacredtimeline.data.VerifiedHolidays.isSubhaMuhurtham(date),
+            brahmaMuhurtham = brahma,
+            abhijitMuhurtham = abhijit
         )
     }
 }

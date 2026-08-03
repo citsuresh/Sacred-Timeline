@@ -79,6 +79,96 @@
     <string name="month_maasi">மாசி</string>
     <string name="month_panguni">பங்குனி</string>
 
+    <!-- Paksha -->
+    <string name="paksha_valarpirai">வளர்பிறை</string>
+    <string name="paksha_theipirai">தேய்பிறை</string>
+
+    <!-- Tithis -->
+    <string name="tithi_1">பிரதமை</string>
+    <string name="tithi_2">துவிதியை</string>
+    <string name="tithi_3">திருதியை</string>
+    <string name="tithi_4">சதுர்த்தி</string>
+    <string name="tithi_5">பஞ்சமி</string>
+    <string name="tithi_6">சஷ்டி</string>
+    <string name="tithi_7">சப்தமி</string>
+    <string name="tithi_8">அஷ்டமி</string>
+    <string name="tithi_9">நவமி</string>
+    <string name="tithi_10">தசமி</string>
+    <string name="tithi_11">ஏகாதசி</string>
+    <string name="tithi_12">துவாதசி</string>
+    <string name="tithi_13">திரயோதசி</string>
+    <string name="tithi_14">சதுர்தசி</string>
+    <string name="tithi_15">பௌர்ணமி</string>
+    <string name="tithi_16">பிரதமை (கிருஷ்ண பட்சம்)</string>
+    <string name="tithi_17">துவிதியை (கிருஷ்ண பட்சம்)</string>
+    <string name="tithi_18">திருதியை (கிருஷ்ண பட்சம்)</string>
+    <string name="tithi_19">சங்கடஹர சதுர்த்தி</string>
+    <string name="tithi_20">பஞ்சமி (கிருஷ்ண பட்சம்)</string>
+    <string name="tithi_21">சஷ்டி (கிருஷ்ண பட்சம்)</string>
+    <string name="tithi_22">சப்தமி (கிருஷ்ண பட்சம்)</string>
+    <string name="tithi_23">அஷ்டமி (கிருஷ்ண பட்சம்)</string>
+    <string name="tithi_24">நவமி (கிருஷ்ண பட்சம்)</string>
+    <string name="tithi_25">தசமி (கிருஷ்ண பட்சம்)</string>
+    <string name="tithi_26">ஏகாதசி (கிருஷ்ண பட்சம்)</string>
+    <string name="tithi_27">துவாதசி (கிருஷ்ண பட்சம்)</string>
+    <string name="tithi_28">திரயோதசி (கிருஷ்ண பட்சம்)</string>
+    <string name="tithi_29">சதுர்தசி (கிருஷ்ண பட்சம்)</string>
+    <string name="tithi_30">அமாவாசை</string>
+
+    <!-- Nakshatras -->
+    <string name="star_1">அசுவினி</string>
+    <string name="star_2">பரணி</string>
+    <string name="star_3">கார்த்திகை</string>
+    <string name="star_4">ரோகிணி</string>
+    <string name="star_5">மிருகசீரிடம்</string>
+    <string name="star_6">திருவாதிரை</string>
+    <string name="star_7">புனர்பூசம்</string>
+    <string name="star_8">பூசம்</string>
+    <string name="star_9">ஆயில்யம்</string>
+    <string name="star_10">மகம்</string>
+    <string name="star_11">பூரம்</string>
+    <string name="star_12">உத்திரம்</string>
+    <string name="star_13">அஸ்தம்</string>
+    <string name="star_14">சித்திரை</string>
+    <string name="star_15">சுவாதி</string>
+    <string name="star_16">விசாகம்</string>
+    <string name="star_17">அனுஷம்</string>
+    <string name="star_18">கேட்டை</string>
+    <string name="star_19">மூலம்</string>
+    <string name="star_20">பூராடம்</string>
+    <string name="star_21">உத்திராடம்</string>
+    <string name="star_22">திருவோணம்</string>
+    <string name="star_23">அவிட்டம்</string>
+    <string name="star_24">சதயம்</string>
+    <string name="star_25">பூரட்டாதி</string>
+    <string name="star_26">உத்திரட்டாதி</string>
+    <string name="star_27">ரேவதி</string>
+
+    <!-- Muhurthams -->
+    <string name="muhurtham_brahma">பிரம்ம முகூர்த்தம்</string>
+    <string name="muhurtham_abhijit">அபிஜித் முகூர்த்தம்</string>
+    <string name="muhurtham_subha">சுப முகூர்த்தம்</string>
+
+    <!-- Events -->
+    <string name="event_aadi_perukku">ஆடிப் பெருக்கு</string>
+    <string name="event_aadi_pooram">ஆடிப் பூரம்</string>
+    <string name="event_naga_chaturthi">நாக சதுர்த்தி</string>
+    <string name="event_naga_panchami">நாக பஞ்சமி</string>
+    <string name="event_garuda_panchami">கருட பஞ்சமி</string>
+    <string name="event_pradosham">பிரதோஷம்</string>
+    <string name="event_sivaratri">மகா சிவராத்திரி</string>
+    <string name="event_sankatahara_chaturthi">சங்கடஹர சதுர்த்தி</string>
+    <string name="event_vinayagar_chaturthi">விநாயகர் சதுர்த்தி</string>
+    <string name="event_deepavali">தீபாவளி</string>
+    <string name="event_pongal">தைப்பொங்கல்</string>
+    <string name="event_tamil_new_year">தமிழ்ப் புத்தாண்டு</string>
+    <string name="event_independence_day">சுதந்திர தினம்</string>
+    <string name="event_republic_day">குடியரசு தினம்</string>
+    <string name="event_milad_un_nabi">மிிலாதுன் நபி</string>
+    <string name="event_gandhi_jayanthi">காந்தி ஜெயந்தி</string>
+    <string name="event_christmas">கிறிஸ்துமஸ்</string>
+    <string name="event_thiruvalluvar_day">திருவள்ளுவர் தினம்</string>
+
     <!-- Tamil Years (60 Year Cycle) -->
     <string name="year_1">பிரபவ</string>
     <string name="year_2">விபவ</string>
@@ -145,6 +235,10 @@
     <string name="settings_title">அமைப்புகள்</string>
     <string name="settings_display">காட்சி</string>
     <string name="settings_language">பயன்பாட்டு மொழி</string>
+    <string name="settings_theme">பயன்பாட்டு தீம்</string>
+    <string name="settings_theme_system">கணினி இயல்புநிலை</string>
+    <string name="settings_theme_light">ஒளி தீம்</string>
+    <string name="settings_theme_dark">இருண்ட தீம்</string>
     <string name="settings_default_launch_view">தொடக்கத்தில் இயல்புநிலை பார்வை</string>
     <string name="settings_time_format_24h">24-மணிநேர வடிவத்தைப் பயன்படுத்தவும்</string>
     <string name="settings_columns_composite">நெடுவரிசை மேலாண்மை (கூட்டுப் பார்வை மட்டும்)</string>
@@ -165,7 +259,12 @@
     <string name="settings_zoom_composite">கூட்டுப் பார்வை பெரிதாக்கம்</string>
     <string name="settings_zoom_single">ஒற்றைப் பார்வை பெரிதாக்கம்</string>
     <string name="settings_pinch_zoom">கிள்ளு-பெரிதாக்கலை இயக்கு</string>
-    <string name="settings_indicators">காலவரிசை குறிகாட்டிகள்</string>
+    <string name="settings_indicators">காலவரிசை காட்சி</string>
+    <string name="settings_show_tamil_date">தமிழ் தேதியைக் காட்டு</string>
+    <string name="settings_show_tamil_year">தமிழ் ஆண்டைக் காட்டு</string>
+    <string name="settings_show_pirai">பிறையைக் காட்டு</string>
+    <string name="settings_tithi_options">காண்பிக்கப்பட வேண்டிய திதிகள்</string>
+    <string name="settings_star_options">காண்பிக்கப்பட வேண்டிய நட்சத்திரங்கள்</string>
     <string name="settings_show_now_line">இப்போது கோட்டைக் காட்டு</string>
     <string name="settings_line_color">கோட்டின் நிறம்</string>
     <string name="settings_line_thickness">கோட்டின் தடிமன்</string>

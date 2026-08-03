@@ -79,6 +79,96 @@
     <string name="month_maasi">Maasi</string>
     <string name="month_panguni">Panguni</string>
 
+    <!-- Paksha -->
+    <string name="paksha_valarpirai">Valarpirai</string>
+    <string name="paksha_theipirai">Theipirai</string>
+
+    <!-- Tithis -->
+    <string name="tithi_1">Pratipada</string>
+    <string name="tithi_2">Dwitiya</string>
+    <string name="tithi_3">Tritiya</string>
+    <string name="tithi_4">Chaturthi</string>
+    <string name="tithi_5">Panchami</string>
+    <string name="tithi_6">Shashti</string>
+    <string name="tithi_7">Saptami</string>
+    <string name="tithi_8">Ashtami</string>
+    <string name="tithi_9">Navami</string>
+    <string name="tithi_10">Dashami</string>
+    <string name="tithi_11">Ekadashi</string>
+    <string name="tithi_12">Dwadashi</string>
+    <string name="tithi_13">Trayodashi</string>
+    <string name="tithi_14">Chaturdashi</string>
+    <string name="tithi_15">Pournami (Full Moon)</string>
+    <string name="tithi_16">Pratipada (Krishna)</string>
+    <string name="tithi_17">Dwitiya (Krishna)</string>
+    <string name="tithi_18">Tritiya (Krishna)</string>
+    <string name="tithi_19">Sankatahara Chaturthi</string>
+    <string name="tithi_20">Panchami (Krishna)</string>
+    <string name="tithi_21">Shashti (Krishna)</string>
+    <string name="tithi_22">Saptami (Krishna)</string>
+    <string name="tithi_23">Ashtami (Krishna)</string>
+    <string name="tithi_24">Navami (Krishna)</string>
+    <string name="tithi_25">Dashami (Krishna)</string>
+    <string name="tithi_26">Ekadashi (Krishna)</string>
+    <string name="tithi_27">Dwadashi (Krishna)</string>
+    <string name="tithi_28">Trayodashi (Krishna)</string>
+    <string name="tithi_29">Chaturdashi (Krishna)</string>
+    <string name="tithi_30">Amavasai (New Moon)</string>
+
+    <!-- Nakshatras -->
+    <string name="star_1">Ashwini</string>
+    <string name="star_2">Bharani</string>
+    <string name="star_3">Krittika</string>
+    <string name="star_4">Rohini</string>
+    <string name="star_5">Mrigashirsha</string>
+    <string name="star_6">Ardra</string>
+    <string name="star_7">Punarvasu</string>
+    <string name="star_8">Pushya</string>
+    <string name="star_9">Ashlesha</string>
+    <string name="star_10">Magha</string>
+    <string name="star_11">Purva Phalguni</string>
+    <string name="star_12">Uttara Phalguni</string>
+    <string name="star_13">Hasta</string>
+    <string name="star_14">Chitra</string>
+    <string name="star_15">Swati</string>
+    <string name="star_16">Vishakha</string>
+    <string name="star_17">Anuradha</string>
+    <string name="star_18">Jyeshtha</string>
+    <string name="star_19">Mula</string>
+    <string name="star_20">Purva Ashadha</string>
+    <string name="star_21">Uttara Ashadha</string>
+    <string name="star_22">Shravana</string>
+    <string name="star_23">Dhanishta</string>
+    <string name="star_24">Shatabhisha</string>
+    <string name="star_25">Purva Bhadrapada</string>
+    <string name="star_26">Uttara Bhadrapada</string>
+    <string name="star_27">Revati</string>
+
+    <!-- Muhurthams -->
+    <string name="muhurtham_brahma">Brahma Muhurtham</string>
+    <string name="muhurtham_abhijit">Abhijit Muhurtham</string>
+    <string name="muhurtham_subha">Subha Muhurtham</string>
+
+    <!-- Events -->
+    <string name="event_aadi_perukku">Aadi Perukku</string>
+    <string name="event_aadi_pooram">Aadi Pooram</string>
+    <string name="event_naga_chaturthi">Naga Chaturthi</string>
+    <string name="event_naga_panchami">Naga Panchami</string>
+    <string name="event_garuda_panchami">Garuda Panchami</string>
+    <string name="event_pradosham">Pradosham</string>
+    <string name="event_sivaratri">Masik Sivaratri</string>
+    <string name="event_sankatahara_chaturthi">Sankatahara Chaturthi</string>
+    <string name="event_vinayagar_chaturthi">Vinayagar Chaturthi</string>
+    <string name="event_deepavali">Deepavali</string>
+    <string name="event_pongal">Thai Pongal</string>
+    <string name="event_tamil_new_year">Tamil New Year</string>
+    <string name="event_independence_day">Independence Day</string>
+    <string name="event_republic_day">Republic Day</string>
+    <string name="event_milad_un_nabi">Milad-un-Nabi</string>
+    <string name="event_gandhi_jayanthi">Gandhi Jayanthi</string>
+    <string name="event_christmas">Christmas</string>
+    <string name="event_thiruvalluvar_day">Thiruvalluvar Day</string>
+
     <!-- Tamil Years (60 Year Cycle) -->
     <string name="year_1">Prabhava</string>
     <string name="year_2">Vibhava</string>
@@ -145,6 +235,10 @@
     <string name="settings_title">Settings</string>
     <string name="settings_display">Display</string>
     <string name="settings_language">App Language</string>
+    <string name="settings_theme">App Theme</string>
+    <string name="settings_theme_system">System Default</string>
+    <string name="settings_theme_light">Light Theme</string>
+    <string name="settings_theme_dark">Dark Theme</string>
     <string name="settings_default_launch_view">Default View on Launch</string>
     <string name="settings_time_format_24h">Use 24-Hour Format</string>
     <string name="settings_columns_composite">Column Management (Composite View Only)</string>
@@ -165,7 +259,12 @@
     <string name="settings_zoom_composite">Composite View Zoom</string>
     <string name="settings_zoom_single">Single View Zoom</string>
     <string name="settings_pinch_zoom">Enable Pinch-to-Zoom</string>
-    <string name="settings_indicators">Timeline Indicators</string>
+    <string name="settings_indicators">Timeline Display</string>
+    <string name="settings_show_tamil_date">Show Tamil Date</string>
+    <string name="settings_show_tamil_year">Show Tamil Year</string>
+    <string name="settings_show_pirai">Show Pirai</string>
+    <string name="settings_tithi_options">Tithis to Display</string>
+    <string name="settings_star_options">Nakshatras to Display</string>
     <string name="settings_show_now_line">Show NOW Line</string>
     <string name="settings_line_color">Line Color</string>
     <string name="settings_line_thickness">Line Thickness</string>

@@ -62,6 +62,9 @@ fun TimelinePager(
     nowLineThickness: Float,
     columnVisibility: Set<String>,
     columnOrder: List<String>,
+    showTamilDate: Boolean = true,
+    showTamilYear: Boolean = true,
+    showPirai: Boolean = true,
     onScaleChange: (Float) -> Unit,
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
@@ -131,7 +134,10 @@ fun TimelinePager(
                             nowLineColor = nowLineColor,
                             nowLineThickness = nowLineThickness,
                             columnVisibility = columnVisibility,
-                            columnOrder = columnOrder
+                            columnOrder = columnOrder,
+                            showTamilDate = showTamilDate,
+                            showTamilYear = showTamilYear,
+                            showPirai = showPirai
                         )
                     } else {
                         Box(modifier = Modifier.fillMaxSize()) {
@@ -180,7 +186,10 @@ fun TimelineContent(
     nowLineColor: Int = 0xFFFF0000.toInt(),
     nowLineThickness: Float = 2.0f,
     columnVisibility: Set<String> = setOf("NERAM", "GOWRI", "HORA"),
-    columnOrder: List<String> = listOf("NERAM", "GOWRI", "HORA")
+    columnOrder: List<String> = listOf("NERAM", "GOWRI", "HORA"),
+    showTamilDate: Boolean = true,
+    showTamilYear: Boolean = true,
+    showPirai: Boolean = true
 ) {
     val scrollState = rememberScrollState()
     val density = LocalDensity.current
@@ -214,6 +223,17 @@ fun TimelineContent(
                 tamilDay = dayData.tamilDay,
                 tamilMonthResId = dayData.tamilMonthResId,
                 tamilYearResId = dayData.tamilYearResId,
+                pakshaResId = dayData.pakshaResId,
+                pakshaDay = dayData.pakshaDay,
+                tithiResId = dayData.tithiResId,
+                nakshatraResId = dayData.nakshatraResId,
+                tithiValue = dayData.tithiValue,
+                specialEvents = dayData.specialEvents,
+                isSubhaMuhurtham = dayData.isSubhaMuhurtham,
+                abhijitMuhurtham = dayData.abhijitMuhurtham,
+                showTamilDate = showTamilDate,
+                showTamilYear = showTamilYear,
+                showPirai = showPirai,
                 isFallback = dayData.isFallback, 
                 isLandscape = false, 
                 is24Hour = is24Hour

@@ -16,5 +16,14 @@ data class DayData(
     val isFallback: Boolean,
     val tamilDay: Int = 0,
     val tamilMonthResId: Int = 0,
-    val tamilYearResId: Int = 0
+    val tamilYearResId: Int = 0,
+    val pakshaResId: Int = 0,
+    val pakshaDay: Int = 0,
+    val tithiValue: Int = 0,
+    val tithiResId: Int = 0,
+    val nakshatraResId: Int = 0,
+    val specialEvents: List<Int> = emptyList(),
+    val isSubhaMuhurtham: Boolean = false,
+    val brahmaMuhurtham: Pair<@Serializable(with = LocalTimeSerializer::class) LocalTime, @Serializable(with = LocalTimeSerializer::class) LocalTime>? = null,
+    val abhijitMuhurtham: Pair<@Serializable(with = LocalTimeSerializer::class) LocalTime, @Serializable(with = LocalTimeSerializer::class) LocalTime>? = null
 )

@@ -120,6 +120,50 @@ object TamilCalendarUtils {
     }
 
     /**
+     * Identifies special events/festivals based on Solar and Lunar combinations.
+     */
+    fun getSpecialEvents(
+        tamilDate: TamilDate,
+        lunarInfo: LunarCalendarUtils.LunarInfo
+    ): List<Int> {
+        val events = mutableListOf<Int>()
+
+        // 1. Solar Fixed Festivals
+        if (tamilDate.monthResId == R.string.month_aadi && tamilDate.day == 18) {
+            events.add(R.string.event_aadi_perukku)
+        }
+        if (tamilDate.monthResId == R.string.month_thai && tamilDate.day == 1) {
+            events.add(R.string.event_pongal)
+        }
+        if (tamilDate.monthResId == R.string.month_chithirai && tamilDate.day == 1) {
+            events.add(R.string.event_tamil_new_year)
+        }
+
+        // 2. Lunar/Star Based Festivals
+        // Aadi Pooram: Aadi Month + Pooram Star (11)
+        if (tamilDate.monthResId == R.string.month_aadi && lunarInfo.nakshatra == 11) {
+            events.add(R.string.event_aadi_pooram)
+        }
+        
+        // Naga Chaturthi: Sawan/Aavani Shukla Chaturthi (4)
+        if (tamilDate.monthResId == R.string.month_avani && lunarInfo.tithi == 4) {
+            events.add(R.string.event_naga_chaturthi)
+        }
+
+        // Pradosham: Trayodashi (13 or 28)
+        if (lunarInfo.tithi == 13 || lunarInfo.tithi == 28) {
+            events.add(R.string.event_pradosham)
+        }
+
+        // Sivaratri: Krishna Chaturdashi (29)
+        if (lunarInfo.tithi == 29) {
+            events.add(R.string.event_sivaratri)
+        }
+
+        return events
+    }
+
+    /**
      * Returns the resource ID for the Tamil Year name in the 60-year cycle.
      */
     fun getTamilYearResId(date: LocalDate): Int {

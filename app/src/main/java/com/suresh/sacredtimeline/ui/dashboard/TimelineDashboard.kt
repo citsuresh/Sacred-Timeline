@@ -36,13 +36,19 @@ fun TimelineDashboard(
     val selectedDate by viewModel.selectedDate.collectAsState()
     val timelineScale by viewModel.timelineScale.collectAsState()
     val pinchToZoomEnabled by viewModel.pinchToZoomEnabled.collectAsState(initial = true)
+    
+    // Use initial = null or handle properly to avoid flicker during state load
     val timeFormat24h by viewModel.timeFormat24h.collectAsState(initial = false)
-    val showNowLine by viewModel.showNowLine.collectAsState()
+    val showNowLine by viewModel.showNowLine.collectAsState(initial = true)
     val nowLineColor by viewModel.nowLineColor.collectAsState()
     val nowLineThickness by viewModel.nowLineThickness.collectAsState()
     val columnVisibility by viewModel.columnVisibility.collectAsState(initial = setOf("NERAM", "GOWRI", "HORA"))
     val columnOrder by viewModel.columnOrder.collectAsState(initial = listOf("NERAM", "GOWRI", "HORA"))
     
+    val showTamilDate by viewModel.showTamilDate.collectAsState()
+    val showTamilYear by viewModel.showTamilYear.collectAsState()
+    val showPirai by viewModel.showPirai.collectAsState()
+
     LaunchedEffect(viewMode) {
         viewModel.setViewMode(viewMode)
     }
@@ -181,6 +187,9 @@ fun TimelineDashboard(
             nowLineThickness = nowLineThickness,
             columnVisibility = columnVisibility,
             columnOrder = columnOrder,
+            showTamilDate = showTamilDate,
+            showTamilYear = showTamilYear,
+            showPirai = showPirai,
             onMenuClick = onMenuClick,
             onZoomIn = onZoomIn,
             onZoomOut = onZoomOut,
@@ -213,6 +222,9 @@ fun TimelineDashboard(
             nowLineThickness = nowLineThickness,
             columnVisibility = columnVisibility,
             columnOrder = columnOrder,
+            showTamilDate = showTamilDate,
+            showTamilYear = showTamilYear,
+            showPirai = showPirai,
             onMenuClick = onMenuClick,
             onZoomIn = onZoomIn,
             onZoomOut = onZoomOut,

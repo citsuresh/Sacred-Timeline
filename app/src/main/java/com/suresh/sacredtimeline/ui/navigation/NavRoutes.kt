@@ -17,4 +17,13 @@ sealed interface NavRoute : NavKey {
 
     @Serializable
     data object Settings : NavRoute
+
+    @Serializable
+    data object CalendarSettings : NavRoute
+
+    @Serializable
+    data object TithiSettings : NavRoute
+
+    @Serializable
+    data object NakshatraSettings : NavRoute
 }

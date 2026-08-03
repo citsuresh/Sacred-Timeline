@@ -25,6 +25,9 @@ import com.suresh.sacredtimeline.ui.dashboard.TimelineDashboard
 import com.suresh.sacredtimeline.ui.navigation.NavRoute
 import com.suresh.sacredtimeline.ui.navigation.ViewMode
 import com.suresh.sacredtimeline.ui.settings.SettingsScreen
+import com.suresh.sacredtimeline.ui.settings.TimelineDisplaySettingsScreen
+import com.suresh.sacredtimeline.ui.settings.TithiSettingsScreen
+import com.suresh.sacredtimeline.ui.settings.NakshatraSettingsScreen
 import com.suresh.sacredtimeline.ui.theme.SacredTimelineTheme
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -44,6 +47,7 @@ class MainActivity : AppCompatActivity() {
             }
             
             val language by repository.language.collectAsState(initial = currentLocale)
+            val themeMode by repository.themeMode.collectAsState(initial = "SYSTEM")
 
             LaunchedEffect(language) {
                 val currentTags = AppCompatDelegate.getApplicationLocales().toLanguageTags()
@@ -69,7 +73,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 
                 if (startMode != null) {
-                    MainShell(initialMode = startMode!!)
+                    MainShell(initialMode = startMode!!, themeMode = themeMode)
                 } else {
                     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                         Box(contentAlignment = androidx.compose.ui.Alignment.Center) {
@@ -82,14 +86,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     @Composable
-    fun MainShell(initialMode: ViewMode) {
+    fun MainShell(initialMode: ViewMode, themeMode: String) {
         val backStack = remember { mutableStateListOf<Any>(NavRoute.Dashboard(initialMode)) }
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
         val scope = rememberCoroutineScope()
 
         val currentRoute = backStack.lastOrNull()
 
-        SacredTimelineTheme {
+        val isDarkTheme = when (themeMode) {
+            "LIGHT" -> false
+            "DARK" -> true
+            else -> androidx.compose.foundation.isSystemInDarkTheme()
+        }
+
+        SacredTimelineTheme(darkTheme = isDarkTheme) {
             ModalNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
@@ -181,11 +191,49 @@ class MainActivity : AppCompatActivity() {
                                 ) 
                             }
                             NavRoute.Settings -> NavEntry(key) { 
-                                SettingsScreen(onBack = { 
-                                    if (backStack.size > 1) {
-                                        backStack.removeLastOrNull()
+                                SettingsScreen(
+                                    onBack = { 
+                                        if (backStack.size > 1) {
+                                            backStack.removeLastOrNull()
+                                        }
+                                    },
+                                    onNavigateToTimelineDisplaySettings = {
+                                        backStack.add(NavRoute.CalendarSettings)
                                     }
-                                })
+                                )
+                            }
+                            NavRoute.TithiSettings -> NavEntry(key) {
+                                TithiSettingsScreen(
+                                    onBack = {
+                                        if (backStack.size > 1) {
+                                            backStack.removeLastOrNull()
+                                        }
+                                    }
+                                )
+                            }
+                            NavRoute.NakshatraSettings -> NavEntry(key) {
+                                NakshatraSettingsScreen(
+                                    onBack = {
+                                        if (backStack.size > 1) {
+                                            backStack.removeLastOrNull()
+                                        }
+                                    }
+                                )
+                            }
+                            NavRoute.CalendarSettings -> NavEntry(key) {
+                                TimelineDisplaySettingsScreen(
+                                    onBack = {
+                                        if (backStack.size > 1) {
+                                            backStack.removeLastOrNull()
+                                        }
+                                    },
+                                    onNavigateToTithiSettings = {
+                                        backStack.add(NavRoute.TithiSettings)
+                                    },
+                                    onNavigateToNakshatraSettings = {
+                                        backStack.add(NavRoute.NakshatraSettings)
+                                    }
+                                )
                             }
                             else -> NavEntry(Unit) { Text(stringResource(R.string.unknown_route)) }
                         }

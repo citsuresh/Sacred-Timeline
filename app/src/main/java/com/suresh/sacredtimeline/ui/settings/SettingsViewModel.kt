@@ -96,12 +96,36 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     val preloadDays: StateFlow<Int> = repository.preloadDays.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), 3)
 
+    val enabledTithis: StateFlow<Set<String>> = repository.enabledTithis.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), emptySet()
+    )
+
+    val enabledNakshatras: StateFlow<Set<String>> = repository.enabledNakshatras.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), emptySet()
+    )
+
+    val showTamilDate: StateFlow<Boolean> = repository.showTamilDate.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), true
+    )
+
+    val showTamilYear: StateFlow<Boolean> = repository.showTamilYear.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), true
+    )
+
+    val showPirai: StateFlow<Boolean> = repository.showPirai.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), true
+    )
+
     val language: StateFlow<String> = repository.language.stateIn(
         viewModelScope, 
         SharingStarted.WhileSubscribed(5000), 
         AppCompatDelegate.getApplicationLocales().let { locales ->
             if (locales.isEmpty()) "en" else locales.toLanguageTags().split(",")[0]
         }
+    )
+
+    val themeMode: StateFlow<String> = repository.themeMode.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), "SYSTEM"
     )
 
     private val _searchState = MutableStateFlow<SearchState>(SearchState.Idle)
@@ -232,8 +256,32 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch { repository.setLanguage(lang) }
     }
 
+    fun setThemeMode(mode: String) {
+        viewModelScope.launch { repository.setThemeMode(mode) }
+    }
+
     fun clearCache() {
         cacheManager.clearCache()
+    }
+
+    fun updateEnabledTithi(tithi: String, enabled: Boolean) {
+        viewModelScope.launch { repository.updateEnabledTithi(tithi, enabled) }
+    }
+
+    fun updateEnabledNakshatra(star: String, enabled: Boolean) {
+        viewModelScope.launch { repository.updateEnabledNakshatra(star, enabled) }
+    }
+
+    fun setShowTamilDate(show: Boolean) {
+        viewModelScope.launch { repository.setShowTamilDate(show) }
+    }
+
+    fun setShowTamilYear(show: Boolean) {
+        viewModelScope.launch { repository.setShowTamilYear(show) }
+    }
+
+    fun setShowPirai(show: Boolean) {
+        viewModelScope.launch { repository.setShowPirai(show) }
     }
 }
 

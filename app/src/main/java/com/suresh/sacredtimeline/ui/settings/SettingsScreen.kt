@@ -28,6 +28,7 @@ import java.util.Locale
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit,
+    onNavigateToTimelineDisplaySettings: () -> Unit,
     viewModel: SettingsViewModel = viewModel()
 ) {
     val compositeScale by viewModel.compositeScale.collectAsState()
@@ -41,6 +42,7 @@ fun SettingsScreen(
     val widgetColumnVisibility by viewModel.widgetColumnVisibility.collectAsState()
     val widgetColumnOrder by viewModel.widgetColumnOrder.collectAsState()
     val language by viewModel.language.collectAsState()
+    val themeMode by viewModel.themeMode.collectAsState()
     
     @Composable
     fun getLocalizedViewModeName(mode: ViewMode): String = when (mode) {
@@ -88,6 +90,27 @@ fun SettingsScreen(
                             viewModel.setLanguage(if (it == englishLabel) "en" else "ta")
                         }
                     )
+                    val themeSystem = stringResource(R.string.settings_theme_system)
+                    val themeLight = stringResource(R.string.settings_theme_light)
+                    val themeDark = stringResource(R.string.settings_theme_dark)
+
+                    SettingsDropdownItem(
+                        label = stringResource(R.string.settings_theme),
+                        selected = when (themeMode) {
+                            "LIGHT" -> themeLight
+                            "DARK" -> themeDark
+                            else -> themeSystem
+                        },
+                        options = listOf(themeSystem, themeLight, themeDark),
+                        onOptionSelected = {
+                            val mode = when (it) {
+                                themeLight -> "LIGHT"
+                                themeDark -> "DARK"
+                                else -> "SYSTEM"
+                            }
+                            viewModel.setThemeMode(mode)
+                        }
+                    )
                     val viewModeOptions = ViewMode.entries
                     val viewModeLabels = viewModeOptions.map { getLocalizedViewModeName(it) }
                     SettingsDropdownItem(
@@ -104,6 +127,30 @@ fun SettingsScreen(
                         checked = timeFormat24h,
                         onCheckedChange = { viewModel.setTimeFormat24h(it) }
                     )
+                    
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), thickness = 0.5.dp)
+                    
+                    TextButton(
+                        onClick = onNavigateToTimelineDisplaySettings,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = stringResource(R.string.settings_indicators),
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Icon(
+                                Icons.Default.ChevronRight, 
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
                 }
             }
 

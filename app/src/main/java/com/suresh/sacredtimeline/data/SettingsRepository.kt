@@ -34,6 +34,12 @@ class SettingsRepository(private val context: Context) {
         val LAST_KNOWN_LONGITUDE = doublePreferencesKey("last_known_longitude")
         val PRELOAD_DAYS = intPreferencesKey("preload_days")
         val LANGUAGE = stringPreferencesKey("language")
+        val THEME_MODE = stringPreferencesKey("theme_mode")
+        val ENABLED_TITHIS = stringSetPreferencesKey("enabled_tithis")
+        val ENABLED_NAKSHATRAS = stringSetPreferencesKey("enabled_nakshatras")
+        val SHOW_TAMIL_DATE = booleanPreferencesKey("show_tamil_date")
+        val SHOW_TAMIL_YEAR = booleanPreferencesKey("show_tamil_year")
+        val SHOW_PIRAI = booleanPreferencesKey("show_pirai")
     }
 
     val compositeScale: Flow<Float> = context.dataStore.data.map { it[Keys.COMPOSITE_SCALE] ?: 1.0f }
@@ -80,6 +86,19 @@ class SettingsRepository(private val context: Context) {
     
     val preloadDays: Flow<Int> = context.dataStore.data.map { it[Keys.PRELOAD_DAYS] ?: 3 }
     val language: Flow<String> = context.dataStore.data.map { it[Keys.LANGUAGE] ?: "en" }
+    val themeMode: Flow<String> = context.dataStore.data.map { it[Keys.THEME_MODE] ?: "SYSTEM" }
+
+    val enabledTithis: Flow<Set<String>> = context.dataStore.data.map { 
+        it[Keys.ENABLED_TITHIS] ?: setOf("TITHI_11", "TITHI_15", "TITHI_19", "TITHI_26", "TITHI_30") 
+    }
+
+    val enabledNakshatras: Flow<Set<String>> = context.dataStore.data.map { 
+        it[Keys.ENABLED_NAKSHATRAS] ?: setOf("STAR_3", "STAR_11", "STAR_22") 
+    }
+
+    val showTamilDate: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_TAMIL_DATE] ?: true }
+    val showTamilYear: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_TAMIL_YEAR] ?: true }
+    val showPirai: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_PIRAI] ?: true }
 
     suspend fun updateCompositeScale(scale: Float) {
         context.dataStore.edit { it[Keys.COMPOSITE_SCALE] = scale.coerceIn(0.2f, 3.0f) }
@@ -171,5 +190,39 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun setLanguage(lang: String) {
         context.dataStore.edit { it[Keys.LANGUAGE] = lang }
+    }
+
+    suspend fun setThemeMode(mode: String) {
+        context.dataStore.edit { it[Keys.THEME_MODE] = mode }
+    }
+
+    suspend fun updateEnabledTithi(tithi: String, enabled: Boolean) {
+        context.dataStore.edit { prefs ->
+            val current = prefs[Keys.ENABLED_TITHIS] ?: setOf("TITHI_11", "TITHI_15", "TITHI_19", "TITHI_26", "TITHI_30")
+            val newSet = current.toMutableSet()
+            if (enabled) newSet.add(tithi) else newSet.remove(tithi)
+            prefs[Keys.ENABLED_TITHIS] = newSet
+        }
+    }
+
+    suspend fun updateEnabledNakshatra(star: String, enabled: Boolean) {
+        context.dataStore.edit { prefs ->
+            val current = prefs[Keys.ENABLED_NAKSHATRAS] ?: setOf("STAR_3", "STAR_11", "STAR_22")
+            val newSet = current.toMutableSet()
+            if (enabled) newSet.add(star) else newSet.remove(star)
+            prefs[Keys.ENABLED_NAKSHATRAS] = newSet
+        }
+    }
+
+    suspend fun setShowTamilDate(show: Boolean) {
+        context.dataStore.edit { it[Keys.SHOW_TAMIL_DATE] = show }
+    }
+
+    suspend fun setShowTamilYear(show: Boolean) {
+        context.dataStore.edit { it[Keys.SHOW_TAMIL_YEAR] = show }
+    }
+
+    suspend fun setShowPirai(show: Boolean) {
+        context.dataStore.edit { it[Keys.SHOW_PIRAI] = show }
     }
 }
