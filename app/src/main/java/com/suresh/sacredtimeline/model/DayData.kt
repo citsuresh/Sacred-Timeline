@@ -13,5 +13,8 @@ data class DayData(
     val sunrise: LocalTime,
     @Serializable(with = LocalTimeSerializer::class)
     val sunset: LocalTime,
-    val isFallback: Boolean
+    val isFallback: Boolean,
+    val tamilDay: Int = 0,
+    val tamilMonthResId: Int = 0,
+    val tamilYearResId: Int = 0
 )

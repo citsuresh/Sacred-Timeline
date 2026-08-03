@@ -208,7 +208,16 @@ fun TimelineContent(
 
     Column(modifier = Modifier.fillMaxSize()) {
         if (!isLandscape) {
-            SunTimesDisplay(dayData.sunrise, dayData.sunset, dayData.isFallback, isLandscape = false, is24Hour = is24Hour)
+            SunTimesDisplay(
+                sunrise = dayData.sunrise, 
+                sunset = dayData.sunset, 
+                tamilDay = dayData.tamilDay,
+                tamilMonthResId = dayData.tamilMonthResId,
+                tamilYearResId = dayData.tamilYearResId,
+                isFallback = dayData.isFallback, 
+                isLandscape = false, 
+                is24Hour = is24Hour
+            )
         }
         TimelineHeader(viewMode = viewMode, columnVisibility = columnVisibility, columnOrder = columnOrder)
         

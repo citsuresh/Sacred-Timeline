@@ -27,10 +27,23 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun SunTimesDisplay(sunrise: LocalTime, sunset: LocalTime, isFallback: Boolean, isLandscape: Boolean, is24Hour: Boolean) {
+fun SunTimesDisplay(
+    sunrise: LocalTime,
+    sunset: LocalTime,
+    tamilDay: Int,
+    tamilMonthResId: Int,
+    tamilYearResId: Int,
+    isFallback: Boolean,
+    isLandscape: Boolean,
+    is24Hour: Boolean
+) {
     val timeFormatter = DateTimeFormatter.ofPattern(if (is24Hour) "HH:mm" else "h:mm")
     val amLabel = stringResource(R.string.label_am)
     val pmLabel = stringResource(R.string.label_pm)
+
+    val tamilMonth = if (tamilMonthResId != 0) stringResource(tamilMonthResId) else ""
+    val tamilYear = if (tamilYearResId != 0) stringResource(tamilYearResId) else ""
+    val tamilDateFull = if (tamilDay > 0) "$tamilDay $tamilMonth - $tamilYear" else "$tamilYear | $tamilMonth"
     
     fun formatWithAmPm(time: LocalTime): String {
         if (is24Hour) return time.format(timeFormatter)
@@ -49,6 +62,17 @@ fun SunTimesDisplay(sunrise: LocalTime, sunset: LocalTime, isFallback: Boolean, 
                 modifier = Modifier.padding(8.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
+                if (tamilMonth.isNotEmpty()) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = tamilDateFull,
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 2.dp), thickness = 0.5.dp, color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.1f))
+                }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.WbSunny, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color(0xFFFF9800))
                     Spacer(modifier = Modifier.width(6.dp))
@@ -67,45 +91,70 @@ fun SunTimesDisplay(sunrise: LocalTime, sunset: LocalTime, isFallback: Boolean, 
             }
         }
     } else {
-        FlowRow(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f))
-                .padding(vertical = 8.dp, horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    Icons.Default.WbSunny, 
-                    contentDescription = null, 
-                    modifier = Modifier.size(16.dp),
-                    tint = Color(0xFFFF9800)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("${stringResource(R.string.label_sunrise)}: ", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSecondaryContainer)
-                Text(formatWithAmPm(sunrise), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondaryContainer)
+            if (tamilMonth.isNotEmpty()) {
+                Surface(
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = tamilDateFull,
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Black,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                }
             }
-            
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    Icons.Default.WbTwilight, 
-                    contentDescription = null, 
-                    modifier = Modifier.size(16.dp),
-                    tint = Color(0xFFFF5722)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("${stringResource(R.string.label_sunset)}: ", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSecondaryContainer)
-                Text(formatWithAmPm(sunset), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondaryContainer)
-            }
-            
-            if (isFallback) {
-                Text(
-                    stringResource(R.string.label_approximate), 
-                    style = MaterialTheme.typography.labelSmall, 
-                    color = MaterialTheme.colorScheme.error.copy(alpha = 0.7f), 
-                    fontSize = 10.sp
-                )
+
+            FlowRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp, horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        Icons.Default.WbSunny, 
+                        contentDescription = null, 
+                        modifier = Modifier.size(16.dp),
+                        tint = Color(0xFFFF9800)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("${stringResource(R.string.label_sunrise)}: ", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                    Text(formatWithAmPm(sunrise), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                }
+                
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        Icons.Default.WbTwilight, 
+                        contentDescription = null, 
+                        modifier = Modifier.size(16.dp),
+                        tint = Color(0xFFFF5722)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("${stringResource(R.string.label_sunset)}: ", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                    Text(formatWithAmPm(sunset), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                }
+                
+                if (isFallback) {
+                    Text(
+                        stringResource(R.string.label_approximate), 
+                        style = MaterialTheme.typography.labelSmall, 
+                        color = MaterialTheme.colorScheme.error.copy(alpha = 0.7f), 
+                        fontSize = 10.sp
+                    )
+                }
             }
         }
     }

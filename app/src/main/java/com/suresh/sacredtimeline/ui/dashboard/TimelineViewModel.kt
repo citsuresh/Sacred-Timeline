@@ -280,6 +280,8 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
         val sunResult = sunProvider.getSunTimes(lat, lng, date)
         val timings = provider.getTimings(date, sunResult.sunrise, sunResult.sunset)
         
+        val tamilCalendar = com.suresh.sacredtimeline.logic.TamilCalendarUtils.getTamilDate(date)
+
         return DayData(
             nallaNeram = timings.filterIsInstance<NallaNeram>(),
             gowriNeram = timings.filterIsInstance<GowriNeram>(),
@@ -287,7 +289,10 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
             specialPeriods = timings.filterIsInstance<SpecialPeriod>(),
             sunrise = sunResult.sunrise,
             sunset = sunResult.sunset,
-            isFallback = sunResult.isFallback
+            isFallback = sunResult.isFallback,
+            tamilDay = tamilCalendar.day,
+            tamilMonthResId = tamilCalendar.monthResId,
+            tamilYearResId = tamilCalendar.yearResId
         )
     }
 }

@@ -240,6 +240,9 @@ fun LandscapeTimelineLayout(
                             SunTimesDisplay(
                                 sunrise = dayData.sunrise,
                                 sunset = dayData.sunset,
+                                tamilDay = dayData.tamilDay,
+                                tamilMonthResId = dayData.tamilMonthResId,
+                                tamilYearResId = dayData.tamilYearResId,
                                 isFallback = dayData.isFallback,
                                 isLandscape = true,
                                 is24Hour = is24Hour
