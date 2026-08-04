@@ -25,15 +25,17 @@ graph TD
 ## 2. Layer Responsibilities
 
 ### Domain/Logic (`logic/`)
-- `PanchangamCalculator`: Core engine for Nalla Neram (sunrise-relative), Gowri Neram (8 slots), and Hora (planetary hours).
+- `PanchangamCalculator`: Core engine for Nalla Neram (sunrise-relative), Gowri Neram, and Hora.
+- `LunarCalendarUtils`: Astronomical formulas for Tithi, Nakshatra, and Paksha; calculates dynamic end times.
+- `TamilCalendarUtils`: Mapping for 60-year cycles and lunar-solar festival combinations.
 
 ### UI (`ui/`)
-- `ui/dashboard`: 24h vertical timeline, `TimelinePager` (multi-day swipe), `TimingCard` (sticker-look blocks).
-- `ui/settings`: Persistence-linked preferences (Locale, Zoom, Column mgmt).
-- **Navigation**: Navigation 3 (backstack-as-state).
+- `ui/dashboard`: 24h vertical timeline, `SunTimesDisplay` (Marquee header with PNG spiritual icons).
+- `ui/settings`: Hierarchical menus for general settings, Tithi/Nakshatra toggles, and Theme management.
 
 ### Data (`data/`)
-- `SettingsRepository`: Jetpack DataStore for user preferences.
+- `SettingsRepository`: Jetpack DataStore for user preferences (now including Theme and Lunar filters).
+- `VerifiedHolidays`: Static dataset for 2024-2026 confirmed TN Public Holidays and Subha Muhurthams.
 - `CacheManager`: Shared JSON caching for App/Widget offline support.
 
 ## 3. Infrastructure

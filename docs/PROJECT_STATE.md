@@ -1,13 +1,13 @@
 # Project State
 
-**Phase**: Alpha/Stable (Phase 2 Complete)
+**Phase**: Alpha/Stable (Phase 3 Complete)
 
 ## 1. Recently Implemented
-- **Multi-Language Support**: Persistent English/Tamil switching via `AppCompatDelegate`.
-- **UI Optimization**: Shortened/stacked Tamil AM/PM markers, dynamic wrapping for sun indicators.
-- **Stability Fixes**: Resolved Navigation 3 dispatcher crashes and Activity recreation loops.
-- **Advanced Settings**: Per-view zoom levels, 24h format toggle, and column reordering.
-- **Widget Reliability**: Transition-synchronized refreshes and shared JSON cache.
+- **Traditional Tamil Calendar**: Full Lunar Engine for Tithi, Nakshatra, and Paksha calculations.
+- **Religious Events**: Integrated 2024-2026 TN Public Holidays and Subha Muhurthams.
+- **Spiritual UI**: High-fidelity PNG icons for Shiva, Ganesha, and Nandi; refined custom Vel icon with dynamic visibility borders.
+- **App Theme Switcher**: Persistent System/Light/Dark mode selection integrated into Compose theme.
+- **Timeline Display Customization**: Detailed toggles for individual Tithis and Nakshatras.
 
 ## 2. Technical Stack
 - **UI**: Kotlin, Jetpack Compose (Material 3), Jetpack Glance (Widgets).
@@ -17,5 +17,5 @@
 - **Target SDK**: 34 (Android 14).
 
 ## 3. Next Focus
-- **Tamil Month/Year**: Integration of the traditional Tamil calendar system.
-- **User Thresholds**: Customizable auspiciousness levels.
+- **Adaptive Layouts**: Optimization for Tablets/Foldables using List-Detail patterns.
+- **Wear OS Support**: Complications and Tiles for quick timing checks.
