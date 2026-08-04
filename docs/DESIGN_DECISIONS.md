@@ -7,6 +7,10 @@ Historical record of architectural and UI/UX choices.
 - **High-Fidelity Spiritual Icons**: Switched from simplified code-drawn SVGs to user-provided PNGs for Nandi, Shiva, and Ganesha to ensure 100% traditional accuracy.
 - **Double-Border (Sticker Look)**: All timing cards and custom icons (like Vel) use white outer and black inner borders (or vice versa based on mode) to remain legible on any wallpaper or theme.
 - **Marquee Header**: Line 2 of the header uses auto-scrolling (Marquee) to prevent clipping when multiple festivals or holidays occur on the same day.
+- **Header Row Terminology**:
+    - **Calendar Row**: Line 1 (Tamil Date, Paksha).
+    - **Events Row**: Line 2 (Marquee: Festivals, Tithi, Nakshatra).
+    - **Timings Row**: Line 3 (Sun times, Brahma Muhurtham).
 
 ## Architecture
 - **Compositional Theme Switching**: Theme management (Light/Dark/System) is handled purely within the Compose root to avoid Activity recreation loops associated with `AppCompatDelegate` in a hybrid environment.

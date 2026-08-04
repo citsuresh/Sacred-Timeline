@@ -263,6 +263,9 @@
     <string name="settings_show_tamil_date">Show Tamil Date</string>
     <string name="settings_show_tamil_year">Show Tamil Year</string>
     <string name="settings_show_pirai">Show Pirai</string>
+    <string name="settings_show_sunrise">Show Sunrise</string>
+    <string name="settings_show_sunset">Show Sunset</string>
+    <string name="settings_show_brahma_muhurtham">Show Brahma Muhurtham</string>
     <string name="settings_tithi_options">Tithis to Display</string>
     <string name="settings_star_options">Nakshatras to Display</string>
     <string name="settings_show_now_line">Show NOW Line</string>

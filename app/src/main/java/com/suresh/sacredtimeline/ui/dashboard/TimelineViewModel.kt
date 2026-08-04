@@ -98,6 +98,18 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
         viewModelScope, SharingStarted.WhileSubscribed(5000), true
     )
 
+    val showSunrise: StateFlow<Boolean> = repository.showSunrise.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), true
+    )
+
+    val showSunset: StateFlow<Boolean> = repository.showSunset.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), true
+    )
+
+    val showBrahmaMuhurtham: StateFlow<Boolean> = repository.showBrahmaMuhurtham.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), false
+    )
+
     init {
         // Observe scale settings based on view mode
         viewModelScope.launch {

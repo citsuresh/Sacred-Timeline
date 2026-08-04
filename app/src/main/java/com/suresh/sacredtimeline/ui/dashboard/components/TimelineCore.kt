@@ -65,6 +65,9 @@ fun TimelinePager(
     showTamilDate: Boolean = true,
     showTamilYear: Boolean = true,
     showPirai: Boolean = true,
+    showSunrise: Boolean = true,
+    showSunset: Boolean = true,
+    showBrahmaMuhurtham: Boolean = false,
     onScaleChange: (Float) -> Unit,
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
@@ -137,7 +140,10 @@ fun TimelinePager(
                             columnOrder = columnOrder,
                             showTamilDate = showTamilDate,
                             showTamilYear = showTamilYear,
-                            showPirai = showPirai
+                            showPirai = showPirai,
+                            showSunrise = showSunrise,
+                            showSunset = showSunset,
+                            showBrahmaMuhurtham = showBrahmaMuhurtham
                         )
                     } else {
                         Box(modifier = Modifier.fillMaxSize()) {
@@ -189,7 +195,10 @@ fun TimelineContent(
     columnOrder: List<String> = listOf("NERAM", "GOWRI", "HORA"),
     showTamilDate: Boolean = true,
     showTamilYear: Boolean = true,
-    showPirai: Boolean = true
+    showPirai: Boolean = true,
+    showSunrise: Boolean = true,
+    showSunset: Boolean = true,
+    showBrahmaMuhurtham: Boolean = false
 ) {
     val scrollState = rememberScrollState()
     val density = LocalDensity.current
@@ -231,9 +240,13 @@ fun TimelineContent(
                 specialEvents = dayData.specialEvents,
                 isSubhaMuhurtham = dayData.isSubhaMuhurtham,
                 abhijitMuhurtham = dayData.abhijitMuhurtham,
+                brahmaMuhurtham = dayData.brahmaMuhurtham,
                 showTamilDate = showTamilDate,
                 showTamilYear = showTamilYear,
                 showPirai = showPirai,
+                showSunrise = showSunrise,
+                showSunset = showSunset,
+                showBrahmaMuhurtham = showBrahmaMuhurtham,
                 isFallback = dayData.isFallback, 
                 isLandscape = false, 
                 is24Hour = is24Hour
@@ -294,22 +307,26 @@ fun TimelineContent(
                         }
                     }
 
-                    SunGridMarker(
-                        time = dayData.sunrise, 
-                        label = "Sunrise", 
-                        icon = Icons.Default.WbSunny, 
-                        iconTint = Color(0xFFFF9800),
-                        hourHeight = hourHeight,
-                        is24Hour = is24Hour
-                    )
-                    SunGridMarker(
-                        time = dayData.sunset, 
-                        label = "Sunset", 
-                        icon = Icons.Default.WbTwilight, 
-                        iconTint = Color(0xFFFF5722),
-                        hourHeight = hourHeight,
-                        is24Hour = is24Hour
-                    )
+                    if (showSunrise) {
+                        SunGridMarker(
+                            time = dayData.sunrise, 
+                            label = "Sunrise", 
+                            icon = Icons.Default.WbSunny, 
+                            iconTint = Color(0xFFFF9800),
+                            hourHeight = hourHeight,
+                            is24Hour = is24Hour
+                        )
+                    }
+                    if (showSunset) {
+                        SunGridMarker(
+                            time = dayData.sunset, 
+                            label = "Sunset", 
+                            icon = Icons.Default.WbTwilight, 
+                            iconTint = Color(0xFFFF5722),
+                            hourHeight = hourHeight,
+                            is24Hour = is24Hour
+                        )
+                    }
 
                     if (isToday && showNowLine) {
                         NowIndicator(

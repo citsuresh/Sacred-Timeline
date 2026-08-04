@@ -3,6 +3,9 @@
 **Phase**: Alpha/Stable (Phase 3 Complete)
 
 ## 1. Recently Implemented
+- **Timeline Timing Toggles**: New settings to show/hide Sunrise, Sunset, and Brahma Muhurtham.
+- **Brahma Muhurtham Display**: Explicit window calculation and UI integration in the dashboard.
+- **Header Standardization**: Established three-row layout terminology: Calendar Row, Events Row, and Timings Row.
 - **Traditional Tamil Calendar**: Full Lunar Engine for Tithi, Nakshatra, and Paksha calculations.
 - **Religious Events**: Integrated 2024-2026 TN Public Holidays and Subha Muhurthams.
 - **Spiritual UI**: High-fidelity PNG icons for Shiva, Ganesha, and Nandi; refined custom Vel icon with dynamic visibility borders.

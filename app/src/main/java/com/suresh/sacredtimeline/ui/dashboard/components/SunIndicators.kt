@@ -231,9 +231,13 @@ fun SunTimesDisplay(
     specialEvents: List<Int>,
     isSubhaMuhurtham: Boolean,
     abhijitMuhurtham: Pair<LocalTime, LocalTime>?,
+    brahmaMuhurtham: Pair<LocalTime, LocalTime>? = null,
     showTamilDate: Boolean,
     showTamilYear: Boolean,
     showPirai: Boolean,
+    showSunrise: Boolean = true,
+    showSunset: Boolean = true,
+    showBrahmaMuhurtham: Boolean = false,
     isFallback: Boolean,
     isLandscape: Boolean,
     is24Hour: Boolean
@@ -359,14 +363,31 @@ fun SunTimesDisplay(
                     }
                 }
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.WbSunny, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color(0xFFFF9800))
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(formatWithAmPm(sunrise), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondaryContainer)
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Icon(Icons.Default.WbTwilight, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color(0xFFFF5722))
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(formatWithAmPm(sunset), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                if (showSunrise || showSunset || (showBrahmaMuhurtham && brahmaMuhurtham != null)) {
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.basicMarquee()) {
+                        if (showSunrise) {
+                            Icon(Icons.Default.WbSunny, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color(0xFFFF9800))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(formatWithAmPm(sunrise), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                            if (showSunset || (showBrahmaMuhurtham && brahmaMuhurtham != null)) Spacer(modifier = Modifier.width(16.dp))
+                        }
+                        if (showSunset) {
+                            Icon(Icons.Default.WbTwilight, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color(0xFFFF5722))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(formatWithAmPm(sunset), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                            if (showBrahmaMuhurtham && brahmaMuhurtham != null) Spacer(modifier = Modifier.width(16.dp))
+                        }
+                        if (showBrahmaMuhurtham && brahmaMuhurtham != null) {
+                            Icon(Icons.Default.Star, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color(0xFFE91E63))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "${stringResource(R.string.muhurtham_brahma)}: ${formatWithAmPm(brahmaMuhurtham.first)} - ${formatWithAmPm(brahmaMuhurtham.second)}",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFFE91E63)
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -516,23 +537,42 @@ fun SunTimesDisplay(
                 }
             }
 
-            FlowRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp, horizontal = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.WbSunny, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color(0xFFFF9800))
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(formatWithAmPm(sunrise), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
-                }
+            if (showSunrise || showSunset || (showBrahmaMuhurtham && brahmaMuhurtham != null)) {
+                FlowRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp, horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    if (showSunrise) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.WbSunny, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color(0xFFFF9800))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(formatWithAmPm(sunrise), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                        }
+                    }
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.WbTwilight, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color(0xFFFF5722))
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(formatWithAmPm(sunset), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                    if (showSunset) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.WbTwilight, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color(0xFFFF5722))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(formatWithAmPm(sunset), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                        }
+                    }
+
+                    if (showBrahmaMuhurtham && brahmaMuhurtham != null) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.Star, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color(0xFFE91E63))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "${stringResource(R.string.muhurtham_brahma)}: ${formatWithAmPm(brahmaMuhurtham.first)} - ${formatWithAmPm(brahmaMuhurtham.second)}",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFFE91E63)
+                            )
+                        }
+                    }
                 }
             }
         }

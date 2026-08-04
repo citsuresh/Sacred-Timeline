@@ -116,6 +116,18 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         viewModelScope, SharingStarted.WhileSubscribed(5000), true
     )
 
+    val showSunrise: StateFlow<Boolean> = repository.showSunrise.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), true
+    )
+
+    val showSunset: StateFlow<Boolean> = repository.showSunset.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), true
+    )
+
+    val showBrahmaMuhurtham: StateFlow<Boolean> = repository.showBrahmaMuhurtham.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), false
+    )
+
     val language: StateFlow<String> = repository.language.stateIn(
         viewModelScope, 
         SharingStarted.WhileSubscribed(5000), 
@@ -282,6 +294,18 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
     fun setShowPirai(show: Boolean) {
         viewModelScope.launch { repository.setShowPirai(show) }
+    }
+
+    fun setShowSunrise(show: Boolean) {
+        viewModelScope.launch { repository.setShowSunrise(show) }
+    }
+
+    fun setShowSunset(show: Boolean) {
+        viewModelScope.launch { repository.setShowSunset(show) }
+    }
+
+    fun setShowBrahmaMuhurtham(show: Boolean) {
+        viewModelScope.launch { repository.setShowBrahmaMuhurtham(show) }
     }
 }
 

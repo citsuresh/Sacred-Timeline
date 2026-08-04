@@ -25,6 +25,9 @@ fun TimelineDisplaySettingsScreen(
     val showTamilDate by viewModel.showTamilDate.collectAsState()
     val showTamilYear by viewModel.showTamilYear.collectAsState()
     val showPirai by viewModel.showPirai.collectAsState()
+    val showSunrise by viewModel.showSunrise.collectAsState()
+    val showSunset by viewModel.showSunset.collectAsState()
+    val showBrahmaMuhurtham by viewModel.showBrahmaMuhurtham.collectAsState()
 
     Scaffold(
         topBar = {
@@ -64,6 +67,27 @@ fun TimelineDisplaySettingsScreen(
                     label = stringResource(R.string.settings_show_pirai),
                     checked = showPirai,
                     onCheckedChange = { viewModel.setShowPirai(it) }
+                )
+            }
+            item {
+                SettingsToggleItem(
+                    label = stringResource(R.string.settings_show_sunrise),
+                    checked = showSunrise,
+                    onCheckedChange = { viewModel.setShowSunrise(it) }
+                )
+            }
+            item {
+                SettingsToggleItem(
+                    label = stringResource(R.string.settings_show_sunset),
+                    checked = showSunset,
+                    onCheckedChange = { viewModel.setShowSunset(it) }
+                )
+            }
+            item {
+                SettingsToggleItem(
+                    label = stringResource(R.string.settings_show_brahma_muhurtham),
+                    checked = showBrahmaMuhurtham,
+                    onCheckedChange = { viewModel.setShowBrahmaMuhurtham(it) }
                 )
             }
 

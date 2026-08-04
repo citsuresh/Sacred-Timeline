@@ -48,6 +48,9 @@ fun TimelineDashboard(
     val showTamilDate by viewModel.showTamilDate.collectAsState()
     val showTamilYear by viewModel.showTamilYear.collectAsState()
     val showPirai by viewModel.showPirai.collectAsState()
+    val showSunrise by viewModel.showSunrise.collectAsState()
+    val showSunset by viewModel.showSunset.collectAsState()
+    val showBrahmaMuhurtham by viewModel.showBrahmaMuhurtham.collectAsState()
 
     LaunchedEffect(viewMode) {
         viewModel.setViewMode(viewMode)
@@ -190,6 +193,9 @@ fun TimelineDashboard(
             showTamilDate = showTamilDate,
             showTamilYear = showTamilYear,
             showPirai = showPirai,
+            showSunrise = showSunrise,
+            showSunset = showSunset,
+            showBrahmaMuhurtham = showBrahmaMuhurtham,
             onMenuClick = onMenuClick,
             onZoomIn = onZoomIn,
             onZoomOut = onZoomOut,
@@ -225,6 +231,9 @@ fun TimelineDashboard(
             showTamilDate = showTamilDate,
             showTamilYear = showTamilYear,
             showPirai = showPirai,
+            showSunrise = showSunrise,
+            showSunset = showSunset,
+            showBrahmaMuhurtham = showBrahmaMuhurtham,
             onMenuClick = onMenuClick,
             onZoomIn = onZoomIn,
             onZoomOut = onZoomOut,

@@ -263,6 +263,9 @@
     <string name="settings_show_tamil_date">தமிழ் தேதியைக் காட்டு</string>
     <string name="settings_show_tamil_year">தமிழ் ஆண்டைக் காட்டு</string>
     <string name="settings_show_pirai">பிறையைக் காட்டு</string>
+    <string name="settings_show_sunrise">சூரிய உதயத்தைக் காட்டு</string>
+    <string name="settings_show_sunset">சூரிய அஸ்தமனத்தைக் காட்டு</string>
+    <string name="settings_show_brahma_muhurtham">பிரம்ம முகூர்த்தத்தைக் காட்டு</string>
     <string name="settings_tithi_options">காண்பிக்கப்பட வேண்டிய திதிகள்</string>
     <string name="settings_star_options">காண்பிக்கப்பட வேண்டிய நட்சத்திரங்கள்</string>
     <string name="settings_show_now_line">இப்போது கோட்டைக் காட்டு</string>
