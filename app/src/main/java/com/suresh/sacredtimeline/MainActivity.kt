@@ -40,7 +40,6 @@ class MainActivity : AppCompatActivity() {
         val repository = SettingsRepository(this)
 
         setContent {
-            // Get the current locales from the system/delegate immediately
             val currentLocale = remember { 
                 val locales = AppCompatDelegate.getApplicationLocales()
                 if (locales.isEmpty) "en" else locales.toLanguageTags().split(",")[0]
@@ -60,10 +59,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            // Provide the NavigationEventDispatcherOwner to avoid the crash in Nav3/Compose
             val navOwner = rememberNavigationEventDispatcherOwner(parent = null)
             CompositionLocalProvider(LocalNavigationEventDispatcherOwner provides navOwner) {
-                // Use a specific state to hold the initial view mode and only set it once
                 var startMode by remember { mutableStateOf<ViewMode?>(null) }
                 
                 LaunchedEffect(Unit) {
@@ -91,8 +88,6 @@ class MainActivity : AppCompatActivity() {
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
         val scope = rememberCoroutineScope()
 
-        val currentRoute = backStack.lastOrNull()
-
         val isDarkTheme = when (themeMode) {
             "LIGHT" -> false
             "DARK" -> true
@@ -104,6 +99,7 @@ class MainActivity : AppCompatActivity() {
                 drawerState = drawerState,
                 drawerContent = {
                     ModalDrawerSheet {
+                        val currentRoute = backStack.lastOrNull()
                         Text(
                             stringResource(R.string.app_name),
                             modifier = Modifier.padding(16.dp),
@@ -193,9 +189,7 @@ class MainActivity : AppCompatActivity() {
                             NavRoute.Settings -> NavEntry(key) { 
                                 SettingsScreen(
                                     onBack = { 
-                                        if (backStack.size > 1) {
-                                            backStack.removeLastOrNull()
-                                        }
+                                        // Handled by NavDisplay
                                     },
                                     onNavigateToTimelineDisplaySettings = {
                                         backStack.add(NavRoute.CalendarSettings)
@@ -205,27 +199,21 @@ class MainActivity : AppCompatActivity() {
                             NavRoute.TithiSettings -> NavEntry(key) {
                                 TithiSettingsScreen(
                                     onBack = {
-                                        if (backStack.size > 1) {
-                                            backStack.removeLastOrNull()
-                                        }
+                                        // Handled by NavDisplay
                                     }
                                 )
                             }
                             NavRoute.NakshatraSettings -> NavEntry(key) {
                                 NakshatraSettingsScreen(
                                     onBack = {
-                                        if (backStack.size > 1) {
-                                            backStack.removeLastOrNull()
-                                        }
+                                        // Handled by NavDisplay
                                     }
                                 )
                             }
                             NavRoute.CalendarSettings -> NavEntry(key) {
                                 TimelineDisplaySettingsScreen(
                                     onBack = {
-                                        if (backStack.size > 1) {
-                                            backStack.removeLastOrNull()
-                                        }
+                                        // Handled by NavDisplay
                                     },
                                     onNavigateToTithiSettings = {
                                         backStack.add(NavRoute.TithiSettings)
