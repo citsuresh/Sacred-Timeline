@@ -26,7 +26,7 @@ graph TD
 
 ### Domain/Logic (`logic/`)
 - `PanchangamCalculator`: Core engine for Nalla Neram (sunrise-relative), Gowri Neram, and Hora.
-- `LunarCalendarUtils`: Astronomical formulas for Tithi, Nakshatra, and Paksha; calculates dynamic end times.
+- `LunarCalendarUtils`: Astronomical formulas for Tithi, Nakshatra, and Paksha; calculates exact start/end intervals for a 24h window.
 - `TamilCalendarUtils`: Mapping for 60-year cycles and lunar-solar festival combinations.
 
 ### UI (`ui/`)
