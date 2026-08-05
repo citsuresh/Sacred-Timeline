@@ -51,6 +51,7 @@ fun TimelineDashboard(
     val showSunrise by viewModel.showSunrise.collectAsState()
     val showSunset by viewModel.showSunset.collectAsState()
     val showBrahmaMuhurtham by viewModel.showBrahmaMuhurtham.collectAsState()
+    val showAbhijitMuhurtham by viewModel.showAbhijitMuhurtham.collectAsState()
 
     LaunchedEffect(viewMode) {
         viewModel.setViewMode(viewMode)
@@ -196,6 +197,7 @@ fun TimelineDashboard(
             showSunrise = showSunrise,
             showSunset = showSunset,
             showBrahmaMuhurtham = showBrahmaMuhurtham,
+            showAbhijitMuhurtham = showAbhijitMuhurtham,
             onMenuClick = onMenuClick,
             onZoomIn = onZoomIn,
             onZoomOut = onZoomOut,
@@ -234,6 +236,7 @@ fun TimelineDashboard(
             showSunrise = showSunrise,
             showSunset = showSunset,
             showBrahmaMuhurtham = showBrahmaMuhurtham,
+            showAbhijitMuhurtham = showAbhijitMuhurtham,
             onMenuClick = onMenuClick,
             onZoomIn = onZoomIn,
             onZoomOut = onZoomOut,

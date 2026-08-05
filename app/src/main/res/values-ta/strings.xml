@@ -45,6 +45,11 @@
     <string name="label_to">முடிவு</string>
     <string name="label_sunrise">சூரிய உதயம்</string>
     <string name="label_sunset">சூரிய அஸ்தமனம்</string>
+    <string name="label_starts_at">தொடக்கம் %s</string>
+    <string name="label_started_yesterday_at">நேற்று தொடக்கம் %s</string>
+    <string name="label_ends_at">முடிவு %s</string>
+    <string name="label_ends_tomorrow_at">நாளை முடிவு %s</string>
+    <string name="label_till">வரை %s</string>
     <string name="label_approximate">(தோராயமாக)</string>
     <string name="label_day_muhurat">பகல் முஹூர்த்தம்</string>
     <string name="label_night_muhurat">இரவு முஹூர்த்தம்</string>
@@ -266,6 +271,7 @@
     <string name="settings_show_sunrise">சூரிய உதயத்தைக் காட்டு</string>
     <string name="settings_show_sunset">சூரிய அஸ்தமனத்தைக் காட்டு</string>
     <string name="settings_show_brahma_muhurtham">பிரம்ம முகூர்த்தத்தைக் காட்டு</string>
+    <string name="settings_show_abhijit_muhurtham">அபிஜித் முகூர்த்தத்தைக் காட்டு</string>
     <string name="settings_tithi_options">காண்பிக்கப்பட வேண்டிய திதிகள்</string>
     <string name="settings_star_options">காண்பிக்கப்பட வேண்டிய நட்சத்திரங்கள்</string>
     <string name="settings_show_now_line">இப்போது கோட்டைக் காட்டு</string>

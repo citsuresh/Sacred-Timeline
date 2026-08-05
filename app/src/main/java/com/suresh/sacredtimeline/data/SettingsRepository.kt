@@ -43,6 +43,7 @@ class SettingsRepository(private val context: Context) {
         val SHOW_SUNRISE = booleanPreferencesKey("show_sunrise")
         val SHOW_SUNSET = booleanPreferencesKey("show_sunset")
         val SHOW_BRAHMA_MUHURTHAM = booleanPreferencesKey("show_brahma_muhurtham")
+        val SHOW_ABHIJIT_MUHURTHAM = booleanPreferencesKey("show_abhijit_muhurtham")
     }
 
     val compositeScale: Flow<Float> = context.dataStore.data.map { it[Keys.COMPOSITE_SCALE] ?: 1.0f }
@@ -105,6 +106,7 @@ class SettingsRepository(private val context: Context) {
     val showSunrise: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_SUNRISE] ?: true }
     val showSunset: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_SUNSET] ?: true }
     val showBrahmaMuhurtham: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_BRAHMA_MUHURTHAM] ?: false }
+    val showAbhijitMuhurtham: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_ABHIJIT_MUHURTHAM] ?: false }
 
     suspend fun updateCompositeScale(scale: Float) {
         context.dataStore.edit { it[Keys.COMPOSITE_SCALE] = scale.coerceIn(0.2f, 3.0f) }
@@ -242,5 +244,9 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun setShowBrahmaMuhurtham(show: Boolean) {
         context.dataStore.edit { it[Keys.SHOW_BRAHMA_MUHURTHAM] = show }
+    }
+
+    suspend fun setShowAbhijitMuhurtham(show: Boolean) {
+        context.dataStore.edit { it[Keys.SHOW_ABHIJIT_MUHURTHAM] = show }
     }
 }

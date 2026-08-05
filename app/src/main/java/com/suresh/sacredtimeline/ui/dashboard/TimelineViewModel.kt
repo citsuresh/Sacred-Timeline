@@ -110,7 +110,14 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
         viewModelScope, SharingStarted.WhileSubscribed(5000), false
     )
 
+    val showAbhijitMuhurtham: StateFlow<Boolean> = repository.showAbhijitMuhurtham.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), false
+    )
+
     init {
+        // Clear cache to ensure new timing structure and filters are applied
+        cacheManager.clearCache()
+
         // Observe scale settings based on view mode
         viewModelScope.launch {
             combine(repository.compositeScale, repository.singleViewScale, _viewMode) { composite, single, mode ->
@@ -323,8 +330,17 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
         val timings = provider.getTimings(date, sunResult.sunrise, sunResult.sunset)
         
         val tamilCalendar = com.suresh.sacredtimeline.logic.TamilCalendarUtils.getTamilDate(date)
-        val lunarInfo = com.suresh.sacredtimeline.logic.LunarCalendarUtils.getLunarInfo(date)
-        val festivals = com.suresh.sacredtimeline.logic.TamilCalendarUtils.getSpecialEvents(tamilCalendar, lunarInfo)
+        val lunarDayInfo = com.suresh.sacredtimeline.logic.LunarCalendarUtils.getLunarDayInfo(date)
+        
+        // Use noon-representative values for special event calculation
+        val representativeLunarInfo = com.suresh.sacredtimeline.logic.LunarCalendarUtils.LunarInfo(
+            tithi = lunarDayInfo.tithis.firstOrNull { it.startTime?.atZone(java.time.ZoneId.systemDefault())?.toLocalDate()?.isBefore(date.plusDays(1)) == true }?.value ?: 0,
+            nakshatra = lunarDayInfo.nakshatras.firstOrNull { it.startTime?.atZone(java.time.ZoneId.systemDefault())?.toLocalDate()?.isBefore(date.plusDays(1)) == true }?.value ?: 0,
+            pakshaResId = lunarDayInfo.pakshaResId,
+            pakshaDay = lunarDayInfo.pakshaDay,
+            tithiResId = 0, nakshatraResId = 0 // Not needed for event mapping
+        )
+        val festivals = com.suresh.sacredtimeline.logic.TamilCalendarUtils.getSpecialEvents(tamilCalendar, representativeLunarInfo)
         val holidays = com.suresh.sacredtimeline.data.VerifiedHolidays.getHolidays(date)
         
         val brahma = com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculateBrahmaMuhurtham(sunResult.sunrise)
@@ -334,8 +350,17 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
         val enabledTithisVal = repository.enabledTithis.first()
         val enabledStarsVal = repository.enabledNakshatras.first()
         
-        val tithiId = "TITHI_${lunarInfo.tithi}"
-        val starId = "STAR_${lunarInfo.nakshatra}"
+        val filteredTithis = lunarDayInfo.tithis.filter { 
+            enabledTithisVal.contains("TITHI_${it.value}") 
+        }.map { 
+            LunarInterval(it.value, it.resId, it.startTime, it.endTime)
+        }
+
+        val filteredNakshatras = lunarDayInfo.nakshatras.filter { 
+            enabledStarsVal.contains("STAR_${it.value}") 
+        }.map { 
+            LunarInterval(it.value, it.resId, it.startTime, it.endTime)
+        }
 
         return DayData(
             nallaNeram = timings.filterIsInstance<NallaNeram>(),
@@ -348,11 +373,10 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
             tamilDay = tamilCalendar.day,
             tamilMonthResId = tamilCalendar.monthResId,
             tamilYearResId = tamilCalendar.yearResId,
-            pakshaResId = lunarInfo.pakshaResId,
-            pakshaDay = lunarInfo.pakshaDay,
-            tithiValue = lunarInfo.tithi,
-            tithiResId = if (enabledTithisVal.contains(tithiId)) lunarInfo.tithiResId else 0,
-            nakshatraResId = if (enabledStarsVal.contains(starId)) lunarInfo.nakshatraResId else 0,
+            pakshaResId = lunarDayInfo.pakshaResId,
+            pakshaDay = lunarDayInfo.pakshaDay,
+            tithis = filteredTithis,
+            nakshatras = filteredNakshatras,
             specialEvents = holidays + festivals,
             isSubhaMuhurtham = com.suresh.sacredtimeline.data.VerifiedHolidays.isSubhaMuhurtham(date),
             brahmaMuhurtham = brahma,

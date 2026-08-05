@@ -189,7 +189,7 @@ class MainActivity : AppCompatActivity() {
                             NavRoute.Settings -> NavEntry(key) { 
                                 SettingsScreen(
                                     onBack = { 
-                                        // Handled by NavDisplay
+                                        backStack.removeLastOrNull()
                                     },
                                     onNavigateToTimelineDisplaySettings = {
                                         backStack.add(NavRoute.CalendarSettings)
@@ -199,21 +199,21 @@ class MainActivity : AppCompatActivity() {
                             NavRoute.TithiSettings -> NavEntry(key) {
                                 TithiSettingsScreen(
                                     onBack = {
-                                        // Handled by NavDisplay
+                                        backStack.removeLastOrNull()
                                     }
                                 )
                             }
                             NavRoute.NakshatraSettings -> NavEntry(key) {
                                 NakshatraSettingsScreen(
                                     onBack = {
-                                        // Handled by NavDisplay
+                                        backStack.removeLastOrNull()
                                     }
                                 )
                             }
                             NavRoute.CalendarSettings -> NavEntry(key) {
                                 TimelineDisplaySettingsScreen(
                                     onBack = {
-                                        // Handled by NavDisplay
+                                        backStack.removeLastOrNull()
                                     },
                                     onNavigateToTithiSettings = {
                                         backStack.add(NavRoute.TithiSettings)

@@ -15,40 +15,85 @@ object LunarCalendarUtils {
         val pakshaResId: Int,
         val pakshaDay: Int,
         val tithiResId: Int,
-        val nakshatraResId: Int,
-        val tithiEndTime: LocalTime? = null,
-        val nakshatraEndTime: LocalTime? = null
+        val nakshatraResId: Int
+    )
+
+    data class LunarInterval(
+        val value: Int,
+        val resId: Int,
+        val startTime: java.time.Instant?,
+        val endTime: java.time.Instant?
+    )
+
+    data class LunarDayInfo(
+        val tithis: List<LunarInterval>,
+        val nakshatras: List<LunarInterval>,
+        val pakshaResId: Int,
+        val pakshaDay: Int
     )
 
     /**
-     * Calculates Lunar info and finds exact end times for Tithi and Nakshatra.
+     * Calculates all Tithis and Nakshatras that occur during the given date.
      */
-    fun getLunarInfo(date: LocalDate): LunarInfo {
+    fun getLunarDayInfo(date: LocalDate): LunarDayInfo {
         val zoneId = ZoneId.systemDefault()
-        
-        // Calculate prevailing values at Noon
-        val prevailingNoon = getLunarValues(date.atTime(12, 0).atZone(zoneId).toInstant())
-        
-        // Find end times by searching between Midnight today and Midnight tomorrow
-        val startInstant = date.atStartOfDay(zoneId).toInstant()
-        val endInstant = date.plusDays(1).atStartOfDay(zoneId).toInstant()
-        
-        val tithiEnd = findEndTime(startInstant, endInstant, prevailingNoon.first) { getLunarValues(it).first }
-        val nakshatraEnd = findEndTime(startInstant, endInstant, prevailingNoon.second) { getLunarValues(it).second }
+        val dayStart = date.atStartOfDay(zoneId).toInstant()
+        val dayEnd = date.plusDays(1).atStartOfDay(zoneId).toInstant()
 
-        val tithi = prevailingNoon.first
-        val isValarpirai = tithi <= 15
-        
-        return LunarInfo(
-            tithi = tithi,
-            nakshatra = prevailingNoon.second,
+        val tithis = findIntervalsForDay(dayStart, dayEnd) { getLunarValues(it).first }
+            .map { it.copy(resId = getTithiResId(it.value)) }
+            
+        val nakshatras = findIntervalsForDay(dayStart, dayEnd) { getLunarValues(it).second }
+            .map { it.copy(resId = getNakshatraResId(it.value)) }
+
+        // Paksha info based on Noon value (representative of the day)
+        val noonValue = getLunarValues(date.atTime(12, 0).atZone(zoneId).toInstant()).first
+        val isValarpirai = noonValue <= 15
+
+        return LunarDayInfo(
+            tithis = tithis,
+            nakshatras = nakshatras,
             pakshaResId = if (isValarpirai) R.string.paksha_valarpirai else R.string.paksha_theipirai,
-            pakshaDay = if (isValarpirai) tithi else tithi - 15,
-            tithiResId = getTithiResId(tithi),
-            nakshatraResId = getNakshatraResId(prevailingNoon.second),
-            tithiEndTime = tithiEnd?.atZone(zoneId)?.toLocalTime(),
-            nakshatraEndTime = nakshatraEnd?.atZone(zoneId)?.toLocalTime()
+            pakshaDay = if (isValarpirai) noonValue else noonValue - 15
         )
+    }
+
+    private fun findIntervalsForDay(
+        dayStart: java.time.Instant,
+        dayEnd: java.time.Instant,
+        getter: (java.time.Instant) -> Int
+    ): List<LunarInterval> {
+        val intervals = mutableListOf<LunarInterval>()
+        var currentSearchStart = dayStart
+        
+        while (currentSearchStart.isBefore(dayEnd)) {
+            val currentVal = getter(currentSearchStart)
+            
+            // Search backward for absolute start (within -2 days)
+            val windowStart = currentSearchStart.minus(java.time.Duration.ofDays(2))
+            val absoluteStart = findStartTime(windowStart, currentSearchStart, currentVal, getter)
+            
+            // Search forward for absolute end (within +2 days)
+            val windowEnd = currentSearchStart.plus(java.time.Duration.ofDays(2))
+            val absoluteEnd = findEndTime(currentSearchStart, windowEnd, currentVal, getter)
+            
+            intervals.add(
+                LunarInterval(
+                    value = currentVal,
+                    resId = 0, // Filled by caller
+                    startTime = absoluteStart,
+                    endTime = absoluteEnd
+                )
+            )
+            
+            // Move search start to just after the end of this interval
+            if (absoluteEnd != null && absoluteEnd.isBefore(dayEnd)) {
+                currentSearchStart = absoluteEnd.plusMillis(1000) // Small step forward
+            } else {
+                break
+            }
+        }
+        return intervals
     }
 
     private fun getLunarValues(instant: java.time.Instant): Pair<Int, Int> {
@@ -70,30 +115,48 @@ object LunarCalendarUtils {
         return tithi to nakshatra
     }
 
-    private fun findEndTime(
-        start: java.time.Instant,
-        end: java.time.Instant,
+    private fun findStartTime(
+        windowStart: java.time.Instant,
+        current: java.time.Instant,
         currentVal: Int,
         getter: (java.time.Instant) -> Int
     ): java.time.Instant? {
-        val startVal = getter(start)
-        val endVal = getter(end)
-        
-        // If it changes during the day
-        if (startVal == currentVal && endVal != currentVal) {
-            var low = start.toEpochMilli()
-            var high = end.toEpochMilli()
-            repeat(12) { // ~1 min precision
-                val mid = (low + high) / 2
-                if (getter(java.time.Instant.ofEpochMilli(mid)) == currentVal) {
-                    low = mid
-                } else {
-                    high = mid
-                }
+        val startVal = getter(windowStart)
+        if (startVal == currentVal) return null // Started even earlier
+
+        var low = windowStart.toEpochMilli()
+        var high = current.toEpochMilli()
+        repeat(12) {
+            val mid = (low + high) / 2
+            if (getter(java.time.Instant.ofEpochMilli(mid)) != currentVal) {
+                low = mid
+            } else {
+                high = mid
             }
-            return java.time.Instant.ofEpochMilli(high)
         }
-        return null
+        return java.time.Instant.ofEpochMilli(high)
+    }
+
+    private fun findEndTime(
+        current: java.time.Instant,
+        windowEnd: java.time.Instant,
+        currentVal: Int,
+        getter: (java.time.Instant) -> Int
+    ): java.time.Instant? {
+        val endVal = getter(windowEnd)
+        if (endVal == currentVal) return null // Ends even later
+
+        var low = current.toEpochMilli()
+        var high = windowEnd.toEpochMilli()
+        repeat(12) { // ~1 min precision
+            val mid = (low + high) / 2
+            if (getter(java.time.Instant.ofEpochMilli(mid)) == currentVal) {
+                low = mid
+            } else {
+                high = mid
+            }
+        }
+        return java.time.Instant.ofEpochMilli(high)
     }
 
     fun calculateBrahmaMuhurtham(sunrise: LocalTime): Pair<LocalTime, LocalTime> {

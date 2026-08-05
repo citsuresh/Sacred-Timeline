@@ -4,6 +4,16 @@ import kotlinx.serialization.Serializable
 import java.time.LocalTime
 
 @Serializable
+data class LunarInterval(
+    val value: Int,
+    val resId: Int,
+    @Serializable(with = InstantSerializer::class)
+    val startTime: java.time.Instant? = null,
+    @Serializable(with = InstantSerializer::class)
+    val endTime: java.time.Instant? = null
+)
+
+@Serializable
 data class DayData(
     val nallaNeram: List<NallaNeram>,
     val gowriNeram: List<GowriNeram>,
@@ -19,9 +29,8 @@ data class DayData(
     val tamilYearResId: Int = 0,
     val pakshaResId: Int = 0,
     val pakshaDay: Int = 0,
-    val tithiValue: Int = 0,
-    val tithiResId: Int = 0,
-    val nakshatraResId: Int = 0,
+    val tithis: List<LunarInterval> = emptyList(),
+    val nakshatras: List<LunarInterval> = emptyList(),
     val specialEvents: List<Int> = emptyList(),
     val isSubhaMuhurtham: Boolean = false,
     val brahmaMuhurtham: Pair<@Serializable(with = LocalTimeSerializer::class) LocalTime, @Serializable(with = LocalTimeSerializer::class) LocalTime>? = null,

@@ -28,6 +28,7 @@ fun TimelineDisplaySettingsScreen(
     val showSunrise by viewModel.showSunrise.collectAsState()
     val showSunset by viewModel.showSunset.collectAsState()
     val showBrahmaMuhurtham by viewModel.showBrahmaMuhurtham.collectAsState()
+    val showAbhijitMuhurtham by viewModel.showAbhijitMuhurtham.collectAsState()
 
     Scaffold(
         topBar = {
@@ -88,6 +89,13 @@ fun TimelineDisplaySettingsScreen(
                     label = stringResource(R.string.settings_show_brahma_muhurtham),
                     checked = showBrahmaMuhurtham,
                     onCheckedChange = { viewModel.setShowBrahmaMuhurtham(it) }
+                )
+            }
+            item {
+                SettingsToggleItem(
+                    label = stringResource(R.string.settings_show_abhijit_muhurtham),
+                    checked = showAbhijitMuhurtham,
+                    onCheckedChange = { viewModel.setShowAbhijitMuhurtham(it) }
                 )
             }
 

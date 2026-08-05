@@ -68,6 +68,7 @@ fun TimelinePager(
     showSunrise: Boolean = true,
     showSunset: Boolean = true,
     showBrahmaMuhurtham: Boolean = false,
+    showAbhijitMuhurtham: Boolean = false,
     onScaleChange: (Float) -> Unit,
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
@@ -143,7 +144,8 @@ fun TimelinePager(
                             showPirai = showPirai,
                             showSunrise = showSunrise,
                             showSunset = showSunset,
-                            showBrahmaMuhurtham = showBrahmaMuhurtham
+                            showBrahmaMuhurtham = showBrahmaMuhurtham,
+                            showAbhijitMuhurtham = showAbhijitMuhurtham
                         )
                     } else {
                         Box(modifier = Modifier.fillMaxSize()) {
@@ -198,7 +200,8 @@ fun TimelineContent(
     showPirai: Boolean = true,
     showSunrise: Boolean = true,
     showSunset: Boolean = true,
-    showBrahmaMuhurtham: Boolean = false
+    showBrahmaMuhurtham: Boolean = false,
+    showAbhijitMuhurtham: Boolean = false
 ) {
     val scrollState = rememberScrollState()
     val density = LocalDensity.current
@@ -229,14 +232,15 @@ fun TimelineContent(
             SunTimesDisplay(
                 sunrise = dayData.sunrise, 
                 sunset = dayData.sunset, 
+                viewDate = date,
                 tamilDay = dayData.tamilDay,
                 tamilMonthResId = dayData.tamilMonthResId,
                 tamilYearResId = dayData.tamilYearResId,
                 pakshaResId = dayData.pakshaResId,
                 pakshaDay = dayData.pakshaDay,
-                tithiResId = dayData.tithiResId,
-                nakshatraResId = dayData.nakshatraResId,
-                tithiValue = dayData.tithiValue,
+                tithis = dayData.tithis,
+                nakshatras = dayData.nakshatras,
+                tithiValue = dayData.tithis.firstOrNull()?.value ?: 0,
                 specialEvents = dayData.specialEvents,
                 isSubhaMuhurtham = dayData.isSubhaMuhurtham,
                 abhijitMuhurtham = dayData.abhijitMuhurtham,
@@ -247,6 +251,7 @@ fun TimelineContent(
                 showSunrise = showSunrise,
                 showSunset = showSunset,
                 showBrahmaMuhurtham = showBrahmaMuhurtham,
+                showAbhijitMuhurtham = showAbhijitMuhurtham,
                 isFallback = dayData.isFallback, 
                 isLandscape = false, 
                 is24Hour = is24Hour

@@ -45,6 +45,11 @@
     <string name="label_to">To</string>
     <string name="label_sunrise">Sunrise</string>
     <string name="label_sunset">Sunset</string>
+    <string name="label_starts_at">Starts %s</string>
+    <string name="label_started_yesterday_at">Started Yesterday %s</string>
+    <string name="label_ends_at">Ends %s</string>
+    <string name="label_ends_tomorrow_at">Ends Tomorrow %s</string>
+    <string name="label_till">Till %s</string>
     <string name="label_approximate">(approximate)</string>
     <string name="label_day_muhurat">Day Muhurat</string>
     <string name="label_night_muhurat">Night Muhurat</string>
@@ -266,6 +271,7 @@
     <string name="settings_show_sunrise">Show Sunrise</string>
     <string name="settings_show_sunset">Show Sunset</string>
     <string name="settings_show_brahma_muhurtham">Show Brahma Muhurtham</string>
+    <string name="settings_show_abhijit_muhurtham">Show Abhijit Muhurtham</string>
     <string name="settings_tithi_options">Tithis to Display</string>
     <string name="settings_star_options">Nakshatras to Display</string>
     <string name="settings_show_now_line">Show NOW Line</string>

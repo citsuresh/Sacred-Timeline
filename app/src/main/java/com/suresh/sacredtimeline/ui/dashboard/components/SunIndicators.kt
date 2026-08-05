@@ -220,14 +220,15 @@ fun VelIcon(modifier: Modifier = Modifier, lightColor: Color, darkColor: Color, 
 fun SunTimesDisplay(
     sunrise: LocalTime,
     sunset: LocalTime,
+    viewDate: java.time.LocalDate,
     tamilDay: Int,
     tamilMonthResId: Int,
     tamilYearResId: Int,
     pakshaResId: Int,
     pakshaDay: Int,
-    tithiResId: Int,
-    nakshatraResId: Int,
-    tithiValue: Int,
+    tithis: List<com.suresh.sacredtimeline.model.LunarInterval> = emptyList(),
+    nakshatras: List<com.suresh.sacredtimeline.model.LunarInterval> = emptyList(),
+    tithiValue: Int, // Still needed for representative icons
     specialEvents: List<Int>,
     isSubhaMuhurtham: Boolean,
     abhijitMuhurtham: Pair<LocalTime, LocalTime>?,
@@ -238,6 +239,7 @@ fun SunTimesDisplay(
     showSunrise: Boolean = true,
     showSunset: Boolean = true,
     showBrahmaMuhurtham: Boolean = false,
+    showAbhijitMuhurtham: Boolean = false,
     isFallback: Boolean,
     isLandscape: Boolean,
     is24Hour: Boolean
@@ -246,11 +248,42 @@ fun SunTimesDisplay(
     val amLabel = stringResource(R.string.label_am)
     val pmLabel = stringResource(R.string.label_pm)
 
+    fun formatWithAmPm(time: LocalTime): String {
+        if (is24Hour) return time.format(timeFormatter)
+        val period = if (time.hour < 12) amLabel else pmLabel
+        return "${time.format(timeFormatter)} $period"
+    }
+
+    @Composable
+    fun formatLunarRange(start: java.time.Instant?, end: java.time.Instant?): String {
+        val zone = java.time.ZoneId.systemDefault()
+        val startTime = start?.atZone(zone)
+        val endTime = end?.atZone(zone)
+        
+        val startStr = when {
+            startTime == null -> null
+            startTime.toLocalDate().isBefore(viewDate) -> stringResource(R.string.label_started_yesterday_at, formatWithAmPm(startTime.toLocalTime()))
+            else -> stringResource(R.string.label_starts_at, formatWithAmPm(startTime.toLocalTime()))
+        }
+        
+        val endStr = when {
+            endTime == null -> null
+            endTime.toLocalDate().isAfter(viewDate) -> stringResource(R.string.label_ends_tomorrow_at, formatWithAmPm(endTime.toLocalTime()))
+            else -> stringResource(R.string.label_ends_at, formatWithAmPm(endTime.toLocalTime()))
+        }
+        
+        return if (startStr != null && endStr != null) {
+            "($startStr - $endStr)"
+        } else if (startStr != null) {
+            "($startStr)"
+        } else if (endStr != null) {
+            "($endStr)"
+        } else ""
+    }
+
     val tamilMonth = if (tamilMonthResId != 0) stringResource(tamilMonthResId) else ""
     val tamilYear = if (tamilYearResId != 0) stringResource(tamilYearResId) else ""
     val paksha = if (pakshaResId != 0) stringResource(pakshaResId) else ""
-    val tithi = if (tithiResId != 0) stringResource(tithiResId) else ""
-    val star = if (nakshatraResId != 0) stringResource(nakshatraResId) else ""
 
     val tamilDateMain = remember(showTamilDate, showTamilYear, tamilDay, tamilMonth, tamilYear) {
         buildString {
@@ -268,12 +301,6 @@ fun SunTimesDisplay(
     }
     
     val showPiraiWithIcon = showPirai && paksha.isNotEmpty()
-
-    fun formatWithAmPm(time: LocalTime): String {
-        if (is24Hour) return time.format(timeFormatter)
-        val period = if (time.hour < 12) amLabel else pmLabel
-        return "${time.format(timeFormatter)} $period"
-    }
 
     if (isLandscape) {
         Surface(
@@ -313,7 +340,7 @@ fun SunTimesDisplay(
                     HorizontalDivider(modifier = Modifier.padding(vertical = 2.dp), thickness = 0.5.dp, color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.1f))
                 }
                 
-                if (specialEvents.isNotEmpty() || isSubhaMuhurtham || tithi.isNotEmpty() || star.isNotEmpty()) {
+                if (specialEvents.isNotEmpty() || isSubhaMuhurtham || tithis.isNotEmpty() || nakshatras.isNotEmpty()) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         if (isSubhaMuhurtham) {
                             KalashIcon(color = Color(0xFF1976D2))
@@ -332,60 +359,122 @@ fun SunTimesDisplay(
                                     Spacer(modifier = Modifier.width(4.dp))
                                 }
                             }
-                            Text(stringResource(resId), style = MaterialTheme.typography.labelSmall, color = Color(0xFFC5A000), fontWeight = FontWeight.Bold)
+                            val eventText = when (resId) {
+                                R.string.event_pradosham -> {
+                                    val start = sunset.minusMinutes(90)
+                                    "${stringResource(resId)} (${formatWithAmPm(start)} - ${formatWithAmPm(sunset)})"
+                                }
+                                else -> stringResource(resId)
+                            }
+                            Text(eventText, style = MaterialTheme.typography.labelSmall, color = Color(0xFFC5A000), fontWeight = FontWeight.Bold)
                             Text(" • ", color = Color.Gray)
                         }
-                        if (tithi.isNotEmpty()) {
-                            when (tithiValue) {
-                                4 -> GaneshaIcon(modifier = Modifier.size(16.dp), light = true)
-                                19 -> GaneshaIcon(modifier = Modifier.size(16.dp), light = false)
-                                6 -> VelIcon(modifier = Modifier.size(18.dp), lightColor = Color.White, darkColor = Color.Black, strokeColor = Color.Black)
-                                21 -> VelIcon(modifier = Modifier.size(18.dp), lightColor = Color.Black, darkColor = Color.White, strokeColor = Color.White)
-                                else -> MoonPhaseIcon(
-                                    tithi = tithiValue, 
-                                    modifier = Modifier.size(12.dp),
-                                    lightColor = Color.White,
-                                    darkColor = Color.Black,
-                                    strokeColor = Color.Black
-                                )
+                        
+                        tithis.forEach { item ->
+                            val tithiName = stringResource(item.resId)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                when (item.value) {
+                                    4 -> GaneshaIcon(modifier = Modifier.size(16.dp), light = true)
+                                    19 -> GaneshaIcon(modifier = Modifier.size(16.dp), light = false)
+                                    6 -> VelIcon(modifier = Modifier.size(18.dp), lightColor = Color.White, darkColor = Color.Black, strokeColor = Color.Black)
+                                    21 -> VelIcon(modifier = Modifier.size(18.dp), lightColor = Color.Black, darkColor = Color.White, strokeColor = Color.White)
+                                    else -> MoonPhaseIcon(
+                                        tithi = item.value, 
+                                        modifier = Modifier.size(12.dp),
+                                        lightColor = Color.White, 
+                                        darkColor = Color.Black, 
+                                        strokeColor = Color.Black
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(4.dp))
+                                val range = formatLunarRange(item.startTime, item.endTime)
+                                val tithiText = if (range.isNotEmpty()) "$tithiName $range" else tithiName
+                                Text(tithiText, style = MaterialTheme.typography.labelSmall)
                             }
-                            Spacer(modifier = Modifier.width(2.dp))
-                            Text(tithi, style = MaterialTheme.typography.labelSmall)
                             Text(" • ", color = Color.Gray)
                         }
-                        if (star.isNotEmpty()) {
-                            if (nakshatraResId == R.string.star_3) {
-                                Icon(Icons.Default.Star, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color(0xFFFF9800))
-                                Spacer(modifier = Modifier.width(2.dp))
+
+                        nakshatras.forEach { item ->
+                            val starName = stringResource(item.resId)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                if (item.resId == R.string.star_3) {
+                                    Icon(Icons.Default.Star, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color(0xFFFF9800))
+                                    Spacer(modifier = Modifier.width(2.dp))
+                                }
+                                val range = formatLunarRange(item.startTime, item.endTime)
+                                val starText = if (range.isNotEmpty()) "$starName $range" else starName
+                                Text(starText, style = MaterialTheme.typography.labelSmall)
                             }
-                            Text(star, style = MaterialTheme.typography.labelSmall)
+                            if (item != nakshatras.last()) {
+                                Text(" • ", color = Color.Gray)
+                            }
                         }
                     }
                 }
 
-                if (showSunrise || showSunset || (showBrahmaMuhurtham && brahmaMuhurtham != null)) {
-                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.basicMarquee()) {
+                if (showSunrise || showSunset || (showBrahmaMuhurtham && brahmaMuhurtham != null) || (showAbhijitMuhurtham && abhijitMuhurtham != null)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
                         if (showSunrise) {
-                            Icon(Icons.Default.WbSunny, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color(0xFFFF9800))
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(formatWithAmPm(sunrise), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondaryContainer)
-                            if (showSunset || (showBrahmaMuhurtham && brahmaMuhurtham != null)) Spacer(modifier = Modifier.width(16.dp))
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.WbSunny, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color(0xFFFF9800))
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(formatWithAmPm(sunrise), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                            }
                         }
+
+                        val hasBrahma = showBrahmaMuhurtham && brahmaMuhurtham != null
+                        val hasAbhijit = showAbhijitMuhurtham && abhijitMuhurtham != null
+                        if (hasBrahma || hasAbhijit) {
+                            Row(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(horizontal = 12.dp)
+                                    .basicMarquee(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                if (hasBrahma) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(Icons.Default.Star, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color(0xFFE91E63))
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text(
+                                            text = "${stringResource(R.string.muhurtham_brahma)}: ${formatWithAmPm(brahmaMuhurtham.first)} - ${formatWithAmPm(brahmaMuhurtham.second)}",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color(0xFFE91E63)
+                                        )
+                                    }
+                                }
+                                if (hasBrahma && hasAbhijit) {
+                                    Text("  •  ", color = Color.Gray, style = MaterialTheme.typography.labelSmall)
+                                }
+                                if (hasAbhijit) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(Icons.Default.Star, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color(0xFF4CAF50))
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text(
+                                            text = "${stringResource(R.string.muhurtham_abhijit)}: ${formatWithAmPm(abhijitMuhurtham.first)} - ${formatWithAmPm(abhijitMuhurtham.second)}",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color(0xFF4CAF50)
+                                        )
+                                    }
+                                }
+                            }
+                        } else {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
+
                         if (showSunset) {
-                            Icon(Icons.Default.WbTwilight, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color(0xFFFF5722))
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(formatWithAmPm(sunset), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondaryContainer)
-                            if (showBrahmaMuhurtham && brahmaMuhurtham != null) Spacer(modifier = Modifier.width(16.dp))
-                        }
-                        if (showBrahmaMuhurtham && brahmaMuhurtham != null) {
-                            Icon(Icons.Default.Star, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color(0xFFE91E63))
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(
-                                text = "${stringResource(R.string.muhurtham_brahma)}: ${formatWithAmPm(brahmaMuhurtham.first)} - ${formatWithAmPm(brahmaMuhurtham.second)}",
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFFE91E63)
-                            )
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(formatWithAmPm(sunset), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Icon(Icons.Default.WbTwilight, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color(0xFFFF5722))
+                            }
                         }
                     }
                 }
@@ -441,7 +530,7 @@ fun SunTimesDisplay(
                 }
             }
 
-            val eventsExist = specialEvents.isNotEmpty() || isSubhaMuhurtham || tithi.isNotEmpty() || star.isNotEmpty()
+            val eventsExist = specialEvents.isNotEmpty() || isSubhaMuhurtham || tithis.isNotEmpty() || nakshatras.isNotEmpty()
             if (eventsExist) {
                 Box(
                     modifier = Modifier
@@ -485,8 +574,15 @@ fun SunTimesDisplay(
                                         Spacer(modifier = Modifier.width(4.dp))
                                     }
                                 }
+                                val eventText = when (resId) {
+                                    R.string.event_pradosham -> {
+                                        val start = sunset.minusMinutes(90)
+                                        "${stringResource(resId)} (${formatWithAmPm(start)} - ${formatWithAmPm(sunset)})"
+                                    }
+                                    else -> stringResource(resId)
+                                }
                                 Text(
-                                    text = stringResource(resId),
+                                    text = eventText,
                                     style = MaterialTheme.typography.labelSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = color
@@ -495,55 +591,69 @@ fun SunTimesDisplay(
                             Text("  •  ", color = Color.Gray)
                         }
 
-                        if (tithi.isNotEmpty()) {
-                            when (tithiValue) {
-                                4 -> GaneshaIcon(modifier = Modifier.size(16.dp), light = true)
-                                19 -> GaneshaIcon(modifier = Modifier.size(16.dp), light = false)
-                                6 -> VelIcon(modifier = Modifier.size(18.dp), lightColor = Color.White, darkColor = Color.Black, strokeColor = Color.Black)
-                                21 -> VelIcon(modifier = Modifier.size(18.dp), lightColor = Color.Black, darkColor = Color.White, strokeColor = Color.White)
-                                else -> MoonPhaseIcon(
-                                    tithi = tithiValue, 
-                                    lightColor = Color.White, 
-                                    darkColor = Color.Black, 
-                                    strokeColor = Color.Black
+                        tithis.forEach { item ->
+                            val tithiName = stringResource(item.resId)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                when (item.value) {
+                                    4 -> GaneshaIcon(modifier = Modifier.size(16.dp), light = true)
+                                    19 -> GaneshaIcon(modifier = Modifier.size(16.dp), light = false)
+                                    6 -> VelIcon(modifier = Modifier.size(18.dp), lightColor = Color.White, darkColor = Color.Black, strokeColor = Color.Black)
+                                    21 -> VelIcon(modifier = Modifier.size(18.dp), lightColor = Color.Black, darkColor = Color.White, strokeColor = Color.White)
+                                    else -> MoonPhaseIcon(
+                                        tithi = item.value, 
+                                        modifier = Modifier.size(12.dp),
+                                        lightColor = Color.White, 
+                                        darkColor = Color.Black, 
+                                        strokeColor = Color.Black
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(4.dp))
+                                val range = formatLunarRange(item.startTime, item.endTime)
+                                val tithiText = if (range.isNotEmpty()) "$tithiName $range" else tithiName
+                                Text(
+                                    text = tithiText,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = tithi,
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
                             Text("  •  ", color = Color.Gray)
                         }
 
-                        if (star.isNotEmpty()) {
-                            if (nakshatraResId == R.string.star_3) {
-                                Icon(
-                                    Icons.Default.Star, 
-                                    contentDescription = null, 
-                                    modifier = Modifier.size(14.dp),
-                                    tint = Color(0xFFFF9800)
+                        nakshatras.forEach { item ->
+                            val starName = stringResource(item.resId)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                if (item.resId == R.string.star_3) {
+                                    Icon(
+                                        Icons.Default.Star, 
+                                        contentDescription = null, 
+                                        modifier = Modifier.size(14.dp),
+                                        tint = Color(0xFFFF9800)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                }
+                                val range = formatLunarRange(item.startTime, item.endTime)
+                                val starText = if (range.isNotEmpty()) "$starName $range" else starName
+                                Text(
+                                    text = starText,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
-                                Spacer(modifier = Modifier.width(4.dp))
                             }
-                            Text(
-                                text = star,
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                            if (item != nakshatras.last()) {
+                                Text("  •  ", color = Color.Gray)
+                            }
                         }
                     }
                 }
             }
 
-            if (showSunrise || showSunset || (showBrahmaMuhurtham && brahmaMuhurtham != null)) {
-                FlowRow(
+            if (showSunrise || showSunset || (showBrahmaMuhurtham && brahmaMuhurtham != null) || (showAbhijitMuhurtham && abhijitMuhurtham != null)) {
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp, horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     if (showSunrise) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -553,24 +663,54 @@ fun SunTimesDisplay(
                         }
                     }
 
-                    if (showSunset) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.WbTwilight, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color(0xFFFF5722))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(formatWithAmPm(sunset), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                    val hasBrahma = showBrahmaMuhurtham && brahmaMuhurtham != null
+                    val hasAbhijit = showAbhijitMuhurtham && abhijitMuhurtham != null
+                    if (hasBrahma || hasAbhijit) {
+                        Row(
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(horizontal = 8.dp)
+                                .basicMarquee(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            if (hasBrahma) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(Icons.Default.Star, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color(0xFFE91E63))
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = "${stringResource(R.string.muhurtham_brahma)}: ${formatWithAmPm(brahmaMuhurtham.first)} - ${formatWithAmPm(brahmaMuhurtham.second)}",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFFE91E63)
+                                    )
+                                }
+                            }
+                            if (hasBrahma && hasAbhijit) {
+                                Text("  •  ", color = Color.Gray, style = MaterialTheme.typography.labelSmall)
+                            }
+                            if (hasAbhijit) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(Icons.Default.Star, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color(0xFF4CAF50))
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = "${stringResource(R.string.muhurtham_abhijit)}: ${formatWithAmPm(abhijitMuhurtham.first)} - ${formatWithAmPm(abhijitMuhurtham.second)}",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFF4CAF50)
+                                    )
+                                }
+                            }
                         }
+                    } else {
+                        Spacer(modifier = Modifier.weight(1f))
                     }
 
-                    if (showBrahmaMuhurtham && brahmaMuhurtham != null) {
+                    if (showSunset) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Star, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color(0xFFE91E63))
+                            Text(formatWithAmPm(sunset), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "${stringResource(R.string.muhurtham_brahma)}: ${formatWithAmPm(brahmaMuhurtham.first)} - ${formatWithAmPm(brahmaMuhurtham.second)}",
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFFE91E63)
-                            )
+                            Icon(Icons.Default.WbTwilight, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color(0xFFFF5722))
                         }
                     }
                 }

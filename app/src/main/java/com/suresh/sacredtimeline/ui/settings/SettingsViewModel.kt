@@ -128,6 +128,10 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         viewModelScope, SharingStarted.WhileSubscribed(5000), false
     )
 
+    val showAbhijitMuhurtham: StateFlow<Boolean> = repository.showAbhijitMuhurtham.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), false
+    )
+
     val language: StateFlow<String> = repository.language.stateIn(
         viewModelScope, 
         SharingStarted.WhileSubscribed(5000), 
@@ -306,6 +310,10 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
     fun setShowBrahmaMuhurtham(show: Boolean) {
         viewModelScope.launch { repository.setShowBrahmaMuhurtham(show) }
+    }
+
+    fun setShowAbhijitMuhurtham(show: Boolean) {
+        viewModelScope.launch { repository.setShowAbhijitMuhurtham(show) }
     }
 }
 
