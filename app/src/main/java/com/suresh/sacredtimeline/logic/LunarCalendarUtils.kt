@@ -4,7 +4,9 @@ import com.suresh.sacredtimeline.R
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
-import java.util.Date
+import java.time.ZonedDateTime
+import java.time.Instant
+import java.time.Duration
 import kotlin.math.*
 
 object LunarCalendarUtils {
@@ -21,8 +23,8 @@ object LunarCalendarUtils {
     data class LunarInterval(
         val value: Int,
         val resId: Int,
-        val startTime: java.time.Instant?,
-        val endTime: java.time.Instant?
+        val startTime: Instant?,
+        val endTime: Instant?
     )
 
     data class LunarDayInfo(
@@ -32,9 +34,6 @@ object LunarCalendarUtils {
         val pakshaDay: Int
     )
 
-    /**
-     * Calculates all Tithis and Nakshatras that occur during the given date.
-     */
     fun getLunarDayInfo(date: LocalDate): LunarDayInfo {
         val zoneId = ZoneId.systemDefault()
         val dayStart = date.atStartOfDay(zoneId).toInstant()
@@ -46,7 +45,6 @@ object LunarCalendarUtils {
         val nakshatras = findIntervalsForDay(dayStart, dayEnd) { getLunarValues(it).second }
             .map { it.copy(resId = getNakshatraResId(it.value)) }
 
-        // Paksha info based on Noon value (representative of the day)
         val noonValue = getLunarValues(date.atTime(12, 0).atZone(zoneId).toInstant()).first
         val isValarpirai = noonValue <= 15
 
@@ -59,36 +57,31 @@ object LunarCalendarUtils {
     }
 
     private fun findIntervalsForDay(
-        dayStart: java.time.Instant,
-        dayEnd: java.time.Instant,
-        getter: (java.time.Instant) -> Int
+        dayStart: Instant,
+        dayEnd: Instant,
+        getter: (Instant) -> Int
     ): List<LunarInterval> {
         val intervals = mutableListOf<LunarInterval>()
         var currentSearchStart = dayStart
         
         while (currentSearchStart.isBefore(dayEnd)) {
             val currentVal = getter(currentSearchStart)
-            
-            // Search backward for absolute start (within -2 days)
-            val windowStart = currentSearchStart.minus(java.time.Duration.ofDays(2))
+            val windowStart = currentSearchStart.minus(Duration.ofDays(2))
             val absoluteStart = findStartTime(windowStart, currentSearchStart, currentVal, getter)
-            
-            // Search forward for absolute end (within +2 days)
-            val windowEnd = currentSearchStart.plus(java.time.Duration.ofDays(2))
+            val windowEnd = currentSearchStart.plus(Duration.ofDays(2))
             val absoluteEnd = findEndTime(currentSearchStart, windowEnd, currentVal, getter)
             
             intervals.add(
                 LunarInterval(
                     value = currentVal,
-                    resId = 0, // Filled by caller
+                    resId = 0,
                     startTime = absoluteStart,
                     endTime = absoluteEnd
                 )
             )
             
-            // Move search start to just after the end of this interval
             if (absoluteEnd != null && absoluteEnd.isBefore(dayEnd)) {
-                currentSearchStart = absoluteEnd.plusMillis(1000) // Small step forward
+                currentSearchStart = absoluteEnd.plusMillis(1000)
             } else {
                 break
             }
@@ -96,106 +89,198 @@ object LunarCalendarUtils {
         return intervals
     }
 
-    private fun getLunarValues(instant: java.time.Instant): Pair<Int, Int> {
-        val julianDate = (instant.toEpochMilli() / 86400000.0) + 2440587.5
-        val t = (julianDate - 2451545.0) / 36525.0
+    private fun getLunarValues(instant: Instant): Pair<Int, Int> {
+        val jd = (instant.toEpochMilli() / 86400000.0) + 2440587.5
+        val t = (jd - 2451545.0) / 36525.0
 
-        val sunLong = calculateSunLongitude(julianDate)
-        val moonLong = calculateMoonLongitude(t)
+        val sunLong = calculateSunLongitudeHighPrecision(t)
+        val moonLong = calculateMoonLongitudeHighPrecision(t)
         
         var diff = moonLong - sunLong
-        if (diff < 0) diff += 360.0
+        while (diff < 0) diff += 360.0
+        while (diff >= 360.0) diff -= 360.0
         val tithi = (floor(diff / 12.0).toInt() + 1).coerceIn(1, 30)
 
-        val ayanamsha = 22.466 + 0.01396 * ((julianDate - 2415020.5) / 365.25)
+        val ayanamsha = calculateLahiriAyanamsha(jd)
         var siderealMoon = moonLong - ayanamsha
-        if (siderealMoon < 0) siderealMoon += 360.0
+        while (siderealMoon < 0) siderealMoon += 360.0
+        while (siderealMoon >= 360.0) siderealMoon -= 360.0
         val nakshatra = (floor(siderealMoon / (360.0 / 27.0)).toInt() + 1).coerceIn(1, 27)
 
         return tithi to nakshatra
     }
 
-    private fun findStartTime(
-        windowStart: java.time.Instant,
-        current: java.time.Instant,
-        currentVal: Int,
-        getter: (java.time.Instant) -> Int
-    ): java.time.Instant? {
-        val startVal = getter(windowStart)
-        if (startVal == currentVal) return null // Started even earlier
-
-        var low = windowStart.toEpochMilli()
-        var high = current.toEpochMilli()
-        repeat(12) {
-            val mid = (low + high) / 2
-            if (getter(java.time.Instant.ofEpochMilli(mid)) != currentVal) {
-                low = mid
-            } else {
-                high = mid
-            }
-        }
-        return java.time.Instant.ofEpochMilli(high)
+    private fun calculateSunLongitudeHighPrecision(t: Double): Double {
+        val l0 = 280.46646 + 36000.76983 * t + 0.0003032 * t * t
+        val m = 357.52911 + 35999.05029 * t - 0.0001537 * t * t
+        val c = (1.914602 - 0.004817 * t - 0.000014 * t * t) * sin(Math.toRadians(m)) +
+                (0.019993 - 0.000101 * t) * sin(Math.toRadians(2 * m)) +
+                0.000289 * sin(Math.toRadians(3 * m))
+        var sunLong = l0 + c
+        while (sunLong < 0) sunLong += 360.0
+        while (sunLong >= 360.0) sunLong -= 360.0
+        return sunLong
     }
 
-    private fun findEndTime(
-        current: java.time.Instant,
-        windowEnd: java.time.Instant,
-        currentVal: Int,
-        getter: (java.time.Instant) -> Int
-    ): java.time.Instant? {
-        val endVal = getter(windowEnd)
-        if (endVal == currentVal) return null // Ends even later
+    private fun calculateMoonLongitudeHighPrecision(t: Double): Double {
+        // ELP-2000 Main Perturbations
+        val lPrime = 218.3164477 + 481267.8812307 * t - 0.0015786 * t * t + t * t * t / 538841.0
+        val d = 297.8501921 + 445267.1114034 * t - 0.0018819 * t * t + t * t * t / 545868.0
+        val m = 357.5291092 + 35999.0502909 * t - 0.0001536 * t * t + t * t * t / 24490000.0
+        val mPrime = 134.9633964 + 477198.8675055 * t + 0.0087414 * t * t + t * t * t / 69699.0
+        val f = 93.2720950 + 483202.0175233 * t - 0.0036539 * t * t - t * t * t / 3526000.0
 
-        var low = current.toEpochMilli()
-        var high = windowEnd.toEpochMilli()
-        repeat(12) { // ~1 min precision
-            val mid = (low + high) / 2
-            if (getter(java.time.Instant.ofEpochMilli(mid)) == currentVal) {
-                low = mid
-            } else {
-                high = mid
-            }
-        }
-        return java.time.Instant.ofEpochMilli(high)
+        val dR = Math.toRadians(d)
+        val mR = Math.toRadians(m)
+        val mPR = Math.toRadians(mPrime)
+        val fR = Math.toRadians(f)
+
+        var sumL = 0.0
+        // Major terms from Meeus
+        sumL += 6288774 * sin(mPR)
+        sumL += 1274027 * sin(2 * dR - mPR)
+        sumL += 658314 * sin(2 * dR)
+        sumL += 213618 * sin(2 * mPR)
+        sumL += -185116 * sin(mR)
+        sumL += -114332 * sin(2 * fR)
+        sumL += 58793 * sin(2 * dR - 2 * mPR)
+        sumL += 57066 * sin(2 * dR - mR - mPR)
+        sumL += 53322 * sin(2 * dR + mPR)
+        sumL += 45758 * sin(2 * dR - mR)
+        sumL += -40923 * sin(mR - mPR)
+        sumL += -34720 * sin(dR)
+        sumL += -30383 * sin(mR + mPR)
+        sumL += 15327 * sin(2 * dR - 2 * fR)
+        sumL += -12528 * sin(mPR + 2 * fR)
+        sumL += 10980 * sin(mPR - 2 * fR)
+        sumL += 10675 * sin(4 * dR - mPR)
+        sumL += 10034 * sin(4 * dR)
+        sumL += 8548 * sin(4 * dR - 2 * mPR)
+        sumL += -7888 * sin(2 * dR + mR - mPR)
+        sumL += -6766 * sin(2 * dR + mR)
+        sumL += -5163 * sin(dR - mPR)
+        sumL += 4987 * sin(dR + mR)
+        sumL += 4036 * sin(2 * dR - mR + mPR)
+        sumL += 3994 * sin(2 * dR + 2 * mPR)
+        sumL += 3861 * sin(4 * dR - mR - mPR)
+        sumL += 3665 * sin(2 * dR - 3 * mPR)
+        sumL += -2689 * sin(mR - 2 * mPR)
+        sumL += -2602 * sin(2 * dR - mR + 2 * fR)
+        sumL += 2390 * sin(2 * dR - mR - 2 * fR)
+        sumL += -2125 * sin(2 * mPR + 2 * fR)
+        sumL += 2079 * sin(2 * dR + mR + mPR)
+        sumL += 2059 * sin(2 * dR - mR - mPR)
+
+        var moonLong = lPrime + sumL / 1000000.0
+        while (moonLong < 0) moonLong += 360.0
+        while (moonLong >= 360.0) moonLong -= 360.0
+        return moonLong
+    }
+
+    private fun calculateLahiriAyanamsha(jd: Double): Double {
+        // Lahiri Ayanamsha: 22.466... formula is too simple.
+        // Better approximation for Lahiri: 23.85 + (jd - 2433282.5) * 0.01396 / 365.25
+        // Chitra Paksha (Lahiri) for Jan 1 1900 was 22.4666 deg
+        val t = (jd - 2451545.0) / 36525.0
+        return 23.852777 + 1.39697127 * t + 0.0003086 * t * t
+    }
+
+    fun calculateSunriseSunset(lat: Double, lng: Double, date: LocalDate, zenith: Double = 90.83): Pair<LocalTime, LocalTime> {
+        val zoneId = ZoneId.systemDefault()
+        val zonedDateTime = date.atStartOfDay(zoneId)
+        val jd = (zonedDateTime.toInstant().toEpochMilli() / 86400000.0) + 2440587.5
+        
+        val t = (jd - 2451545.0) / 36525.0
+        val l0 = 280.46646 + 36000.76983 * t
+        val m = 357.52911 + 35999.05029 * t
+        val e = 0.016708634 - 0.000042037 * t
+        val c = (1.914602 - 0.004817 * t) * sin(Math.toRadians(m)) +
+                (0.019993 - 0.000101 * t) * sin(Math.toRadians(2 * m))
+        val sunLong = l0 + c
+        val epsilon = 23.439291 - 0.0130041 * t
+        
+        val alpha = Math.toDegrees(atan2(cos(Math.toRadians(epsilon)) * sin(Math.toRadians(sunLong)), cos(Math.toRadians(sunLong))))
+        val delta = Math.toDegrees(asin(sin(Math.toRadians(epsilon)) * sin(Math.toRadians(sunLong))))
+        
+        val h0 = Math.toDegrees(acos((cos(Math.toRadians(zenith)) - sin(Math.toRadians(lat)) * sin(Math.toRadians(delta))) / (cos(Math.toRadians(lat)) * cos(Math.toRadians(delta)))))
+        
+        val equationOfTime = 4 * (l0 - alpha) // Simplified
+        val centerNoon = 720 - 4 * lng - equationOfTime
+        
+        val sunriseMinutes = centerNoon - h0 * 4
+        val sunsetMinutes = centerNoon + h0 * 4
+        
+        val offsetMinutes = zoneId.rules.getOffset(Instant.now()).totalSeconds / 60
+        val localSunrise = sunriseMinutes + offsetMinutes
+        val localSunset = sunsetMinutes + offsetMinutes
+        
+        return minutesToLocalTime(localSunrise) to minutesToLocalTime(localSunset)
+    }
+
+    private fun minutesToLocalTime(minutes: Double): LocalTime {
+        var m = minutes
+        while (m < 0) m += 1440
+        while (m >= 1440) m -= 1440
+        val h = (m / 60).toInt()
+        val min = (m % 60).toInt()
+        return LocalTime.of(h % 24, min % 60)
     }
 
     fun calculateBrahmaMuhurtham(sunrise: LocalTime): Pair<LocalTime, LocalTime> {
-        // Brahma Muhurtham starts 1 hour 36 minutes before sunrise
         val start = sunrise.minusMinutes(96)
         val end = sunrise.minusMinutes(48)
         return start to end
     }
 
     fun calculateAbhijitMuhurtham(sunrise: LocalTime, sunset: LocalTime): Pair<LocalTime, LocalTime>? {
-        // Midday = average of sunrise and sunset
-        // Duration between sunrise and sunset
-        val totalDayMinutes = java.time.Duration.between(sunrise, sunset).toMinutes()
+        val totalDayMinutes = Duration.between(sunrise, sunset).toMinutes()
         if (totalDayMinutes <= 0) return null
-        
         val midday = sunrise.plusMinutes(totalDayMinutes / 2)
         val start = midday.minusMinutes(24)
         val end = midday.plusMinutes(24)
         return start to end
     }
 
-    private fun calculateSunLongitude(jd: Double): Double {
-        val g = 357.529 + 0.98560028 * (jd - 2451545.0)
-        val q = 280.459 + 0.98564736 * (jd - 2451545.0)
-        val l = q + 1.915 * sin(Math.toRadians(g)) + 0.020 * sin(Math.toRadians(2 * g))
-        return l % 360.0
+    private fun findStartTime(
+        windowStart: Instant,
+        current: Instant,
+        currentVal: Int,
+        getter: (Instant) -> Int
+    ): Instant? {
+        val startVal = getter(windowStart)
+        if (startVal == currentVal) return null
+        var low = windowStart.toEpochMilli()
+        var high = current.toEpochMilli()
+        repeat(20) {
+            val mid = (low + high) / 2
+            if (getter(Instant.ofEpochMilli(mid)) != currentVal) {
+                low = mid
+            } else {
+                high = mid
+            }
+        }
+        return Instant.ofEpochMilli(high)
     }
 
-    private fun calculateMoonLongitude(t: Double): Double {
-        val lPrime = 218.316 + 481267.881 * t
-        val mPrime = 134.963 + 477198.867 * t
-        val d = 297.850 + 445267.111 * t
-        
-        var moonLong = lPrime + 6.289 * sin(Math.toRadians(mPrime)) +
-                1.274 * sin(Math.toRadians(2 * d - mPrime)) +
-                0.658 * sin(Math.toRadians(2 * d)) +
-                0.214 * sin(Math.toRadians(2 * mPrime))
-        
-        return moonLong % 360.0
+    private fun findEndTime(
+        current: Instant,
+        windowEnd: Instant,
+        currentVal: Int,
+        getter: (Instant) -> Int
+    ): Instant? {
+        val endVal = getter(windowEnd)
+        if (endVal == currentVal) return null
+        var low = current.toEpochMilli()
+        var high = windowEnd.toEpochMilli()
+        repeat(20) {
+            val mid = (low + high) / 2
+            if (getter(Instant.ofEpochMilli(mid)) == currentVal) {
+                low = mid
+            } else {
+                high = mid
+            }
+        }
+        return Instant.ofEpochMilli(high)
     }
 
     private fun getTithiResId(tithi: Int): Int = when (tithi) {

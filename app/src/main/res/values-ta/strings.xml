@@ -93,7 +93,11 @@
     <string name="label_nakshatra">நட்சத்திரம்</string>
     <string name="label_rasi">ராசி</string>
     <string name="label_yoga">யோகம்</string>
+    <string name="label_nama_yoga">நாம யோகம்</string>
+    <string name="label_amritadi_yoga">அமிர்தாதி யோகம்</string>
     <string name="label_chandrashtamam">சந்திராஷ்டமம்</string>
+    <string name="label_nethiram">நேத்திரம்</string>
+    <string name="label_jeevan">ஜீவன்</string>
     <string name="label_now_line">இப்போது</string>
     <string name="label_from">தொடக்கம்</string>
     <string name="label_to">முடிவு</string>
@@ -246,4 +250,29 @@
     <string name="label_muhurtham_short">முஹூர்த்தம்</string>
     <string name="label_neram_short">நேரம்</string>
     <string name="label_special_short">சிறப்பு</string>
+
+    <!-- Settings Labels -->
+    <string name="settings_title">அமைப்புகள்</string>
+    <string name="settings_display">காட்சி</string>
+    <string name="settings_language">பயன்பாட்டு மொழி</string>
+    <string name="settings_theme">பயன்பாட்டு தீம்</string>
+    <string name="settings_theme_system">கணினி இயல்புநிலை</string>
+    <string name="settings_theme_light">ஒளி தீம்</string>
+    <string name="settings_theme_dark">இருண்ட தீம்</string>
+    <string name="settings_default_launch_view">தொடக்கக் காட்சி</string>
+    <string name="settings_time_format_24h">24-மணிநேர வடிவத்தைப் பயன்படுத்தவும்</string>
+    <string name="settings_show_now_line">இப்போது வரியைக் காட்டு</string>
+    <string name="settings_sunrise_definition">சூரிய உதய இலக்கணம்</string>
+    <string name="settings_sunrise_scientific">அறிவியல் (மேல் விளிம்பு)</string>
+    <string name="settings_sunrise_traditional">பாரம்பரியம் (மையம்)</string>
+    <string name="settings_special_period_style">சிறப்பு கால நடைமுறை (ராகு/எம/குளிகை)</string>
+    <string name="settings_style_proportional">விகிதாசார (வானியல்)</string>
+    <string name="settings_style_fixed">நிலையான (1.5 மணிநேரம்)</string>
+    <string name="settings_lunar_month_system">சந்திர மாத முறை</string>
+    <string name="settings_amanta">அமாந்தம் (தென்னிந்தியா)</string>
+    <string name="settings_purnimanta">பூர்ணிமாந்தம் (வடஇந்தியா)</string>
+    <string name="settings_line_color">வரி நிறம்</string>
+    <string name="settings_line_thickness">வரி தடிமன்</string>
+    <string name="settings_advanced">மேம்பட்ட (தற்காலிக சேமிப்பு)</string>
+    <string name="settings_clear_cache">தற்காலிக சேமிப்பை அழி</string>
 </resources>

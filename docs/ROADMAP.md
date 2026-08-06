@@ -14,3 +14,9 @@ Future development phases for the Sacred Timeline project.
 ## Phase 3: Adaptive Ecosystem
 - **Adaptive Layouts**: Optimized UI for tablets and foldables using `ListDetailPaneScaffold`.
 - **Extended Platform Support**: Exploring Wear OS tiles for quick timing checks.
+
+## Phase 4: Precision Refinement & Traditional Depth
+- **High-Precision Ephemeris**: Upgrade `LunarCalendarUtils` to use a more accurate astronomical model (e.g., increased perturbation terms or a native wrapper for an ephemeris library) to fix Nakshatra/Tithi discrepancies.
+- **Traditional Calculations**: Implement **Yogam** and **Chandrashtamam** logic based on the refined lunar engine.
+- **Enhanced Festive Detection**: Automate detection of specific traditional events like "Aadi Kiruthigai" (Nakshatra-based festivals) and "Pradosham".
+- **Dynamic Timing Labels**: Add "Till [Time]" labels for Tithis and Nakshatras to match traditional calendar layouts.

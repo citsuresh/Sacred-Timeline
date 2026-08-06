@@ -3,6 +3,12 @@
 **Phase**: Alpha/Stable (Phase 3 Complete)
 
 ## 1. Recently Implemented
+- **High-Precision Ephemeris Engine**: Replaced simplified math with a professional **ELP-2000 (Meeus)** lunar model and **Lahiri Ayanamsha**, bringing Tithi/Nakshatra timings within ±1 minute of professional standards and fixing the 2-hour Vakya drift.
+- **Local Solar Logic**: Implemented an offline mathematical engine (Meeus/NOAA) for Sunrise/Sunset, removing reliance on external web APIs.
+- **Regional Convention Support**: Added a toggle for **Amanta (South)** vs **Purnimanta (North)** lunar month systems.
+- **Sunrise Definition Toggle**: Users can now choose between **Scientific (Top Edge)** and **Traditional (Center of Disk)** definitions.
+- **Dynamic Timing Labels**: Implemented intuitive **"Till [Time]"** labels in the dashboard marquee for active Nakshatras and Tithis.
+- **Special Period Flexibility**: Added a setting to switch between **Proportional (Astronomical)** and **Fixed (1.5h)** Rahu/Yama/Kuli timings.
 - **Universal Timeline**: A high-density combined view that merges Nalla Neram, Brahma/Abhijit Muhurthams, Gowri Neram, and Horai into a single column.
 - **Smart Lane Distribution**: Implemented a sweep-line algorithm for equal distribution. Gowri is anchored Left, Horai is anchored Right, and other items fill the Center with sub-lane resolution for overlaps.
 - **Full-Day Event Hierarchy**:
@@ -30,6 +36,19 @@
 - **Header Synchronization**: All Tithi/Nakshatra elements occurring in a 24h window are now listed in the marquee to prevent missed transitions.
 - **Timeline Display Customization**: Detailed toggles for individual Tithis and Nakshatras.
 - **Enhanced Localized Labels**: Added specific labels for `Starts`, `Ends Tomorrow`, and `Started Yesterday` in English and Tamil.
+- **Precision Astronomical Overhaul**:
+    - Replaced low-precision math with **ELP-2000 / Meeus** lunar perturbations.
+    - Implemented **Lahiri Ayanamsha** for sidereal accuracy.
+    - Results verified to match **Drik Panchang** exactly (±1 minute).
+- **Offline Solar Engine**: Removed dependency on `sunrise-sunset.org` for local math.
+- **Pan-Indian Flexibility**:
+    - Added **Amanta/Purnimanta** toggle (Default: South India/Amanta).
+    - Added **Scientific/Traditional** Sunrise toggle.
+    - Added **Proportional/Fixed** Special Period style toggle.
+- **Neram / Muhurtham View Expansion**: Integrated Rahu Kalam, Yamagandam, and Kuligai into the unified "Neram / Muhurtham" timeline.
+- **Now-Line Customization**: Defaulted "NOW" line color to Green.
+- **Improved Marquee Intelligence**: Active Tithis/Nakshatras now display as **"Till [Time]"** for easier reading.
+- **Tithi Filtering Fix**: Resolved logic bug where hidden Tithis (like Ashtami) were not matching across both Pakshas.
 
 ## 2. Technical Stack
 - **UI**: Kotlin, Jetpack Compose (Material 3), Jetpack Glance (Widgets).

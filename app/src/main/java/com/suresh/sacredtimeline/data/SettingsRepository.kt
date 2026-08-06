@@ -44,6 +44,9 @@ class SettingsRepository(private val context: Context) {
         val SHOW_SUNSET = booleanPreferencesKey("show_sunset")
         val SHOW_BRAHMA_MUHURTHAM = booleanPreferencesKey("show_brahma_muhurtham")
         val SHOW_ABHIJIT_MUHURTHAM = booleanPreferencesKey("show_abhijit_muhurtham")
+        val SUNRISE_DEFINITION = stringPreferencesKey("sunrise_definition")
+        val SPECIAL_PERIOD_STYLE = stringPreferencesKey("special_period_style")
+        val LUNAR_MONTH_SYSTEM = stringPreferencesKey("lunar_month_system")
     }
 
     val compositeScale: Flow<Float> = context.dataStore.data.map { it[Keys.COMPOSITE_SCALE] ?: 1.0f }
@@ -74,7 +77,7 @@ class SettingsRepository(private val context: Context) {
 
     val timeFormat24h: Flow<Boolean> = context.dataStore.data.map { it[Keys.TIME_FORMAT_24H] ?: false }
     val showNowLine: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_NOW_LINE] ?: true }
-    val nowLineColor: Flow<Int> = context.dataStore.data.map { it[Keys.NOW_LINE_COLOR] ?: 0xFFFF0000.toInt() } // Default Red
+    val nowLineColor: Flow<Int> = context.dataStore.data.map { it[Keys.NOW_LINE_COLOR] ?: 0xFF4CAF50.toInt() } // Default Green
     val nowLineThickness: Flow<Float> = context.dataStore.data.map { it[Keys.NOW_LINE_THICKNESS] ?: 2.0f }
     val pinchToZoomEnabled: Flow<Boolean> = context.dataStore.data.map { it[Keys.PINCH_TO_ZOOM_ENABLED] ?: true }
 
@@ -107,6 +110,10 @@ class SettingsRepository(private val context: Context) {
     val showSunset: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_SUNSET] ?: true }
     val showBrahmaMuhurtham: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_BRAHMA_MUHURTHAM] ?: true }
     val showAbhijitMuhurtham: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_ABHIJIT_MUHURTHAM] ?: true }
+
+    val sunriseDefinition: Flow<String> = context.dataStore.data.map { it[Keys.SUNRISE_DEFINITION] ?: "SCIENTIFIC" }
+    val specialPeriodStyle: Flow<String> = context.dataStore.data.map { it[Keys.SPECIAL_PERIOD_STYLE] ?: "PROPORTIONAL" }
+    val lunarMonthSystem: Flow<String> = context.dataStore.data.map { it[Keys.LUNAR_MONTH_SYSTEM] ?: "AMANTA" }
 
     suspend fun updateCompositeScale(scale: Float) {
         context.dataStore.edit { it[Keys.COMPOSITE_SCALE] = scale.coerceIn(0.2f, 3.0f) }
@@ -248,5 +255,17 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun setShowAbhijitMuhurtham(show: Boolean) {
         context.dataStore.edit { it[Keys.SHOW_ABHIJIT_MUHURTHAM] = show }
+    }
+
+    suspend fun setSunriseDefinition(definition: String) {
+        context.dataStore.edit { it[Keys.SUNRISE_DEFINITION] = definition }
+    }
+
+    suspend fun setSpecialPeriodStyle(style: String) {
+        context.dataStore.edit { it[Keys.SPECIAL_PERIOD_STYLE] = style }
+    }
+
+    suspend fun setLunarMonthSystem(system: String) {
+        context.dataStore.edit { it[Keys.LUNAR_MONTH_SYSTEM] = system }
     }
 }

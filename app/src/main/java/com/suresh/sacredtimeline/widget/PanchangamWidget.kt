@@ -62,12 +62,15 @@ class PanchangamWidget : GlanceAppWidget() {
         val is24Hour = repository.timeFormat24h.first()
         val columnVisibility = repository.widgetColumnVisibility.first()
         val columnOrder = repository.widgetColumnOrder.first()
+        val sunDef = repository.sunriseDefinition.first()
+        val style = repository.specialPeriodStyle.first()
+        
         val lat: Double
         val lng: Double
         
         if (mode == "AUTO") {
-            lat = 11.0168
-            lng = 76.9558
+            lat = repository.lastKnownLatitude.first()
+            lng = repository.lastKnownLongitude.first()
         } else {
             lat = repository.manualLatitude.first()
             lng = repository.manualLongitude.first()
@@ -78,8 +81,8 @@ class PanchangamWidget : GlanceAppWidget() {
         val dayData: DayData = if (cache?.containsKey(date) == true) {
             cache[date]!!
         } else {
-            val sunResult = sunProvider.getSunTimes(lat, lng, date)
-            val timings = provider.getTimings(date, sunResult.sunrise, sunResult.sunset)
+            val sunResult = sunProvider.getSunTimes(lat, lng, date, sunDef)
+            val timings = provider.getTimings(date, sunResult.sunrise, sunResult.sunset, style)
             DayData(
                 nallaNeram = timings.filterIsInstance<NallaNeram>(),
                 gowriNeram = timings.filterIsInstance<GowriNeram>(),
@@ -140,6 +143,39 @@ class PanchangamWidget : GlanceAppWidget() {
                 columnOrder.forEach { colId ->
                     if (columnVisibility.contains(colId)) {
                         when (colId) {
+                            "UNIVERSAL" -> {
+                                UniversalTimingColumn(
+                                    context = context,
+                                    dayData = dayData,
+                                    now = now,
+                                    timeFormatter = timeFormatter,
+                                    modifier = GlanceModifier.defaultWeight()
+                                )
+                            }
+                            "NERAM_MUHURTHAM" -> {
+                                val currentNalla = dayData.nallaNeram.find { it.isCurrent(now) }
+                                val currentSpecial = dayData.specialPeriods.find { it.isCurrent(now) }
+                                val currentAbhijit = if (dayData.abhijitMuhurtham?.isCurrent(now) == true) dayData.abhijitMuhurtham else null
+                                val currentBrahma = if (dayData.brahmaMuhurtham?.isCurrent(now) == true) dayData.brahmaMuhurtham else null
+                                
+                                val timing = currentSpecial ?: currentAbhijit ?: currentBrahma ?: currentNalla
+                                val labelRes = when {
+                                    currentSpecial != null -> Metadata.getSpecialNameRes(currentSpecial.name)
+                                    currentAbhijit != null -> R.string.muhurtham_abhijit
+                                    currentBrahma != null -> R.string.muhurtham_brahma
+                                    currentNalla != null -> Metadata.getSpecialNameRes("Nalla")
+                                    else -> R.string.nav_nalla_neram
+                                }
+                                val label = if (timing != null) context.getString(labelRes) else "None"
+                                
+                                // Simplified next logic
+                                val next = (dayData.nallaNeram + dayData.specialPeriods + 
+                                            listOfNotNull(dayData.brahmaMuhurtham, dayData.abhijitMuhurtham))
+                                            .filter { it.startTime.isAfter(now) }
+                                            .minByOrNull { it.startTime }
+
+                                TimingColumn(context.getString(R.string.nav_neram_muhurtham), label, timing, next, timeFormatter, GlanceModifier.defaultWeight())
+                            }
                             "ABHIJIT" -> {
                                 val currentAbhijit = if (dayData.abhijitMuhurtham?.isCurrent(now) == true) dayData.abhijitMuhurtham else null
                                 val nextAbhijit = if (dayData.abhijitMuhurtham?.startTime?.isAfter(now) == true) dayData.abhijitMuhurtham else null
@@ -206,6 +242,168 @@ class PanchangamWidget : GlanceAppWidget() {
                     )
                 }
             }
+        }
+    }
+
+    @Composable
+    private fun UniversalTimingColumn(
+        context: Context,
+        dayData: DayData,
+        now: LocalTime,
+        timeFormatter: DateTimeFormatter,
+        modifier: GlanceModifier = GlanceModifier
+    ) {
+        val currentGowri = dayData.gowriNeram.find { it.isCurrent(now) }
+        val currentHora = dayData.hora.find { it.isCurrent(now) }
+        val currentNalla = dayData.nallaNeram.find { it.isCurrent(now) }
+        val currentSpecial = dayData.specialPeriods.find { it.isCurrent(now) }
+        val currentAbhijit = if (dayData.abhijitMuhurtham?.isCurrent(now) == true) dayData.abhijitMuhurtham else null
+        val currentBrahma = if (dayData.brahmaMuhurtham?.isCurrent(now) == true) dayData.brahmaMuhurtham else null
+
+        val middleTiming = currentSpecial ?: currentAbhijit ?: currentBrahma ?: currentNalla
+
+        Box(
+            modifier = modifier
+                .fillMaxHeight()
+                .padding(4.dp)
+                .cornerRadius(8.dp)
+                .background(CardOuterBorderColor),
+            contentAlignment = Alignment.Center
+        ) {
+            Box(
+                modifier = GlanceModifier
+                    .fillMaxSize()
+                    .padding(1.dp)
+                    .cornerRadius(7.dp)
+                    .background(CardBorderColor),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    modifier = GlanceModifier
+                        .fillMaxSize()
+                        .padding(1.dp)
+                        .cornerRadius(6.dp)
+                        .background(Color.White), // Use white for high density universal view
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = context.getString(R.string.nav_universal),
+                        style = TextStyle(
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = ColorProvider(Color.Black.copy(alpha = 0.6f))
+                        )
+                    )
+                    
+                    Spacer(modifier = GlanceModifier.height(4.dp))
+
+                    // Dynamic Lane Arrangement (Matches App Logic)
+                    Row(
+                        modifier = GlanceModifier.fillMaxWidth().padding(horizontal = 4.dp).defaultWeight(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        val activeLanes = buildList {
+                            if (currentGowri != null) add("GOWRI")
+                            if (middleTiming != null) add("NERAM")
+                            if (currentHora != null) add("HORAI")
+                        }
+
+                        activeLanes.forEachIndexed { index, laneId ->
+                            when (laneId) {
+                                "GOWRI" -> {
+                                    UniversalMiniLane(
+                                        title = context.getString(R.string.nav_gowri_neram),
+                                        timing = currentGowri,
+                                        context = context,
+                                        labelProvider = { Metadata.getGowriNameRes(it.name) },
+                                        modifier = GlanceModifier.defaultWeight()
+                                    )
+                                }
+                                "NERAM" -> {
+                                    UniversalMiniLane(
+                                        title = context.getString(R.string.label_neram_short),
+                                        timing = middleTiming,
+                                        context = context,
+                                        labelProvider = { 
+                                            when (it) {
+                                                is SpecialPeriod -> Metadata.getSpecialNameRes(it.name)
+                                                is Muhurtham -> if (it.name.contains("Abhijit")) R.string.muhurtham_abhijit else R.string.muhurtham_brahma
+                                                else -> Metadata.getSpecialNameRes("Nalla")
+                                            }
+                                        },
+                                        modifier = GlanceModifier.defaultWeight()
+                                    )
+                                }
+                                "HORAI" -> {
+                                    UniversalMiniLane(
+                                        title = context.getString(R.string.nav_hora),
+                                        timing = currentHora,
+                                        context = context,
+                                        labelProvider = { Metadata.getPlanetNameRes(it.name) },
+                                        modifier = GlanceModifier.defaultWeight()
+                                    )
+                                }
+                            }
+                            if (index < activeLanes.size - 1) {
+                                Spacer(modifier = GlanceModifier.width(2.dp))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun UniversalMiniLane(
+        title: String,
+        timing: Timing?,
+        context: Context,
+        labelProvider: (Timing) -> Int,
+        modifier: GlanceModifier = GlanceModifier
+    ) {
+        val color = timing?.let { SacredTimelineColors.getTimingColor(it) } ?: Color.LightGray.copy(alpha = 0.3f)
+        val contentColor = if (timing != null) SacredTimelineColors.getContentColor(color) else Color.Gray
+        val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+
+        Column(
+            modifier = modifier
+                .fillMaxHeight()
+                .padding(1.dp)
+                .background(color)
+                .cornerRadius(4.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = title.uppercase(),
+                style = TextStyle(
+                    fontSize = 9.sp, 
+                    fontWeight = FontWeight.Bold, 
+                    color = ColorProvider(contentColor.copy(alpha = 0.9f)),
+                    textAlign = TextAlign.Center
+                ),
+                maxLines = 1,
+                modifier = GlanceModifier.padding(top = 2.dp)
+            )
+            
+            Spacer(modifier = GlanceModifier.defaultWeight())
+
+            Text(
+                text = if (timing != null) context.getString(labelProvider(timing)) else "None",
+                style = TextStyle(fontSize = 11.sp, fontWeight = FontWeight.Bold, color = ColorProvider(contentColor), textAlign = TextAlign.Center),
+                maxLines = 1
+            )
+            if (timing != null) {
+                Text(
+                    text = context.getString(R.string.label_till, timing.endTime.format(timeFormatter)),
+                    style = TextStyle(fontSize = 7.sp, color = ColorProvider(contentColor.copy(alpha = 0.8f))),
+                    maxLines = 1
+                )
+            }
+
+            Spacer(modifier = GlanceModifier.defaultWeight())
         }
     }
 

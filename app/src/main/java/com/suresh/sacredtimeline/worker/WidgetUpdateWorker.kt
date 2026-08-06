@@ -62,11 +62,15 @@ class WidgetUpdateWorker(
         }
     }
 
-    private suspend fun fetchDayData(lat: Double, lng: Double, date: LocalDate): DayData {
+    private suspend fun fetchDayData(lat: Double, lng: Double, date: LocalDate, repository: SettingsRepository): DayData {
         val sunProvider = SunriseSunsetProvider()
         val provider = MockPanchangamProvider()
-        val sunResult = sunProvider.getSunTimes(lat, lng, date)
-        val timings = provider.getTimings(date, sunResult.sunrise, sunResult.sunset)
+        
+        val sunDef = repository.sunriseDefinition.first()
+        val style = repository.specialPeriodStyle.first()
+        
+        val sunResult = sunProvider.getSunTimes(lat, lng, date, sunDef)
+        val timings = provider.getTimings(date, sunResult.sunrise, sunResult.sunset, style)
         
         return DayData(
             nallaNeram = timings.filterIsInstance<com.suresh.sacredtimeline.model.NallaNeram>(),
@@ -75,7 +79,16 @@ class WidgetUpdateWorker(
             specialPeriods = timings.filterIsInstance<com.suresh.sacredtimeline.model.SpecialPeriod>(),
             sunrise = sunResult.sunrise,
             sunset = sunResult.sunset,
-            isFallback = sunResult.isFallback
+            isFallback = sunResult.isFallback,
+            brahmaMuhurtham = com.suresh.sacredtimeline.model.Muhurtham(
+                "Brahma Muhurtham", "",
+                com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculateBrahmaMuhurtham(sunResult.sunrise).first,
+                com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculateBrahmaMuhurtham(sunResult.sunrise).second,
+                com.suresh.sacredtimeline.model.Auspiciousness.GREEN
+            ),
+            abhijitMuhurtham = com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculateAbhijitMuhurtham(sunResult.sunrise, sunResult.sunset)?.let {
+                com.suresh.sacredtimeline.model.Muhurtham("Abhijit Muhurtham", "", it.first, it.second, com.suresh.sacredtimeline.model.Auspiciousness.GREEN)
+            }
         )
     }
 
@@ -89,7 +102,7 @@ class WidgetUpdateWorker(
         val datesToLoad = (-rangeDays..rangeDays).map { centerDate.plusDays(it.toLong()) }
         datesToLoad.forEach { date ->
             if (!newCache.containsKey(date)) {
-                newCache[date] = fetchDayData(lat, lng, date)
+                newCache[date] = fetchDayData(lat, lng, date, repository)
             }
         }
         
@@ -105,13 +118,23 @@ class WidgetUpdateWorker(
         val date = LocalDate.now()
         val sunProvider = SunriseSunsetProvider()
         val provider = MockPanchangamProvider()
+        val repository = SettingsRepository(context)
 
-        val sunTimes = sunProvider.getSunTimes(lat, lng, date)
-        val timings = provider.getTimings(date, sunTimes.sunrise, sunTimes.sunset)
+        val sunDef = repository.sunriseDefinition.first()
+        val style = repository.specialPeriodStyle.first()
 
-        // Find the earliest endTime that is in the future
-        val nextTransition = timings
-            .map { it.endTime }
+        val sunTimes = sunProvider.getSunTimes(lat, lng, date, sunDef)
+        val timings = provider.getTimings(date, sunTimes.sunrise, sunTimes.sunset, style)
+        
+        val brahma = com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculateBrahmaMuhurtham(sunTimes.sunrise)
+        val abhijit = com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculateAbhijitMuhurtham(sunTimes.sunrise, sunTimes.sunset)
+
+        // Find the earliest endTime that is in the future across ALL possible blocks
+        val allEndTimes = timings.map { it.endTime }.toMutableList()
+        allEndTimes.add(brahma.second)
+        abhijit?.let { allEndTimes.add(it.second) }
+        
+        val nextTransition = allEndTimes
             .filter { it.isAfter(now) }
             .minByOrNull { it }
 

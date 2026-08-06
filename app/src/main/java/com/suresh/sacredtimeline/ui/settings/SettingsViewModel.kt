@@ -70,7 +70,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     )
 
     val nowLineColor: StateFlow<Int> = repository.nowLineColor.stateIn(
-        viewModelScope, SharingStarted.WhileSubscribed(5000), 0xFFFF0000.toInt()
+        viewModelScope, SharingStarted.WhileSubscribed(5000), 0xFF4CAF50.toInt()
     )
 
     val nowLineThickness: StateFlow<Float> = repository.nowLineThickness.stateIn(
@@ -130,6 +130,18 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
     val showAbhijitMuhurtham: StateFlow<Boolean> = repository.showAbhijitMuhurtham.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), false
+    )
+
+    val sunriseDefinition: StateFlow<String> = repository.sunriseDefinition.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), "SCIENTIFIC"
+    )
+
+    val specialPeriodStyle: StateFlow<String> = repository.specialPeriodStyle.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), "PROPORTIONAL"
+    )
+
+    val lunarMonthSystem: StateFlow<String> = repository.lunarMonthSystem.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), "AMANTA"
     )
 
     val language: StateFlow<String> = repository.language.stateIn(
@@ -314,6 +326,18 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
     fun setShowAbhijitMuhurtham(show: Boolean) {
         viewModelScope.launch { repository.setShowAbhijitMuhurtham(show) }
+    }
+
+    fun setSunriseDefinition(definition: String) {
+        viewModelScope.launch { repository.setSunriseDefinition(definition) }
+    }
+
+    fun setSpecialPeriodStyle(style: String) {
+        viewModelScope.launch { repository.setSpecialPeriodStyle(style) }
+    }
+
+    fun setLunarMonthSystem(system: String) {
+        viewModelScope.launch { repository.setLunarMonthSystem(system) }
     }
 }
 

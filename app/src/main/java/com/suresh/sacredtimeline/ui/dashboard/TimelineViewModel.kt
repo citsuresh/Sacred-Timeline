@@ -60,7 +60,7 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
     )
 
     val nowLineColor: StateFlow<Int> = repository.nowLineColor.stateIn(
-        viewModelScope, SharingStarted.WhileSubscribed(5000), 0xFFFF0000.toInt()
+        viewModelScope, SharingStarted.WhileSubscribed(5000), 0xFF4CAF50.toInt()
     )
 
     val nowLineThickness: StateFlow<Float> = repository.nowLineThickness.stateIn(
@@ -111,6 +111,14 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
 
     val showAbhijitMuhurtham: StateFlow<Boolean> = repository.showAbhijitMuhurtham.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), false
+    )
+
+    val sunriseDefinition: StateFlow<String> = repository.sunriseDefinition.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), "SCIENTIFIC"
+    )
+
+    val specialPeriodStyle: StateFlow<String> = repository.specialPeriodStyle.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), "PROPORTIONAL"
     )
 
     init {
@@ -177,10 +185,16 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
             }
         }
 
-        // Observe settings changes and clear cache to force re-calculation of filtered IDs
+        // Observe settings changes and clear cache to force re-calculation of filtered IDs and new precision
         viewModelScope.launch {
-            combine(repository.enabledTithis, repository.enabledNakshatras) { tithis, stars ->
-                tithis to stars
+            combine(
+                repository.enabledTithis, 
+                repository.enabledNakshatras,
+                repository.sunriseDefinition,
+                repository.specialPeriodStyle,
+                repository.lunarMonthSystem
+            ) { tithis, stars, sunDef, style, system ->
+                true // Just trigger
             }.collect {
                 cacheMutex.withLock { cachedDays.clear() }
                 preloadData(selectedDate.value, repository.preloadDays.first())
@@ -325,8 +339,11 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
 
     private suspend fun fetchDayData(date: LocalDate): DayData {
         val (lat, lng) = currentLocation
-        val sunResult = sunProvider.getSunTimes(lat, lng, date)
-        val timings = provider.getTimings(date, sunResult.sunrise, sunResult.sunset)
+        val sunDef = repository.sunriseDefinition.first()
+        val style = repository.specialPeriodStyle.first()
+
+        val sunResult = sunProvider.getSunTimes(lat, lng, date, sunDef)
+        val timings = provider.getTimings(date, sunResult.sunrise, sunResult.sunset, style)
         
         val tamilCalendar = com.suresh.sacredtimeline.logic.TamilCalendarUtils.getTamilDate(date)
         val lunarDayInfo = com.suresh.sacredtimeline.logic.LunarCalendarUtils.getLunarDayInfo(date)
@@ -368,14 +385,16 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
         val enabledTithisVal = repository.enabledTithis.first()
         val enabledStarsVal = repository.enabledNakshatras.first()
         
-        val filteredTithis = lunarDayInfo.tithis.filter { 
-            enabledTithisVal.contains("TITHI_${it.value}") 
+        val filteredTithis = lunarDayInfo.tithis.filter { interval ->
+            val normalizedValue = if (interval.value > 15) interval.value - 15 else interval.value
+            enabledTithisVal.contains("TITHI_${interval.value}") || 
+            (interval.value > 15 && enabledTithisVal.contains("TITHI_$normalizedValue"))
         }.map { 
             LunarInterval(it.value, it.resId, it.startTime, it.endTime)
         }
 
-        val filteredNakshatras = lunarDayInfo.nakshatras.filter { 
-            enabledStarsVal.contains("STAR_${it.value}") 
+        val filteredNakshatras = lunarDayInfo.nakshatras.filter { interval ->
+            enabledStarsVal.contains("STAR_${interval.value}") 
         }.map { 
             LunarInterval(it.value, it.resId, it.startTime, it.endTime)
         }

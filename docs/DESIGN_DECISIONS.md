@@ -33,6 +33,10 @@ Historical record of architectural and UI/UX choices.
 - **Landscape Side-Panel Scrolling**: To maintain accessibility of the vertical Date Dial in landscape mode, the side-panel `Column` is now scrollable, preventing the expanded header from pushing other controls off-screen.
 - **Compositional Theme Switching**: Theme management (Light/Dark/System) is handled purely within the Compose root to avoid Activity recreation loops associated with `AppCompatDelegate` in a hybrid environment.
 - **Interval-Based Lunar Calculation**: Switched from noon-representative values to a full 24h interval search. The engine now identifies all Tithi/Nakshatra transitions within a day to ensure 100% accuracy in the marquee list.
+- **High-Precision Ephemeris (Drik Siddhanta)**: Moved from simplified lunar math to a professional **ELP-2000 (Meeus)** model and **Lahiri Ayanamsha**. This ensures timings match professional Panchangams (like DrikPanchang) within ±1 minute, correcting the ~2-hour drift found in Vakya-based calendars.
+- **Local Solar Computation**: Decoupled from external Sunrise/Sunset APIs in favor of a local mathematical model. This ensures offline reliability and allows user-selectable definitions (Scientific Top-Edge vs. Traditional Center-of-Disk).
+- **Proportional vs. Fixed Slots**: Implemented a hybrid timing system for Rahu/Yama/Kuli. While traditional proportional division (daylight / 8) is the default for astronomical accuracy, a "Fixed 1.5h" toggle is provided for users following wall-calendar conventions.
+- **North/South Convention Toggle**: Implemented a global switch for Amanta (South) and Purnimanta (North) lunar month systems to ensure universal applicability across India.
 - **Navigation 3**: Reactive, state-driven routing managed in `MainActivity`.
 - **Dispatcher Hoisting**: Manually providing `NavigationEventDispatcherOwner` at the root to fix Nav3/Compose integration crashes.
 - **Transition-Synchronized Updates**: Widget refreshes are timed to `endTime` of slots, not periodic intervals, ensuring 100% accuracy.

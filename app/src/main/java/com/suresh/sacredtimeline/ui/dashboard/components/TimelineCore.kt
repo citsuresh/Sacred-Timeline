@@ -389,7 +389,7 @@ fun TimelineContent(
                                                 .sortedBy { it.startTime }
                                         }
                                         "NERAM_MUHURTHAM" -> {
-                                            (dayData.nallaNeram + 
+                                            (dayData.nallaNeram + dayData.specialPeriods +
                                              listOfNotNull(dayData.brahmaMuhurtham, dayData.abhijitMuhurtham))
                                                 .sortedBy { it.startTime }
                                         }
@@ -421,7 +421,7 @@ fun TimelineContent(
                                         .sortedBy { it.startTime }
                                 }
                                 ViewMode.NERAM_MUHURTHAM -> {
-                                    (dayData.nallaNeram + 
+                                    (dayData.nallaNeram + dayData.specialPeriods +
                                      listOfNotNull(dayData.brahmaMuhurtham, dayData.abhijitMuhurtham))
                                         .sortedBy { it.startTime }
                                 }

@@ -403,7 +403,13 @@ fun LunarItem(
         val zone = java.time.ZoneId.systemDefault()
         val startTime = start?.atZone(zone)
         val endTime = end?.atZone(zone)
+        val now = java.time.ZonedDateTime.now(zone)
         
+        // Use "Till" if currently active
+        if (startTime != null && endTime != null && now.isAfter(startTime) && now.isBefore(endTime)) {
+            return stringResource(R.string.label_till, formatWithAmPm(endTime.toLocalTime()))
+        }
+
         val startStr = when {
             startTime == null -> null
             startTime.toLocalDate().isBefore(viewDate) -> stringResource(R.string.label_started_yesterday_at, formatWithAmPm(startTime.toLocalTime()))

@@ -86,6 +86,19 @@ fun SettingsScreen(
         ) {
             item {
                 SettingsSection(title = stringResource(R.string.settings_display)) {
+                    val lunarMonthSystem by viewModel.lunarMonthSystem.collectAsState()
+                    val amantaLabel = stringResource(R.string.settings_amanta)
+                    val purnimantaLabel = stringResource(R.string.settings_purnimanta)
+
+                    SettingsDropdownItem(
+                        label = stringResource(R.string.settings_lunar_month_system),
+                        selected = if (lunarMonthSystem == "AMANTA") amantaLabel else purnimantaLabel,
+                        options = listOf(amantaLabel, purnimantaLabel),
+                        onOptionSelected = {
+                            viewModel.setLunarMonthSystem(if (it == amantaLabel) "AMANTA" else "PURNIMANTA")
+                        }
+                    )
+
                     SettingsDropdownItem(
                         label = stringResource(R.string.settings_language),
                         selected = currentLanguageLabel,
@@ -126,6 +139,34 @@ fun SettingsScreen(
                             if (index != -1) viewModel.setDefaultLaunchView(viewModeOptions[index])
                         }
                     )
+
+                    val sunriseDefinition by viewModel.sunriseDefinition.collectAsState()
+                    val specialPeriodStyle by viewModel.specialPeriodStyle.collectAsState()
+
+                    val scientificLabel = stringResource(R.string.settings_sunrise_scientific)
+                    val traditionalLabel = stringResource(R.string.settings_sunrise_traditional)
+                    
+                    SettingsDropdownItem(
+                        label = stringResource(R.string.settings_sunrise_definition),
+                        selected = if (sunriseDefinition == "SCIENTIFIC") scientificLabel else traditionalLabel,
+                        options = listOf(scientificLabel, traditionalLabel),
+                        onOptionSelected = {
+                            viewModel.setSunriseDefinition(if (it == scientificLabel) "SCIENTIFIC" else "TRADITIONAL")
+                        }
+                    )
+
+                    val proportionalLabel = stringResource(R.string.settings_style_proportional)
+                    val fixedLabel = stringResource(R.string.settings_style_fixed)
+
+                    SettingsDropdownItem(
+                        label = stringResource(R.string.settings_special_period_style),
+                        selected = if (specialPeriodStyle == "PROPORTIONAL") proportionalLabel else fixedLabel,
+                        options = listOf(proportionalLabel, fixedLabel),
+                        onOptionSelected = {
+                            viewModel.setSpecialPeriodStyle(if (it == proportionalLabel) "PROPORTIONAL" else "FIXED")
+                        }
+                    )
+
                     SettingsToggleItem(
                         label = stringResource(R.string.settings_time_format_24h),
                         checked = timeFormat24h,

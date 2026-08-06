@@ -6,11 +6,11 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 class MockPanchangamProvider {
-    fun getTimings(date: LocalDate, sunrise: LocalTime, sunset: LocalTime): List<Timing> {
+    fun getTimings(date: LocalDate, sunrise: LocalTime, sunset: LocalTime, style: String = "PROPORTIONAL"): List<Timing> {
         // Use yesterday's cycle to fill 00:00 to Today's Sunrise
-        val yesterdayCycle = PanchangamCalculator.calculateAllTimings(date.minusDays(1).dayOfWeek, sunrise, sunset)
+        val yesterdayCycle = PanchangamCalculator.calculateAllTimings(date.minusDays(1).dayOfWeek, sunrise, sunset, style)
         // Use today's cycle to fill Today's Sunrise to 23:59
-        val todayCycle = PanchangamCalculator.calculateAllTimings(date.dayOfWeek, sunrise, sunset)
+        val todayCycle = PanchangamCalculator.calculateAllTimings(date.dayOfWeek, sunrise, sunset, style)
         
         val result = mutableListOf<Timing>()
         

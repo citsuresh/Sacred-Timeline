@@ -68,16 +68,16 @@ object PanchangamCalculator {
         DayOfWeek.SATURDAY to 0
     )
 
-    fun calculateRahuKalam(dayOfWeek: DayOfWeek, sunrise: LocalTime, sunset: LocalTime): SpecialPeriod {
-        return calculateSpecialPeriod("Rahu", dayOfWeek, sunrise, sunset, RAHU_SEQUENCE, Auspiciousness.DARK_RED)
+    fun calculateRahuKalam(dayOfWeek: DayOfWeek, sunrise: LocalTime, sunset: LocalTime, style: String = "PROPORTIONAL"): SpecialPeriod {
+        return calculateSpecialPeriod("Rahu", dayOfWeek, sunrise, sunset, RAHU_SEQUENCE, Auspiciousness.DARK_RED, style)
     }
 
-    fun calculateYamagandam(dayOfWeek: DayOfWeek, sunrise: LocalTime, sunset: LocalTime): SpecialPeriod {
-        return calculateSpecialPeriod("Yama", dayOfWeek, sunrise, sunset, YAMA_SEQUENCE, Auspiciousness.ORANGE)
+    fun calculateYamagandam(dayOfWeek: DayOfWeek, sunrise: LocalTime, sunset: LocalTime, style: String = "PROPORTIONAL"): SpecialPeriod {
+        return calculateSpecialPeriod("Yama", dayOfWeek, sunrise, sunset, YAMA_SEQUENCE, Auspiciousness.ORANGE, style)
     }
 
-    fun calculateKuligai(dayOfWeek: DayOfWeek, sunrise: LocalTime, sunset: LocalTime): SpecialPeriod {
-        val period = calculateSpecialPeriod("Kuli", dayOfWeek, sunrise, sunset, KULI_SEQUENCE, Auspiciousness.GREY)
+    fun calculateKuligai(dayOfWeek: DayOfWeek, sunrise: LocalTime, sunset: LocalTime, style: String = "PROPORTIONAL"): SpecialPeriod {
+        val period = calculateSpecialPeriod("Kuli", dayOfWeek, sunrise, sunset, KULI_SEQUENCE, Auspiciousness.GREY, style)
         val name = if (period.startTime.isBefore(LocalTime.NOON)) "Kuli Dawn" else "Kuli Dusk"
         return period.copy(name = name)
     }
@@ -88,13 +88,23 @@ object PanchangamCalculator {
         sunrise: LocalTime,
         sunset: LocalTime,
         sequence: Map<DayOfWeek, Int>,
-        auspiciousness: Auspiciousness
+        auspiciousness: Auspiciousness,
+        style: String = "PROPORTIONAL"
     ): SpecialPeriod {
-        val duration = Duration.between(sunrise, sunset)
-        val slotDuration = duration.dividedBy(8)
         val slotIndex = sequence[dayOfWeek] ?: 0
-        val start = sunrise.plus(slotDuration.multipliedBy(slotIndex.toLong()))
-        val end = sunrise.plus(slotDuration.multipliedBy((slotIndex + 1).toLong()))
+        val (start, end) = if (style == "FIXED") {
+            // Standard wall calendar timings (based on 6AM sunrise approx)
+            // Each slot is exactly 1.5 hours
+            val s = LocalTime.of(6, 0).plusMinutes(slotIndex.toLong() * 90)
+            val e = s.plusMinutes(90)
+            s to e
+        } else {
+            val duration = Duration.between(sunrise, sunset)
+            val slotDuration = duration.dividedBy(8)
+            val s = sunrise.plus(slotDuration.multipliedBy(slotIndex.toLong()))
+            val e = sunrise.plus(slotDuration.multipliedBy((slotIndex + 1).toLong()))
+            s to e
+        }
         return SpecialPeriod(
             name = name,
             tamilName = "",
@@ -334,14 +344,14 @@ object PanchangamCalculator {
         }
     }
 
-    fun calculateAllTimings(dayOfWeek: DayOfWeek, sunrise: LocalTime, sunset: LocalTime): List<Timing> {
+    fun calculateAllTimings(dayOfWeek: DayOfWeek, sunrise: LocalTime, sunset: LocalTime, style: String = "PROPORTIONAL"): List<Timing> {
         return calculateNallaNeram(dayOfWeek, sunrise, sunset) +
                 calculateGowriNeram(dayOfWeek, sunrise, sunset) +
                 calculateHora(dayOfWeek, sunrise, sunset) +
                 listOf(
-                    calculateRahuKalam(dayOfWeek, sunrise, sunset),
-                    calculateYamagandam(dayOfWeek, sunrise, sunset),
-                    calculateKuligai(dayOfWeek, sunrise, sunset)
+                    calculateRahuKalam(dayOfWeek, sunrise, sunset, style),
+                    calculateYamagandam(dayOfWeek, sunrise, sunset, style),
+                    calculateKuligai(dayOfWeek, sunrise, sunset, style)
                 )
     }
 
