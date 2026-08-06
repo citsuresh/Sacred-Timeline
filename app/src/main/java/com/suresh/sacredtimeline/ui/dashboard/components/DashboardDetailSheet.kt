@@ -86,6 +86,7 @@ fun DashboardDetailSheet(
                                 is NallaNeram -> Metadata.getSpecialNameRes("Nalla")
                                 is GowriNeram -> Metadata.getGowriNameRes(t.name)
                                 is SpecialPeriod -> Metadata.getSpecialNameRes(t.name)
+                                is Muhurtham -> Metadata.getMuhurthamNameRes(t.name)
                             }
                             stringResource(nameRes)
                         }
@@ -250,6 +251,7 @@ fun DashboardDetailSheet(
                         is GowriNeram -> Metadata.getGowriDescription(t.name, context)
                         is SpecialPeriod -> Metadata.getSpecialDescription(t.name, context)
                         is NallaNeram -> Metadata.getSpecialDescription("Nalla", context)
+                        is Muhurtham -> Metadata.getSpecialDescription(t.name, context)
                     }
                 }
                 is DashboardDetail.Lunar -> {
@@ -285,6 +287,7 @@ fun DetailIcon(detail: DashboardDetail, tint: Color) {
                 is NallaNeram -> Icon(Icons.Default.Star, contentDescription = null, tint = tint)
                 is Hora -> Icon(Icons.Default.Today, contentDescription = null, tint = tint)
                 is GowriNeram -> Icon(Icons.Default.Brightness4, contentDescription = null, tint = tint)
+                is Muhurtham -> Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = tint)
                 is SpecialPeriod -> {
                     if (t.name == "Yama") {
                         Image(

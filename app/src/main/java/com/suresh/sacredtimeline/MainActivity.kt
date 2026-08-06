@@ -107,16 +107,28 @@ class MainActivity : AppCompatActivity() {
                         )
                         HorizontalDivider()
                         NavigationDrawerItem(
-                            label = { Text(stringResource(R.string.nav_composite)) },
-                            selected = currentRoute is NavRoute.Dashboard && currentRoute.mode == ViewMode.COMPOSITE,
+                            label = { Text(stringResource(R.string.nav_universal)) },
+                            selected = currentRoute is NavRoute.Dashboard && currentRoute.mode == ViewMode.UNIVERSAL,
                             onClick = {
                                 scope.launch {
                                     backStack.clear()
-                                    backStack.add(NavRoute.Dashboard(ViewMode.COMPOSITE))
+                                    backStack.add(NavRoute.Dashboard(ViewMode.UNIVERSAL))
                                     drawerState.close()
                                 }
                             },
-                            icon = { Icon(Icons.Default.ViewColumn, contentDescription = null) }
+                            icon = { Icon(Icons.Default.AllInclusive, contentDescription = null) }
+                        )
+                        NavigationDrawerItem(
+                            label = { Text(stringResource(R.string.nav_neram_muhurtham)) },
+                            selected = currentRoute is NavRoute.Dashboard && currentRoute.mode == ViewMode.NERAM_MUHURTHAM,
+                            onClick = {
+                                scope.launch {
+                                    backStack.clear()
+                                    backStack.add(NavRoute.Dashboard(ViewMode.NERAM_MUHURTHAM))
+                                    drawerState.close()
+                                }
+                            },
+                            icon = { Icon(Icons.Default.AutoAwesome, contentDescription = null) }
                         )
                         NavigationDrawerItem(
                             label = { Text(stringResource(R.string.nav_nalla_neram)) },

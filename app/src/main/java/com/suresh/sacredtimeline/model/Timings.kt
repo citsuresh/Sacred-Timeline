@@ -72,3 +72,15 @@ data class SpecialPeriod(
     override val auspiciousness: Auspiciousness,
     override val description: String = ""
 ) : Timing
+
+@Serializable
+data class Muhurtham(
+    override val name: String,
+    override val tamilName: String,
+    @Serializable(with = LocalTimeSerializer::class)
+    override val startTime: LocalTime,
+    @Serializable(with = LocalTimeSerializer::class)
+    override val endTime: LocalTime,
+    override val auspiciousness: Auspiciousness,
+    override val description: String = ""
+) : Timing

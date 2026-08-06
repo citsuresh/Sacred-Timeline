@@ -26,7 +26,6 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.time.LocalDate
-import java.time.LocalTime
 import java.util.Locale
 
 class TimelineViewModel(application: Application) : AndroidViewModel(application) {
@@ -71,11 +70,11 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
     val pinchToZoomEnabled = repository.pinchToZoomEnabled
 
     val columnVisibility: StateFlow<Set<String>> = repository.columnVisibility.stateIn(
-        viewModelScope, SharingStarted.WhileSubscribed(5000), setOf("NERAM", "GOWRI", "HORA")
+        viewModelScope, SharingStarted.WhileSubscribed(5000), setOf("UNIVERSAL")
     )
 
     val columnOrder: StateFlow<List<String>> = repository.columnOrder.stateIn(
-        viewModelScope, SharingStarted.WhileSubscribed(5000), listOf("NERAM", "GOWRI", "HORA")
+        viewModelScope, SharingStarted.WhileSubscribed(5000), listOf("NERAM_MUHURTHAM", "UNIVERSAL", "NERAM", "BRAHMA", "ABHIJIT", "GOWRI", "HORA")
     )
 
     val enabledTithis: StateFlow<Set<String>> = repository.enabledTithis.stateIn(
@@ -343,8 +342,27 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
         val festivals = com.suresh.sacredtimeline.logic.TamilCalendarUtils.getSpecialEvents(tamilCalendar, representativeLunarInfo)
         val holidays = com.suresh.sacredtimeline.data.VerifiedHolidays.getHolidays(date)
         
-        val brahma = com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculateBrahmaMuhurtham(sunResult.sunrise)
-        val abhijit = com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculateAbhijitMuhurtham(sunResult.sunrise, sunResult.sunset)
+        val brahmaTimes = com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculateBrahmaMuhurtham(sunResult.sunrise)
+        val brahma = Muhurtham(
+            name = "Brahma Muhurtham",
+            tamilName = "",
+            startTime = brahmaTimes.first,
+            endTime = brahmaTimes.second,
+            auspiciousness = Auspiciousness.GREEN,
+            description = ""
+        )
+
+        val abhijitTimes = com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculateAbhijitMuhurtham(sunResult.sunrise, sunResult.sunset)
+        val abhijit = abhijitTimes?.let {
+            Muhurtham(
+                name = "Abhijit Muhurtham",
+                tamilName = "",
+                startTime = it.first,
+                endTime = it.second,
+                auspiciousness = Auspiciousness.GREEN,
+                description = ""
+            )
+        }
 
         // Filter Tithi and Nakshatra based on user preferences
         val enabledTithisVal = repository.enabledTithis.first()

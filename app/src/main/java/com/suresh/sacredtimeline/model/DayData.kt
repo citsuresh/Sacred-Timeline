@@ -33,6 +33,6 @@ data class DayData(
     val nakshatras: List<LunarInterval> = emptyList(),
     val specialEvents: List<Int> = emptyList(),
     val isSubhaMuhurtham: Boolean = false,
-    val brahmaMuhurtham: Pair<@Serializable(with = LocalTimeSerializer::class) LocalTime, @Serializable(with = LocalTimeSerializer::class) LocalTime>? = null,
-    val abhijitMuhurtham: Pair<@Serializable(with = LocalTimeSerializer::class) LocalTime, @Serializable(with = LocalTimeSerializer::class) LocalTime>? = null
+    val brahmaMuhurtham: Muhurtham? = null,
+    val abhijitMuhurtham: Muhurtham? = null
 )

@@ -27,7 +27,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.gestures.calculateZoom
-import kotlin.math.abs
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -35,21 +34,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.suresh.sacredtimeline.R
-import com.suresh.sacredtimeline.model.DayData
-import com.suresh.sacredtimeline.model.Timing
+import com.suresh.sacredtimeline.model.*
 import com.suresh.sacredtimeline.ui.dashboard.TimelineUiState
 import com.suresh.sacredtimeline.ui.navigation.ViewMode
-import com.suresh.sacredtimeline.ui.theme.SeparatorGrey
+import com.suresh.sacredtimeline.ui.theme.*
 import kotlinx.coroutines.delay
 import java.time.LocalDate
 import java.time.LocalTime
-import java.util.*
 
 private val BASE_HOUR_HEIGHT = 160.dp
 private const val START_HOUR = 0
 private const val END_HOUR = 24
 private val TIME_COLUMN_WIDTH = 65.dp
+
+data class FullDayEvent(
+    val label: String,
+    val color: Color,
+    val backgroundColor: Color
+)
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -318,13 +322,44 @@ fun TimelineContent(
                     onDetailClick = onDetailClick
                 )
             }
-            TimelineHeader(viewMode = viewMode, columnVisibility = columnVisibility, columnOrder = columnOrder)
+            TimelineHeader(
+                viewMode = viewMode, 
+                columnVisibility = columnVisibility, 
+                columnOrder = columnOrder,
+                fullDayEvents = buildList {
+                    if (dayData.isSubhaMuhurtham) {
+                        add(FullDayEvent(stringResource(R.string.muhurtham_subha), SubhaMuhurthamGold, SubhaMuhurthamPale))
+                    }
+                    dayData.specialEvents.forEach { resId ->
+                        if (resId != R.string.event_pradosham && resId != R.string.event_sivaratri) {
+                            val (c, bg) = SacredTimelineColors.getEventColors(resId)
+                            add(FullDayEvent(stringResource(resId), c, bg))
+                        }
+                    }
+                }
+            )
         }
         
+        val currentBackgroundTint = remember(dayData) {
+            val hasGoldEvent = dayData.isSubhaMuhurtham || dayData.specialEvents.any { 
+                SacredTimelineColors.getEventColors(it).first == SubhaMuhurthamGold 
+            }
+            val hasPurpleEvent = dayData.specialEvents.any { 
+                SacredTimelineColors.getEventColors(it).first == HolidayPurple 
+            }
+
+            when {
+                hasGoldEvent -> SubhaMuhurthamPale
+                hasPurpleEvent -> HolidayPale
+                else -> null
+            }
+        }
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .onGloballyPositioned { containerHeight = it.size.height }
+                .then(if (currentBackgroundTint != null) Modifier.background(currentBackgroundTint) else Modifier)
         ) {
             Box(
                 modifier = Modifier
@@ -347,7 +382,20 @@ fun TimelineContent(
                             columnOrder.forEachIndexed { index, colId ->
                                 if (columnVisibility.contains(colId)) {
                                     val timings = when (colId) {
+                                        "UNIVERSAL" -> {
+                                            (dayData.nallaNeram + dayData.specialPeriods + 
+                                             dayData.gowriNeram + dayData.hora +
+                                             listOfNotNull(dayData.brahmaMuhurtham, dayData.abhijitMuhurtham))
+                                                .sortedBy { it.startTime }
+                                        }
+                                        "NERAM_MUHURTHAM" -> {
+                                            (dayData.nallaNeram + 
+                                             listOfNotNull(dayData.brahmaMuhurtham, dayData.abhijitMuhurtham))
+                                                .sortedBy { it.startTime }
+                                        }
                                         "NERAM" -> dayData.nallaNeram + dayData.specialPeriods
+                                        "BRAHMA" -> listOfNotNull(dayData.brahmaMuhurtham)
+                                        "ABHIJIT" -> listOfNotNull(dayData.abhijitMuhurtham)
                                         "GOWRI" -> dayData.gowriNeram
                                         "HORA" -> dayData.hora
                                         else -> emptyList()
@@ -365,11 +413,33 @@ fun TimelineContent(
                                 }
                             }
                         } else {
-                            when (viewMode) {
-                                ViewMode.NERAM -> TimelineColumn(dayData.nallaNeram + dayData.specialPeriods, onTimingClick, hourHeight, is24Hour, Modifier.weight(1f))
-                                ViewMode.GOWRI -> TimelineColumn(dayData.gowriNeram, onTimingClick, hourHeight, is24Hour, Modifier.weight(1f))
-                                ViewMode.HORA -> TimelineColumn(dayData.hora, onTimingClick, hourHeight, is24Hour, Modifier.weight(1f))
-                                else -> {}
+                            val timings = when (viewMode) {
+                                ViewMode.UNIVERSAL -> {
+                                    (dayData.nallaNeram + dayData.specialPeriods + 
+                                     dayData.gowriNeram + dayData.hora +
+                                     listOfNotNull(dayData.brahmaMuhurtham, dayData.abhijitMuhurtham))
+                                        .sortedBy { it.startTime }
+                                }
+                                ViewMode.NERAM_MUHURTHAM -> {
+                                    (dayData.nallaNeram + 
+                                     listOfNotNull(dayData.brahmaMuhurtham, dayData.abhijitMuhurtham))
+                                        .sortedBy { it.startTime }
+                                }
+                                ViewMode.NERAM -> dayData.nallaNeram + dayData.specialPeriods
+                                ViewMode.BRAHMA -> listOfNotNull(dayData.brahmaMuhurtham)
+                                ViewMode.ABHIJIT -> listOfNotNull(dayData.abhijitMuhurtham)
+                                ViewMode.GOWRI -> dayData.gowriNeram
+                                ViewMode.HORA -> dayData.hora
+                                ViewMode.COMPOSITE -> emptyList()
+                            }
+                            if (timings.isNotEmpty()) {
+                                TimelineColumn(
+                                    timings = timings, 
+                                    onTimingClick = onTimingClick, 
+                                    hourHeight = hourHeight, 
+                                    is24Hour = is24Hour, 
+                                    modifier = Modifier.weight(1f)
+                                )
                             }
                         }
                     }
@@ -443,43 +513,95 @@ fun TimelineContent(
 }
 
 @Composable
-fun TimelineHeader(viewMode: ViewMode, columnVisibility: Set<String> = emptySet(), columnOrder: List<String> = emptyList()) {
-    Row(
+fun TimelineHeader(
+    viewMode: ViewMode, 
+    columnVisibility: Set<String> = emptySet(), 
+    columnOrder: List<String> = emptyList(),
+    fullDayEvents: List<FullDayEvent> = emptyList()
+) {
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceVariant)
-            .padding(vertical = 12.dp)
-            .height(IntrinsicSize.Min)
     ) {
-        Spacer(modifier = Modifier.width(TIME_COLUMN_WIDTH))
-        Box(modifier = Modifier.fillMaxHeight().width(1.dp).background(SeparatorGrey))
-        
-        if (viewMode == ViewMode.COMPOSITE) {
-            columnOrder.forEach { colId ->
-                if (columnVisibility.contains(colId)) {
-                    val labelRes = when (colId) {
-                        "NERAM" -> R.string.nav_nalla_neram
-                        "GOWRI" -> R.string.nav_gowri_neram
-                        "HORA" -> R.string.nav_hora
-                        else -> R.string.app_name
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 12.dp)
+                .height(IntrinsicSize.Min)
+        ) {
+            Spacer(modifier = Modifier.width(TIME_COLUMN_WIDTH))
+            Box(modifier = Modifier.fillMaxHeight().width(1.dp).background(SeparatorGrey))
+            
+            if (viewMode == ViewMode.COMPOSITE) {
+                columnOrder.forEach { colId ->
+                    if (columnVisibility.contains(colId)) {
+                        val text = when (colId) {
+                            "UNIVERSAL" -> stringResource(R.string.nav_universal)
+                            "NERAM_MUHURTHAM" -> stringResource(R.string.nav_neram_muhurtham)
+                            "NERAM" -> stringResource(R.string.nav_nalla_neram)
+                            "BRAHMA" -> stringResource(R.string.muhurtham_brahma)
+                            "ABHIJIT" -> stringResource(R.string.muhurtham_abhijit)
+                            "GOWRI" -> stringResource(R.string.nav_gowri_neram)
+                            "HORA" -> stringResource(R.string.nav_hora)
+                            else -> stringResource(R.string.app_name)
+                        }
+                        Text(
+                            text = text,
+                            modifier = Modifier.weight(1f),
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
-                    Text(
-                        text = stringResource(labelRes),
-                        modifier = Modifier.weight(1f),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Bold
-                    )
+                }
+            } else {
+                val labelRes = when (viewMode) {
+                    ViewMode.UNIVERSAL -> R.string.nav_universal
+                    ViewMode.NERAM_MUHURTHAM -> R.string.nav_neram_muhurtham
+                    ViewMode.NERAM -> R.string.nav_nalla_neram
+                    ViewMode.BRAHMA -> R.string.muhurtham_brahma
+                    ViewMode.ABHIJIT -> R.string.muhurtham_abhijit
+                    ViewMode.GOWRI -> R.string.nav_gowri_neram
+                    ViewMode.HORA -> R.string.nav_hora
+                    ViewMode.COMPOSITE -> R.string.app_name
+                }
+                Text(stringResource(labelRes), modifier = Modifier.weight(1f), textAlign = TextAlign.Center, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            }
+        }
+
+        if (fullDayEvents.isNotEmpty()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Spacer(modifier = Modifier.width(TIME_COLUMN_WIDTH))
+                Row(
+                    modifier = Modifier.weight(1f),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    fullDayEvents.forEach { event ->
+                        Surface(
+                            color = event.color,
+                            shape = RoundedCornerShape(4.dp),
+                            shadowElevation = 2.dp,
+                            modifier = Modifier.padding(horizontal = 4.dp)
+                        ) {
+                            Text(
+                                text = event.label.uppercase(),
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                                style = MaterialTheme.typography.labelSmall,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Black,
+                                color = Color.White
+                            )
+                        }
+                    }
                 }
             }
-        } else {
-            val labelRes = when (viewMode) {
-                ViewMode.NERAM -> R.string.nav_nalla_neram
-                ViewMode.GOWRI -> R.string.nav_gowri_neram
-                ViewMode.HORA -> R.string.nav_hora
-                else -> R.string.app_name
-            }
-            Text(stringResource(labelRes), modifier = Modifier.weight(1f), textAlign = TextAlign.Center, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -490,11 +612,137 @@ fun TimelineColumn(
     onTimingClick: (Timing) -> Unit,
     hourHeight: Dp,
     is24Hour: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.fillMaxHeight()) {
-        timings.forEach { timing ->
-            TimingCard(timing = timing, hourHeight = hourHeight, is24Hour = is24Hour, onClick = { onTimingClick(timing) })
+        val lanes = remember(timings) { calculateLanes(timings) }
+        
+        lanes.forEach { (timing, laneInfo) ->
+            TimingCard(
+                timing = timing, 
+                hourHeight = hourHeight, 
+                is24Hour = is24Hour,
+                widthFactor = laneInfo.widthFactor,
+                horizontalOffsetFactor = laneInfo.offsetFactor,
+                onClick = { onTimingClick(timing) }
+            )
         }
     }
+}
+
+private data class LaneInfo(
+    val widthFactor: Float,
+    val offsetFactor: Float
+)
+
+private fun calculateLanes(timings: List<Timing>): Map<Timing, LaneInfo> {
+    if (timings.isEmpty()) return emptyMap()
+
+    val result = mutableMapOf<Timing, LaneInfo>()
+    
+    // 1. Group timings that belong to the same 'track'
+    val gowri = timings.filterIsInstance<GowriNeram>()
+    val horai = timings.filterIsInstance<Hora>()
+    val middle = timings.filter { it !is GowriNeram && it !is Hora }
+
+    // 2. For each track, resolve internal overlaps by assigning sub-indices
+    val gowriSubLanes = resolveInternalLanes(gowri)
+    val horaiSubLanes = resolveInternalLanes(horai)
+    val middleSubLanes = resolveInternalLanes(middle)
+
+    // 3. For each item, calculate how many tracks are active during its span
+    timings.forEach { timing ->
+        val overlapping = timings.filter { overlaps(it, timing) }
+        
+        // Find which tracks are represented in this span
+        val hasGowri = overlapping.any { it is GowriNeram }
+        val hasMiddle = overlapping.any { it !is GowriNeram && it !is Hora }
+        val hasHorai = overlapping.any { it is Hora }
+        
+        val activeTracks = mutableListOf<Int>()
+        if (hasGowri) activeTracks.add(0)
+        if (hasMiddle) activeTracks.add(1)
+        if (hasHorai) activeTracks.add(2)
+        
+        val totalTracks = activeTracks.size
+        val trackWidth = 1.0f / totalTracks
+        
+        val myTrack = when (timing) {
+            is GowriNeram -> 0
+            is Hora -> 2
+            else -> 1
+        }
+        val myTrackIndex = activeTracks.indexOf(myTrack)
+        
+        // Now factor in internal track sub-division
+        val subLaneInfo = when (timing) {
+            is GowriNeram -> gowriSubLanes[timing]!!
+            is Hora -> horaiSubLanes[timing]!!
+            else -> middleSubLanes[timing]!!
+        }
+        
+        // To maintain equal distribution, we find the max sub-lanes needed for this track 
+        // during this specific item's span.
+        val itemsInMyTrackInSpan = overlapping.filter { 
+            when (it) {
+                is GowriNeram -> myTrack == 0
+                is Hora -> myTrack == 2
+                else -> myTrack == 1
+            }
+        }
+        val maxSubLanesInTrack = itemsInMyTrackInSpan.map { 
+            when (it) {
+                is GowriNeram -> gowriSubLanes[it]!!.total
+                is Hora -> horaiSubLanes[it]!!.total
+                else -> middleSubLanes[it]!!.total
+            }
+        }.maxOrNull() ?: 1
+
+        val finalWidth = trackWidth / maxSubLanesInTrack
+        val trackOffset = myTrackIndex * trackWidth
+        val subOffset = subLaneInfo.index * finalWidth
+        
+        result[timing] = LaneInfo(
+            widthFactor = finalWidth,
+            offsetFactor = trackOffset + subOffset
+        )
+    }
+
+    return result
+}
+
+private data class SubLaneInfo(val index: Int, val total: Int)
+
+private fun resolveInternalLanes(items: List<Timing>): Map<Timing, SubLaneInfo> {
+    if (items.isEmpty()) return emptyMap()
+    val result = mutableMapOf<Timing, Int>()
+    val sorted = items.sortedBy { it.startTime }
+    
+    sorted.forEach { t ->
+        val overlapping = sorted.filter { result.containsKey(it) && overlaps(it, t) }
+        val used = overlapping.map { result[it]!! }
+        var idx = 0
+        while (used.contains(idx)) idx++
+        result[t] = idx
+    }
+    
+    // Calculate total concurrent for each item's specific span
+    return result.mapValues { (t, idx) ->
+        val overlapping = items.filter { overlaps(it, t) }
+        // The number of sub-lanes needed is the max concurrent at any point in t's range
+        val timePoints = (overlapping.map { it.startTime } + overlapping.map { it.endTime })
+            .filter { !it.isBefore(t.startTime) && !it.isAfter(t.endTime) }
+            .distinct().sorted()
+        
+        var maxC = 1
+        for (i in 0 until timePoints.size - 1) {
+            val count = overlapping.count { it.startTime.isBefore(timePoints[i+1]) && it.endTime.isAfter(timePoints[i]) }
+            maxC = maxOf(maxC, count)
+        }
+        SubLaneInfo(idx, maxC)
+    }
+}
+
+private fun overlaps(t1: Timing, t2: Timing): Boolean {
+    return t1.startTime.isBefore(t2.endTime) && t2.startTime.isBefore(t1.endTime)
 }

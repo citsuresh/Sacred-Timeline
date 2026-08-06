@@ -2,9 +2,13 @@
     <string name="app_name">Sacred Timeline</string>
     <string name="nav_dashboard">Dashboard</string>
     <string name="nav_composite">Composite View</string>
-    <string name="nav_nalla_neram">Nalla Neram</string>
+    <string name="nav_nalla_neram">Neram</string>
     <string name="nav_gowri_neram">Gowri Neram</string>
-    <string name="nav_hora">Hora</string>
+    <string name="nav_hora">Horai</string>
+    <string name="nav_universal">Universal Timeline</string>
+    <string name="nav_neram_muhurtham">Neram / Muhurtham</string>
+    <string name="view_mode_universal">Universal</string>
+    <string name="view_mode_neram_muhurtham">Neram / Muhurtham</string>
     <string name="nav_settings">Settings</string>
 
     <!-- Timing Names -->
@@ -382,7 +386,7 @@
     <string name="view_mode_composite">Composite</string>
     <string name="view_mode_neram">Nalla Neram</string>
     <string name="view_mode_gowri">Gowri Neram</string>
-    <string name="view_mode_hora">Hora</string>
+    <string name="view_mode_hora">Horai</string>
 
     <!-- Common UI -->
     <string name="btn_ok">OK</string>
@@ -562,4 +566,7 @@
         <item>Endurance training</item>
     </string-array>
 
+    <string name="label_muhurtham_short">Muhurtham</string>
+    <string name="label_neram_short">Neram</string>
+    <string name="label_special_short">Special</string>
 </resources>

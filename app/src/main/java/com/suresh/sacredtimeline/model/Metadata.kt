@@ -69,7 +69,19 @@ object Metadata {
             "Yama" -> R.string.desc_timing_yama
             "Kuli", "Kuli Dawn", "Kuli Dusk" -> R.string.desc_timing_kuli
             "Morning", "Evening" -> R.string.desc_timing_nalla
+            "Abhijit Muhurtham" -> R.string.muhurtham_desc_abhijit
+            "Brahma Muhurtham" -> R.string.muhurtham_desc_brahma
             else -> R.string.app_name
+        }
+    }
+
+    @StringRes
+    fun getCategoryShortNameRes(timing: Timing): Int {
+        return when (timing) {
+            is NallaNeram, is SpecialPeriod -> R.string.label_neram_short
+            is GowriNeram -> R.string.nav_gowri_neram
+            is Hora -> R.string.nav_hora
+            is Muhurtham -> R.string.label_muhurtham_short
         }
     }
     
@@ -280,6 +292,15 @@ object Metadata {
             context.resources.getStringArray(resourceId).toList()
         } catch (e: Exception) {
             listOf(context.getString(R.string.guidance_default))
+        }
+    }
+
+    @StringRes
+    fun getMuhurthamNameRes(name: String): Int {
+        return when (name) {
+            "Brahma Muhurtham" -> R.string.muhurtham_brahma
+            "Abhijit Muhurtham" -> R.string.muhurtham_abhijit
+            else -> R.string.app_name
         }
     }
 }

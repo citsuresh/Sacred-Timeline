@@ -2,9 +2,14 @@
     <string name="app_name">புனித காலவரிசை</string>
     <string name="nav_dashboard">டாஷ்போர்டு</string>
     <string name="nav_composite">கூட்டுப் பார்வை</string>
-    <string name="nav_nalla_neram">நல்ல நேரம்</string>
+    <string name="nav_nalla_neram">நேரம்</string>
     <string name="nav_gowri_neram">கௌரி நேரம்</string>
     <string name="nav_hora">ஹோரை</string>
+    <string name="nav_universal">முழுமையான காலவரிசை</string>
+    <string name="nav_neram_muhurtham">நேரம் / முஹூர்த்தம்</string>
+    <string name="view_mode_universal">அனைத்தும்</string>
+    <string name="view_mode_neram_muhurtham">நேரம் / முஹூர்த்தம்</string>
+    <string name="view_mode_hora">ஹோரை</string>
     <string name="nav_settings">அமைப்புகள்</string>
 
     <!-- Timing Names -->
@@ -238,4 +243,7 @@
     <string name="muhurtham_desc_abhijit">அபிஜித் முஹூர்த்தம்: எந்தவொரு வேலைக்கும் அன்றைய நாளின் மிகவும் மங்களகரமான நேரம். வெற்றி கிடைக்க அதிக வாய்ப்புள்ளது.</string>
     <string name="muhurtham_desc_subha">முக்கியமான வாழ்க்கை நிகழ்வுகளுக்கான சரிபார்க்கப்பட்ட மங்களகரமான காலம்.</string>
 
+    <string name="label_muhurtham_short">முஹூர்த்தம்</string>
+    <string name="label_neram_short">நேரம்</string>
+    <string name="label_special_short">சிறப்பு</string>
 </resources>

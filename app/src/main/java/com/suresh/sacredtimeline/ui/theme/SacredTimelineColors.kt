@@ -1,6 +1,7 @@
 package com.suresh.sacredtimeline.ui.theme
 
 import androidx.compose.ui.graphics.Color
+import com.suresh.sacredtimeline.R
 import com.suresh.sacredtimeline.model.*
 
 object SacredTimelineColors {
@@ -39,6 +40,30 @@ object SacredTimelineColors {
                     else -> KuliDawnGrey
                 }
             }
+            is Muhurtham -> {
+                if (timing.name == "Abhijit Muhurtham") Color(0xFF4CAF50) else Color(0xFFE91E63)
+            }
+        }
+    }
+
+    fun getSubhaMuhurthamTextColor(): Color = SubhaMuhurthamGold
+    fun getSubhaMuhurthamBackgroundColor(): Color = SubhaMuhurthamPale
+
+    fun getEventColors(resId: Int): Pair<Color, Color> {
+        val isTraditional = when (resId) {
+            R.string.event_pongal, R.string.event_thiruvalluvar_day, 
+            R.string.event_tamil_new_year, R.string.event_deepavali,
+            R.string.event_aadi_perukku, R.string.event_aadi_pooram,
+            R.string.event_naga_chaturthi, R.string.event_naga_panchami,
+            R.string.event_garuda_panchami, R.string.event_vinayagar_chaturthi,
+            R.string.event_sankatahara_chaturthi -> true
+            else -> false
+        }
+        
+        return if (isTraditional) {
+            SubhaMuhurthamGold to SubhaMuhurthamPale
+        } else {
+            HolidayPurple to HolidayPale
         }
     }
 

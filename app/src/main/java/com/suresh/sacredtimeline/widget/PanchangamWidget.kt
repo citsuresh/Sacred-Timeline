@@ -87,7 +87,16 @@ class PanchangamWidget : GlanceAppWidget() {
                 specialPeriods = timings.filterIsInstance<SpecialPeriod>(),
                 sunrise = sunResult.sunrise,
                 sunset = sunResult.sunset,
-                isFallback = sunResult.isFallback
+                isFallback = sunResult.isFallback,
+                brahmaMuhurtham = Muhurtham(
+                    "Brahma Muhurtham", "",
+                    com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculateBrahmaMuhurtham(sunResult.sunrise).first,
+                    com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculateBrahmaMuhurtham(sunResult.sunrise).second,
+                    Auspiciousness.GREEN
+                ),
+                abhijitMuhurtham = com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculateAbhijitMuhurtham(sunResult.sunrise, sunResult.sunset)?.let {
+                    Muhurtham("Abhijit Muhurtham", "", it.first, it.second, Auspiciousness.GREEN)
+                }
             )
         }
 
@@ -131,6 +140,12 @@ class PanchangamWidget : GlanceAppWidget() {
                 columnOrder.forEach { colId ->
                     if (columnVisibility.contains(colId)) {
                         when (colId) {
+                            "ABHIJIT" -> {
+                                val currentAbhijit = if (dayData.abhijitMuhurtham?.isCurrent(now) == true) dayData.abhijitMuhurtham else null
+                                val nextAbhijit = if (dayData.abhijitMuhurtham?.startTime?.isAfter(now) == true) dayData.abhijitMuhurtham else null
+                                val label = if (currentAbhijit != null) context.getString(R.string.muhurtham_abhijit) else "None"
+                                TimingColumn(context.getString(R.string.muhurtham_abhijit), label, currentAbhijit, nextAbhijit, timeFormatter, GlanceModifier.defaultWeight())
+                            }
                             "NERAM" -> {
                                 val currentNalla = dayData.nallaNeram.find { it.isCurrent(now) }
                                 val currentSpecial = dayData.specialPeriods.find { it.isCurrent(now) }

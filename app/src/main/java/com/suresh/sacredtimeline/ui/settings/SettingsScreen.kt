@@ -47,9 +47,13 @@ fun SettingsScreen(
     @Composable
     fun getLocalizedViewModeName(mode: ViewMode): String = when (mode) {
         ViewMode.COMPOSITE -> stringResource(R.string.view_mode_composite)
+        ViewMode.UNIVERSAL -> stringResource(R.string.view_mode_universal)
+        ViewMode.NERAM_MUHURTHAM -> stringResource(R.string.view_mode_neram_muhurtham)
         ViewMode.NERAM -> stringResource(R.string.view_mode_neram)
+        ViewMode.BRAHMA -> stringResource(R.string.muhurtham_brahma)
+        ViewMode.ABHIJIT -> stringResource(R.string.muhurtham_abhijit)
         ViewMode.GOWRI -> stringResource(R.string.view_mode_gowri)
-        ViewMode.HORA -> stringResource(R.string.view_mode_hora)
+        ViewMode.HORA -> stringResource(R.string.nav_hora)
     }
 
     val englishLabel = "English"
@@ -165,9 +169,13 @@ fun SettingsScreen(
                         val isVisible = columnVisibility.contains(colId)
                         ColumnOrderItem(
                             name = when(colId) {
-                                "NERAM" -> stringResource(R.string.view_mode_neram)
+                                "UNIVERSAL" -> stringResource(R.string.nav_universal)
+                                "NERAM_MUHURTHAM" -> stringResource(R.string.nav_neram_muhurtham)
+                                "NERAM" -> stringResource(R.string.nav_nalla_neram)
+                                "BRAHMA" -> stringResource(R.string.muhurtham_brahma)
+                                "ABHIJIT" -> stringResource(R.string.muhurtham_abhijit)
                                 "GOWRI" -> stringResource(R.string.view_mode_gowri)
-                                "HORA" -> stringResource(R.string.view_mode_hora)
+                                "HORA" -> stringResource(R.string.nav_hora)
                                 else -> colId
                             },
                             isVisible = isVisible,
@@ -299,9 +307,13 @@ fun SettingsScreen(
                         val isVisible = widgetColumnVisibility.contains(colId)
                         ColumnOrderItem(
                             name = when(colId) {
-                                "NERAM" -> stringResource(R.string.view_mode_neram)
+                                "UNIVERSAL" -> stringResource(R.string.nav_universal)
+                                "NERAM_MUHURTHAM" -> stringResource(R.string.nav_neram_muhurtham)
+                                "NERAM" -> stringResource(R.string.nav_nalla_neram)
+                                "BRAHMA" -> stringResource(R.string.muhurtham_brahma)
+                                "ABHIJIT" -> stringResource(R.string.muhurtham_abhijit)
                                 "GOWRI" -> stringResource(R.string.view_mode_gowri)
-                                "HORA" -> stringResource(R.string.view_mode_hora)
+                                "HORA" -> stringResource(R.string.nav_hora)
                                 else -> colId
                             },
                             isVisible = isVisible,

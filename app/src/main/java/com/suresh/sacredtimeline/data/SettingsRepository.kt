@@ -50,20 +50,20 @@ class SettingsRepository(private val context: Context) {
     val singleViewScale: Flow<Float> = context.dataStore.data.map { it[Keys.SINGLE_VIEW_SCALE] ?: 0.5f }
     
     val columnVisibility: Flow<Set<String>> = context.dataStore.data.map { 
-        it[Keys.COLUMN_VISIBILITY] ?: setOf("NERAM", "GOWRI", "HORA")
+        it[Keys.COLUMN_VISIBILITY] ?: setOf("UNIVERSAL")
     }
 
     val columnOrder: Flow<List<String>> = context.dataStore.data.map { 
-        val orderString = it[Keys.COLUMN_ORDER] ?: "NERAM,GOWRI,HORA"
+        val orderString = it[Keys.COLUMN_ORDER] ?: "NERAM_MUHURTHAM,UNIVERSAL,NERAM,BRAHMA,ABHIJIT,GOWRI,HORA"
         orderString.split(",").filter { it.isNotBlank() }
     }
 
     val widgetColumnVisibility: Flow<Set<String>> = context.dataStore.data.map { 
-        it[Keys.WIDGET_COLUMN_VISIBILITY] ?: setOf("NERAM", "GOWRI", "HORA")
+        it[Keys.WIDGET_COLUMN_VISIBILITY] ?: setOf("UNIVERSAL")
     }
 
     val widgetColumnOrder: Flow<List<String>> = context.dataStore.data.map { 
-        val orderString = it[Keys.WIDGET_COLUMN_ORDER] ?: "NERAM,GOWRI,HORA"
+        val orderString = it[Keys.WIDGET_COLUMN_ORDER] ?: "NERAM_MUHURTHAM,UNIVERSAL,NERAM,BRAHMA,ABHIJIT,GOWRI,HORA"
         orderString.split(",").filter { it.isNotBlank() }
     }
 
@@ -105,8 +105,8 @@ class SettingsRepository(private val context: Context) {
     val showPirai: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_PIRAI] ?: true }
     val showSunrise: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_SUNRISE] ?: true }
     val showSunset: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_SUNSET] ?: true }
-    val showBrahmaMuhurtham: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_BRAHMA_MUHURTHAM] ?: false }
-    val showAbhijitMuhurtham: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_ABHIJIT_MUHURTHAM] ?: false }
+    val showBrahmaMuhurtham: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_BRAHMA_MUHURTHAM] ?: true }
+    val showAbhijitMuhurtham: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_ABHIJIT_MUHURTHAM] ?: true }
 
     suspend fun updateCompositeScale(scale: Float) {
         context.dataStore.edit { it[Keys.COMPOSITE_SCALE] = scale.coerceIn(0.2f, 3.0f) }
@@ -118,7 +118,7 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun updateColumnVisibility(column: String, visible: Boolean) {
         context.dataStore.edit { prefs ->
-            val current = prefs[Keys.COLUMN_VISIBILITY] ?: setOf("NERAM", "GOWRI", "HORA")
+            val current = prefs[Keys.COLUMN_VISIBILITY] ?: setOf("UNIVERSAL")
             val newSet = current.toMutableSet()
             if (visible) newSet.add(column) else newSet.remove(column)
             prefs[Keys.COLUMN_VISIBILITY] = newSet
@@ -131,7 +131,7 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun updateWidgetColumnVisibility(column: String, visible: Boolean) {
         context.dataStore.edit { prefs ->
-            val current = prefs[Keys.WIDGET_COLUMN_VISIBILITY] ?: setOf("NERAM", "GOWRI", "HORA")
+            val current = prefs[Keys.WIDGET_COLUMN_VISIBILITY] ?: setOf("UNIVERSAL")
             val newSet = current.toMutableSet()
             if (visible) newSet.add(column) else newSet.remove(column)
             prefs[Keys.WIDGET_COLUMN_VISIBILITY] = newSet

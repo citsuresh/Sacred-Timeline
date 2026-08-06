@@ -39,3 +39,9 @@ val CardOuterBorderColor = Color(0xFFFFFFFF)
 val CompatibilityFavorable = Color(0xFF4CAF50)
 val CompatibilityConflicting = Color(0xFFF44336)
 val CompatibilityNeutral = Color(0xFF9E9E9E)
+
+val SubhaMuhurthamGold = Color(0xFFA68900)
+val SubhaMuhurthamPale = Color(0xFFFFD700).copy(alpha = 0.18f)
+
+val HolidayPurple = Color(0xFF7B1FA2)
+val HolidayPale = Color(0xFFE1BEE7).copy(alpha = 0.25f)

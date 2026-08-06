@@ -42,19 +42,19 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     )
 
     val columnVisibility: StateFlow<Set<String>> = repository.columnVisibility.stateIn(
-        viewModelScope, SharingStarted.WhileSubscribed(5000), setOf("NERAM", "GOWRI", "HORA")
+        viewModelScope, SharingStarted.WhileSubscribed(5000), setOf("UNIVERSAL")
     )
 
     val columnOrder: StateFlow<List<String>> = repository.columnOrder.stateIn(
-        viewModelScope, SharingStarted.WhileSubscribed(5000), listOf("NERAM", "GOWRI", "HORA")
+        viewModelScope, SharingStarted.WhileSubscribed(5000), listOf("NERAM_MUHURTHAM", "UNIVERSAL", "NERAM", "BRAHMA", "ABHIJIT", "GOWRI", "HORA")
     )
 
     val widgetColumnVisibility: StateFlow<Set<String>> = repository.widgetColumnVisibility.stateIn(
-        viewModelScope, SharingStarted.WhileSubscribed(5000), setOf("NERAM", "GOWRI", "HORA")
+        viewModelScope, SharingStarted.WhileSubscribed(5000), setOf("UNIVERSAL")
     )
 
     val widgetColumnOrder: StateFlow<List<String>> = repository.widgetColumnOrder.stateIn(
-        viewModelScope, SharingStarted.WhileSubscribed(5000), listOf("NERAM", "GOWRI", "HORA")
+        viewModelScope, SharingStarted.WhileSubscribed(5000), listOf("NERAM_MUHURTHAM", "UNIVERSAL", "NERAM", "BRAHMA", "ABHIJIT", "GOWRI", "HORA")
     )
 
     val defaultLaunchView: StateFlow<ViewMode> = repository.defaultLaunchView.stateIn(

@@ -6,7 +6,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 enum class ViewMode {
     COMPOSITE,
+    UNIVERSAL,
+    NERAM_MUHURTHAM,
     NERAM,
+    BRAHMA,
+    ABHIJIT,
     GOWRI,
     HORA
 }

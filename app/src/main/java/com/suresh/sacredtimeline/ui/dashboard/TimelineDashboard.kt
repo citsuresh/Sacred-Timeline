@@ -21,7 +21,7 @@ import com.suresh.sacredtimeline.ui.navigation.ViewMode
 import com.suresh.sacredtimeline.ui.theme.SacredTimelineTheme
 import java.time.Instant
 import java.time.LocalDate
-import java.time.ZoneId
+import java.time.ZoneOffset
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class, ExperimentalFoundationApi::class)
 @Composable
@@ -41,8 +41,8 @@ fun TimelineDashboard(
     val showNowLine by viewModel.showNowLine.collectAsState(initial = true)
     val nowLineColor by viewModel.nowLineColor.collectAsState()
     val nowLineThickness by viewModel.nowLineThickness.collectAsState()
-    val columnVisibility by viewModel.columnVisibility.collectAsState(initial = setOf("NERAM", "GOWRI", "HORA"))
-    val columnOrder by viewModel.columnOrder.collectAsState(initial = listOf("NERAM", "GOWRI", "HORA"))
+    val columnVisibility by viewModel.columnVisibility.collectAsState(initial = setOf("UNIVERSAL"))
+    val columnOrder by viewModel.columnOrder.collectAsState(initial = listOf("NERAM_MUHURTHAM", "UNIVERSAL", "NERAM", "BRAHMA", "ABHIJIT", "GOWRI", "HORA"))
     
     val showTamilDate by viewModel.showTamilDate.collectAsState()
     val showTamilYear by viewModel.showTamilYear.collectAsState()
@@ -86,17 +86,16 @@ fun TimelineDashboard(
         )
     }
 
-    val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = selectedDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-    )
-
     if (showDatePicker) {
+        val datePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = selectedDate.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
+        )
         DatePickerDialog(
             onDismissRequest = { showDatePicker = false },
             confirmButton = {
                 TextButton(onClick = {
                     datePickerState.selectedDateMillis?.let { millis ->
-                        val newDate = Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDate()
+                        val newDate = Instant.ofEpochMilli(millis).atZone(ZoneOffset.UTC).toLocalDate()
                         viewModel.updateDate(newDate)
                     }
                     showDatePicker = false
@@ -150,22 +149,33 @@ fun TimelineDashboard(
     }
 
     val dates = remember {
-        (-30..30).map { LocalDate.now().plusDays(it.toLong()) }
+        val start = LocalDate.of(2024, 1, 1)
+        (0..1500).map { start.plusDays(it.toLong()) }
     }
-    val initialPage = dates.indexOf(selectedDate).coerceAtLeast(0)
-    val pagerState = rememberPagerState(initialPage = initialPage, pageCount = { dates.size })
+    val pagerState = rememberPagerState(
+        initialPage = dates.indexOf(selectedDate).coerceAtLeast(0), 
+        pageCount = { dates.size }
+    )
 
+    // View -> Pager: Scroll when selectedDate changes (e.g. from Picker or Dials)
     LaunchedEffect(selectedDate) {
         val page = dates.indexOf(selectedDate)
         if (page != -1 && page != pagerState.currentPage) {
-            pagerState.animateScrollToPage(page)
+            // Use scrollToPage for immediate jumps to avoid mid-way glitches
+            // Or animateScrollToPage if we're sure about the sync
+            pagerState.scrollToPage(page)
         }
     }
 
-    LaunchedEffect(pagerState.currentPage) {
-        val date = dates[pagerState.currentPage]
-        if (date != selectedDate) {
-            viewModel.updateDate(date)
+    // Pager -> View: Update selectedDate when user swipes
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.currentPage }.collect { page ->
+            if (page in dates.indices) {
+                val date = dates[page]
+                if (date != selectedDate) {
+                    viewModel.updateDate(date)
+                }
+            }
         }
     }
 

@@ -476,8 +476,8 @@ fun SunTimesDisplay(
     tithiValue: Int,
     specialEvents: List<Int>,
     isSubhaMuhurtham: Boolean,
-    abhijitMuhurtham: Pair<LocalTime, LocalTime>?,
-    brahmaMuhurtham: Pair<LocalTime, LocalTime>? = null,
+    abhijitMuhurtham: com.suresh.sacredtimeline.model.Muhurtham?,
+    brahmaMuhurtham: com.suresh.sacredtimeline.model.Muhurtham? = null,
     showTamilDate: Boolean,
     showTamilYear: Boolean,
     showPirai: Boolean,
@@ -583,13 +583,13 @@ fun SunTimesDisplay(
                     }
                 }
                 if (showBrahmaMuhurtham && brahmaMuhurtham != null) {
-                    MuhurthamItem(R.string.muhurtham_brahma, brahmaMuhurtham.first, brahmaMuhurtham.second, Icons.Default.Star, Color(0xFFE91E63), is24Hour, maxLines = Int.MAX_VALUE) {
-                        onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.Muhurtham(R.string.muhurtham_brahma, brahmaMuhurtham.first, brahmaMuhurtham.second))
+                    MuhurthamItem(R.string.muhurtham_brahma, brahmaMuhurtham.startTime, brahmaMuhurtham.endTime, Icons.Default.Star, Color(0xFFE91E63), is24Hour, maxLines = Int.MAX_VALUE) {
+                        onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.Muhurtham(R.string.muhurtham_brahma, brahmaMuhurtham.startTime, brahmaMuhurtham.endTime))
                     }
                 }
                 if (showAbhijitMuhurtham && abhijitMuhurtham != null) {
-                    MuhurthamItem(R.string.muhurtham_abhijit, abhijitMuhurtham.first, abhijitMuhurtham.second, Icons.Default.Star, Color(0xFF4CAF50), is24Hour, maxLines = Int.MAX_VALUE) {
-                        onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.Muhurtham(R.string.muhurtham_abhijit, abhijitMuhurtham.first, abhijitMuhurtham.second))
+                    MuhurthamItem(R.string.muhurtham_abhijit, abhijitMuhurtham.startTime, abhijitMuhurtham.endTime, Icons.Default.Star, Color(0xFF4CAF50), is24Hour, maxLines = Int.MAX_VALUE) {
+                        onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.Muhurtham(R.string.muhurtham_abhijit, abhijitMuhurtham.startTime, abhijitMuhurtham.endTime))
                     }
                 }
             }
@@ -756,16 +756,16 @@ fun SunTimesDisplay(
                                 .padding(horizontal = 8.dp)
                         ) {
                             if (hasBrahma) {
-                                MuhurthamItem(R.string.muhurtham_brahma, brahmaMuhurtham!!.first, brahmaMuhurtham!!.second, Icons.Default.Star, Color(0xFFE91E63), is24Hour) {
-                                    onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.Muhurtham(R.string.muhurtham_brahma, brahmaMuhurtham.first, brahmaMuhurtham.second))
+                                MuhurthamItem(R.string.muhurtham_brahma, brahmaMuhurtham.startTime, brahmaMuhurtham.endTime, Icons.Default.Star, Color(0xFFE91E63), is24Hour) {
+                                    onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.Muhurtham(R.string.muhurtham_brahma, brahmaMuhurtham.startTime, brahmaMuhurtham.endTime))
                                 }
                             }
                             if (hasBrahma && hasAbhijit) {
                                 Text("  •  ", color = Color.Gray, style = MaterialTheme.typography.labelSmall)
                             }
                             if (hasAbhijit) {
-                                MuhurthamItem(R.string.muhurtham_abhijit, abhijitMuhurtham!!.first, abhijitMuhurtham!!.second, Icons.Default.Star, Color(0xFF4CAF50), is24Hour) {
-                                    onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.Muhurtham(R.string.muhurtham_abhijit, abhijitMuhurtham.first, abhijitMuhurtham.second))
+                                MuhurthamItem(R.string.muhurtham_abhijit, abhijitMuhurtham.startTime, abhijitMuhurtham.endTime, Icons.Default.Star, Color(0xFF4CAF50), is24Hour) {
+                                    onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.Muhurtham(R.string.muhurtham_abhijit, abhijitMuhurtham.startTime, abhijitMuhurtham.endTime))
                                 }
                             }
                         }
