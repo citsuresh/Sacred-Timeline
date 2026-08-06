@@ -236,6 +236,45 @@
     <string name="year_59">Krodhana</string>
     <string name="year_60">Akshaya</string>
 
+    <!-- Tithi Descriptions -->
+    <string name="tithi_desc_generic">Tithi is the lunar day. Each Tithi has specific energy influencing daily activities.</string>
+    <string name="tithi_desc_1">Pratipada: Good for religious ceremonies and starting new ventures.</string>
+    <string name="tithi_desc_2">Dwitiya: Auspicious for laying foundations, weddings, and long-term investments.</string>
+    <string name="tithi_desc_3">Tritiya: Very auspicious for all virtuous deeds and auspicious beginnings.</string>
+    <string name="tithi_desc_4">Chaturthi: Associated with Lord Ganesha. Good for removing obstacles, but generally avoided for weddings.</string>
+    <string name="tithi_desc_5">Panchami: Favorable for all religious activities and administrative work.</string>
+    <string name="tithi_desc_6">Shashti: Associated with Lord Muruga. Favorable for construction and courageous deeds.</string>
+    <string name="tithi_desc_7">Saptami: Auspicious for starting journeys and medical treatments.</string>
+    <string name="tithi_desc_8">Ashtami: Suitable for finishing tasks, but avoid starting new ventures if possible.</string>
+    <string name="tithi_desc_9">Navami: Generally avoided for auspicious beginnings; good for conquering enemies or legal matters.</string>
+    <string name="tithi_desc_10">Dashami: Highly auspicious for all kinds of work, travels, and new ventures.</string>
+    <string name="tithi_desc_11">Ekadashi: Excellent for fasting, spiritual practices, and religious observances.</string>
+    <string name="tithi_desc_12">Dwadashi: Good for charity and completing religious rituals started on Ekadashi.</string>
+    <string name="tithi_desc_13">Trayodashi: Associated with Pradosham. Good for friendship, arts, and spiritual growth.</string>
+    <string name="tithi_desc_14">Chaturdashi: Avoid for auspicious beginnings; suitable for spiritual practices and finishing tasks.</string>
+    <string name="tithi_desc_15">Pournami: Extremely auspicious for all virtuous deeds, meditation, and rituals.</string>
+    <string name="tithi_desc_30">Amavasai: Dedicated to ancestors (Pitrus). Good for charity and spiritual introspection; avoid new ventures.</string>
+
+    <!-- Nakshatra Descriptions -->
+    <string name="star_desc_generic">The Nakshatra or Star during this period influences the mental and emotional state. This star is traditionally used to determine suitability for activities.</string>
+    <string name="star_desc_3">Krittika: Associated with fire. Good for purification, hard work, and technical tasks.</string>
+    <string name="star_desc_4">Rohini: Very auspicious. Ideal for growth, creativity, and all positive beginnings.</string>
+    <string name="star_desc_8">Pushya: The most auspicious star for all virtuous and nourishing activities.</string>
+
+    <!-- Event Descriptions -->
+    <string name="event_desc_pradosham">An auspicious period dedicated to Lord Shiva. Ideal for seeking forgiveness and spiritual liberation.</string>
+    <string name="event_desc_sivaratri">A monthly observance for Lord Shiva. Focus on meditation, fasting, and spiritual vigil.</string>
+    <string name="event_desc_generic">A special religious or traditional event observed during this period.</string>
+    <string name="event_desc_tamil_date">The Tamil Calendar is a sidereal solar calendar used traditionally in Tamil Nadu. It marks months based on the sun\'s entry into zodiac signs.</string>
+
+    <!-- Tamil Month Descriptions (Optional but nice) -->
+    <string name="desc_month_generic">This month in the Tamil calendar has unique spiritual and seasonal significance.</string>
+
+    <!-- Muhurtham Descriptions -->
+    <string name="muhurtham_desc_brahma">The "Time of Brahma." Highly auspicious for meditation, yoga, and starting the day with focus.</string>
+    <string name="muhurtham_desc_abhijit">The most auspicious time of the day for any work. Success is highly likely.</string>
+    <string name="muhurtham_desc_subha">A verified auspicious window for significant life events.</string>
+
     <!-- Settings Labels -->
     <string name="settings_title">Settings</string>
     <string name="settings_display">Display</string>

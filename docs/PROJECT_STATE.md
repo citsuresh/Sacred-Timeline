@@ -3,6 +3,8 @@
 **Phase**: Alpha/Stable (Phase 3 Complete)
 
 ## 1. Recently Implemented
+- **Header Significance Details**: Added a details pane (BottomSheet) for every item in the header (Tithi, Nakshatra, Events, Muhurthams) with traditional guidance and precise start/end times.
+- **Interactive Marquees**: Replaced `basicMarquee` with a custom `AutoScrollingRow` to ensure all scrolling header items remain 100% clickable during animation.
 - **Timeline Timing Toggles**: New settings to show/hide Sunrise, Sunset, and Brahma Muhurtham.
 - **Brahma Muhurtham Display**: Explicit window calculation and UI integration in the dashboard.
 - **Header Standardization**: Established three-row layout terminology: Calendar Row, Events Row, and Timings Row.

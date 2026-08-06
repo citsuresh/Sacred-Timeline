@@ -103,27 +103,27 @@
     <string name="tithi_12">துவாதசி</string>
     <string name="tithi_13">திரயோதசி</string>
     <string name="tithi_14">சதுர்தசி</string>
-    <string name="tithi_15">பௌர்ணமி</string>
-    <string name="tithi_16">பிரதமை (கிருஷ்ண பட்சம்)</string>
-    <string name="tithi_17">துவிதியை (கிருஷ்ண பட்சம்)</string>
-    <string name="tithi_18">திருதியை (கிருஷ்ண பட்சம்)</string>
+    <string name="tithi_15">பௌர்ணமி (முழு நிலவு)</string>
+    <string name="tithi_16">பிரதமை (தேய்பிறை)</string>
+    <string name="tithi_17">துவிதியை (தேய்பிறை)</string>
+    <string name="tithi_18">திருதியை (தேய்பிறை)</string>
     <string name="tithi_19">சங்கடஹர சதுர்த்தி</string>
-    <string name="tithi_20">பஞ்சமி (கிருஷ்ண பட்சம்)</string>
-    <string name="tithi_21">சஷ்டி (கிருஷ்ண பட்சம்)</string>
-    <string name="tithi_22">சப்தமி (கிருஷ்ண பட்சம்)</string>
-    <string name="tithi_23">அஷ்டமி (கிருஷ்ண பட்சம்)</string>
-    <string name="tithi_24">நவமி (கிருஷ்ண பட்சம்)</string>
-    <string name="tithi_25">தசமி (கிருஷ்ண பட்சம்)</string>
-    <string name="tithi_26">ஏகாதசி (கிருஷ்ண பட்சம்)</string>
-    <string name="tithi_27">துவாதசி (கிருஷ்ண பட்சம்)</string>
-    <string name="tithi_28">திரயோதசி (கிருஷ்ண பட்சம்)</string>
-    <string name="tithi_29">சதுர்தசி (கிருஷ்ண பட்சம்)</string>
-    <string name="tithi_30">அமாவாசை</string>
+    <string name="tithi_20">பஞ்சமி (தேய்பிறை)</string>
+    <string name="tithi_21">சஷ்டி (தேய்பிறை)</string>
+    <string name="tithi_22">சப்தமி (தேய்பிறை)</string>
+    <string name="tithi_23">அஷ்டமி (தேய்பிறை)</string>
+    <string name="tithi_24">நவமி (தேய்பிறை)</string>
+    <string name="tithi_25">தசமி (தேய்பிறை)</string>
+    <string name="tithi_26">ஏகாதசி (தேய்பிறை)</string>
+    <string name="tithi_27">துவாதசி (தேய்பிறை)</string>
+    <string name="tithi_28">திரயோதசி (தேய்பிறை)</string>
+    <string name="tithi_29">சதுர்தசி (தேய்பிறை)</string>
+    <string name="tithi_30">அமாவாசை (புது நிலவு)</string>
 
     <!-- Nakshatras -->
     <string name="star_1">அசுவினி</string>
     <string name="star_2">பரணி</string>
-    <string name="star_3">கார்த்திகை</string>
+    <string name="star_3">கிருத்திகை</string>
     <string name="star_4">ரோகிணி</string>
     <string name="star_5">மிருகசீரிடம்</string>
     <string name="star_6">திருவாதிரை</string>
@@ -149,327 +149,42 @@
     <string name="star_26">உத்திரட்டாதி</string>
     <string name="star_27">ரேவதி</string>
 
-    <!-- Muhurthams -->
-    <string name="muhurtham_brahma">பிரம்ம முகூர்த்தம்</string>
-    <string name="muhurtham_abhijit">அபிஜித் முகூர்த்தம்</string>
-    <string name="muhurtham_subha">சுப முகூர்த்தம்</string>
+    <!-- Tithi Descriptions -->
+    <string name="tithi_desc_generic">திதி என்பது சந்திர நாள். ஒவ்வொரு திதிக்கும் தினசரி நடவடிக்கைகளில் பாதிப்பை ஏற்படுத்தும் குறிப்பிட்ட ஆற்றல் உள்ளது.</string>
+    <string name="tithi_desc_1">பிரதமை: மதச் சடங்குகளுக்கும் புதிய முயற்சிகளைத் தொடங்குவதற்கும் நல்லது.</string>
+    <string name="tithi_desc_2">துவிதியை: அஸ்திவாரம் அமைப்பதற்கும், திருமணங்களுக்கும், நீண்ட கால முதலீடுகளுக்கும் உகந்தது.</string>
+    <string name="tithi_desc_3">திருதியை: அனைத்து நற்பண்புகளுக்கும் நன்மையான தொடக்கங்களுக்கும் மிகவும் மங்களகரமானது.</string>
+    <string name="tithi_desc_4">சதுர்த்தி: விநாயகப் பெருமானுடன் தொடர்புடையது. தடைகளை நீக்க நல்லது, ஆனால் பொதுவாக திருமணங்களைத் தவிர்ப்பது நல்லது.</string>
+    <string name="tithi_desc_5">பஞ்சமி: அனைத்து மத நடவடிக்கைகளுக்கும் நிர்வாகப் பணிகளுக்கும் சாதகமானது.</string>
+    <string name="tithi_desc_6">சஷ்டி: முருகப் பெருமானுடன் தொடர்புடையது. கட்டுமானப் பணிகளுக்கும் துணிச்சலான செயல்களுக்கும் சாதகமானது.</string>
+    <string name="tithi_desc_7">சப்தமி: பயணங்களைத் தொடங்குவதற்கும் மருத்துவ சிகிச்சைகளுக்கும் மங்களகரமானது.</string>
+    <string name="tithi_desc_8">அஷ்டமி: பணிகளை முடிக்க ஏற்றது, ஆனால் முடிந்தவரை புதிய முயற்சிகளைத் தவிர்க்கவும்.</string>
+    <string name="tithi_desc_9">நவமி: பொதுவாக மங்களகரமான தொடக்கங்களைத் தவிர்ப்பது நல்லது; எதிரிகளை வெல்வதற்கும் சட்ட விவகாரங்களுக்கும் நல்லது.</string>
+    <string name="tithi_desc_10">தசமி: அனைத்து வகையான வேலைகளுக்கும், பயணங்களுக்கும், புதிய முயற்சிகளுக்கும் மிகவும் மங்களகரமானது.</string>
+    <string name="tithi_desc_11">ஏகாதசி: விரதங்கள், ஆன்மீகப் பயிற்சிகள் மற்றும் மத அனுஷ்டானங்களுக்குச் சிறந்தது.</string>
+    <string name="tithi_desc_12">துவாதசி: தானம் செய்வதற்கும் ஏகாதசியில் தொடங்கிய மதச் சடங்குகளை முடிப்பதற்கும் நல்லது.</string>
+    <string name="tithi_desc_13">திரயோதசி: பிரதோஷத்துடன் தொடர்புடையது. நட்பு, கலை மற்றும் ஆன்மீக வளர்ச்சிக்கு நல்லது.</string>
+    <string name="tithi_desc_14">சதுர்தசி: மங்களகரமான தொடக்கங்களைத் தவிர்க்கவும்; ஆன்மீகப் பயிற்சிகளுக்கும் பணிகளை முடிப்பதற்கும் ஏற்றது.</string>
+    <string name="tithi_desc_15">பௌர்ணமி: அனைத்து நற்பண்புகளுக்கும், தியானத்திற்கும், சடங்குகளுக்கும் மிகவும் மங்களகரமானது.</string>
+    <string name="tithi_desc_30">அமாவாசை: முன்னோர்களுக்கு (பித்ருக்கள்) அர்ப்பணிக்கப்பட்டது. தானம் மற்றும் ஆன்மீக சுயபரிசோதனைக்கு நல்லது; புதிய முயற்சிகளைத் தவிர்க்கவும்.</string>
 
-    <!-- Events -->
-    <string name="event_aadi_perukku">ஆடிப் பெருக்கு</string>
-    <string name="event_aadi_pooram">ஆடிப் பூரம்</string>
-    <string name="event_naga_chaturthi">நாக சதுர்த்தி</string>
-    <string name="event_naga_panchami">நாக பஞ்சமி</string>
-    <string name="event_garuda_panchami">கருட பஞ்சமி</string>
-    <string name="event_pradosham">பிரதோஷம்</string>
-    <string name="event_sivaratri">மகா சிவராத்திரி</string>
-    <string name="event_sankatahara_chaturthi">சங்கடஹர சதுர்த்தி</string>
-    <string name="event_vinayagar_chaturthi">விநாயகர் சதுர்த்தி</string>
-    <string name="event_deepavali">தீபாவளி</string>
-    <string name="event_pongal">தைப்பொங்கல்</string>
-    <string name="event_tamil_new_year">தமிழ்ப் புத்தாண்டு</string>
-    <string name="event_independence_day">சுதந்திர தினம்</string>
-    <string name="event_republic_day">குடியரசு தினம்</string>
-    <string name="event_milad_un_nabi">மிிலாதுன் நபி</string>
-    <string name="event_gandhi_jayanthi">காந்தி ஜெயந்தி</string>
-    <string name="event_christmas">கிறிஸ்துமஸ்</string>
-    <string name="event_thiruvalluvar_day">திருவள்ளுவர் தினம்</string>
+    <!-- Nakshatra Descriptions -->
+    <string name="star_desc_generic">இந்தக் காலத்தில் இருக்கும் நட்சத்திரம் மன மற்றும் உணர்ச்சி நிலையை பாதிக்கிறது. இந்த நட்சத்திரம் பாரம்பரியமாக நடவடிக்கைகளுக்கான பொருத்தத்தை தீர்மானிக்கப் பயன்படுகிறது.</string>
+    <string name="star_desc_3">கிருத்திகை: நெருப்புடன் தொடர்புடையது. சுத்திகரிப்பு, கடின உழைப்பு மற்றும் தொழில்நுட்ப பணிகளுக்கு நல்லது.</string>
+    <string name="star_desc_4">ரோகிணி: மிகவும் மங்களகரமானது. வளர்ச்சி, படைப்பாற்றல் மற்றும் அனைத்து நேர்மறையான தொடக்கங்களுக்கும் ஏற்றது.</string>
+    <string name="star_desc_8">பூசம்: அனைத்து நற்பண்புகளுக்கும் ஊக்கமளிக்கும் நடவடிக்கைகளுக்கும் மிகவும் மங்களகரமான நட்சத்திரம்.</string>
 
-    <!-- Tamil Years (60 Year Cycle) -->
-    <string name="year_1">பிரபவ</string>
-    <string name="year_2">விபவ</string>
-    <string name="year_3">சுக்ல</string>
-    <string name="year_4">பிரமோதூத</string>
-    <string name="year_5">பிரசோற்பத்தி</string>
-    <string name="year_6">ஆங்கீரச</string>
-    <string name="year_7">ஸ்ரீமுக</string>
-    <string name="year_8">பவ</string>
-    <string name="year_9">யுவ</string>
-    <string name="year_10">தாது</string>
-    <string name="year_11">ஈஸ்வர</string>
-    <string name="year_12">வெகுதானிய</string>
-    <string name="year_13">பிரமாதி</string>
-    <string name="year_14">விக்கிரம</string>
-    <string name="year_15">விஷு</string>
-    <string name="year_16">சித்திரபானு</string>
-    <string name="year_17">சுபானு</string>
-    <string name="year_18">தாரண</string>
-    <string name="year_19">பார்த்திப</string>
-    <string name="year_20">விய</string>
-    <string name="year_21">சர்வசித்து</string>
-    <string name="year_22">சர்வதாரி</string>
-    <string name="year_23">விரோதி</string>
-    <string name="year_24">விக்ருதி</string>
-    <string name="year_25">கர</string>
-    <string name="year_26">நந்தன</string>
-    <string name="year_27">விஜய</string>
-    <string name="year_28">ஜய</string>
-    <string name="year_29">மன்மத</string>
-    <string name="year_30">துன்முகி</string>
-    <string name="year_31">ஹேவிளம்பி</string>
-    <string name="year_32">விளம்பி</string>
-    <string name="year_33">விகாரி</string>
-    <string name="year_34">சார்வரி</string>
-    <string name="year_35">பிலவ</string>
-    <string name="year_36">சுபகிருது</string>
-    <string name="year_37">சோபகிருது</string>
-    <string name="year_38">குரோதி</string>
-    <string name="year_39">விசுவாசுவ</string>
-    <string name="year_40">பராபவ</string>
-    <string name="year_41">பிலவங்க</string>
-    <string name="year_42">கீலக</string>
-    <string name="year_43">சௌமிய</string>
-    <string name="year_44">சாதாரண</string>
-    <string name="year_45">விரோதிகிருது</string>
-    <string name="year_46">பரிதாபி</string>
-    <string name="year_47">பிரமாதீச</string>
-    <string name="year_48">ஆனந்த</string>
-    <string name="year_49">ராட்சச</string>
-    <string name="year_50">நள</string>
-    <string name="year_51">பிங்கள</string>
-    <string name="year_52">காலயுக்தி</string>
-    <string name="year_53">சித்தார்த்தி</string>
-    <string name="year_54">ரௌத்திரி</string>
-    <string name="year_55">துன்மதி</string>
-    <string name="year_56">துந்துபி</string>
-    <string name="year_57">ருத்ரோத்காரி</string>
-    <string name="year_58">ரக்தாட்சி</string>
-    <string name="year_59">குரோதன</string>
-    <string name="year_60">அட்சய</string>
+    <!-- Event Descriptions -->
+    <string name="event_desc_pradosham">சிவபெருமானுக்கு அர்ப்பணிக்கப்பட்ட ஒரு மங்களகரமான காலம். மன்னிப்பு மற்றும் ஆன்மீக விடுதலையைப் பெறுவதற்கு ஏற்றது.</string>
+    <string name="event_desc_sivaratri">சிவபெருமானுக்கு மாதாந்திர அனுஷ்டானம். தியானம், விரதம் மற்றும் ஆன்மீக விழிப்புணர்வில் கவனம் செலுத்துங்கள்.</string>
+    <string name="event_desc_generic">இந்தக் காலத்தில் கடைபிடிக்கப்படும் ஒரு சிறப்பு மத அல்லது பாரம்பரிய நிகழ்வு.</string>
+    <string name="event_desc_tamil_date">தமிழ் நாட்காட்டி என்பது தமிழ்நாட்டில் பாரம்பரியமாகப் பயன்படுத்தப்படும் ஒரு சூரிய நாட்காட்டியாகும். இது ராசிகளில் சூரியன் நுழைவதைப் பொறுத்து மாதங்களைக் குறிக்கிறது.</string>
 
-    <!-- Settings Labels -->
-    <string name="settings_title">அமைப்புகள்</string>
-    <string name="settings_display">காட்சி</string>
-    <string name="settings_language">பயன்பாட்டு மொழி</string>
-    <string name="settings_theme">பயன்பாட்டு தீம்</string>
-    <string name="settings_theme_system">கணினி இயல்புநிலை</string>
-    <string name="settings_theme_light">ஒளி தீம்</string>
-    <string name="settings_theme_dark">இருண்ட தீம்</string>
-    <string name="settings_default_launch_view">தொடக்கத்தில் இயல்புநிலை பார்வை</string>
-    <string name="settings_time_format_24h">24-மணிநேர வடிவத்தைப் பயன்படுத்தவும்</string>
-    <string name="settings_columns_composite">நெடுவரிசை மேலாண்மை (கூட்டுப் பார்வை மட்டும்)</string>
-    <string name="settings_columns_desc">கூட்டுப் பார்வைக்கான நெடுவரிசைகளை மறுவரிசைப்படுத்தவும் அல்லது மறைக்கவும். ஒற்றைப் பார்வைகள் (ஹோரை, கௌரி போன்றவை) எப்போதும் அவற்றின் நெடுவரிசையைக் காட்டும்.</string>
-    <string name="settings_location">இருப்பிடம்</string>
-    <string name="settings_location_mode">இருப்பிட முறை</string>
-    <string name="settings_location_auto">ஜிபிஎஸ் தானாக கண்டறிதல்</string>
-    <string name="settings_location_manual">கையேடு நகரம்</string>
-    <string name="settings_city_name">நகரத்தின் பெயர்</string>
-    <string name="settings_search_city">நகரத்தைத் தேடு</string>
-    <string name="settings_widget_mgmt">விட்ஜெட் மேலாண்மை</string>
-    <string name="settings_widget_refresh">விட்ஜெட் புதுப்பிப்பு காலம்</string>
-    <string name="settings_widget_columns">நெடுவரிசை மேலாண்மை (விட்ஜெட்)</string>
-    <string name="settings_refresh_min">%1$d நிமி</string>
-    <string name="settings_refresh_hr">%1$d மணி</string>
-    <string name="settings_preload_days">%1$d நாட்கள்</string>
-    <string name="settings_density">காலவரிசை அடர்த்தி</string>
-    <string name="settings_zoom_composite">கூட்டுப் பார்வை பெரிதாக்கம்</string>
-    <string name="settings_zoom_single">ஒற்றைப் பார்வை பெரிதாக்கம்</string>
-    <string name="settings_pinch_zoom">கிள்ளு-பெரிதாக்கலை இயக்கு</string>
-    <string name="settings_indicators">காலவரிசை காட்சி</string>
-    <string name="settings_show_tamil_date">தமிழ் தேதியைக் காட்டு</string>
-    <string name="settings_show_tamil_year">தமிழ் ஆண்டைக் காட்டு</string>
-    <string name="settings_show_pirai">பிறையைக் காட்டு</string>
-    <string name="settings_show_sunrise">சூரிய உதயத்தைக் காட்டு</string>
-    <string name="settings_show_sunset">சூரிய அஸ்தமனத்தைக் காட்டு</string>
-    <string name="settings_show_brahma_muhurtham">பிரம்ம முகூர்த்தத்தைக் காட்டு</string>
-    <string name="settings_show_abhijit_muhurtham">அபிஜித் முகூர்த்தத்தைக் காட்டு</string>
-    <string name="settings_tithi_options">காண்பிக்கப்பட வேண்டிய திதிகள்</string>
-    <string name="settings_star_options">காண்பிக்கப்பட வேண்டிய நட்சத்திரங்கள்</string>
-    <string name="settings_show_now_line">இப்போது கோட்டைக் காட்டு</string>
-    <string name="settings_line_color">கோட்டின் நிறம்</string>
-    <string name="settings_line_thickness">கோட்டின் தடிமன்</string>
-    <string name="settings_advanced">மேம்பட்ட (கேச்)</string>
-    <string name="settings_preload_range">முன்பதிவு வரம்பு</string>
-    <string name="settings_clear_cache">கேச் அழிக்கவும்</string>
+    <string name="desc_month_generic">தமிழ் நாட்காட்டியில் உள்ள இந்த மாதம் தனித்துவமான ஆன்மீக மற்றும் பருவகால முக்கியத்துவத்தைக் கொண்டுள்ளது.</string>
 
-    <string name="lang_english">English</string>
-    <string name="lang_tamil">தமிழ்</string>
-
-    <string name="label_am">மு.ப</string>
-    <string name="label_pm">பி.ப</string>
-    <string name="label_zoom_value">பெரிதாக்கம்: %1$.1fx</string>
-
-    <!-- View Modes -->
-    <string name="view_mode_composite">கூட்டுப் பார்வை</string>
-    <string name="view_mode_neram">நல்ல நேரம்</string>
-    <string name="view_mode_gowri">கௌரி நேரம்</string>
-    <string name="view_mode_hora">ஹோரை</string>
-
-    <!-- Common UI -->
-    <string name="btn_ok">சரி</string>
-    <string name="btn_cancel">ரத்துசெய்</string>
-    <string name="btn_update">புதுப்பிப்பு</string>
-    <string name="btn_search">தேடு</string>
-    <string name="dialog_change_location">இருப்பிடத்தை மாற்றவும்</string>
-    <string name="dialog_location_hint">காட்சிக்கு நகரத்தின் பெயர் அல்லது பகுதி பெயரை கைமுறையாக உள்ளிடவும்.</string>
-    <string name="unknown_route">தெரியாத பாதை</string>
-
-    <!-- Metadata: Gowri Descriptions -->
-    <string name="desc_gowri_amridha">மிகவும் மங்களகரமானது. எந்தவொரு பணியையும் தொடங்குவதற்கும், பயணங்களுக்கும், புதிய முயற்சிகளுக்கும் சிறந்தது.</string>
-    <string name="desc_gowri_uthi">முற்போக்கான மற்றும் சாதகமானது. வளர்ச்சி, விரிவாக்கம் மற்றும் நிர்வாகப் பணிகளுக்கு நல்லது.</string>
-    <string name="desc_gowri_labam">இலாபகரமானது. வணிக ஒப்பந்தங்கள், நிதி பரிவர்த்தனைகள் மற்றும் வர்த்தகத்திற்கு ஏற்றது.</string>
-    <string name="desc_gowri_dhanam">செல்வத்தை உருவாக்குதல். முதலீடுகள் மற்றும் சொத்துக்களை வாங்குவதற்கு சாதகமானது.</string>
-    <string name="desc_gowri_sugam">வசதியானது. அமைதி தொடர்பான நடவடிக்கைகள் மற்றும் உள்நாட்டு விஷயங்களுக்கு நல்லது.</string>
-    <string name="desc_gowri_soram">திருட்டு/இழப்பு அபாயம். பெரிய பணத்தைக் கையாளுவதையோ அல்லது அதிக ஆபத்துள்ள வேலையைத் தொடங்குவதையோ தவிர்க்கவும்.</string>
-    <string name="desc_gowri_visham">விஷமானது/நச்சுத்தன்மை வாய்ந்தது. மருத்துவ சிகிச்சைகள் அல்லது புதிய திட்டங்களைத் தொடங்குவதைத் தவிர்க்கவும்.</string>
-    <string name="desc_gowri_rogam">நோய்/வியாதி. அசுபமானது; உடல்நலம் தொடர்பான நடவடிக்கைகள் அல்லது பயணத்தைத் தவிர்க்கவும்.</string>
-
-    <!-- Metadata: Special Descriptions -->
-    <string name="desc_timing_rahu">அசுப காலம். புதிய முயற்சிகள், முக்கிய கொள்முதல் அல்லது முக்கியமான கூட்டங்களைத் தொடங்குவதைத் தவிர்க்கவும்.\n\nசெய்யுங்கள்: வழக்கமான பணிகள், சுத்தம் செய்தல், ஆன்மீகப் பயிற்சிகள்.\nவேண்டாம்: பயணம், ஒப்பந்தங்களில் கையெழுத்திடுதல், சொத்துக்களை வாங்குதல்.</string>
-    <string name="desc_timing_yama">அசுப காலம். பெரும்பாலும் இழப்பு அல்லது தடைகளுடன் தொடர்புடையது. எதையும் புதிதாகத் தொடங்குவதைத் தவிர்க்கவும்.\n\nசெய்யுங்கள்: கடன்களைத் திருப்பிச் செலுத்துதல், நிலுவையில் உள்ள வேலையை முடித்தல், விடுவித்தல்.\nவேண்டாம்: புதிய திட்டங்கள், மருத்துவ சிகிச்சைகள், நீண்ட பயணங்கள்.</string>
-    <string name="desc_timing_kuli">விரிவாக்க காலம். இந்த நேரத்தில் செய்வது மீண்டும் நிகழும். சொத்துக்களை வாங்குவதற்கு நல்லது, தீய செயல்களுக்கு அல்ல.\n\nசெய்யுங்கள்: தொண்டு, முதலீடுகள், நேர்மறையான பழக்கங்களைத் தொடங்குதல்.\nவேண்டாம்: கடன் வாங்குதல், இறுதிச் சடங்குகள், எதிர்மறையான நடத்தைகள்.</string>
-    <string name="desc_timing_nalla">முக்கியமான நடவடிக்கைகளுக்கு நாளின் மிகவும் மங்களகரமான நேரம்.</string>
-
-    <!-- Metadata: Planet Qualities -->
-    <string name="quality_sun">அதிகாரம், உயிர்ச்சக்தி, தலைமைத்துவம். நிர்வாகம் மற்றும் மேலதிகாரிகளுடனான கூட்டங்களில் கவனம் செலுத்துங்கள்.</string>
-    <string name="quality_moon">உணர்ச்சி, வளர்ப்பு, மாற்றம். ஆக்கபூர்வமான வேலை மற்றும் வீடு தொடர்பான விஷயங்களுக்கு நல்லது.</string>
-    <string name="quality_mars">ஆற்றல், செயல், தைரியம். உடல் ரீதியான பணிகளில் கவனம் செலுத்துங்கள், ஆனால் மோதல்களைக் கவனியுங்கள்.</string>
-    <string name="quality_mercury">அறிவு, தொடர்பு, வர்த்தகம். படிப்பு, எழுதுதல் மற்றும் வணிகத்திற்கு ஏற்றது.</string>
-    <string name="quality_jupiter">ஞானம், விரிவாக்கம், அதிர்ஷ்டம். கற்றல், கற்பித்தல் மற்றும் சடங்குகளுக்கு சிறந்தது.</string>
-    <string name="quality_venus">அழகு, நல்லிணக்கம், ஆடம்பரம். கலை, காதல் மற்றும் சமூகமயமாக்கலுக்கு நல்லது.</string>
-    <string name="quality_saturn">ஒழுக்கம், தாமதம், கடின உழைப்பு. வழக்கமான பணிகளில் கவனம் செலுத்துங்கள் மற்றும் நிலுவையில் உள்ளவற்றை முடித்தல்.</string>
-
-    <!-- Hora Guidance -->
-    <string name="guidance_sun_fav">தலைமைத்துவம் மற்றும் அதிகாரத்திற்கு மிகவும் மங்களகரமானது. மேலதிகாரிகளுடனான கூட்டங்கள், புதிய பாத்திரங்களைத் தொடங்குதல் மற்றும் அரசாங்க உதவிகளைப் பெறுவதற்கு சிறந்தது.</string>
-    <string name="guidance_sun_conf">முரண்பட்ட சூரிய ஆற்றல். ஈகோ மோதல்கள் சாத்தியம். பிடிவாதம் அல்லது மேலதிகாரிகளுடனான மோதல்களைத் தவிர்க்கவும். தனிப்பட்ட பணிகளில் ஒட்டிக்கொள்ளுங்கள்.</string>
-    <string name="guidance_sun_neut">நிலையான உயிர்ச்சக்தி. நிர்வாகம் மற்றும் திட்டமிடலுக்கு நல்லது. உங்கள் ஆரோக்கியம் மற்றும் ஒழுக்கமான அட்டவணையை பராமரிப்பதில் கவனம் செலுத்துங்கள்.</string>
-
-    <string name="guidance_moon_fav">உணர்ச்சி ரீதியாக இணக்கமானது. உள்நாட்டு வேலைகள், ஆக்கபூர்வமான கலைகள் மற்றும் குடும்பத்துடன் இணைவதற்கு ஏற்றது. மனம் அமைதியாகவும் கவனமாகவும் இருக்கிறது.</string>
-    <string name="guidance_moon_conf">ஏற்ற இறக்கமான மனநிலைகள். உணர்ச்சியின் அடிப்படையில் முக்கிய முடிவுகளை எடுப்பதைத் தவிர்க்கவும். ஆழமான உணர்ச்சி ரீதியான உரையாடல்களுக்கு இது நல்ல நேரமல்ல.</string>
-    <string name="guidance_moon_neut">மென்மையான ஆற்றல். வழக்கமான வேலைகள், சமையல் மற்றும் சிறிய மாற்றங்களுக்கு ஏற்றது. சிறிய சமூக தொடர்புகளுக்கு நல்லது.</string>
-
-    <string name="guidance_mars_fav">அதிக ஆற்றல் மற்றும் தைரியம். உடல் உழைப்பு, விளையாட்டு மற்றும் போட்டிப் பணிகளுக்கு சிறந்தது. தைரியமான செயல்கள் வெற்றியைக் கொண்டுவரும்.</string>
-    <string name="guidance_mars_conf">அதிக உராய்வு. விபத்துக்கள் அல்லது வாதங்களின் அபாயம். அவசரப்படுதல், கூர்மையான கருவிகள் அல்லது ஆக்ரோஷமான பேச்சுவார்த்தைகளைத் தவிர்க்கவும். பொறுமையாக இருங்கள்.</string>
-    <string name="guidance_mars_neut">செயலில் உள்ள ஆற்றல். தொழில்நுட்ப வேலை அல்லது வீட்டு பழுதுபார்ப்புகளில் கவனம் செலுத்துங்கள். சோர்வைத் தவிர்க்க உடல் செயல்பாடுகளை மிதமாக வைத்திருங்கள்.</string>
-
-    <string name="guidance_mercury_fav">அறிவுப்பூர்வமாக கூர்மையானது. வணிக ஒப்பந்தங்கள், எழுதுதல், புதிய திறன்களைக் கற்றல் மற்றும் அனைத்து வகையான தொடர்புகளுக்கும் சிறந்தது.</string>
-    <string name="guidance_mercury_conf">தகவல் சுமை. தொடர்பு பிழைகள் ஏற்பட வாய்ப்புள்ளது. அனைத்து மின்னஞ்சல்கள் மற்றும் ஆவணங்களை இருமுறை சரிபார்க்கவும். இப்போது புதிய ஆய்வுகளைத் தொடங்குவதைத் தவிர்க்கவும்.</string>
-    <string name="guidance_mercury_neut">மன தெளிவு. அமைப்பு, பதிவு பராமரிப்பு மற்றும் கடிதப் பரிமாற்றத்தைப் பிடிப்பதற்கு நல்லது. தர்க்கத்திற்கான நடைமுறை நேரம்.</string>
-
-    <string name="guidance_jupiter_fav">மிகவும் மங்களகரமானது. புதிய கல்வி, முக்கிய நிதி முதலீடுகள் அல்லது ஆன்மீக சடங்குகளைத் தொடங்குவதற்கு சிறந்தது. விரிவாக்கம் சாதகமானது.</string>
-    <string name="guidance_jupiter_conf">முரண்பட்ட ஆற்றல்கள். சுக்கிரன் (இன்பம்) மற்றும் குரு (ஞானம்) மோதலாம். அதிகப்படியான ஈடுபாடு அல்லது மனக்கிளர்ச்சியுடன் ஆடம்பர கொள்முதல் செய்வதைத் தவிர்க்கவும்.</string>
-    <string name="guidance_jupiter_neut">கற்றல் மற்றும் பொதுவான வளர்ச்சிக்கு ஒரு நல்ல நேரம். பெரிய பாய்ச்சல்களை விட நிலையான முன்னேற்றத்தில் கவனம் செலுத்துங்கள்.</string>
-
-    <string name="guidance_venus_fav">இணக்கமான மற்றும் ஆக்கபூர்வமான. கலைகள், சமூகக் கூட்டங்கள், நகைகள்/துணிகள் வாங்குதல் மற்றும் காதல் நடவடிக்கைகளுக்கு ஏற்றது.</string>
-    <string name="guidance_venus_conf">உணர்ச்சி ரீதியான ஆடம்பரம். ஆடம்பரங்களுக்கு அதிக பணம் செலவழிக்கும் அபாயம். இப்போது எடுக்கப்பட்ட அழகியல் தேர்வுகள் பின்னர் வருந்தப்படலாம்.</string>
-    <string name="guidance_venus_neut">இதமான சூழல். சிறிய அழகுபடுத்தல் மற்றும் தளர்வுக்கு நல்லது. உறவுகளை மென்மையாக வளர்ப்பதில் கவனம் செலுத்துங்கள்.</string>
-
-    <string name="guidance_saturn_fav">திடமான அடித்தளம். நீண்ட கால திட்டமிடல், கடன்களை அடைத்தல் மற்றும் தீவிர ஒழுக்கம் மற்றும் சகிப்புத்தன்மை தேவைப்படும் பணிகளுக்கு சிறந்தது.</string>
-    <string name="guidance_saturn_conf">கடுமையான தாமதங்கள். மெதுவான முன்னேற்றத்தால் விரக்தி ஏற்பட வாய்ப்புள்ளது. விரைவான முடிவுகள் தேவைப்படும் எதையும் தொடங்குவதைத் தவிர்க்கவும். ஓய்வு அறிவுறுத்தப்படுகிறது.</string>
-    <string name="guidance_saturn_neut">நடைமுறை ஆற்றல். வழக்கமான வேலை, சுத்தம் செய்தல் மற்றும் ஒழுங்கமைக்கப்பட்ட உழைப்பில் கவனம் செலுத்துங்கள். விடாமுயற்சி பின்னர் பலன் தரும்.</string>
-
-    <string name="guidance_default">சமநிலையான செயல் மற்றும் நினைவாற்றலுக்கான நேரம்.</string>
-
-    <!-- Strategic Activities -->
-    <string-array name="activities_sun_fav">
-        <item>மேலதிகாரிகளை சந்திக்கவும்</item>
-        <item>அனுமதிகளுக்கு விண்ணப்பிக்கவும்</item>
-        <item>ஒரு குழு திட்டத்தை வழிநடத்தவும்</item>
-    </string-array>
-    <string-array name="activities_sun_conf">
-        <item>தனிப்பட்ட கவனம் செலுத்திய வேலை</item>
-        <item>தியானம்</item>
-        <item>ஆவணங்களை மதிப்பாய்வு செய்தல்</item>
-    </string-array>
-    <string-array name="activities_sun_neut">
-        <item>அட்டவணையை ஒழுங்கமைக்கவும்</item>
-        <item>உடல்நல பரிசோதனை</item>
-        <item>நிர்வாக பணிகள்</item>
-    </string-array>
-
-    <string-array name="activities_moon_fav">
-        <item>குடும்ப இரவு உணவு</item>
-        <item>ஆக்கபூர்வமான எழுதுதல்</item>
-        <item>தோட்டம் வளர்ப்பு</item>
-    </string-array>
-    <string-array name="activities_moon_conf">
-        <item>வழக்கமான வேலைகள்</item>
-        <item>அமைதியான பிரதிபலிப்பு</item>
-        <item>இலகுவான வாசிப்பு</item>
-    </string-array>
-    <string-array name="activities_moon_neut">
-        <item>சமையலறை அமைப்பு</item>
-        <item>சமூக நிகழ்வுகளைத் திட்டமிடுதல்</item>
-        <item>வீட்டிற்கு ஷாப்பிங்</item>
-    </string-array>
-
-    <string-array name="activities_mars_fav">
-        <item>தீவிர பயிற்சி</item>
-        <item>கட்டுமானத்தைத் தொடங்குதல்</item>
-        <item>போட்டி விளையாட்டுகள்</item>
-    </string-array>
-    <string-array name="activities_mars_conf">
-        <item>பாதுகாப்பு தணிக்கைகள்</item>
-        <item>கருவிகளை சுத்தம் செய்தல்</item>
-        <item>யோகா</item>
-    </string-array>
-    <string-array name="activities_mars_neut">
-        <item>வீட்டு பழுதுபார்ப்பு</item>
-        <item>தர்க்கரீதியான சிக்கலைத் தீர்ப்பது</item>
-        <item>தொழில்நுட்ப வரைவு</item>
-    </string-array>
-
-    <string-array name="activities_mercury_fav">
-        <item>ஒப்பந்தங்களில் கையெழுத்திடுங்கள்</item>
-        <item>ஒரு விளக்கக்காட்சியை வழங்கவும்</item>
-        <item>ஒரு பாடத்திட்டத்தைத் தொடங்குங்கள்</item>
-    </string-array>
-    <string-array name="activities_mercury_conf">
-        <item>ஆவணங்களை சரிபார்க்கவும்</item>
-        <item>தரவு உள்ளீடு</item>
-        <item>மேசையை சுத்தம் செய்தல்</item>
-    </string-array>
-    <string-array name="activities_mercury_neut">
-        <item>மின்னஞ்சல்களை காப்பகப்படுத்தவும்</item>
-        <item>கணக்குகளை சமநிலைப்படுத்துங்கள்</item>
-        <item>குறுகிய தூர பயணம்</item>
-    </string-array>
-
-    <string-array name="activities_jupiter_fav">
-        <item>பங்குகளில் முதலீடு செய்யுங்கள்</item>
-        <item>ஆன்மீக வழிபாடு</item>
-        <item>கல்வி சேர்க்கை</item>
-    </string-array>
-    <string-array name="activities_jupiter_conf">
-        <item>பட்ஜெட்டை மதிப்பாய்வு செய்யவும்</item>
-        <item>தத்துவ வாசிப்பு</item>
-        <item>உள் தணிக்கை</item>
-    </string-array>
-    <string-array name="activities_jupiter_neut">
-        <item>ஒரு வழிகாட்டியை அணுகுதல்</item>
-        <item>பொதுவான ஆராய்ச்சி</item>
-        <item>நீண்ட கால இலக்கு அமைத்தல்</item>
-    </string-array>
-
-    <string-array name="activities_venus_fav">
-        <item>கலை கண்காட்சி</item>
-        <item>இரவு சந்திப்பு</item>
-        <item>பேஷன் ஷாப்பிங்</item>
-    </string-array>
-    <string-array name="activities_venus_conf">
-        <item>நிதி திட்டமிடல்</item>
-        <item>சுய பாதுகாப்பு</item>
-        <item>உள் சுத்தம்</item>
-    </string-array>
-    <string-array name="activities_venus_neut">
-        <item>இசை கேட்பது</item>
-        <item>மலர் ஏற்பாடு</item>
-        <item>சமூக வலைப்பின்னல்</item>
-    </string-array>
-
-    <string-array name="activities_saturn_fav">
-        <item>பரம்பரை திட்டமிடல்</item>
-        <item>கடன்களை அடைத்தல்</item>
-        <item>ஆழ்ந்த ஆராய்ச்சி</item>
-    </string-array>
-    <string-array name="activities_saturn_conf">
-        <item>வழக்கமான பராமரிப்பு</item>
-        <item>ஆரம்ப தூக்கம்</item>
-        <item>வரிகளை தாக்கல் செய்தல்</item>
-    </string-array>
-    <string-array name="activities_saturn_neut">
-        <item>கிடங்கு சுத்தம்</item>
-        <item>உடல் உழைப்பு</item>
-        <item>சகிப்புத்தன்மை பயிற்சி</item>
-    </string-array>
+    <!-- Muhurtham Descriptions -->
+    <string name="muhurtham_desc_brahma">"பிரம்ம முஹூர்த்தம்." தியானம், யோகா மற்றும் கவனத்துடன் நாளைத் தொடங்குவதற்கு மிகவும் மங்களகரமானது.</string>
+    <string name="muhurtham_desc_abhijit">அபிஜித் முஹூர்த்தம்: எந்தவொரு வேலைக்கும் அன்றைய நாளின் மிகவும் மங்களகரமான நேரம். வெற்றி கிடைக்க அதிக வாய்ப்புள்ளது.</string>
+    <string name="muhurtham_desc_subha">முக்கியமான வாழ்க்கை நிகழ்வுகளுக்கான சரிபார்க்கப்பட்ட மங்களகரமான காலம்.</string>
 
 </resources>

@@ -4,8 +4,10 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
@@ -13,7 +15,9 @@ import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material.icons.filled.WbTwilight
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -33,8 +37,48 @@ import com.suresh.sacredtimeline.R
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import androidx.compose.foundation.Image
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlin.math.abs
 import kotlin.math.cos
+
+@Composable
+fun AutoScrollingRow(
+    modifier: Modifier = Modifier,
+    content: @Composable RowScope.() -> Unit
+) {
+    val scrollState = rememberScrollState()
+    
+    LaunchedEffect(scrollState.maxValue) {
+        if (scrollState.maxValue > 0) {
+            while (isActive) {
+                try {
+                    delay(1000) // 1 second pause to read the first item
+                    // Smoothly scroll to the end
+                    scrollState.animateScrollTo(
+                        value = scrollState.maxValue,
+                        animationSpec = androidx.compose.animation.core.tween(
+                            durationMillis = (scrollState.maxValue * 25).coerceAtLeast(2000),
+                            easing = androidx.compose.animation.core.LinearEasing
+                        )
+                    )
+                    delay(1000) // 1 second pause at the end
+                    scrollState.scrollTo(0)
+                } catch (e: Exception) {
+                    // Resume on any interruption (like a click or touch)
+                    delay(500)
+                }
+            }
+        }
+    }
+
+    Row(
+        modifier = modifier.horizontalScroll(scrollState, enabled = false), // Disable manual scroll to keep marquee consistent
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start,
+        content = content
+    )
+}
 
 @Composable
 fun MoonPhaseIcon(
@@ -44,7 +88,7 @@ fun MoonPhaseIcon(
     darkColor: Color = Color.Black,
     strokeColor: Color = Color.Black
 ) {
-    Canvas(modifier = modifier.size(16.dp)) {
+    Canvas(modifier = modifier) {
         val radius = size.minDimension / 2f
         val center = Offset(size.width / 2, size.height / 2)
         val rect = Rect(center.x - radius, center.y - radius, center.x + radius, center.y + radius)
@@ -242,7 +286,8 @@ fun SunTimesDisplay(
     showAbhijitMuhurtham: Boolean = false,
     isFallback: Boolean,
     isLandscape: Boolean,
-    is24Hour: Boolean
+    is24Hour: Boolean,
+    onDetailClick: (com.suresh.sacredtimeline.model.DashboardDetail) -> Unit = {}
 ) {
     val timeFormatter = DateTimeFormatter.ofPattern(if (is24Hour) "HH:mm" else "h:mm")
     val amLabel = stringResource(R.string.label_am)
@@ -314,27 +359,62 @@ fun SunTimesDisplay(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 if (tamilDateMain.isNotEmpty() || showPiraiWithIcon) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        if (tamilDateMain.isNotEmpty()) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        if (showTamilDate) {
                             Text(
-                                text = tamilDateMain,
+                                text = if (tamilDay > 0) "$tamilDay $tamilMonth" else tamilMonth,
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.ExtraBold,
-                                color = MaterialTheme.colorScheme.primary
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.clickable {
+                                    onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.SpecialEvent(tamilMonthResId))
+                                }
                             )
                         }
-                        if (tamilDateMain.isNotEmpty() && showPiraiWithIcon) {
+                        if (showTamilDate && showTamilYear && tamilYear.isNotEmpty()) {
+                            Text(" - ", color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f), style = MaterialTheme.typography.labelSmall)
+                        }
+                        if (showTamilYear && tamilYear.isNotEmpty()) {
+                            Text(
+                                text = tamilYear,
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.clickable {
+                                    onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.SpecialEvent(tamilYearResId))
+                                }
+                            )
+                        }
+                        
+                        if ((showTamilDate || showTamilYear) && showPiraiWithIcon) {
                             Text(" | ", color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f), style = MaterialTheme.typography.labelSmall)
                         }
+                        
                         if (showPiraiWithIcon) {
-                            MoonPhaseIcon(
-                                tithi = tithiValue, 
-                                lightColor = Color.White, 
-                                darkColor = Color.Black, 
-                                strokeColor = Color.Black
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(text = "$paksha $pakshaDay", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.clickable {
+                                    val primaryTithi = tithis.firstOrNull { it.value == tithiValue } ?: tithis.firstOrNull()
+                                    if (primaryTithi != null) {
+                                        onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.Lunar(
+                                            primaryTithi, com.suresh.sacredtimeline.model.DashboardDetail.LunarType.TITHI
+                                        ))
+                                    }
+                                }
+                            ) {
+                                MoonPhaseIcon(
+                                    tithi = tithiValue, 
+                                    modifier = Modifier.size(16.dp),
+                                    lightColor = Color.White, 
+                                    darkColor = Color.Black, 
+                                    strokeColor = Color.Black
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(text = "$paksha $pakshaDay", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                            }
                         }
                     }
                     HorizontalDivider(modifier = Modifier.padding(vertical = 2.dp), thickness = 0.5.dp, color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.1f))
@@ -343,36 +423,66 @@ fun SunTimesDisplay(
                 if (specialEvents.isNotEmpty() || isSubhaMuhurtham || tithis.isNotEmpty() || nakshatras.isNotEmpty()) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         if (isSubhaMuhurtham) {
-                            KalashIcon(color = Color(0xFF1976D2))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(stringResource(R.string.muhurtham_subha), style = MaterialTheme.typography.labelSmall, color = Color(0xFF1976D2), fontWeight = FontWeight.Bold)
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.clickable {
+                                    onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.Muhurtham(
+                                        R.string.muhurtham_subha,
+                                        LocalTime.MIN, // Subha Muhurtham timing is implicit in the events list for now
+                                        LocalTime.MAX
+                                    ))
+                                }
+                            ) {
+                                KalashIcon(color = Color(0xFF1976D2))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(stringResource(R.string.muhurtham_subha), style = MaterialTheme.typography.labelSmall, color = Color(0xFF1976D2), fontWeight = FontWeight.Bold)
+                            }
                             Text(" • ", color = Color.Gray)
                         }
                         specialEvents.forEach { resId ->
-                            when (resId) {
-                                R.string.event_pradosham -> {
-                                    NandiIcon(modifier = Modifier.size(16.dp), light = tithiValue <= 15)
-                                    Spacer(modifier = Modifier.width(4.dp))
+                            val eventStartEnd = if (resId == R.string.event_pradosham) {
+                                sunset.minusMinutes(90) to sunset
+                            } else null
+                            
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.clickable {
+                                    onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.SpecialEvent(
+                                        resId, eventStartEnd?.first, eventStartEnd?.second
+                                    ))
                                 }
-                                R.string.event_sivaratri -> {
-                                    ShivaIcon(modifier = Modifier.size(16.dp))
-                                    Spacer(modifier = Modifier.width(4.dp))
+                            ) {
+                                when (resId) {
+                                    R.string.event_pradosham -> {
+                                        NandiIcon(modifier = Modifier.size(16.dp), light = tithiValue <= 15)
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                    }
+                                    R.string.event_sivaratri -> {
+                                        ShivaIcon(modifier = Modifier.size(16.dp))
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                    }
                                 }
+                                val eventText = when (resId) {
+                                    R.string.event_pradosham -> {
+                                        "${stringResource(resId)} (${formatWithAmPm(eventStartEnd!!.first)} - ${formatWithAmPm(sunset)})"
+                                    }
+                                    else -> stringResource(resId)
+                                }
+                                Text(eventText, style = MaterialTheme.typography.labelSmall, color = Color(0xFFC5A000), fontWeight = FontWeight.Bold)
                             }
-                            val eventText = when (resId) {
-                                R.string.event_pradosham -> {
-                                    val start = sunset.minusMinutes(90)
-                                    "${stringResource(resId)} (${formatWithAmPm(start)} - ${formatWithAmPm(sunset)})"
-                                }
-                                else -> stringResource(resId)
-                            }
-                            Text(eventText, style = MaterialTheme.typography.labelSmall, color = Color(0xFFC5A000), fontWeight = FontWeight.Bold)
                             Text(" • ", color = Color.Gray)
                         }
                         
                         tithis.forEach { item ->
                             val tithiName = stringResource(item.resId)
-                            Row(verticalAlignment = Alignment.CenterVertically) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.clickable {
+                                    onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.Lunar(
+                                        item, com.suresh.sacredtimeline.model.DashboardDetail.LunarType.TITHI
+                                    ))
+                                }
+                            ) {
                                 when (item.value) {
                                     4 -> GaneshaIcon(modifier = Modifier.size(16.dp), light = true)
                                     19 -> GaneshaIcon(modifier = Modifier.size(16.dp), light = false)
@@ -396,7 +506,14 @@ fun SunTimesDisplay(
 
                         nakshatras.forEach { item ->
                             val starName = stringResource(item.resId)
-                            Row(verticalAlignment = Alignment.CenterVertically) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.clickable {
+                                    onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.Lunar(
+                                        item, com.suresh.sacredtimeline.model.DashboardDetail.LunarType.NAKSHATRA
+                                    ))
+                                }
+                            ) {
                                 if (item.resId == R.string.star_3) {
                                     Icon(Icons.Default.Star, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color(0xFFFF9800))
                                     Spacer(modifier = Modifier.width(2.dp))
@@ -429,23 +546,30 @@ fun SunTimesDisplay(
                         val hasBrahma = showBrahmaMuhurtham && brahmaMuhurtham != null
                         val hasAbhijit = showAbhijitMuhurtham && abhijitMuhurtham != null
                         if (hasBrahma || hasAbhijit) {
-                            Row(
+                            AutoScrollingRow(
                                 modifier = Modifier
                                     .weight(1f)
                                     .padding(horizontal = 12.dp)
-                                    .basicMarquee(),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Center
                             ) {
                                 if (hasBrahma) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.clickable {
+                                            onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.Muhurtham(
+                                                R.string.muhurtham_brahma,
+                                                brahmaMuhurtham!!.first,
+                                                brahmaMuhurtham.second
+                                            ))
+                                        }
+                                    ) {
                                         Icon(Icons.Default.Star, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color(0xFFE91E63))
                                         Spacer(modifier = Modifier.width(6.dp))
                                         Text(
                                             text = "${stringResource(R.string.muhurtham_brahma)}: ${formatWithAmPm(brahmaMuhurtham.first)} - ${formatWithAmPm(brahmaMuhurtham.second)}",
                                             style = MaterialTheme.typography.labelSmall,
                                             fontWeight = FontWeight.Bold,
-                                            color = Color(0xFFE91E63)
+                                            color = Color(0xFFE91E63),
+                                            maxLines = 1
                                         )
                                     }
                                 }
@@ -453,14 +577,24 @@ fun SunTimesDisplay(
                                     Text("  •  ", color = Color.Gray, style = MaterialTheme.typography.labelSmall)
                                 }
                                 if (hasAbhijit) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.clickable {
+                                            onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.Muhurtham(
+                                                R.string.muhurtham_abhijit,
+                                                abhijitMuhurtham!!.first,
+                                                abhijitMuhurtham.second
+                                            ))
+                                        }
+                                    ) {
                                         Icon(Icons.Default.Star, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color(0xFF4CAF50))
                                         Spacer(modifier = Modifier.width(6.dp))
                                         Text(
-                                            text = "${stringResource(R.string.muhurtham_abhijit)}: ${formatWithAmPm(abhijitMuhurtham.first)} - ${formatWithAmPm(abhijitMuhurtham.second)}",
+                                            text = "${stringResource(R.string.muhurtham_abhijit)}: ${formatWithAmPm(abhijitMuhurtham!!.first)} - ${formatWithAmPm(abhijitMuhurtham.second)}",
                                             style = MaterialTheme.typography.labelSmall,
                                             fontWeight = FontWeight.Bold,
-                                            color = Color(0xFF4CAF50)
+                                            color = Color(0xFF4CAF50),
+                                            maxLines = 1
                                         )
                                     }
                                 }
@@ -496,35 +630,71 @@ fun SunTimesDisplay(
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        if (tamilDateMain.isNotEmpty()) {
+                        if (showTamilDate) {
                             Text(
-                                text = tamilDateMain,
+                                text = if (tamilDay > 0) "$tamilDay $tamilMonth" else tamilMonth,
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Black,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                modifier = Modifier.clickable {
+                                    onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.SpecialEvent(tamilMonthResId))
+                                }
                             )
                         }
-                        if (tamilDateMain.isNotEmpty() && showPiraiWithIcon) {
+                        if (showTamilDate && showTamilYear && tamilYear.isNotEmpty()) {
+                            Text(
+                                text = " - ",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.5f)
+                            )
+                        }
+                        if (showTamilYear && tamilYear.isNotEmpty()) {
+                            Text(
+                                text = tamilYear,
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Black,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                modifier = Modifier.clickable {
+                                    onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.SpecialEvent(tamilYearResId))
+                                }
+                            )
+                        }
+                        
+                        if ((showTamilDate || showTamilYear) && showPiraiWithIcon) {
                             Text(
                                 text = " | ",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.5f)
                             )
                         }
+                        
                         if (showPiraiWithIcon) {
-                            MoonPhaseIcon(
-                                tithi = tithiValue, 
-                                lightColor = Color.White, 
-                                darkColor = Color.Black, 
-                                strokeColor = Color.Black
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "$paksha $pakshaDay",
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = FontWeight.Black,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
-                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.clickable {
+                                    val primaryTithi = tithis.firstOrNull { it.value == tithiValue } ?: tithis.firstOrNull()
+                                    if (primaryTithi != null) {
+                                        onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.Lunar(
+                                            primaryTithi, com.suresh.sacredtimeline.model.DashboardDetail.LunarType.TITHI
+                                        ))
+                                    }
+                                }
+                            ) {
+                                MoonPhaseIcon(
+                                    tithi = tithiValue, 
+                                    modifier = Modifier.size(16.dp),
+                                    lightColor = Color.White, 
+                                    darkColor = Color.Black, 
+                                    strokeColor = Color.Black
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = "$paksha $pakshaDay",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Black,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                            }
                         }
                     }
                 }
@@ -532,29 +702,36 @@ fun SunTimesDisplay(
 
             val eventsExist = specialEvents.isNotEmpty() || isSubhaMuhurtham || tithis.isNotEmpty() || nakshatras.isNotEmpty()
             if (eventsExist) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.4f))
-                        .padding(vertical = 4.dp)
+                Surface(
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.4f),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Row(
+                    AutoScrollingRow(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                            .basicMarquee(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
+                            .padding(vertical = 4.dp, horizontal = 16.dp)
                     ) {
                         if (isSubhaMuhurtham) {
-                            KalashIcon(color = Color(0xFF1976D2))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = stringResource(R.string.muhurtham_subha),
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF1976D2)
-                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.clickable {
+                                    onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.Muhurtham(
+                                        R.string.muhurtham_subha,
+                                        LocalTime.MIN,
+                                        LocalTime.MAX
+                                    ))
+                                }
+                            ) {
+                                KalashIcon(color = Color(0xFF1976D2))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = stringResource(R.string.muhurtham_subha),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF1976D2),
+                                    maxLines = 1
+                                )
+                            }
                             Text("  •  ", color = Color.Gray)
                         }
                         
@@ -563,7 +740,18 @@ fun SunTimesDisplay(
                                 R.string.event_independence_day, R.string.event_republic_day, R.string.event_milad_un_nabi -> Color.Red
                                 else -> Color(0xFFC5A000) 
                             }
-                            Row(verticalAlignment = Alignment.CenterVertically) {
+                            val eventStartEnd = if (resId == R.string.event_pradosham) {
+                                sunset.minusMinutes(90) to sunset
+                            } else null
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.clickable {
+                                    onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.SpecialEvent(
+                                        resId, eventStartEnd?.first, eventStartEnd?.second
+                                    ))
+                                }
+                            ) {
                                 when (resId) {
                                     R.string.event_pradosham -> {
                                         NandiIcon(modifier = Modifier.size(16.dp), light = tithiValue <= 15)
@@ -576,8 +764,7 @@ fun SunTimesDisplay(
                                 }
                                 val eventText = when (resId) {
                                     R.string.event_pradosham -> {
-                                        val start = sunset.minusMinutes(90)
-                                        "${stringResource(resId)} (${formatWithAmPm(start)} - ${formatWithAmPm(sunset)})"
+                                        "${stringResource(resId)} (${formatWithAmPm(eventStartEnd!!.first)} - ${formatWithAmPm(sunset)})"
                                     }
                                     else -> stringResource(resId)
                                 }
@@ -585,7 +772,8 @@ fun SunTimesDisplay(
                                     text = eventText,
                                     style = MaterialTheme.typography.labelSmall,
                                     fontWeight = FontWeight.Bold,
-                                    color = color
+                                    color = color,
+                                    maxLines = 1
                                 )
                             }
                             Text("  •  ", color = Color.Gray)
@@ -593,7 +781,14 @@ fun SunTimesDisplay(
 
                         tithis.forEach { item ->
                             val tithiName = stringResource(item.resId)
-                            Row(verticalAlignment = Alignment.CenterVertically) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.clickable {
+                                    onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.Lunar(
+                                        item, com.suresh.sacredtimeline.model.DashboardDetail.LunarType.TITHI
+                                    ))
+                                }
+                            ) {
                                 when (item.value) {
                                     4 -> GaneshaIcon(modifier = Modifier.size(16.dp), light = true)
                                     19 -> GaneshaIcon(modifier = Modifier.size(16.dp), light = false)
@@ -613,7 +808,8 @@ fun SunTimesDisplay(
                                 Text(
                                     text = tithiText,
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 1
                                 )
                             }
                             Text("  •  ", color = Color.Gray)
@@ -621,7 +817,14 @@ fun SunTimesDisplay(
 
                         nakshatras.forEach { item ->
                             val starName = stringResource(item.resId)
-                            Row(verticalAlignment = Alignment.CenterVertically) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.clickable {
+                                    onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.Lunar(
+                                        item, com.suresh.sacredtimeline.model.DashboardDetail.LunarType.NAKSHATRA
+                                    ))
+                                }
+                            ) {
                                 if (item.resId == R.string.star_3) {
                                     Icon(
                                         Icons.Default.Star, 
@@ -636,7 +839,8 @@ fun SunTimesDisplay(
                                 Text(
                                     text = starText,
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 1
                                 )
                             }
                             if (item != nakshatras.last()) {
@@ -666,23 +870,30 @@ fun SunTimesDisplay(
                     val hasBrahma = showBrahmaMuhurtham && brahmaMuhurtham != null
                     val hasAbhijit = showAbhijitMuhurtham && abhijitMuhurtham != null
                     if (hasBrahma || hasAbhijit) {
-                        Row(
+                        AutoScrollingRow(
                             modifier = Modifier
                                 .weight(1f)
                                 .padding(horizontal = 8.dp)
-                                .basicMarquee(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
                         ) {
                             if (hasBrahma) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.clickable {
+                                        onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.Muhurtham(
+                                            R.string.muhurtham_brahma,
+                                            brahmaMuhurtham!!.first,
+                                            brahmaMuhurtham.second
+                                        ))
+                                    }
+                                ) {
                                     Icon(Icons.Default.Star, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color(0xFFE91E63))
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text(
-                                        text = "${stringResource(R.string.muhurtham_brahma)}: ${formatWithAmPm(brahmaMuhurtham.first)} - ${formatWithAmPm(brahmaMuhurtham.second)}",
+                                        text = "${stringResource(R.string.muhurtham_brahma)}: ${formatWithAmPm(brahmaMuhurtham!!.first)} - ${formatWithAmPm(brahmaMuhurtham.second)}",
                                         style = MaterialTheme.typography.labelSmall,
                                         fontWeight = FontWeight.Bold,
-                                        color = Color(0xFFE91E63)
+                                        color = Color(0xFFE91E63),
+                                        maxLines = 1
                                     )
                                 }
                             }
@@ -690,14 +901,24 @@ fun SunTimesDisplay(
                                 Text("  •  ", color = Color.Gray, style = MaterialTheme.typography.labelSmall)
                             }
                             if (hasAbhijit) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.clickable {
+                                        onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.Muhurtham(
+                                            R.string.muhurtham_abhijit,
+                                            abhijitMuhurtham!!.first,
+                                            abhijitMuhurtham.second
+                                        ))
+                                    }
+                                ) {
                                     Icon(Icons.Default.Star, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color(0xFF4CAF50))
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text(
-                                        text = "${stringResource(R.string.muhurtham_abhijit)}: ${formatWithAmPm(abhijitMuhurtham.first)} - ${formatWithAmPm(abhijitMuhurtham.second)}",
+                                        text = "${stringResource(R.string.muhurtham_abhijit)}: ${formatWithAmPm(abhijitMuhurtham!!.first)} - ${formatWithAmPm(abhijitMuhurtham.second)}",
                                         style = MaterialTheme.typography.labelSmall,
                                         fontWeight = FontWeight.Bold,
-                                        color = Color(0xFF4CAF50)
+                                        color = Color(0xFF4CAF50),
+                                        maxLines = 1
                                     )
                                 }
                             }

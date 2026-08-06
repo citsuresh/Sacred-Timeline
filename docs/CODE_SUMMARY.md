@@ -50,3 +50,5 @@ graph TD
 | `SettingsRepository` | Source of truth for preferences. |
 | `PanchangamWidget` | Glance-based Home Screen summary. |
 | `Metadata` | UI mapping for localized strings/icons. |
+| `DashboardDetail` | Unified model for header/timeline detail items. |
+| `DashboardDetailSheet` | Refactored BottomSheet for all significance data. |

@@ -72,6 +72,7 @@ fun TimelinePager(
     onScaleChange: (Float) -> Unit,
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
+    onDetailClick: (com.suresh.sacredtimeline.model.DashboardDetail) -> Unit = {},
     isLandscape: Boolean
 ) {
     val hourHeight = BASE_HOUR_HEIGHT * timelineScale
@@ -132,6 +133,7 @@ fun TimelinePager(
                             hourHeight = hourHeight,
                             onZoomIn = onZoomIn,
                             onZoomOut = onZoomOut,
+                            onDetailClick = onDetailClick,
                             isLandscape = isLandscape,
                             is24Hour = is24Hour,
                             showNowLine = showNowLine,
@@ -188,6 +190,7 @@ fun TimelineContent(
     hourHeight: Dp,
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
+    onDetailClick: (com.suresh.sacredtimeline.model.DashboardDetail) -> Unit = {},
     isLandscape: Boolean = false,
     is24Hour: Boolean = false,
     showNowLine: Boolean = true,
@@ -254,7 +257,8 @@ fun TimelineContent(
                 showAbhijitMuhurtham = showAbhijitMuhurtham,
                 isFallback = dayData.isFallback, 
                 isLandscape = false, 
-                is24Hour = is24Hour
+                is24Hour = is24Hour,
+                onDetailClick = onDetailClick
             )
         }
         TimelineHeader(viewMode = viewMode, columnVisibility = columnVisibility, columnOrder = columnOrder)

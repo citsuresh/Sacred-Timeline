@@ -13,6 +13,7 @@ Historical record of architectural and UI/UX choices.
     - **Calendar Row**: Line 1 (Tamil Date, Paksha).
     - **Events Row**: Line 2 (Marquee: Festivals, Tithi, Nakshatra).
     - **Timings Row**: Line 3 (Sun times, Brahma Muhurtham).
+- **Interactive Scrolling Headers**: Replaced `Modifier.basicMarquee` with a custom `AutoScrollingRow` using `ScrollState`. Traditional marquees in Compose only animate drawing, leaving touch targets behind. The custom implementation ensures that significance details can be accessed by clicking any item while it is moving.
 
 ## Architecture
 - **Compositional Theme Switching**: Theme management (Light/Dark/System) is handled purely within the Compose root to avoid Activity recreation loops associated with `AppCompatDelegate` in a hybrid environment.

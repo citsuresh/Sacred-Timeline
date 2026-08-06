@@ -55,6 +55,7 @@ fun PortraitTimelineLayout(
     onDateClick: () -> Unit,
     onLocationClick: (String) -> Unit,
     onTimingClick: (Timing) -> Unit,
+    onDetailClick: (com.suresh.sacredtimeline.model.DashboardDetail) -> Unit = {},
     onTodayClick: () -> Unit,
     onCalendarClick: () -> Unit
 ) {
@@ -151,6 +152,7 @@ fun PortraitTimelineLayout(
                     onZoomIn = onZoomIn,
                     onZoomOut = onZoomOut,
                     onTimingClick = onTimingClick,
+                    onDetailClick = onDetailClick,
                     isLandscape = false
                 )
             }
@@ -189,6 +191,7 @@ fun LandscapeTimelineLayout(
     onDateClick: () -> Unit,
     onLocationClick: (String) -> Unit,
     onTimingClick: (Timing) -> Unit,
+    onDetailClick: (com.suresh.sacredtimeline.model.DashboardDetail) -> Unit = {},
     onTodayClick: () -> Unit,
     onCalendarClick: () -> Unit
 ) {
@@ -283,7 +286,8 @@ fun LandscapeTimelineLayout(
                                 showAbhijitMuhurtham = showAbhijitMuhurtham,
                                 isFallback = dayData.isFallback,
                                 isLandscape = true,
-                                is24Hour = is24Hour
+                                is24Hour = is24Hour,
+                                onDetailClick = onDetailClick
                             )
                         }
                     }
@@ -337,6 +341,7 @@ fun LandscapeTimelineLayout(
                     onZoomIn = onZoomIn,
                     onZoomOut = onZoomOut,
                     onTimingClick = onTimingClick,
+                    onDetailClick = onDetailClick,
                     isLandscape = true
                 )
             }

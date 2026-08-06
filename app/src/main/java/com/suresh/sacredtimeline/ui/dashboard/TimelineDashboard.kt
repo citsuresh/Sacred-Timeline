@@ -16,7 +16,6 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.suresh.sacredtimeline.R
-import com.suresh.sacredtimeline.model.Timing
 import com.suresh.sacredtimeline.ui.dashboard.components.*
 import com.suresh.sacredtimeline.ui.navigation.ViewMode
 import com.suresh.sacredtimeline.ui.theme.SacredTimelineTheme
@@ -73,13 +72,13 @@ fun TimelineDashboard(
     var showLocationDialog by remember { mutableStateOf(false) }
     var manualLocationName by remember { mutableStateOf("") }
     
-    var selectedTimingForDetail by remember { mutableStateOf<Timing?>(null) }
+    var selectedDetail by remember { mutableStateOf<com.suresh.sacredtimeline.model.DashboardDetail?>(null) }
     val sheetState = rememberModalBottomSheetState()
     var showSheet by remember { mutableStateOf(false) }
 
-    if (showSheet && selectedTimingForDetail != null) {
-        TimingDetailSheet(
-            timing = selectedTimingForDetail!!,
+    if (showSheet && selectedDetail != null) {
+        DashboardDetailSheet(
+            detail = selectedDetail!!,
             sheetState = sheetState,
             onDismiss = { showSheet = false },
             viewModel = viewModel
@@ -209,7 +208,11 @@ fun TimelineDashboard(
                 showLocationDialog = true
             },
             onTimingClick = { timing ->
-                selectedTimingForDetail = timing
+                selectedDetail = com.suresh.sacredtimeline.model.DashboardDetail.TimelineTiming(timing)
+                showSheet = true
+            },
+            onDetailClick = { detail ->
+                selectedDetail = detail
                 showSheet = true
             },
             onTodayClick = { viewModel.updateDate(LocalDate.now()) },
@@ -248,7 +251,11 @@ fun TimelineDashboard(
                 showLocationDialog = true
             },
             onTimingClick = { timing ->
-                selectedTimingForDetail = timing
+                selectedDetail = com.suresh.sacredtimeline.model.DashboardDetail.TimelineTiming(timing)
+                showSheet = true
+            },
+            onDetailClick = { detail ->
+                selectedDetail = detail
                 showSheet = true
             },
             onTodayClick = { viewModel.updateDate(LocalDate.now()) },

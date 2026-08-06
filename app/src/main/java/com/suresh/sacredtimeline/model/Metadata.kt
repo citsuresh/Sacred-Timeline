@@ -137,6 +137,74 @@ object Metadata {
     fun getPlanetQuality(planet: String, context: Context): String = context.getString(getPlanetQualityRes(planet))
     fun getHoraGuidance(planet: String, compatibility: HoraCompatibility, context: Context): String = context.getString(getHoraGuidanceRes(planet, compatibility))
 
+    @StringRes
+    fun getTithiDescriptionRes(value: Int): Int {
+        return when (value) {
+            1 -> R.string.tithi_desc_1
+            2 -> R.string.tithi_desc_2
+            3 -> R.string.tithi_desc_3
+            4 -> R.string.tithi_desc_4
+            5 -> R.string.tithi_desc_5
+            6 -> R.string.tithi_desc_6
+            7 -> R.string.tithi_desc_7
+            8 -> R.string.tithi_desc_8
+            9 -> R.string.tithi_desc_9
+            10 -> R.string.tithi_desc_10
+            11 -> R.string.tithi_desc_11
+            12 -> R.string.tithi_desc_12
+            13 -> R.string.tithi_desc_13
+            14 -> R.string.tithi_desc_14
+            15 -> R.string.tithi_desc_15
+            30 -> R.string.tithi_desc_30
+            else -> R.string.tithi_desc_generic
+        }
+    }
+
+    @StringRes
+    fun getNakshatraDescriptionRes(value: Int): Int {
+        return when (value) {
+            3 -> R.string.star_desc_3
+            4 -> R.string.star_desc_4
+            8 -> R.string.star_desc_8
+            else -> R.string.star_desc_generic
+        }
+    }
+
+    @StringRes
+    fun getEventDescriptionRes(resId: Int): Int {
+        return when (resId) {
+            R.string.event_pradosham -> R.string.event_desc_pradosham
+            R.string.event_sivaratri -> R.string.event_desc_sivaratri
+            R.string.month_chithirai, R.string.month_vaikasi, R.string.month_aani,
+            R.string.month_aadi, R.string.month_avani, R.string.month_purattasi,
+            R.string.month_aippasi, R.string.month_karthigai, R.string.month_margazhi,
+            R.string.month_thai, R.string.month_maasi, R.string.month_panguni -> R.string.desc_month_generic
+            R.string.year_1, R.string.year_2, R.string.year_3, R.string.year_4, R.string.year_5,
+            R.string.year_6, R.string.year_7, R.string.year_8, R.string.year_9, R.string.year_10,
+            R.string.year_11, R.string.year_12, R.string.year_13, R.string.year_14, R.string.year_15,
+            R.string.year_16, R.string.year_17, R.string.year_18, R.string.year_19, R.string.year_20,
+            R.string.year_21, R.string.year_22, R.string.year_23, R.string.year_24, R.string.year_25,
+            R.string.year_26, R.string.year_27, R.string.year_28, R.string.year_29, R.string.year_30,
+            R.string.year_31, R.string.year_32, R.string.year_33, R.string.year_34, R.string.year_35,
+            R.string.year_36, R.string.year_37, R.string.year_38, R.string.year_39, R.string.year_40,
+            R.string.year_41, R.string.year_42, R.string.year_43, R.string.year_44, R.string.year_45,
+            R.string.year_46, R.string.year_47, R.string.year_48, R.string.year_49, R.string.year_50,
+            R.string.year_51, R.string.year_52, R.string.year_53, R.string.year_54, R.string.year_55,
+            R.string.year_56, R.string.year_57, R.string.year_58, R.string.year_59, R.string.year_60 -> R.string.event_desc_tamil_date
+            else -> R.string.event_desc_generic
+        }
+    }
+
+    @StringRes
+    fun getMuhurthamDescriptionRes(resId: Int): Int {
+        return when (resId) {
+            R.string.muhurtham_brahma -> R.string.muhurtham_desc_brahma
+            R.string.muhurtham_abhijit -> R.string.muhurtham_desc_abhijit
+            R.string.muhurtham_subha -> R.string.muhurtham_desc_subha
+            else -> R.string.app_name
+        }
+    }
+
     fun getHoraStrategicActivities(planet: String, compatibility: HoraCompatibility, context: Context): List<String> {
         val resourceId = when (planet) {
             "Sun" -> when (compatibility) {
