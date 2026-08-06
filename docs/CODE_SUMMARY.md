@@ -25,10 +25,10 @@ graph TD
 ## 2. Layer Responsibilities
 
 ### Domain/Logic (`logic/`)
-- `PanchangamCalculator`: Core engine for Nalla Neram (sunrise-relative), Gowri Neram, and Horai.
+- `PanchangamCalculator`: Core engine for Nalla Neram (sunrise-relative), Gowri Neram, and Horai. Supports both proportional (astronomical) and fixed (1.5h) timing styles.
 - `MockPanchangamProvider`: Assembles 24h data by blending yesterday's night and today's day cycles.
-- `SunriseSunsetProvider`: Handles network requests to fetch solar data for accurate muhurtham calculations.
-- `LunarCalendarUtils`: Astronomical formulas for Tithi, Nakshatra, and Paksha; identifies transitions in 24h windows.
+- `SunriseSunsetProvider`: Local wrapper for solar calculations; calculates sunrise/sunset using the Meeus algorithm based on GPS coordinates. (Network dependency removed).
+- `LunarCalendarUtils`: High-precision astronomical engine (**ELP-2000 / Meeus**) for Tithi, Nakshatra, and Paksha. Implements **Lahiri Ayanamsha** for sidereal accuracy.
 - `TamilCalendarUtils`: Mapping for 60-year cycles and lunar-solar festival combinations.
 
 ### UI (`ui/`)

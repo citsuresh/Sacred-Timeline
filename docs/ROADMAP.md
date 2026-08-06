@@ -20,3 +20,4 @@ Future development phases for the Sacred Timeline project.
 - **Traditional Calculations**: Implement **Yogam** and **Chandrashtamam** logic based on the refined lunar engine.
 - **Enhanced Festive Detection**: Automate detection of specific traditional events like "Aadi Kiruthigai" (Nakshatra-based festivals) and "Pradosham".
 - **Dynamic Timing Labels**: Add "Till [Time]" labels for Tithis and Nakshatras to match traditional calendar layouts.
+- **Midnight Auto-Transition**: Add a "Midnight Watcher" to automatically scroll the timeline to the new day at 12:00 AM (Nice to have).
