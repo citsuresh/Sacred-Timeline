@@ -13,9 +13,14 @@ Historical record of architectural and UI/UX choices.
     - **Calendar Row**: Line 1 (Tamil Date, Paksha).
     - **Events Row**: Line 2 (Marquee: Festivals, Tithi, Nakshatra).
     - **Timings Row**: Line 3 (Sun times, Brahma Muhurtham).
-- **Interactive Scrolling Headers**: Replaced `Modifier.basicMarquee` with a custom `AutoScrollingRow` using `ScrollState`. Traditional marquees in Compose only animate drawing, leaving touch targets behind. The custom implementation ensures that significance details can be accessed by clicking any item while it is moving.
-
-## Architecture
+- **Expandable Header (Contextual Expansion)**: 
+    - The header now supports a two-state layout: a compact auto-scrolling marquee (default) and an expanded wrapping view (`FlowRow`).
+    - Expansion is triggered by a Swipe Down gesture, allowing users to see all spiritual significance data at once without waiting for the marquee.
+    - Transitions are smoothed using `AnimatedContent` and `animateContentSize`.
+- **Interaction-Aware Marquees**: 
+    - Replaced `basicMarquee` with a custom `AutoScrollingRow` that now supports manual horizontal scrolling.
+    - The auto-scroll animation intelligently pauses when `isScrollInProgress` is true (user touch/drag), ensuring hit targets remain stable for clicking.
+- **Landscape Side-Panel Scrolling**: To maintain accessibility of the vertical Date Dial in landscape mode, the side-panel `Column` is now scrollable, preventing the expanded header from pushing other controls off-screen.
 - **Compositional Theme Switching**: Theme management (Light/Dark/System) is handled purely within the Compose root to avoid Activity recreation loops associated with `AppCompatDelegate` in a hybrid environment.
 - **Interval-Based Lunar Calculation**: Switched from noon-representative values to a full 24h interval search. The engine now identifies all Tithi/Nakshatra transitions within a day to ensure 100% accuracy in the marquee list.
 - **Navigation 3**: Reactive, state-driven routing managed in `MainActivity`.

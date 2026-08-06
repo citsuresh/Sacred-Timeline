@@ -36,6 +36,55 @@
 
     <!-- Panchangam Labels -->
     <string name="label_tithi">Tithi</string>
+    <string name="label_paksha">Paksha / Lunar Phase</string>
+    <string name="desc_paksha">The lunar month is divided into two Pakshas (fortnights). Shukla Paksha is the waxing phase (growing Moon), and Krishna Paksha is the waning phase (receding Moon).</string>
+
+    <!-- Thithi Descriptions -->
+    <string name="desc_tithi_1">Pratipada (Joyful): The beginning of the lunar phase. Ideal for new beginnings, religious ceremonies, and sowing seeds.</string>
+    <string name="desc_tithi_2">Dwitiya (Lucky): A day of growth and stability. Auspicious for laying foundations, weddings, and permanent works.</string>
+    <string name="desc_tithi_3">Tritiya (Victorious): Excellent for music, arts, and moving into a new home. Akshaya Tritiya falls on this day.</string>
+    <string name="desc_tithi_4">Chaturthi (Empty): Sacred to Lord Ganesha. While generally avoided for business, it is powerful for overcoming obstacles and spiritual work.</string>
+    <string name="desc_tithi_5">Panchami (Full): A day of wisdom and healing. Favorable for medicine, study, and attaining knowledge.</string>
+    <string name="desc_tithi_6">Shasthi (Joyful): Sacred to Lord Kartikeya. Good for building power, festivities, and strengthening friendships.</string>
+    <string name="desc_tithi_7">Saptami (Lucky): Sacred to the Sun God. Ideal for starting journeys, health regimens, and buying vehicles.</string>
+    <string name="desc_tithi_8">Ashtami (Victorious): Sacred to Goddess Durga and Lord Krishna. A day for courage and strength, though travel is usually avoided.</string>
+    <string name="desc_tithi_9">Navami (Empty): Sacred to Lord Rama. While inauspicious for new worldly tasks, it is powerful for destroying negative habits.</string>
+    <string name="desc_tithi_10">Dashami (Full): Highly auspicious for virtuous acts, duty (Dharma), and spiritual growth.</string>
+    <string name="desc_tithi_11">Ekadashi (Joyful): The most sacred day for fasting and devotion to Lord Vishnu. Brings purification of mind and body.</string>
+    <string name="desc_tithi_12">Dwadashi (Lucky): A day of fulfillment and completion of rituals. Symbolizes the light of the 12 Adityas.</string>
+    <string name="desc_tithi_13">Trayodashi (Victorious): Sacred to Lord Shiva (Pradosham). Excellent for forming connections, romance, and spiritual joy.</string>
+    <string name="desc_tithi_14">Chaturdashi (Empty): Sacred to Lord Shiva (Shivaratri). A day of high energy, best suited for meditation and internal transformation.</string>
+    <string name="desc_tithi_15">Purnima (Full): Full Moon day. Auspicious for growth, celebrations, and seeking blessings for prosperity.</string>
+    <string name="desc_tithi_30">Amavasya (Full): New Moon day. A day for introspection, spiritual silence, and honoring ancestors (Pitrus).</string>
+
+    <!-- Nakshatra Descriptions -->
+    <string name="desc_star_1">Ashwini: Healing. \"Physician of the Gods.\" Ideal for starting medical treatments and quick actions.</string>
+    <string name="desc_star_2">Bharani: Transformation. Represents the cycle of life and rebirth. A day for discipline and creativity.</string>
+    <string name="desc_star_3">Krittika: Purification. \"The Star of Fire.\" Sharp intellect; ideal for burning away negativity and bad habits.</string>
+    <string name="desc_star_4">Rohini: Growth. \"The Chariot.\" Star of abundance and beauty. Excellent for business and farming.</string>
+    <string name="desc_star_5">Mrigashira: Search. Represents the soul\'s quest for truth. Good for research, travel, and curiosity.</string>
+    <string name="desc_star_6">Ardra: Breakthrough. Transformation through emotion. A day to wash away the old and start fresh.</string>
+    <string name="desc_star_7">Punarvasu: Resilience. \"The Return of Light.\" Signifies hope and success on the second attempt.</string>
+    <string name="desc_star_8">Pushya: Nourishment. The most auspicious star for spiritual growth. Ideal for gurus and teaching.</string>
+    <string name="desc_star_9">Ashlesha: Intuition. Star of deep insight and strategy. Good for planning and inward reflection.</string>
+    <string name="desc_star_10">Magha: Heritage. \"The Royal Throne.\" Connects to ancestors. Best for honoring lineage and duty.</string>
+    <string name="desc_star_11">Purva Phalguni: Relaxation. Star of joy and luxury. Excellent for social events and the arts.</string>
+    <string name="desc_star_12">Uttara Phalguni: Duty. Signifies service and stable relationships. Good for contracts and help.</string>
+    <string name="desc_star_13">Hasta: Skill. \"The Hand.\" Power to manifest. Ideal for crafts, business, and skill-based work.</string>
+    <string name="desc_star_14">Chitra: Creativity. \"The Jewel.\" Focuses on beauty and structure. Good for design and aesthetics.</string>
+    <string name="desc_star_15">Swati: Independence. Represents freedom and the intellect. Best for communication and diplomacy.</string>
+    <string name="desc_star_16">Vishakha: Purpose. Single-minded determination to reach goals. Good for focus and ambition.</string>
+    <string name="desc_star_17">Anuradha: Devotion. \"The Lotus.\" Thriving in challenges. Excellent for loyalty and friendship.</string>
+    <string name="desc_star_18">Jyeshtha: Authority. Signifies seniority and responsibility. Good for leadership and protection.</string>
+    <string name="desc_star_19">Mula: Truth. \"The Roots.\" Getting to the core of reality. Best for deep research and silence.</string>
+    <string name="desc_star_20">Purva Ashadha: Invincibility. Purifying power. Good for cleansing and filtration of ideas.</string>
+    <string name="desc_star_21">Uttara Ashadha: Righteousness. \"The Tusk.\" Permanent success through discipline and Dharma.</string>
+    <string name="desc_star_22">Shravana: Listening. \"The Ear.\" Star of learning and oral traditions. Ideal for study and silence.</string>
+    <string name="desc_star_23">Dhanishta: Harmony. Rhythm of the universe. Good for music, wealth, and group activities.</string>
+    <string name="desc_star_24">Shatabhisha: Mystery. \"The Hundred Physicians.\" Star of hidden healing and solve mysteries.</string>
+    <string name="desc_star_25">Purva Bhadrapada: Penance. Transformative fire. Ideal for deep meditation and spiritual breakthroughs.</string>
+    <string name="desc_star_26">Uttara Bhadrapada: Wisdom. \"Serpent of the Deep.\" Grounded wisdom and control over emotions.</string>
+    <string name="desc_star_27">Revati: Liberation. Safe journey back to the source. Star of compassion and safe travel.</string>
     <string name="label_nakshatra">Nakshatra</string>
     <string name="label_rasi">Rasi</string>
     <string name="label_yoga">Yoga</string>
@@ -49,6 +98,8 @@
     <string name="label_started_yesterday_at">Started Yesterday %s</string>
     <string name="label_ends_at">Ends %s</string>
     <string name="label_ends_tomorrow_at">Ends Tomorrow %s</string>
+    <string name="label_expand">Expand</string>
+    <string name="label_collapse">Collapse</string>
     <string name="label_till">Till %s</string>
     <string name="label_approximate">(approximate)</string>
     <string name="label_day_muhurat">Day Muhurat</string>

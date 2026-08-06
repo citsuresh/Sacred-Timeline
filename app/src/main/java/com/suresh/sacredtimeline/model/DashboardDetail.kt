@@ -22,7 +22,7 @@ sealed interface DashboardDetail {
         override val description: Int = 0 // Resolved dynamically via Metadata
     }
 
-    enum class LunarType { TITHI, NAKSHATRA }
+    enum class LunarType { TITHI, NAKSHATRA, PAKSHA }
 
     data class SpecialEvent(
         val resId: Int,

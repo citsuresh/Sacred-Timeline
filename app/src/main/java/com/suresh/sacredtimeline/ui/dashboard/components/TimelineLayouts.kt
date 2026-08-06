@@ -2,8 +2,12 @@ package com.suresh.sacredtimeline.ui.dashboard.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Menu
@@ -12,7 +16,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.changedToUp
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.res.stringResource
+import kotlin.math.abs
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -47,6 +55,8 @@ fun PortraitTimelineLayout(
     showSunset: Boolean,
     showBrahmaMuhurtham: Boolean,
     showAbhijitMuhurtham: Boolean,
+    isHeaderExpanded: Boolean = false,
+    onToggleHeaderExpanded: (Boolean) -> Unit = {},
     onMenuClick: () -> Unit,
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
@@ -148,6 +158,8 @@ fun PortraitTimelineLayout(
                     showSunset = showSunset,
                     showBrahmaMuhurtham = showBrahmaMuhurtham,
                     showAbhijitMuhurtham = showAbhijitMuhurtham,
+                    isHeaderExpanded = isHeaderExpanded,
+                    onToggleHeaderExpanded = onToggleHeaderExpanded,
                     onScaleChange = onScaleChange,
                     onZoomIn = onZoomIn,
                     onZoomOut = onZoomOut,
@@ -183,6 +195,8 @@ fun LandscapeTimelineLayout(
     showSunset: Boolean,
     showBrahmaMuhurtham: Boolean,
     showAbhijitMuhurtham: Boolean,
+    isHeaderExpanded: Boolean = false,
+    onToggleHeaderExpanded: (Boolean) -> Unit = {},
     onMenuClick: () -> Unit,
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
@@ -206,7 +220,49 @@ fun LandscapeTimelineLayout(
                 tonalElevation = 4.dp
             ) {
                 Column(
-                    modifier = Modifier.padding(12.dp),
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .verticalScroll(rememberScrollState())
+                        .pointerInput(isHeaderExpanded) {
+                            awaitEachGesture {
+                                val down = awaitFirstDown(requireUnconsumed = false)
+                                var totalX = 0f
+                                var totalY = 0f
+                                var decided = false
+                                var isVertical = false
+                                
+                                while (true) {
+                                    val event = awaitPointerEvent()
+                                    val change = event.changes.first()
+                                    if (change.changedToUp()) break
+                                    
+                                    val delta = change.positionChange()
+                                    totalX += abs(delta.x)
+                                    totalY += abs(delta.y)
+                                    
+                                    if (!decided) {
+                                        val slop = viewConfiguration.touchSlop
+                                        if (totalY > slop || totalX > slop) {
+                                            decided = true
+                                            isVertical = totalY > totalX
+                                        }
+                                    }
+                                    
+                                    if (decided && isVertical) {
+                                        change.consume()
+                                        if (totalY > 25) {
+                                            if (delta.y > 0 && !isHeaderExpanded) {
+                                                onToggleHeaderExpanded(true)
+                                            } else if (delta.y < 0 && isHeaderExpanded) {
+                                                onToggleHeaderExpanded(false)
+                                            }
+                                        }
+                                    }
+                                    
+                                    if (change.isConsumed && !isVertical) break
+                                }
+                            }
+                        },
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Row(
@@ -284,6 +340,8 @@ fun LandscapeTimelineLayout(
                                 showSunset = showSunset,
                                 showBrahmaMuhurtham = showBrahmaMuhurtham,
                                 showAbhijitMuhurtham = showAbhijitMuhurtham,
+                                isExpanded = isHeaderExpanded,
+                                onToggleExpanded = onToggleHeaderExpanded,
                                 isFallback = dayData.isFallback,
                                 isLandscape = true,
                                 is24Hour = is24Hour,
@@ -337,6 +395,8 @@ fun LandscapeTimelineLayout(
                     showSunset = showSunset,
                     showBrahmaMuhurtham = showBrahmaMuhurtham,
                     showAbhijitMuhurtham = showAbhijitMuhurtham,
+                    isHeaderExpanded = isHeaderExpanded,
+                    onToggleHeaderExpanded = onToggleHeaderExpanded,
                     onScaleChange = onScaleChange,
                     onZoomIn = onZoomIn,
                     onZoomOut = onZoomOut,

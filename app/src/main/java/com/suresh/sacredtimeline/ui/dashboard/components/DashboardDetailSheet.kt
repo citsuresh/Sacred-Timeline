@@ -108,7 +108,13 @@ fun DashboardDetailSheet(
                                 else -> ""
                             }
                         }
-                        is DashboardDetail.Lunar -> if (detail.type == DashboardDetail.LunarType.TITHI) stringResource(R.string.label_tithi) else stringResource(R.string.label_nakshatra)
+                        is DashboardDetail.Lunar -> {
+                            when (detail.type) {
+                                DashboardDetail.LunarType.TITHI -> stringResource(R.string.label_tithi)
+                                DashboardDetail.LunarType.NAKSHATRA -> stringResource(R.string.label_nakshatra)
+                                DashboardDetail.LunarType.PAKSHA -> stringResource(R.string.label_paksha)
+                            }
+                        }
                         is DashboardDetail.SpecialEvent -> {
                             val months = listOf(
                                 R.string.month_chithirai, R.string.month_vaikasi, R.string.month_aani,
@@ -247,10 +253,10 @@ fun DashboardDetailSheet(
                     }
                 }
                 is DashboardDetail.Lunar -> {
-                    if (detail.type == DashboardDetail.LunarType.TITHI) {
-                        context.getString(Metadata.getTithiDescriptionRes(detail.item.value))
-                    } else {
-                        context.getString(Metadata.getNakshatraDescriptionRes(detail.item.value))
+                    when (detail.type) {
+                        DashboardDetail.LunarType.TITHI -> context.getString(Metadata.getTithiDescriptionRes(detail.item.value))
+                        DashboardDetail.LunarType.NAKSHATRA -> context.getString(Metadata.getNakshatraDescriptionRes(detail.item.value))
+                        DashboardDetail.LunarType.PAKSHA -> context.getString(R.string.desc_paksha)
                     }
                 }
                 is DashboardDetail.SpecialEvent -> context.getString(Metadata.getEventDescriptionRes(detail.resId))

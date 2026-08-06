@@ -139,33 +139,59 @@ object Metadata {
 
     @StringRes
     fun getTithiDescriptionRes(value: Int): Int {
-        return when (value) {
-            1 -> R.string.tithi_desc_1
-            2 -> R.string.tithi_desc_2
-            3 -> R.string.tithi_desc_3
-            4 -> R.string.tithi_desc_4
-            5 -> R.string.tithi_desc_5
-            6 -> R.string.tithi_desc_6
-            7 -> R.string.tithi_desc_7
-            8 -> R.string.tithi_desc_8
-            9 -> R.string.tithi_desc_9
-            10 -> R.string.tithi_desc_10
-            11 -> R.string.tithi_desc_11
-            12 -> R.string.tithi_desc_12
-            13 -> R.string.tithi_desc_13
-            14 -> R.string.tithi_desc_14
-            15 -> R.string.tithi_desc_15
-            30 -> R.string.tithi_desc_30
-            else -> R.string.tithi_desc_generic
+        val t = value % 30
+        val normalized = if (t == 0) 30 else t
+        return when (normalized) {
+            1 -> R.string.desc_tithi_1
+            2 -> R.string.desc_tithi_2
+            3 -> R.string.desc_tithi_3
+            4 -> R.string.desc_tithi_4
+            5 -> R.string.desc_tithi_5
+            6 -> R.string.desc_tithi_6
+            7 -> R.string.desc_tithi_7
+            8 -> R.string.desc_tithi_8
+            9 -> R.string.desc_tithi_9
+            10 -> R.string.desc_tithi_10
+            11 -> R.string.desc_tithi_11
+            12 -> R.string.desc_tithi_12
+            13 -> R.string.desc_tithi_13
+            14 -> R.string.desc_tithi_14
+            15 -> R.string.desc_tithi_15
+            30 -> R.string.desc_tithi_30
+            else -> R.string.desc_tithi_1
         }
     }
 
     @StringRes
     fun getNakshatraDescriptionRes(value: Int): Int {
         return when (value) {
-            3 -> R.string.star_desc_3
-            4 -> R.string.star_desc_4
-            8 -> R.string.star_desc_8
+            1 -> R.string.desc_star_1
+            2 -> R.string.desc_star_2
+            3 -> R.string.desc_star_3
+            4 -> R.string.desc_star_4
+            5 -> R.string.desc_star_5
+            6 -> R.string.desc_star_6
+            7 -> R.string.desc_star_7
+            8 -> R.string.desc_star_8
+            9 -> R.string.desc_star_9
+            10 -> R.string.desc_star_10
+            11 -> R.string.desc_star_11
+            12 -> R.string.desc_star_12
+            13 -> R.string.desc_star_13
+            14 -> R.string.desc_star_14
+            15 -> R.string.desc_star_15
+            16 -> R.string.desc_star_16
+            17 -> R.string.desc_star_17
+            18 -> R.string.desc_star_18
+            19 -> R.string.desc_star_19
+            20 -> R.string.desc_star_20
+            21 -> R.string.desc_star_21
+            22 -> R.string.desc_star_22
+            23 -> R.string.desc_star_23
+            24 -> R.string.desc_star_24
+            25 -> R.string.desc_star_25
+            26 -> R.string.desc_star_26
+            27 -> R.string.desc_star_27
             else -> R.string.star_desc_generic
         }
     }

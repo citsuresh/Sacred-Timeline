@@ -6,6 +6,11 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.ui.input.pointer.changedToUp
+import androidx.compose.ui.input.pointer.positionChange
+import kotlin.math.abs
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
@@ -69,6 +74,8 @@ fun TimelinePager(
     showSunset: Boolean = true,
     showBrahmaMuhurtham: Boolean = false,
     showAbhijitMuhurtham: Boolean = false,
+    isHeaderExpanded: Boolean = false,
+    onToggleHeaderExpanded: (Boolean) -> Unit = {},
     onScaleChange: (Float) -> Unit,
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
@@ -147,7 +154,9 @@ fun TimelinePager(
                             showSunrise = showSunrise,
                             showSunset = showSunset,
                             showBrahmaMuhurtham = showBrahmaMuhurtham,
-                            showAbhijitMuhurtham = showAbhijitMuhurtham
+                            showAbhijitMuhurtham = showAbhijitMuhurtham,
+                            isHeaderExpanded = isHeaderExpanded,
+                            onToggleHeaderExpanded = onToggleHeaderExpanded
                         )
                     } else {
                         Box(modifier = Modifier.fillMaxSize()) {
@@ -204,7 +213,9 @@ fun TimelineContent(
     showSunrise: Boolean = true,
     showSunset: Boolean = true,
     showBrahmaMuhurtham: Boolean = false,
-    showAbhijitMuhurtham: Boolean = false
+    showAbhijitMuhurtham: Boolean = false,
+    isHeaderExpanded: Boolean = false,
+    onToggleHeaderExpanded: (Boolean) -> Unit = {}
 ) {
     val scrollState = rememberScrollState()
     val density = LocalDensity.current
@@ -231,37 +242,84 @@ fun TimelineContent(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        if (!isLandscape) {
-            SunTimesDisplay(
-                sunrise = dayData.sunrise, 
-                sunset = dayData.sunset, 
-                viewDate = date,
-                tamilDay = dayData.tamilDay,
-                tamilMonthResId = dayData.tamilMonthResId,
-                tamilYearResId = dayData.tamilYearResId,
-                pakshaResId = dayData.pakshaResId,
-                pakshaDay = dayData.pakshaDay,
-                tithis = dayData.tithis,
-                nakshatras = dayData.nakshatras,
-                tithiValue = dayData.tithis.firstOrNull()?.value ?: 0,
-                specialEvents = dayData.specialEvents,
-                isSubhaMuhurtham = dayData.isSubhaMuhurtham,
-                abhijitMuhurtham = dayData.abhijitMuhurtham,
-                brahmaMuhurtham = dayData.brahmaMuhurtham,
-                showTamilDate = showTamilDate,
-                showTamilYear = showTamilYear,
-                showPirai = showPirai,
-                showSunrise = showSunrise,
-                showSunset = showSunset,
-                showBrahmaMuhurtham = showBrahmaMuhurtham,
-                showAbhijitMuhurtham = showAbhijitMuhurtham,
-                isFallback = dayData.isFallback, 
-                isLandscape = false, 
-                is24Hour = is24Hour,
-                onDetailClick = onDetailClick
-            )
+        Column(
+            modifier = Modifier.pointerInput(isHeaderExpanded) {
+                awaitEachGesture {
+                    val down = awaitFirstDown(requireUnconsumed = false)
+                    var totalX = 0f
+                    var totalY = 0f
+                    var decided = false
+                    var isVertical = false
+                    
+                    while (true) {
+                        val event = awaitPointerEvent()
+                        val change = event.changes.first()
+                        if (change.changedToUp()) break
+                        
+                        val delta = change.positionChange()
+                        totalX += abs(delta.x)
+                        totalY += abs(delta.y)
+                        
+                        if (!decided) {
+                            val slop = viewConfiguration.touchSlop
+                            if (totalY > slop || totalX > slop) {
+                                decided = true
+                                // Prioritize vertical if it's the dominant direction
+                                isVertical = totalY > totalX
+                            }
+                        }
+                        
+                        if (decided && isVertical) {
+                            change.consume()
+                            // Accumulate Y for the threshold
+                            if (totalY > 25) {
+                                if (delta.y > 0 && !isHeaderExpanded) {
+                                    onToggleHeaderExpanded(true)
+                                } else if (delta.y < 0 && isHeaderExpanded) {
+                                    onToggleHeaderExpanded(false)
+                                }
+                            }
+                        }
+                        
+                        if (change.isConsumed && !isVertical) break
+                    }
+                }
+            }
+        ) {
+            if (!isLandscape) {
+                SunTimesDisplay(
+                    sunrise = dayData.sunrise, 
+                    sunset = dayData.sunset, 
+                    viewDate = date,
+                    tamilDay = dayData.tamilDay,
+                    tamilMonthResId = dayData.tamilMonthResId,
+                    tamilYearResId = dayData.tamilYearResId,
+                    pakshaResId = dayData.pakshaResId,
+                    pakshaDay = dayData.pakshaDay,
+                    tithis = dayData.tithis,
+                    nakshatras = dayData.nakshatras,
+                    tithiValue = dayData.tithis.firstOrNull()?.value ?: 0,
+                    specialEvents = dayData.specialEvents,
+                    isSubhaMuhurtham = dayData.isSubhaMuhurtham,
+                    abhijitMuhurtham = dayData.abhijitMuhurtham,
+                    brahmaMuhurtham = dayData.brahmaMuhurtham,
+                    showTamilDate = showTamilDate,
+                    showTamilYear = showTamilYear,
+                    showPirai = showPirai,
+                    showSunrise = showSunrise,
+                    showSunset = showSunset,
+                    showBrahmaMuhurtham = showBrahmaMuhurtham,
+                    showAbhijitMuhurtham = showAbhijitMuhurtham,
+                    isExpanded = isHeaderExpanded,
+                    onToggleExpanded = onToggleHeaderExpanded,
+                    isFallback = dayData.isFallback, 
+                    isLandscape = false, 
+                    is24Hour = is24Hour,
+                    onDetailClick = onDetailClick
+                )
+            }
+            TimelineHeader(viewMode = viewMode, columnVisibility = columnVisibility, columnOrder = columnOrder)
         }
-        TimelineHeader(viewMode = viewMode, columnVisibility = columnVisibility, columnOrder = columnOrder)
         
         Box(
             modifier = Modifier

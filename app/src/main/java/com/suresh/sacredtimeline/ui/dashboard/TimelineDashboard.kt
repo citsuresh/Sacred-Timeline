@@ -71,6 +71,7 @@ fun TimelineDashboard(
     var showDatePicker by remember { mutableStateOf(false) }
     var showLocationDialog by remember { mutableStateOf(false) }
     var manualLocationName by remember { mutableStateOf("") }
+    var isHeaderExpanded by remember { mutableStateOf(false) }
     
     var selectedDetail by remember { mutableStateOf<com.suresh.sacredtimeline.model.DashboardDetail?>(null) }
     val sheetState = rememberModalBottomSheetState()
@@ -197,6 +198,8 @@ fun TimelineDashboard(
             showSunset = showSunset,
             showBrahmaMuhurtham = showBrahmaMuhurtham,
             showAbhijitMuhurtham = showAbhijitMuhurtham,
+            isHeaderExpanded = isHeaderExpanded,
+            onToggleHeaderExpanded = { isHeaderExpanded = it },
             onMenuClick = onMenuClick,
             onZoomIn = onZoomIn,
             onZoomOut = onZoomOut,
@@ -240,6 +243,8 @@ fun TimelineDashboard(
             showSunset = showSunset,
             showBrahmaMuhurtham = showBrahmaMuhurtham,
             showAbhijitMuhurtham = showAbhijitMuhurtham,
+            isHeaderExpanded = isHeaderExpanded,
+            onToggleHeaderExpanded = { isHeaderExpanded = it },
             onMenuClick = onMenuClick,
             onZoomIn = onZoomIn,
             onZoomOut = onZoomOut,
