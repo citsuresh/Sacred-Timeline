@@ -25,13 +25,17 @@ graph TD
 ## 2. Layer Responsibilities
 
 ### Domain/Logic (`logic/`)
-- `PanchangamCalculator`: Core engine for Nalla Neram (sunrise-relative), Gowri Neram, and Hora.
-- `LunarCalendarUtils`: Astronomical formulas for Tithi, Nakshatra, and Paksha; calculates exact start/end intervals for a 24h window.
+- `PanchangamCalculator`: Core engine for Nalla Neram (sunrise-relative), Gowri Neram, and Horai.
+- `MockPanchangamProvider`: Assembles 24h data by blending yesterday's night and today's day cycles.
+- `SunriseSunsetProvider`: Handles network requests to fetch solar data for accurate muhurtham calculations.
+- `LunarCalendarUtils`: Astronomical formulas for Tithi, Nakshatra, and Paksha; identifies transitions in 24h windows.
 - `TamilCalendarUtils`: Mapping for 60-year cycles and lunar-solar festival combinations.
 
 ### UI (`ui/`)
-- `ui/dashboard`: 24h vertical timeline, `SunTimesDisplay` (Marquee header with PNG spiritual icons).
-- `ui/settings`: Hierarchical menus for general settings, Tithi/Nakshatra toggles, and Theme management.
+- `ui/dashboard`: 24h vertical timeline, `TimelineCore` (lane logic), and `SunTimesDisplay`.
+- `ui/settings`: Hierarchical menus for general settings, Tithi/Nakshatra toggles, and Column management.
+- `ui/theme`: `SacredTimelineColors` for dynamic tinting and sticker-look UI patterns.
+- `ui/navigation`: Navigation 3 state definitions and `ViewMode` routes.
 
 ### Data (`data/`)
 - `SettingsRepository`: Jetpack DataStore for user preferences (now including Theme and Lunar filters).
@@ -43,12 +47,19 @@ graph TD
 - **Localization**: `AppCompatDelegate` for dynamic English/Tamil switching.
 
 ## 4. Symbol Index
-| Class | Responsibility |
+| Symbol | Responsibility |
 | :--- | :--- |
-| `PanchangamCalculator` | Math for all time slots. |
-| `MainActivity` | App lifecycle & Navigation host. |
-| `SettingsRepository` | Source of truth for preferences. |
-| `PanchangamWidget` | Glance-based Home Screen summary. |
-| `Metadata` | UI mapping for localized strings/icons. |
-| `DashboardDetail` | Unified model for header/timeline detail items. |
-| `DashboardDetailSheet` | Refactored BottomSheet for all significance data. |
+| `PanchangamCalculator` | Math for all time slots (Gowri, Horai, Nalla Neram). |
+| `MockPanchangamProvider` | Coordinates yesterday/today cycles to fill a 24h window. |
+| `SunriseSunsetProvider` | Retrofit-based API client for location-specific solar data. |
+| `MainActivity` | App lifecycle & Navigation 3 host. |
+| `TimelineViewModel` | MVI state holder; manages location, date, and filtered data. |
+| `SettingsRepository` | DataStore source of truth for all user preferences. |
+| `PanchangamWidget` | Glance-based Home Screen summary widget. |
+| `Metadata` | UI mapping for localized strings and spiritual icons. |
+| `TimelineCore` | The heart of the UI; manages vertical 24h layout and lane distribution. |
+| `TimingCard` | Multi-layered "sticker-look" card for individual time slots. |
+| `DashboardDetail` | Unified model for significance data (header & timeline). |
+| `DashboardDetailSheet` | Reactive BottomSheet for all spiritual guidance. |
+| `FullDayEvent` | Model for sticky headings and background tinting. |
+| `Muhurtham` | Specialized timing model for Brahma and Abhijit windows. |

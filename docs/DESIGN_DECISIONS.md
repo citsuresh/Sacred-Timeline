@@ -3,7 +3,17 @@
 Historical record of architectural and UI/UX choices.
 
 ## UI & Layout
-- **24-Hour Vertical Timeline**: Ensures all slots (Gowri/Hora) are visible; "NOW" indicator centered for immediate focus.
+- **Universal Timeline Distribution (Track-based Lanes)**: 
+    - Implemented a multi-track lane system for the high-density Universal view.
+    - **Gowri Neram** is pinned to the Left Track, **Horai** to the Right Track, and all other events to the Center.
+    - **Dynamic Track Widths**: If only two tracks are active (e.g., Left and Right), they split the space 50/50. If three are active, they split 33/33/33. This eliminates empty gaps in the timeline.
+    - **Sub-Lane Resolution**: Items within the *same* track that overlap (like Rahu and Abhijit in the center) further sub-divide their track's width equally to prevent overlapping boxes.
+- **Priority Event Tinting**:
+    - **Spiritual/Gold Priority**: When multiple full-day events occur (e.g., a Public Holiday and a Subha Muhurtham), the Gold tint takes precedence as it defines the "traditional quality" of the day.
+    - **Global Column Tinting**: Tints are applied to the entire 24h column, including the Time Markers, to ensure the day's quality is visible even when the timeline is crowded with cards.
+- **Strict Pager Synchronization**: Switched from `animateScrollToPage` to a `snapshotFlow` observer and UTC-anchored dates to prevent "midway stops" in the timeline when swiping or picking dates.
+- **Horai Standardization**: Adopted the term "Horai" (instead of "Hora") to better align with Tamil traditional nomenclature while maintaining English legibility.
+- **24-Hour Vertical Timeline**: Ensures all slots (Gowri/Horai) are visible; "NOW" indicator centered for immediate focus.
 - **High-Fidelity Spiritual Icons**: Switched from simplified code-drawn SVGs to user-provided PNGs for Nandi, Shiva, and Ganesha to ensure 100% traditional accuracy.
 - **Double-Border (Sticker Look)**: All timing cards and custom icons (like Vel) use white outer and black inner borders (or vice versa based on mode) to remain legible on any wallpaper or theme.
 - **Marquee Header**: 

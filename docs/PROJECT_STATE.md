@@ -3,6 +3,15 @@
 **Phase**: Alpha/Stable (Phase 3 Complete)
 
 ## 1. Recently Implemented
+- **Universal Timeline**: A high-density combined view that merges Nalla Neram, Brahma/Abhijit Muhurthams, Gowri Neram, and Horai into a single column.
+- **Smart Lane Distribution**: Implemented a sweep-line algorithm for equal distribution. Gowri is anchored Left, Horai is anchored Right, and other items fill the Center with sub-lane resolution for overlaps.
+- **Full-Day Event Hierarchy**:
+    - **Spiritual/Auspicious (Gold)**: Subha Muhurtham, Festivals, and Traditional windows apply a Gold tint to the entire timeline and a sticky heading.
+    - **Secular/Public (Purple)**: Holidays like Independence Day apply a Purple tint and a sticky heading.
+    - **Priority Logic**: Gold tint takes precedence over Purple for background styling while showing both labels.
+- **Date Picker & Pager Sync**: Fixed a timezone-offset bug in the Date Picker and implemented `snapshotFlow` tracking to ensure the Pager and Selected Date remain perfectly synchronized.
+- **Horai Renaming**: Standardized the term "Horai" (Tamil: ஹோரை) across all English and Tamil UI components.
+- **Enhanced Box Detail**: Added categorical headings (e.g., NERAM, HORAI) to individual timeline cards for instant identification in combined views.
 - **Header Significance Details**: Added a details pane (BottomSheet) for every item in the header (Tithi, Nakshatra, Events, Muhurthams) with traditional guidance and precise start/end times.
 - **Interactive Marquees**: Replaced `basicMarquee` with a custom `AutoScrollingRow` to ensure all scrolling header items remain 100% clickable during animation.
 - **Timeline Timing Toggles**: New settings to show/hide Sunrise, Sunset, and Brahma Muhurtham.
