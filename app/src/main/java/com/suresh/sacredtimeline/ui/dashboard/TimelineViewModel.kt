@@ -50,6 +50,7 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
     private val _timelineScale = MutableStateFlow(1.0f)
     val timelineScale: StateFlow<Float> = _timelineScale
 
+    private var refreshJob: kotlinx.coroutines.Job? = null
     private val cachedDays = mutableMapOf<LocalDate, DayData>()
     private val cacheMutex = Mutex()
 
@@ -181,7 +182,10 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
             combine(selectedDate, repository.preloadDays) { date, days ->
                 date to days
             }.collect { (date, days) ->
-                preloadData(date, days)
+                refreshJob?.cancel()
+                refreshJob = viewModelScope.launch {
+                    preloadData(date, days)
+                }
             }
         }
 
@@ -192,15 +196,37 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
                 repository.enabledNakshatras,
                 repository.sunriseDefinition,
                 repository.specialPeriodStyle,
-                repository.lunarMonthSystem
-            ) { tithis, stars, sunDef, style, system ->
-                true // Just trigger
-            }.collect {
-                cacheMutex.withLock { cachedDays.clear() }
-                preloadData(selectedDate.value, repository.preloadDays.first())
+                repository.lunarMonthSystem,
+                repository.preloadDays
+            ) { values ->
+                // Use array for combine > 5 flows
+                DataRefreshTrigger(
+                    tithis = values[0] as Set<String>,
+                    stars = values[1] as Set<String>,
+                    sunDef = values[2] as String,
+                    style = values[3] as String,
+                    system = values[4] as String,
+                    range = values[5] as Int
+                )
+            }.collect { trigger ->
+                refreshJob?.cancel()
+                refreshJob = viewModelScope.launch {
+                    cacheMutex.withLock { cachedDays.clear() }
+                    cacheManager.clearCache() // Clear disk too
+                    preloadData(selectedDate.value, trigger.range)
+                }
             }
         }
     }
+
+    private data class DataRefreshTrigger(
+        val tithis: Set<String>,
+        val stars: Set<String>,
+        val sunDef: String,
+        val style: String,
+        val system: String,
+        val range: Int
+    )
 
     fun setViewMode(mode: ViewMode) {
         _viewMode.value = mode
@@ -232,8 +258,6 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
                 if (location != null) {
                     val newCoords = Pair(location.latitude, location.longitude)
                     
-                    // GUARD: Only reload if location has moved significantly (approx > 100m)
-                    // Or if we were previously in Manual mode
                     val distanceMoved = Math.abs(currentLocation.first - newCoords.first) + 
                                       Math.abs(currentLocation.second - newCoords.second)
                     
@@ -245,25 +269,26 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
                         _locationName.value = name
                         _isLocationAuto.value = name != "Unknown Location"
                         
-                        // Try disk cache for new location if we haven't already
-                        val diskData = cacheManager.loadCache(newCoords.first, newCoords.second)
-                        cacheMutex.withLock {
-                            cachedDays.clear()
-                            if (diskData != null) {
-                                cachedDays.putAll(diskData)
+                        refreshJob?.cancel()
+                        refreshJob = viewModelScope.launch {
+                            val diskData = cacheManager.loadCache(newCoords.first, newCoords.second)
+                            cacheMutex.withLock {
+                                cachedDays.clear()
+                                if (diskData != null) cachedDays.putAll(diskData)
                             }
+                            if (diskData != null) updateSuccessState()
+                            preloadData(selectedDate.value, repository.preloadDays.first())
                         }
-                        if (diskData != null) updateSuccessState()
-                        
-                        preloadData(selectedDate.value, repository.preloadDays.first())
                     } else if (cachedDays.isEmpty()) {
-                        // Cold start in Auto Mode: Already has coords but no data
-                        val diskData = cacheManager.loadCache(newCoords.first, newCoords.second)
-                        if (diskData != null) {
-                            cacheMutex.withLock { cachedDays.putAll(diskData) }
-                            updateSuccessState()
+                        refreshJob?.cancel()
+                        refreshJob = viewModelScope.launch {
+                            val diskData = cacheManager.loadCache(newCoords.first, newCoords.second)
+                            if (diskData != null) {
+                                cacheMutex.withLock { cachedDays.putAll(diskData) }
+                                updateSuccessState()
+                            }
+                            preloadData(selectedDate.value, repository.preloadDays.first())
                         }
-                        preloadData(selectedDate.value, repository.preloadDays.first())
                     }
                 }
             } catch (e: Exception) {
@@ -306,35 +331,33 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    private fun preloadData(centerDate: LocalDate, rangeDays: Int = 3) {
-        viewModelScope.launch {
-            // Ensure at least the current date is loading if no data
-            val isEmpty = cacheMutex.withLock { cachedDays.isEmpty() }
-            if (isEmpty) {
-                _uiState.value = TimelineUiState.Loading
-            }
-
-            // Fetch range: -rangeDays to +rangeDays
-            val datesToLoad = (-rangeDays..rangeDays).map { centerDate.plusDays(it.toLong()) }
-            
-            datesToLoad.forEach { date ->
-                val alreadyCached = cacheMutex.withLock { cachedDays.containsKey(date) }
-                if (!alreadyCached) {
-                    val dayData = fetchDayData(date)
-                    cacheMutex.withLock { cachedDays[date] = dayData }
-                }
-            }
-
-            val snapshot = cacheMutex.withLock { cachedDays.toMap() }
-            _uiState.value = TimelineUiState.Success(
-                days = snapshot,
-                locationName = _locationName.value,
-                isLocationAuto = _isLocationAuto.value
-            )
-            
-            // Save to disk
-            cacheManager.saveCache(currentLocation.first, currentLocation.second, snapshot)
+    private suspend fun preloadData(centerDate: LocalDate, rangeDays: Int = 3) {
+        // Ensure at least the current date is loading if no data
+        val isEmpty = cacheMutex.withLock { cachedDays.isEmpty() }
+        if (isEmpty) {
+            _uiState.value = TimelineUiState.Loading
         }
+
+        // Fetch range: -rangeDays to +rangeDays
+        val datesToLoad = (-rangeDays..rangeDays).map { centerDate.plusDays(it.toLong()) }
+        
+        datesToLoad.forEach { date ->
+            val alreadyCached = cacheMutex.withLock { cachedDays.containsKey(date) }
+            if (!alreadyCached) {
+                val dayData = fetchDayData(date)
+                cacheMutex.withLock { cachedDays[date] = dayData }
+            }
+        }
+
+        val snapshot = cacheMutex.withLock { cachedDays.toMap() }
+        _uiState.value = TimelineUiState.Success(
+            days = snapshot,
+            locationName = _locationName.value,
+            isLocationAuto = _isLocationAuto.value
+        )
+        
+        // Save to disk
+        cacheManager.saveCache(currentLocation.first, currentLocation.second, snapshot)
     }
 
     private suspend fun fetchDayData(date: LocalDate): DayData {
@@ -343,7 +366,7 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
         val style = repository.specialPeriodStyle.first()
 
         val sunResult = sunProvider.getSunTimes(lat, lng, date, sunDef)
-        val timings = provider.getTimings(date, sunResult.sunrise, sunResult.sunset, style)
+        val timings = provider.getTimings(date, sunResult.sunrise, sunResult.sunset, style, sunDef, lat, lng)
         
         val tamilCalendar = com.suresh.sacredtimeline.logic.TamilCalendarUtils.getTamilDate(date)
         val lunarDayInfo = com.suresh.sacredtimeline.logic.LunarCalendarUtils.getLunarDayInfo(date)

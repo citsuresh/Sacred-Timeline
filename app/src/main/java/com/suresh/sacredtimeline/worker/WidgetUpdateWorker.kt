@@ -70,7 +70,7 @@ class WidgetUpdateWorker(
         val style = repository.specialPeriodStyle.first()
         
         val sunResult = sunProvider.getSunTimes(lat, lng, date, sunDef)
-        val timings = provider.getTimings(date, sunResult.sunrise, sunResult.sunset, style)
+        val timings = provider.getTimings(date, sunResult.sunrise, sunResult.sunset, style, sunDef, lat, lng)
         
         return DayData(
             nallaNeram = timings.filterIsInstance<com.suresh.sacredtimeline.model.NallaNeram>(),
@@ -124,7 +124,7 @@ class WidgetUpdateWorker(
         val style = repository.specialPeriodStyle.first()
 
         val sunTimes = sunProvider.getSunTimes(lat, lng, date, sunDef)
-        val timings = provider.getTimings(date, sunTimes.sunrise, sunTimes.sunset, style)
+        val timings = provider.getTimings(date, sunTimes.sunrise, sunTimes.sunset, style, sunDef, lat, lng)
         
         val brahma = com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculateBrahmaMuhurtham(sunTimes.sunrise)
         val abhijit = com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculateAbhijitMuhurtham(sunTimes.sunrise, sunTimes.sunset)

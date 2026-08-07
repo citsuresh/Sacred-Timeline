@@ -329,15 +329,21 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun setSunriseDefinition(definition: String) {
-        viewModelScope.launch { repository.setSunriseDefinition(definition) }
+        viewModelScope.launch { 
+            repository.setSunriseDefinition(definition)
+        }
     }
 
     fun setSpecialPeriodStyle(style: String) {
-        viewModelScope.launch { repository.setSpecialPeriodStyle(style) }
+        viewModelScope.launch { 
+            repository.setSpecialPeriodStyle(style)
+        }
     }
 
     fun setLunarMonthSystem(system: String) {
-        viewModelScope.launch { repository.setLunarMonthSystem(system) }
+        viewModelScope.launch { 
+            repository.setLunarMonthSystem(system)
+        }
     }
 }
 

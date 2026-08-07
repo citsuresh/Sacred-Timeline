@@ -6,11 +6,39 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 class MockPanchangamProvider {
-    fun getTimings(date: LocalDate, sunrise: LocalTime, sunset: LocalTime, style: String = "PROPORTIONAL"): List<Timing> {
-        // Use yesterday's cycle to fill 00:00 to Today's Sunrise
-        val yesterdayCycle = PanchangamCalculator.calculateAllTimings(date.minusDays(1).dayOfWeek, sunrise, sunset, style)
-        // Use today's cycle to fill Today's Sunrise to 23:59
-        val todayCycle = PanchangamCalculator.calculateAllTimings(date.dayOfWeek, sunrise, sunset, style)
+    fun getTimings(
+        date: LocalDate, 
+        sunrise: LocalTime, 
+        sunset: LocalTime, 
+        style: String = "PROPORTIONAL", 
+        sunDef: String = "SCIENTIFIC",
+        lat: Double = 11.0168, 
+        lng: Double = 76.9558,
+        offsetMinutes: Long = 15,
+        durationMinutes: Long = 60
+    ): List<Timing> {
+        val sunProvider = SunriseSunsetProvider()
+        
+        // 1. Calculate Yesterday's Sun Times for the midnight-to-sunrise gap
+        val yesterdaySun = sunProvider.getSunTimes(lat, lng, date.minusDays(1), sunDef)
+        val yesterdayCycle = PanchangamCalculator.calculateAllTimings(
+            date.minusDays(1).dayOfWeek, 
+            yesterdaySun.sunrise, 
+            yesterdaySun.sunset, 
+            style,
+            offsetMinutes,
+            durationMinutes
+        )
+        
+        // 2. Today's cycle
+        val todayCycle = PanchangamCalculator.calculateAllTimings(
+            date.dayOfWeek, 
+            sunrise, 
+            sunset, 
+            style,
+            offsetMinutes,
+            durationMinutes
+        )
         
         val result = mutableListOf<Timing>()
         
@@ -57,8 +85,8 @@ class MockPanchangamProvider {
         }
     }
 
-    fun getCurrentTimings(date: LocalDate, time: LocalTime, sunrise: LocalTime, sunset: LocalTime): SpecialTimings {
-        val timings = getTimings(date, sunrise, sunset)
+    fun getCurrentTimings(date: LocalDate, time: LocalTime, sunrise: LocalTime, sunset: LocalTime, style: String = "PROPORTIONAL"): SpecialTimings {
+        val timings = getTimings(date, sunrise, sunset, style)
         return SpecialTimings(
             nallaNeram = timings.filterIsInstance<NallaNeram>().find { it.isCurrent(time) },
             gowriNeram = timings.filterIsInstance<GowriNeram>().find { it.isCurrent(time) },

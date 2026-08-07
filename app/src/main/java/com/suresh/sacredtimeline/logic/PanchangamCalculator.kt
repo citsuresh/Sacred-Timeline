@@ -129,17 +129,18 @@ object PanchangamCalculator {
         dayOfWeek: DayOfWeek,
         sunrise: LocalTime,
         sunset: LocalTime,
+        style: String = "PROPORTIONAL",
         offsetMinutes: Long = 15,
         durationMinutes: Long = 60
     ): List<NallaNeram> {
-        val gowriSlots = calculateGowriNeram(dayOfWeek, sunrise, sunset)
+        val gowriSlots = calculateGowriNeram(dayOfWeek, sunrise, sunset, style)
         val dayGowri = gowriSlots.filter { 
             !it.startTime.isBefore(sunrise) && !it.endTime.isAfter(sunset) 
         }
         
-        val rahu = calculateRahuKalam(dayOfWeek, sunrise, sunset)
-        val yama = calculateYamagandam(dayOfWeek, sunrise, sunset)
-        val kuli = calculateKuligai(dayOfWeek, sunrise, sunset)
+        val rahu = calculateRahuKalam(dayOfWeek, sunrise, sunset, style)
+        val yama = calculateYamagandam(dayOfWeek, sunrise, sunset, style)
+        val kuli = calculateKuligai(dayOfWeek, sunrise, sunset, style)
         
         val inauspiciousPeriods = listOf(rahu, yama, kuli)
         val primarySlots = NALLA_NERAM_DAY_SLOTS[dayOfWeek] ?: emptyList()
@@ -193,14 +194,25 @@ object PanchangamCalculator {
         return s1.isBefore(e2) && s2.isBefore(e1)
     }
 
-    fun calculateGowriNeram(dayOfWeek: DayOfWeek, sunrise: LocalTime, sunset: LocalTime): List<GowriNeram> {
-        val dayDuration = Duration.between(sunrise, sunset)
-        val daySlotDuration = dayDuration.dividedBy(8)
-        val daySequence = GOWRI_DAY_SEQUENCE[dayOfWeek] ?: return emptyList()
+    fun calculateGowriNeram(dayOfWeek: DayOfWeek, sunrise: LocalTime, sunset: LocalTime, style: String = "PROPORTIONAL"): List<GowriNeram> {
+        val (daySlotDuration, nightSlotDuration, startDay, startNight) = if (style == "FIXED") {
+            val d = Duration.ofMinutes(90)
+            val n = Duration.ofMinutes(90)
+            val sd = LocalTime.of(6, 0)
+            val sn = LocalTime.of(18, 0)
+            Quadruple(d, n, sd, sn)
+        } else {
+            val d = Duration.between(sunrise, sunset).dividedBy(8)
+            var nDur = Duration.between(sunset, sunrise)
+            if (nDur.isNegative) nDur = nDur.plus(Duration.ofDays(1))
+            val n = nDur.dividedBy(8)
+            Quadruple(d, n, sunrise, sunset)
+        }
 
+        val daySequence = GOWRI_DAY_SEQUENCE[dayOfWeek] ?: return emptyList()
         val daySlots = daySequence.mapIndexed { index, category ->
-            val start = sunrise.plus(daySlotDuration.multipliedBy(index.toLong()))
-            val end = sunrise.plus(daySlotDuration.multipliedBy((index + 1).toLong()))
+            val start = startDay.plus(daySlotDuration.multipliedBy(index.toLong()))
+            val end = startDay.plus(daySlotDuration.multipliedBy((index + 1).toLong()))
             GowriNeram(
                 name = category.name,
                 tamilName = "",
@@ -211,17 +223,10 @@ object PanchangamCalculator {
             )
         }
 
-        // Night slots (from sunset to next sunrise)
-        var nightDuration = Duration.between(sunset, sunrise)
-        if (nightDuration.isNegative) {
-            nightDuration = nightDuration.plus(Duration.ofDays(1))
-        }
-        val nightSlotDuration = nightDuration.dividedBy(8)
         val nightSequence = GOWRI_NIGHT_SEQUENCE[dayOfWeek] ?: return emptyList()
-
         val nightSlots = nightSequence.mapIndexed { index, category ->
-            val start = sunset.plus(nightSlotDuration.multipliedBy(index.toLong()))
-            val end = sunset.plus(nightSlotDuration.multipliedBy((index + 1).toLong()))
+            val start = startNight.plus(nightSlotDuration.multipliedBy(index.toLong()))
+            val end = startNight.plus(nightSlotDuration.multipliedBy((index + 1).toLong()))
             GowriNeram(
                 name = category.name,
                 tamilName = "",
@@ -235,15 +240,23 @@ object PanchangamCalculator {
         return daySlots + nightSlots
     }
 
-    fun calculateHora(dayOfWeek: DayOfWeek, sunrise: LocalTime, sunset: LocalTime): List<Hora> {
-        val dayDuration = Duration.between(sunrise, sunset)
-        val daySlotDuration = dayDuration.dividedBy(12)
-        
-        var nightDuration = Duration.between(sunset, sunrise)
-        if (nightDuration.isNegative) {
-            nightDuration = nightDuration.plus(Duration.ofDays(1))
+    private data class Quadruple<A, B, C, D>(val first: A, val second: B, val third: C, val fourth: D)
+
+    fun calculateHora(dayOfWeek: DayOfWeek, sunrise: LocalTime, sunset: LocalTime, style: String = "PROPORTIONAL"): List<Hora> {
+        val (daySlotDuration, nightSlotDuration, startDay, startNight) = if (style == "FIXED") {
+            // Standard Fixed Hora is exactly 1 hour, anchored to 6 AM
+            val d = Duration.ofHours(1)
+            val n = Duration.ofHours(1)
+            val sd = LocalTime.of(6, 0)
+            val sn = LocalTime.of(18, 0)
+            Quadruple(d, n, sd, sn)
+        } else {
+            val d = Duration.between(sunrise, sunset).dividedBy(12)
+            var nDur = Duration.between(sunset, sunrise)
+            if (nDur.isNegative) nDur = nDur.plus(Duration.ofDays(1))
+            val n = nDur.dividedBy(12)
+            Quadruple(d, n, sunrise, sunset)
         }
-        val nightSlotDuration = nightDuration.dividedBy(12)
         
         val planets = listOf("Sun", "Venus", "Mercury", "Moon", "Saturn", "Jupiter", "Mars")
         val startIndex = when (dayOfWeek) {
@@ -258,8 +271,8 @@ object PanchangamCalculator {
 
         val dayHoras = (0 until 12).map { i ->
             val planet = planets[(startIndex + i) % 7]
-            val start = sunrise.plus(daySlotDuration.multipliedBy(i.toLong()))
-            val end = sunrise.plus(daySlotDuration.multipliedBy((i + 1).toLong()))
+            val start = startDay.plus(daySlotDuration.multipliedBy(i.toLong()))
+            val end = startDay.plus(daySlotDuration.multipliedBy((i + 1).toLong()))
             
             val auspiciousness = when (planet) {
                 "Jupiter", "Venus", "Mercury", "Moon" -> Auspiciousness.GREEN
@@ -280,8 +293,8 @@ object PanchangamCalculator {
 
         val nightHoras = (0 until 12).map { i ->
             val planet = planets[(startIndex + 12 + i) % 7]
-            val start = sunset.plus(nightSlotDuration.multipliedBy(i.toLong()))
-            val end = sunset.plus(nightSlotDuration.multipliedBy((i + 1).toLong()))
+            val start = startNight.plus(nightSlotDuration.multipliedBy(i.toLong()))
+            val end = startNight.plus(nightSlotDuration.multipliedBy((i + 1).toLong()))
             
             val auspiciousness = when (planet) {
                 "Jupiter", "Venus", "Mercury", "Moon" -> Auspiciousness.GREEN
@@ -344,10 +357,17 @@ object PanchangamCalculator {
         }
     }
 
-    fun calculateAllTimings(dayOfWeek: DayOfWeek, sunrise: LocalTime, sunset: LocalTime, style: String = "PROPORTIONAL"): List<Timing> {
-        return calculateNallaNeram(dayOfWeek, sunrise, sunset) +
-                calculateGowriNeram(dayOfWeek, sunrise, sunset) +
-                calculateHora(dayOfWeek, sunrise, sunset) +
+    fun calculateAllTimings(
+        dayOfWeek: DayOfWeek, 
+        sunrise: LocalTime, 
+        sunset: LocalTime, 
+        style: String = "PROPORTIONAL",
+        offsetMinutes: Long = 15,
+        durationMinutes: Long = 60
+    ): List<Timing> {
+        return calculateNallaNeram(dayOfWeek, sunrise, sunset, style, offsetMinutes, durationMinutes) +
+                calculateGowriNeram(dayOfWeek, sunrise, sunset, style) +
+                calculateHora(dayOfWeek, sunrise, sunset, style) +
                 listOf(
                     calculateRahuKalam(dayOfWeek, sunrise, sunset, style),
                     calculateYamagandam(dayOfWeek, sunrise, sunset, style),

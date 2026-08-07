@@ -82,8 +82,8 @@ class PanchangamWidget : GlanceAppWidget() {
             cache[date]!!
         } else {
             val sunResult = sunProvider.getSunTimes(lat, lng, date, sunDef)
-            val timings = provider.getTimings(date, sunResult.sunrise, sunResult.sunset, style)
-            DayData(
+            val timings = provider.getTimings(date, sunResult.sunrise, sunResult.sunset, style, sunDef, lat, lng)
+            val data = DayData(
                 nallaNeram = timings.filterIsInstance<NallaNeram>(),
                 gowriNeram = timings.filterIsInstance<GowriNeram>(),
                 hora = timings.filterIsInstance<Hora>(),
@@ -101,6 +101,11 @@ class PanchangamWidget : GlanceAppWidget() {
                     Muhurtham("Abhijit Muhurtham", "", it.first, it.second, Auspiciousness.GREEN)
                 }
             )
+            // Fix: Cache Write-Back
+            val newCache = cache?.toMutableMap() ?: mutableMapOf()
+            newCache[date] = data
+            cacheManager.saveCache(lat, lng, newCache)
+            data
         }
 
         val timeFormatter = DateTimeFormatter.ofPattern(if (is24Hour) "HH:mm" else "hh:mm a")
@@ -423,15 +428,15 @@ class PanchangamWidget : GlanceAppWidget() {
                     }
                     Box(
                         modifier = GlanceModifier
-                            .size(24.dp)
-                            .cornerRadius(12.dp)
+                            .size(16.dp) // Reduced from 24dp to prevent title overlap
+                            .cornerRadius(8.dp)
                             .background(Color.White),
                         contentAlignment = Alignment.Center
                     ) {
                         Image(
                             provider = ImageProvider(iconRes),
                             contentDescription = null,
-                            modifier = GlanceModifier.size(16.dp),
+                            modifier = GlanceModifier.size(12.dp), // Adjusted accordingly
                             colorFilter = ColorFilter.tint(ColorProvider(tintColor))
                         )
                     }
