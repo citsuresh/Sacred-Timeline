@@ -371,16 +371,24 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
         val tamilCalendar = com.suresh.sacredtimeline.logic.TamilCalendarUtils.getTamilDate(date)
         val lunarDayInfo = com.suresh.sacredtimeline.logic.LunarCalendarUtils.getLunarDayInfo(date)
         
-        // Use noon-representative values for special event calculation
-        val representativeLunarInfo = com.suresh.sacredtimeline.logic.LunarCalendarUtils.LunarInfo(
-            tithi = lunarDayInfo.tithis.firstOrNull { it.startTime?.atZone(java.time.ZoneId.systemDefault())?.toLocalDate()?.isBefore(date.plusDays(1)) == true }?.value ?: 0,
-            nakshatra = lunarDayInfo.nakshatras.firstOrNull { it.startTime?.atZone(java.time.ZoneId.systemDefault())?.toLocalDate()?.isBefore(date.plusDays(1)) == true }?.value ?: 0,
-            pakshaResId = lunarDayInfo.pakshaResId,
-            pakshaDay = lunarDayInfo.pakshaDay,
-            tithiResId = 0, nakshatraResId = 0 // Not needed for event mapping
-        )
-        val festivals = com.suresh.sacredtimeline.logic.TamilCalendarUtils.getSpecialEvents(tamilCalendar, representativeLunarInfo)
+        // Aggregate festivals from all Tithis and Nakshatras occurring during the day (Part 2: Interval Wiring)
+        val festivalSet = mutableSetOf<Int>()
+        lunarDayInfo.tithis.forEach { tithiInterval ->
+            lunarDayInfo.nakshatras.forEach { nakshatraInterval ->
+                val info = com.suresh.sacredtimeline.logic.LunarCalendarUtils.LunarInfo(
+                    tithi = tithiInterval.value,
+                    nakshatra = nakshatraInterval.value,
+                    pakshaResId = lunarDayInfo.pakshaResId,
+                    pakshaDay = lunarDayInfo.pakshaDay,
+                    tithiResId = tithiInterval.resId,
+                    nakshatraResId = nakshatraInterval.resId
+                )
+                festivalSet.addAll(com.suresh.sacredtimeline.logic.TamilCalendarUtils.getSpecialEvents(tamilCalendar, info))
+            }
+        }
+        val festivals = festivalSet.toList()
         val holidays = com.suresh.sacredtimeline.data.VerifiedHolidays.getHolidays(date)
+        val combinedEvents = (holidays + festivals).distinct()
         
         val brahmaTimes = com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculateBrahmaMuhurtham(sunResult.sunrise)
         val brahma = Muhurtham(
@@ -437,7 +445,7 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
             pakshaDay = lunarDayInfo.pakshaDay,
             tithis = filteredTithis,
             nakshatras = filteredNakshatras,
-            specialEvents = holidays + festivals,
+            specialEvents = combinedEvents,
             isSubhaMuhurtham = com.suresh.sacredtimeline.data.VerifiedHolidays.isSubhaMuhurtham(date),
             brahmaMuhurtham = brahma,
             abhijitMuhurtham = abhijit

@@ -145,6 +145,11 @@ object TamilCalendarUtils {
             events.add(R.string.event_aadi_pooram)
         }
         
+        // Aadi Kiruthigai: Aadi Month + Krittika Star (3)
+        if (tamilDate.monthResId == R.string.month_aadi && lunarInfo.nakshatra == 3) {
+            events.add(R.string.event_aadi_kiruthigai)
+        }
+        
         // Naga Chaturthi: Sawan/Aavani Shukla Chaturthi (4)
         if (tamilDate.monthResId == R.string.month_avani && lunarInfo.tithi == 4) {
             events.add(R.string.event_naga_chaturthi)

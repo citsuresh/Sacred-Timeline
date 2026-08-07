@@ -54,6 +54,8 @@ object SacredTimelineColors {
             R.string.event_pongal, R.string.event_thiruvalluvar_day, 
             R.string.event_tamil_new_year, R.string.event_deepavali,
             R.string.event_aadi_perukku, R.string.event_aadi_pooram,
+            R.string.event_aadi_kiruthigai,
+            R.string.event_pradosham, R.string.event_sivaratri,
             R.string.event_naga_chaturthi, R.string.event_naga_panchami,
             R.string.event_garuda_panchami, R.string.event_vinayagar_chaturthi,
             R.string.event_sankatahara_chaturthi -> true

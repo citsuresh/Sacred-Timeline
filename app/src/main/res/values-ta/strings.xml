@@ -237,6 +237,8 @@
     <!-- Event Descriptions -->
     <string name="event_desc_pradosham">சிவபெருமானுக்கு அர்ப்பணிக்கப்பட்ட ஒரு மங்களகரமான காலம். மன்னிப்பு மற்றும் ஆன்மீக விடுதலையைப் பெறுவதற்கு ஏற்றது.</string>
     <string name="event_desc_sivaratri">சிவபெருமானுக்கு மாதாந்திர அனுஷ்டானம். தியானம், விரதம் மற்றும் ஆன்மீக விழிப்புணர்வில் கவனம் செலுத்துங்கள்.</string>
+    <string name="event_desc_aadi_kiruthigai">ஆடி கிருத்திகை: ஆடி மாதத்தில் வரும் கிருத்திகை நட்சத்திரத்தில் முருகப்பெருமானுக்கு அர்ப்பணிக்கப்பட்ட ஒரு முக்கிய திருவிழா. இது பக்தி மற்றும் முருகனின் அருளைப் பெறுவதற்கான சிறப்பு நாளாகும்.</string>
+    <string name="event_desc_aadi_pooram">ஆடி பூரம்: மகாலட்சுமியின் அவதாரமான ஆண்டாள் நாச்சியார் பிறந்த நாளைக் கொண்டாடும் சிறப்பு நாள். இது தமிழகம் முழுவதும் உள்ள ஆலயங்களில் வெகு விமர்சையாகக் கொண்டாடப்படுகிறது.</string>
     <string name="event_desc_generic">இந்தக் காலத்தில் கடைபிடிக்கப்படும் ஒரு சிறப்பு மத அல்லது பாரம்பரிய நிகழ்வு.</string>
     <string name="event_desc_tamil_date">தமிழ் நாட்காட்டி என்பது தமிழ்நாட்டில் பாரம்பரியமாகப் பயன்படுத்தப்படும் ஒரு சூரிய நாட்காட்டியாகும். இது ராசிகளில் சூரியன் நுழைவதைப் பொறுத்து மாதங்களைக் குறிக்கிறது.</string>
 
@@ -250,6 +252,27 @@
     <string name="label_muhurtham_short">முஹூர்த்தம்</string>
     <string name="label_neram_short">நேரம்</string>
     <string name="label_special_short">சிறப்பு</string>
+
+    <!-- Events -->
+    <string name="event_aadi_perukku">ஆடி பெருக்கு</string>
+    <string name="event_aadi_pooram">ஆடி பூரம்</string>
+    <string name="event_aadi_kiruthigai">ஆடி கிருத்திகை</string>
+    <string name="event_naga_chaturthi">நாக சதுர்த்தி</string>
+    <string name="event_naga_panchami">நாக பஞ்சமி</string>
+    <string name="event_garuda_panchami">கருட பஞ்சமி</string>
+    <string name="event_pradosham">பிரதோஷம்</string>
+    <string name="event_sivaratri">மாசி சிவராத்திரி</string>
+    <string name="event_sankatahara_chaturthi">சங்கடஹர சதுர்த்தி</string>
+    <string name="event_vinayagar_chaturthi">விநாயகர் சதுர்த்தி</string>
+    <string name="event_deepavali">தீபாவளி</string>
+    <string name="event_pongal">தைப்பொங்கல்</string>
+    <string name="event_tamil_new_year">தமிழ்ப்புத்தாண்டு</string>
+    <string name="event_independence_day">சுதந்திர தினம்</string>
+    <string name="event_republic_day">குடியரசு தினம்</string>
+    <string name="event_milad_un_nabi">மிலாதுன் நபி</string>
+    <string name="event_gandhi_jayanthi">காந்தி ஜெயந்தி</string>
+    <string name="event_christmas">கிறிஸ்துமஸ்</string>
+    <string name="event_thiruvalluvar_day">திருவள்ளுவர் தினம்</string>
 
     <!-- Settings Labels -->
     <string name="settings_title">அமைப்புகள்</string>

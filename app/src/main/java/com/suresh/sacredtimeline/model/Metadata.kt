@@ -213,6 +213,8 @@ object Metadata {
         return when (resId) {
             R.string.event_pradosham -> R.string.event_desc_pradosham
             R.string.event_sivaratri -> R.string.event_desc_sivaratri
+            R.string.event_aadi_kiruthigai -> R.string.event_desc_aadi_kiruthigai
+            R.string.event_aadi_pooram -> R.string.event_desc_aadi_pooram
             R.string.month_chithirai, R.string.month_vaikasi, R.string.month_aani,
             R.string.month_aadi, R.string.month_avani, R.string.month_purattasi,
             R.string.month_aippasi, R.string.month_karthigai, R.string.month_margazhi,
