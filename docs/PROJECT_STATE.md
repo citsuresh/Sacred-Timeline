@@ -9,6 +9,10 @@
 - **Sunrise Definition Toggle**: Users can now choose between **Scientific (Top Edge)** and **Traditional (Center of Disk)** definitions.
 - **Dynamic Timing Labels**: Implemented intuitive **"Till [Time]"** labels in the dashboard marquee for active Nakshatras and Tithis.
 - **Special Period Flexibility**: Added a setting to switch between **Proportional (Astronomical)** and **Fixed (1.5h)** Rahu/Yama/Kuli timings.
+- **Automated Traditional Festival Detection**: Implemented dynamic detection for "Aadi Kiruthigai" and "Aadi Pooram" by intersecting Lunar (Nakshatra) and Solar (Month) calendars.
+- **Iterative Festival Engine**: Refactored `TimelineViewModel` to search all Tithi/Nakshatra intervals in a 24h window, ensuring festivals starting later in the day are never missed.
+- **Enhanced Traditional Styling**: Updated `SacredTimelineColors` to correctly apply the Gold "Traditional" tint to Pradosham and Sivaratri (previously defaulting to Purple).
+- **Rigorous Auditing Protocol**: Established the `AGENTS.md` mandate, requiring independent Regression Auditor sub-agents to verify every code change and "wiring" integrity.
 - **Universal Timeline**: A high-density combined view that merges Nalla Neram, Brahma/Abhijit Muhurthams, Gowri Neram, and Horai into a single column.
 - **Smart Lane Distribution**: Implemented a sweep-line algorithm for equal distribution. Gowri is anchored Left, Horai is anchored Right, and other items fill the Center with sub-lane resolution for overlaps.
 - **Full-Day Event Hierarchy**:
