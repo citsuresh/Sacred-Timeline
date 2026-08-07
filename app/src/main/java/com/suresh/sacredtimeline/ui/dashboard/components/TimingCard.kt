@@ -172,9 +172,10 @@ fun TimingCard(
                             fontWeight = FontWeight.Bold,
                             color = contentColor,
                             textAlign = TextAlign.Center,
-                            maxLines = 1,
+                            maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
-                            fontSize = if (height < 40.dp) 10.sp else if (height < 60.dp) 11.sp else 12.sp
+                            lineHeight = if (height < 60.dp) 11.sp else 13.sp,
+                            fontSize = if (height < 40.dp) 9.sp else if (height < 60.dp) 10.sp else 12.sp
                         )
                     }
 
