@@ -51,9 +51,15 @@ import kotlin.math.cos
 @Composable
 fun AutoScrollingRow(
     modifier: Modifier = Modifier,
+    resetKey: Any? = null,
     content: @Composable RowScope.() -> Unit
 ) {
     val scrollState = rememberScrollState()
+    
+    // Reset scroll when key changes (e.g., date swipe)
+    LaunchedEffect(resetKey) {
+        scrollState.scrollTo(0)
+    }
     
     LaunchedEffect(scrollState.maxValue) {
         if (scrollState.maxValue > 0) {
@@ -536,7 +542,10 @@ fun SunTimesDisplay(
     @Composable
     fun HeaderItems(isMarquee: Boolean) {
         if (isMarquee) {
-            AutoScrollingRow(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp, horizontal = 16.dp)) {
+            AutoScrollingRow(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp, horizontal = 16.dp),
+                resetKey = viewDate
+            ) {
                 if (isSubhaMuhurtham) {
                     MuhurthamItem(R.string.muhurtham_subha, LocalTime.MIN, LocalTime.MAX, null, Color(0xFF1976D2), is24Hour) {
                         onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.Muhurtham(R.string.muhurtham_subha, LocalTime.MIN, LocalTime.MAX))
@@ -704,6 +713,7 @@ fun SunTimesDisplay(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(start = 16.dp, end = 32.dp, top = 4.dp, bottom = 4.dp),
+                                resetKey = viewDate,
                                 content = content
                             )
                         }
@@ -759,7 +769,8 @@ fun SunTimesDisplay(
                         AutoScrollingRow(
                             modifier = Modifier
                                 .weight(1f)
-                                .padding(horizontal = 8.dp)
+                                .padding(horizontal = 8.dp),
+                            resetKey = viewDate
                         ) {
                             if (hasBrahma) {
                                 MuhurthamItem(R.string.muhurtham_brahma, brahmaMuhurtham.startTime, brahmaMuhurtham.endTime, Icons.Default.Star, Color(0xFFE91E63), is24Hour) {
