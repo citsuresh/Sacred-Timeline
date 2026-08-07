@@ -367,43 +367,76 @@ class PanchangamWidget : GlanceAppWidget() {
         val contentColor = if (timing != null) SacredTimelineColors.getContentColor(color) else Color.Gray
         val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
-        Column(
+        Box(
             modifier = modifier
                 .fillMaxHeight()
                 .padding(1.dp)
                 .background(color)
                 .cornerRadius(4.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalAlignment = Alignment.CenterVertically
+            contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = title.uppercase(),
-                style = TextStyle(
-                    fontSize = 9.sp, 
-                    fontWeight = FontWeight.Bold, 
-                    color = ColorProvider(contentColor.copy(alpha = 0.9f)),
-                    textAlign = TextAlign.Center
-                ),
-                maxLines = 1,
-                modifier = GlanceModifier.padding(top = 2.dp)
-            )
-            
-            Spacer(modifier = GlanceModifier.defaultWeight())
-
-            Text(
-                text = if (timing != null) context.getString(labelProvider(timing)) else "None",
-                style = TextStyle(fontSize = 11.sp, fontWeight = FontWeight.Bold, color = ColorProvider(contentColor), textAlign = TextAlign.Center),
-                maxLines = 1
-            )
-            if (timing != null) {
+            Column(
+                modifier = GlanceModifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
-                    text = context.getString(R.string.label_till, timing.endTime.format(timeFormatter)),
-                    style = TextStyle(fontSize = 7.sp, color = ColorProvider(contentColor.copy(alpha = 0.8f))),
+                    text = title.uppercase(),
+                    style = TextStyle(
+                        fontSize = 9.sp, 
+                        fontWeight = FontWeight.Bold, 
+                        color = ColorProvider(contentColor.copy(alpha = 0.9f)),
+                        textAlign = TextAlign.Center
+                    ),
+                    maxLines = 1,
+                    modifier = GlanceModifier.padding(top = 2.dp)
+                )
+                
+                Spacer(modifier = GlanceModifier.defaultWeight())
+
+                Text(
+                    text = if (timing != null) context.getString(labelProvider(timing)) else "None",
+                    style = TextStyle(fontSize = 11.sp, fontWeight = FontWeight.Bold, color = ColorProvider(contentColor), textAlign = TextAlign.Center),
                     maxLines = 1
                 )
+                if (timing != null) {
+                    Text(
+                        text = context.getString(R.string.label_till, timing.endTime.format(timeFormatter)),
+                        style = TextStyle(fontSize = 7.sp, color = ColorProvider(contentColor.copy(alpha = 0.8f))),
+                        maxLines = 1
+                    )
+                }
+
+                Spacer(modifier = GlanceModifier.defaultWeight())
             }
 
-            Spacer(modifier = GlanceModifier.defaultWeight())
+            // Compatibility Icon for Hora in Universal View
+            if (timing is Hora) {
+                Box(
+                    modifier = GlanceModifier.fillMaxSize().padding(2.dp),
+                    contentAlignment = Alignment.TopEnd
+                ) {
+                    val (iconRes, tintColor) = when (timing.compatibility) {
+                        HoraCompatibility.FAVORABLE -> R.drawable.ic_fav to CompatibilityFavorable
+                        HoraCompatibility.CONFLICTING -> R.drawable.ic_con to CompatibilityConflicting
+                        HoraCompatibility.NEUTRAL -> R.drawable.ic_neu to CompatibilityNeutral
+                    }
+                    Box(
+                        modifier = GlanceModifier
+                            .size(24.dp)
+                            .cornerRadius(12.dp)
+                            .background(Color.White),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            provider = ImageProvider(iconRes),
+                            contentDescription = null,
+                            modifier = GlanceModifier.size(16.dp),
+                            colorFilter = ColorFilter.tint(ColorProvider(tintColor))
+                        )
+                    }
+                }
+            }
         }
     }
 
