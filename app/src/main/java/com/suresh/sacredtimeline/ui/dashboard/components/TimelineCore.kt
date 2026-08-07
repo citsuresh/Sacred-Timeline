@@ -638,109 +638,75 @@ private data class LaneInfo(
 private fun calculateLanes(timings: List<Timing>): Map<Timing, LaneInfo> {
     if (timings.isEmpty()) return emptyMap()
 
-    val result = mutableMapOf<Timing, LaneInfo>()
-    
-    // 1. Group timings that belong to the same 'track'
-    val gowri = timings.filterIsInstance<GowriNeram>()
-    val horai = timings.filterIsInstance<Hora>()
-    val middle = timings.filter { it !is GowriNeram && it !is Hora }
-
-    // 2. For each track, resolve internal overlaps by assigning sub-indices
-    val gowriSubLanes = resolveInternalLanes(gowri)
-    val horaiSubLanes = resolveInternalLanes(horai)
-    val middleSubLanes = resolveInternalLanes(middle)
-
-    // 3. For each item, calculate how many tracks are active during its span
+    // 1. Group items into transitive clusters
+    val clusters = mutableListOf<MutableSet<Timing>>()
     timings.forEach { timing ->
-        val overlapping = timings.filter { overlaps(it, timing) }
-        
-        // Find which tracks are represented in this span
-        val hasGowri = overlapping.any { it is GowriNeram }
-        val hasMiddle = overlapping.any { it !is GowriNeram && it !is Hora }
-        val hasHorai = overlapping.any { it is Hora }
-        
-        val activeTracks = mutableListOf<Int>()
-        if (hasGowri) activeTracks.add(0)
-        if (hasMiddle) activeTracks.add(1)
-        if (hasHorai) activeTracks.add(2)
-        
-        val totalTracks = activeTracks.size
-        val trackWidth = 1.0f / totalTracks
-        
-        val myTrack = when (timing) {
-            is GowriNeram -> 0
-            is Hora -> 2
-            else -> 1
-        }
-        val myTrackIndex = activeTracks.indexOf(myTrack)
-        
-        // Now factor in internal track sub-division
-        val subLaneInfo = when (timing) {
-            is GowriNeram -> gowriSubLanes[timing]!!
-            is Hora -> horaiSubLanes[timing]!!
-            else -> middleSubLanes[timing]!!
+        val overlappingClusters = clusters.filter { cluster ->
+            cluster.any { overlaps(it, timing) }
         }
         
-        // To maintain equal distribution, we find the max sub-lanes needed for this track 
-        // during this specific item's span.
-        val itemsInMyTrackInSpan = overlapping.filter { 
-            when (it) {
-                is GowriNeram -> myTrack == 0
-                is Hora -> myTrack == 2
-                else -> myTrack == 1
-            }
+        if (overlappingClusters.isEmpty()) {
+            clusters.add(mutableSetOf(timing))
+        } else {
+            val combined = overlappingClusters.reduce { acc, set -> acc.apply { addAll(set) } }
+            combined.add(timing)
+            clusters.removeAll(overlappingClusters)
+            clusters.add(combined)
         }
-        val maxSubLanesInTrack = itemsInMyTrackInSpan.map { 
-            when (it) {
-                is GowriNeram -> gowriSubLanes[it]!!.total
-                is Hora -> horaiSubLanes[it]!!.total
-                else -> middleSubLanes[it]!!.total
-            }
-        }.maxOrNull() ?: 1
+    }
 
-        val finalWidth = trackWidth / maxSubLanesInTrack
-        val trackOffset = myTrackIndex * trackWidth
-        val subOffset = subLaneInfo.index * finalWidth
-        
-        result[timing] = LaneInfo(
-            widthFactor = finalWidth,
-            offsetFactor = trackOffset + subOffset
-        )
+    val result = mutableMapOf<Timing, LaneInfo>()
+
+    // 2. Process each cluster independently
+    clusters.forEach { cluster ->
+        val items = cluster.toList()
+        val itemsGowri = items.filter { it is GowriNeram }.sortedBy { it.startTime }
+        val itemsHorai = items.filter { it is Hora }.sortedBy { it.startTime }
+        val itemsCenter = items.filter { it !is GowriNeram && it !is Hora }.sortedBy { it.startTime }
+
+        // Helper to assign items into non-overlapping lanes (Greedy)
+        fun assignToLanes(categoryItems: List<Timing>): List<List<Timing>> {
+            val lanes = mutableListOf<MutableList<Timing>>()
+            categoryItems.forEach { timing ->
+                var placed = false
+                for (lane in lanes) {
+                    if (lane.none { overlaps(it, timing) }) {
+                        lane.add(timing)
+                        placed = true
+                        break
+                    }
+                }
+                if (!placed) lanes.add(mutableListOf(timing))
+            }
+            return lanes
+        }
+
+        val gowriLanes = assignToLanes(itemsGowri)
+        val centerLanes = assignToLanes(itemsCenter)
+        val horaiLanes = assignToLanes(itemsHorai)
+
+        val totalLanes = gowriLanes.size + centerLanes.size + horaiLanes.size
+        val width = 1.0f / totalLanes
+
+        // Assign horizontal positions based on strict Type Ordering: Gowri < Center < Horai
+        gowriLanes.forEachIndexed { index, laneItems ->
+            laneItems.forEach { timing ->
+                result[timing] = LaneInfo(widthFactor = width, offsetFactor = index * width)
+            }
+        }
+        centerLanes.forEachIndexed { index, laneItems ->
+            laneItems.forEach { timing ->
+                result[timing] = LaneInfo(widthFactor = width, offsetFactor = (gowriLanes.size + index) * width)
+            }
+        }
+        horaiLanes.forEachIndexed { index, laneItems ->
+            laneItems.forEach { timing ->
+                result[timing] = LaneInfo(widthFactor = width, offsetFactor = (gowriLanes.size + centerLanes.size + index) * width)
+            }
+        }
     }
 
     return result
-}
-
-private data class SubLaneInfo(val index: Int, val total: Int)
-
-private fun resolveInternalLanes(items: List<Timing>): Map<Timing, SubLaneInfo> {
-    if (items.isEmpty()) return emptyMap()
-    val result = mutableMapOf<Timing, Int>()
-    val sorted = items.sortedBy { it.startTime }
-    
-    sorted.forEach { t ->
-        val overlapping = sorted.filter { result.containsKey(it) && overlaps(it, t) }
-        val used = overlapping.map { result[it]!! }
-        var idx = 0
-        while (used.contains(idx)) idx++
-        result[t] = idx
-    }
-    
-    // Calculate total concurrent for each item's specific span
-    return result.mapValues { (t, idx) ->
-        val overlapping = items.filter { overlaps(it, t) }
-        // The number of sub-lanes needed is the max concurrent at any point in t's range
-        val timePoints = (overlapping.map { it.startTime } + overlapping.map { it.endTime })
-            .filter { !it.isBefore(t.startTime) && !it.isAfter(t.endTime) }
-            .distinct().sorted()
-        
-        var maxC = 1
-        for (i in 0 until timePoints.size - 1) {
-            val count = overlapping.count { it.startTime.isBefore(timePoints[i+1]) && it.endTime.isAfter(timePoints[i]) }
-            maxC = maxOf(maxC, count)
-        }
-        SubLaneInfo(idx, maxC)
-    }
 }
 
 private fun overlaps(t1: Timing, t2: Timing): Boolean {
