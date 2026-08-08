@@ -1,5 +1,6 @@
 package com.suresh.sacredtimeline.ui.dashboard.components
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,6 +17,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -35,167 +39,186 @@ fun TimingCard(
     timing: Timing,
     hourHeight: Dp,
     is24Hour: Boolean,
-    widthFactor: Float = 1.0f,
-    horizontalOffsetFactor: Float = 0.0f,
+    segments: List<LaneSegment>,
     onClick: () -> Unit
 ) {
+    if (segments.isEmpty()) return
+
     val topOffset = calculateOffset(timing.startTime, hourHeight)
     val bottomOffset = calculateOffset(timing.endTime, hourHeight)
-    val height = bottomOffset - topOffset
+    val totalHeight = bottomOffset - topOffset
 
     val timingColor = SacredTimelineColors.getTimingColor(timing)
     val contentColor = SacredTimelineColors.getContentColor(timingColor)
+    val density = LocalDensity.current
 
     BoxWithConstraints(
         modifier = Modifier
             .offset(y = topOffset)
-            .height(height - 2.dp)
+            .height(totalHeight)
             .fillMaxWidth()
     ) {
-        val availableWidth = maxWidth
-        val cardWidth = availableWidth * widthFactor
-        val xOffset = availableWidth * horizontalOffsetFactor
+        val containerWidthPx = with(density) { maxWidth.toPx() }
+        val totalHeightPx = with(density) { totalHeight.toPx() }
 
-        Card(
+        // 1. Draw the Stepped Shape and Sticker Borders
+        Canvas(modifier = Modifier.fillMaxSize().clickable { onClick() }) {
+            val path = Path()
+            
+            // Build RIGHT edge (top to bottom)
+            val first = segments[0]
+            path.moveTo(first.offsetFactor * containerWidthPx + 2f, 0f)
+            path.lineTo((first.offsetFactor + first.widthFactor) * containerWidthPx - 2f, 0f)
+            
+            segments.forEachIndexed { index, seg ->
+                val segTop = (calculateOffset(seg.startTime, hourHeight) - topOffset).toPx()
+                val segBottom = (calculateOffset(seg.endTime, hourHeight) - topOffset).toPx()
+                val segRight = (seg.offsetFactor + seg.widthFactor) * containerWidthPx - 2f
+                
+                // Vertical line to top of segment
+                path.lineTo(segRight, segTop)
+                // Vertical line to bottom of segment
+                path.lineTo(segRight, segBottom)
+                
+                if (index < segments.size - 1) {
+                    val next = segments[index + 1]
+                    val nextRight = (next.offsetFactor + next.widthFactor) * containerWidthPx - 2f
+                    // Horizontal step to next segment's right edge
+                    path.lineTo(nextRight, segBottom)
+                }
+            }
+            
+            // Bottom edge
+            val last = segments.last()
+            path.lineTo(last.offsetFactor * containerWidthPx + 2f, totalHeightPx)
+            
+            // Build LEFT edge (bottom to top)
+            segments.reversed().forEachIndexed { index, seg ->
+                val segTop = (calculateOffset(seg.startTime, hourHeight) - topOffset).toPx()
+                val segBottom = (calculateOffset(seg.endTime, hourHeight) - topOffset).toPx()
+                val segLeft = seg.offsetFactor * containerWidthPx + 2f
+                
+                // Vertical line to bottom of segment
+                path.lineTo(segLeft, segBottom)
+                // Vertical line to top of segment
+                path.lineTo(segLeft, segTop)
+                
+                if (index < segments.size - 1) {
+                    val prev = segments.reversed()[index + 1]
+                    val prevLeft = prev.offsetFactor * containerWidthPx + 2f
+                    // Horizontal step to previous segment's left edge
+                    path.lineTo(prevLeft, segTop)
+                }
+            }
+            path.close()
+
+            // Draw Background
+            drawPath(path, timingColor.copy(alpha = 0.9f))
+            
+            // Double Border
+            drawPath(path, Color.White, style = Stroke(width = with(density) { 3.dp.toPx() }))
+            drawPath(path, Color.Black.copy(alpha = 0.3f), style = Stroke(width = with(density) { 0.8.dp.toPx() }))
+        }
+
+        // 2. Place Text in the widest segment
+        val widestSegment = segments.maxByOrNull { it.widthFactor } ?: segments[0]
+        val segTop = calculateOffset(widestSegment.startTime, hourHeight) - topOffset
+        val segHeight = calculateOffset(widestSegment.endTime, hourHeight) - calculateOffset(widestSegment.startTime, hourHeight)
+        
+        Box(
             modifier = Modifier
-                .padding(horizontal = 2.dp, vertical = 1.dp)
-                .width(cardWidth - 4.dp)
-                .offset(x = xOffset)
-                .fillMaxHeight()
-                .clickable(onClick = onClick),
-            colors = CardDefaults.cardColors(containerColor = CardOuterBorderColor.copy(alpha = 0.9f)),
-            shape = RoundedCornerShape(8.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                .offset(x = maxWidth * widestSegment.offsetFactor, y = segTop)
+                .size(width = maxWidth * widestSegment.widthFactor, height = segHeight)
+                .padding(4.dp),
+            contentAlignment = Alignment.Center
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(1.dp)
-                    .background(CardBorderColor.copy(alpha = 0.9f), RoundedCornerShape(7.dp))
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(1.dp)
-                        .background(timingColor.copy(alpha = 0.9f), RoundedCornerShape(6.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    // CATEGORY HEADING (for combined views) - Positioned at Top Center
-                    if (widthFactor < 0.9f && height > 25.dp) {
-                        Text(
-                            text = stringResource(Metadata.getCategoryShortNameRes(timing)).uppercase(),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = contentColor,
-                            fontSize = 8.5.sp,
-                            fontWeight = FontWeight.Black,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier
-                                .align(Alignment.TopCenter)
-                                .padding(top = 1.dp)
+                // CATEGORY HEADING
+                if (widestSegment.widthFactor < 0.9f && segHeight > 25.dp) {
+                    Text(
+                        text = stringResource(Metadata.getCategoryShortNameRes(timing)).uppercase(),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = contentColor,
+                        fontSize = 8.sp,
+                        fontWeight = FontWeight.Black,
+                        textAlign = TextAlign.Center
+                    )
+                }
+
+                // ICON
+                if (segHeight > 80.dp) {
+                    if (timing is SpecialPeriod && timing.name == "Yama") {
+                        Image(
+                            painter = painterResource(R.drawable.ic_yama_bull),
+                            contentDescription = null,
+                            modifier = Modifier.size(28.dp)
                         )
-                    }
-
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center,
-                        modifier = Modifier.padding(start = 2.dp, end = 2.dp, top = if (widthFactor < 0.9f) 8.dp else 0.dp)
-                    ) {
-                        // ICON LOGIC
-                        if (height > 80.dp) {
-                            if (timing is SpecialPeriod && timing.name == "Yama") {
-                                Image(
-                                    painter = painterResource(R.drawable.ic_yama_bull),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(if (height > 110.dp) 32.dp else 24.dp)
-                                )
-                                Spacer(modifier = Modifier.height(2.dp))
-                            } else {
-                                val iconPainter = when {
-                                    timing is SpecialPeriod && timing.name == "Rahu" -> painterResource(R.drawable.ic_rahu)
-                                    timing is SpecialPeriod && (timing.name == "Kuli Dawn" || timing.name == "Kuli Dusk") -> painterResource(R.drawable.ic_saturn)
-                                    else -> null
-                                }
-
-                                if (iconPainter != null) {
-                                    Icon(
-                                        painter = iconPainter,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(if (height > 110.dp) 32.dp else 24.dp),
-                                        tint = contentColor.copy(alpha = 0.9f)
-                                    )
-                                    Spacer(modifier = Modifier.height(2.dp))
-                                } else if (timing is NallaNeram) {
-                                    Icon(
-                                        imageVector = Icons.Default.Star,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(if (height > 110.dp) 24.dp else 16.dp),
-                                        tint = contentColor.copy(alpha = 0.8f)
-                                    )
-                                    Spacer(modifier = Modifier.height(2.dp))
-                                } else if (timing is Muhurtham) {
-                                    Icon(
-                                        imageVector = Icons.Default.AutoAwesome,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(if (height > 110.dp) 24.dp else 16.dp),
-                                        tint = contentColor.copy(alpha = 0.8f)
-                                    )
-                                    Spacer(modifier = Modifier.height(2.dp))
-                                }
-                            }
+                    } else {
+                        val iconPainter = when {
+                            timing is SpecialPeriod && timing.name == "Rahu" -> painterResource(R.drawable.ic_rahu)
+                            timing is SpecialPeriod && (timing.name == "Kuli Dawn" || timing.name == "Kuli Dusk") -> painterResource(R.drawable.ic_saturn)
+                            else -> null
                         }
-
-                        // TIME RANGE
-                        if (height > 70.dp) {
-                            val pattern = if (is24Hour) "HH:mm" else "h:mm"
-                            val timeFormatter = DateTimeFormatter.ofPattern(pattern)
-                            Text(
-                                text = "${timing.startTime.format(timeFormatter)} - ${timing.endTime.format(timeFormatter)}",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = contentColor,
-                                fontSize = 8.sp,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-
-                        // ENGLISH/LOCALIZED LABEL
-                        val labelRes = when (timing) {
-                            is Hora -> Metadata.getPlanetNameRes(timing.name)
-                            is NallaNeram -> Metadata.getSpecialNameRes("Nalla")
-                            is GowriNeram -> Metadata.getGowriNameRes(timing.name)
-                            is SpecialPeriod -> Metadata.getSpecialNameRes(timing.name)
-                            is Muhurtham -> Metadata.getMuhurthamNameRes(timing.name)
-                        }
-                        Text(
-                            text = stringResource(labelRes),
-                            style = if (height < 60.dp) MaterialTheme.typography.labelSmall else MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = contentColor,
-                            textAlign = TextAlign.Center,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
-                            lineHeight = if (height < 60.dp) 11.sp else 13.sp,
-                            fontSize = if (height < 40.dp) 9.sp else if (height < 60.dp) 10.sp else 12.sp
-                        )
-                    }
-
-                    // Compatibility Icon for Hora
-                    if (timing is Hora && height > 30.dp) {
-                        Box(modifier = Modifier.fillMaxSize().padding(2.dp), contentAlignment = Alignment.TopEnd) {
-                            val (icon, tint) = when (timing.compatibility) {
-                                HoraCompatibility.FAVORABLE -> Icons.Default.CheckCircle to CompatibilityFavorable
-                                HoraCompatibility.CONFLICTING -> Icons.Default.Cancel to CompatibilityConflicting
-                                HoraCompatibility.NEUTRAL -> Icons.Default.RadioButtonUnchecked to CompatibilityNeutral
-                            }
-                            Icon(
-                                imageVector = icon,
-                                contentDescription = null,
-                                modifier = Modifier.size(if (height > 60.dp) 20.dp else 14.dp).background(Color.White, RoundedCornerShape(10.dp)),
-                                tint = tint
-                            )
+                        if (iconPainter != null) {
+                            Icon(iconPainter, contentDescription = null, modifier = Modifier.size(24.dp), tint = contentColor)
+                        } else if (timing is NallaNeram || timing is Muhurtham) {
+                            Icon(if (timing is NallaNeram) Icons.Default.Star else Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(20.dp), tint = contentColor)
                         }
                     }
                 }
+
+                // LABEL
+                val labelRes = when (timing) {
+                    is Hora -> Metadata.getPlanetNameRes(timing.name)
+                    is NallaNeram -> Metadata.getSpecialNameRes("Nalla")
+                    is GowriNeram -> Metadata.getGowriNameRes(timing.name)
+                    is SpecialPeriod -> Metadata.getSpecialNameRes(timing.name)
+                    is Muhurtham -> Metadata.getMuhurthamNameRes(timing.name)
+                }
+                Text(
+                    text = stringResource(labelRes),
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = contentColor,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    lineHeight = 11.sp,
+                    fontSize = if (widestSegment.widthFactor < 0.25f) 9.sp else 11.sp
+                )
+
+                // TIME RANGE
+                if (segHeight > 50.dp) {
+                    val pattern = if (is24Hour) "HH:mm" else "h:mm"
+                    val timeFormatter = DateTimeFormatter.ofPattern(pattern)
+                    Text(
+                        text = "${timing.startTime.format(timeFormatter)} - ${timing.endTime.format(timeFormatter)}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = contentColor.copy(alpha = 0.8f),
+                        fontSize = 8.sp,
+                        maxLines = 1
+                    )
+                }
+            }
+        }
+        
+        // Compatibility Icon for Hora
+        if (timing is Hora && totalHeight > 30.dp) {
+             Box(modifier = Modifier.fillMaxSize().padding(2.dp), contentAlignment = Alignment.TopEnd) {
+                val (icon, tint) = when (timing.compatibility) {
+                    HoraCompatibility.FAVORABLE -> Icons.Default.CheckCircle to CompatibilityFavorable
+                    HoraCompatibility.CONFLICTING -> Icons.Default.Cancel to CompatibilityConflicting
+                    HoraCompatibility.NEUTRAL -> Icons.Default.RadioButtonUnchecked to CompatibilityNeutral
+                }
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(if (totalHeight > 60.dp) 18.dp else 12.dp).background(Color.White, RoundedCornerShape(9.dp)),
+                    tint = tint
+                )
             }
         }
     }

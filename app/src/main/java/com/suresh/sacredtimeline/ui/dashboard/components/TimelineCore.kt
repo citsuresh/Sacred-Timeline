@@ -44,6 +44,12 @@ import kotlinx.coroutines.delay
 import java.time.LocalDate
 import java.time.LocalTime
 
+enum class TimelineViewStyle {
+    FIXED_3_TRACK,
+    EQUAL_RECTANGULAR,
+    ORTHOGONAL_STEPPED
+}
+
 private val BASE_HOUR_HEIGHT = 160.dp
 private const val START_HOUR = 0
 private const val END_HOUR = 24
@@ -84,7 +90,8 @@ fun TimelinePager(
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
     onDetailClick: (com.suresh.sacredtimeline.model.DashboardDetail) -> Unit = {},
-    isLandscape: Boolean
+    isLandscape: Boolean,
+    viewStyle: TimelineViewStyle = TimelineViewStyle.EQUAL_RECTANGULAR
 ) {
     val hourHeight = BASE_HOUR_HEIGHT * timelineScale
     
@@ -160,7 +167,8 @@ fun TimelinePager(
                             showBrahmaMuhurtham = showBrahmaMuhurtham,
                             showAbhijitMuhurtham = showAbhijitMuhurtham,
                             isHeaderExpanded = isHeaderExpanded,
-                            onToggleHeaderExpanded = onToggleHeaderExpanded
+                            onToggleHeaderExpanded = onToggleHeaderExpanded,
+                            viewStyle = viewStyle
                         )
                     } else {
                         Box(modifier = Modifier.fillMaxSize()) {
@@ -219,7 +227,8 @@ fun TimelineContent(
     showBrahmaMuhurtham: Boolean = false,
     showAbhijitMuhurtham: Boolean = false,
     isHeaderExpanded: Boolean = false,
-    onToggleHeaderExpanded: (Boolean) -> Unit = {}
+    onToggleHeaderExpanded: (Boolean) -> Unit = {},
+    viewStyle: TimelineViewStyle = TimelineViewStyle.EQUAL_RECTANGULAR
 ) {
     val scrollState = rememberScrollState()
     val density = LocalDensity.current
@@ -405,7 +414,8 @@ fun TimelineContent(
                                         onTimingClick = onTimingClick,
                                         hourHeight = hourHeight,
                                         is24Hour = is24Hour,
-                                        modifier = Modifier.weight(1f)
+                                        modifier = Modifier.weight(1f),
+                                        viewStyle = viewStyle
                                     )
                                     if (index < columnOrder.size - 1 && columnVisibility.count { it in columnOrder.drop(index + 1) } > 0) {
                                         VerticalDivider(thickness = 1.dp, color = Color.LightGray.copy(alpha = 0.3f))
@@ -438,7 +448,8 @@ fun TimelineContent(
                                     onTimingClick = onTimingClick, 
                                     hourHeight = hourHeight, 
                                     is24Hour = is24Hour, 
-                                    modifier = Modifier.weight(1f)
+                                    modifier = Modifier.weight(1f),
+                                    viewStyle = viewStyle
                                 )
                             }
                         }
@@ -613,29 +624,35 @@ fun TimelineColumn(
     hourHeight: Dp,
     is24Hour: Boolean,
     modifier: Modifier = Modifier,
+    viewStyle: TimelineViewStyle = TimelineViewStyle.EQUAL_RECTANGULAR
 ) {
     Box(modifier = modifier.fillMaxHeight()) {
-        val lanes = remember(timings) { calculateLanes(timings) }
+        val lanes = remember(timings, viewStyle) { calculateLanes(timings, viewStyle) }
         
         lanes.forEach { (timing, laneInfo) ->
             TimingCard(
                 timing = timing, 
                 hourHeight = hourHeight, 
                 is24Hour = is24Hour,
-                widthFactor = laneInfo.widthFactor,
-                horizontalOffsetFactor = laneInfo.offsetFactor,
+                segments = laneInfo.segments,
                 onClick = { onTimingClick(timing) }
             )
         }
     }
 }
 
-private data class LaneInfo(
+data class LaneSegment(
+    val startTime: LocalTime,
+    val endTime: LocalTime,
     val widthFactor: Float,
     val offsetFactor: Float
 )
 
-private fun calculateLanes(timings: List<Timing>): Map<Timing, LaneInfo> {
+private data class LaneInfo(
+    val segments: List<LaneSegment>
+)
+
+private fun calculateLanes(timings: List<Timing>, style: TimelineViewStyle): Map<Timing, LaneInfo> {
     if (timings.isEmpty()) return emptyMap()
 
     // 1. Group items into transitive clusters
@@ -655,58 +672,93 @@ private fun calculateLanes(timings: List<Timing>): Map<Timing, LaneInfo> {
         }
     }
 
-    val result = mutableMapOf<Timing, LaneInfo>()
+    val result = mutableMapOf<Timing, MutableList<LaneSegment>>()
+    timings.forEach { result[it] = mutableListOf() }
 
     // 2. Process each cluster independently
     clusters.forEach { cluster ->
         val items = cluster.toList()
-        val itemsGowri = items.filter { it is GowriNeram }.sortedBy { it.startTime }
-        val itemsHorai = items.filter { it is Hora }.sortedBy { it.startTime }
-        val itemsCenter = items.filter { it !is GowriNeram && it !is Hora }.sortedBy { it.startTime }
+        
+        when (style) {
+            TimelineViewStyle.FIXED_3_TRACK -> {
+                val gowri = items.filterIsInstance<GowriNeram>().sortedBy { it.startTime }
+                val horai = items.filterIsInstance<Hora>().sortedBy { it.startTime }
+                val center = items.filter { it !is GowriNeram && it !is Hora }.sortedBy { it.startTime }
 
-        // Helper to assign items into non-overlapping lanes (Greedy)
-        fun assignToLanes(categoryItems: List<Timing>): List<List<Timing>> {
-            val lanes = mutableListOf<MutableList<Timing>>()
-            categoryItems.forEach { timing ->
-                var placed = false
-                for (lane in lanes) {
-                    if (lane.none { overlaps(it, timing) }) {
-                        lane.add(timing)
-                        placed = true
-                        break
+                fun assignFixed(list: List<Timing>, trackIndex: Int) {
+                    val trackWidth = 1.0f / 3.0f
+                    val lanes = mutableListOf<MutableList<Timing>>()
+                    list.forEach { t ->
+                        var placed = false
+                        for (l in lanes) if (l.none { overlaps(it, t) }) { l.add(t); placed = true; break }
+                        if (!placed) lanes.add(mutableListOf(t))
+                    }
+                    val subWidth = trackWidth / (lanes.size.coerceAtLeast(1))
+                    lanes.forEachIndexed { lIdx, lItems ->
+                        lItems.forEach { t ->
+                            result[t]?.add(LaneSegment(t.startTime, t.endTime, subWidth, (trackIndex * trackWidth) + (lIdx * subWidth)))
+                        }
                     }
                 }
-                if (!placed) lanes.add(mutableListOf(timing))
+                assignFixed(gowri, 0)
+                assignFixed(center, 1)
+                assignFixed(horai, 2)
             }
-            return lanes
-        }
 
-        val gowriLanes = assignToLanes(itemsGowri)
-        val centerLanes = assignToLanes(itemsCenter)
-        val horaiLanes = assignToLanes(itemsHorai)
+            TimelineViewStyle.EQUAL_RECTANGULAR -> {
+                val itemsGowri = items.filter { it is GowriNeram }.sortedBy { it.startTime }
+                val itemsHorai = items.filter { it is Hora }.sortedBy { it.startTime }
+                val itemsCenter = items.filter { it !is GowriNeram && it !is Hora }.sortedBy { it.startTime }
 
-        val totalLanes = gowriLanes.size + centerLanes.size + horaiLanes.size
-        val width = 1.0f / totalLanes
+                fun assign(categoryItems: List<Timing>): List<List<Timing>> {
+                    val lanes = mutableListOf<MutableList<Timing>>()
+                    categoryItems.forEach { timing ->
+                        var placed = false
+                        for (lane in lanes) if (lane.none { overlaps(it, timing) }) { lane.add(timing); placed = true; break }
+                        if (!placed) lanes.add(mutableListOf(timing))
+                    }
+                    return lanes
+                }
 
-        // Assign horizontal positions based on strict Type Ordering: Gowri < Center < Horai
-        gowriLanes.forEachIndexed { index, laneItems ->
-            laneItems.forEach { timing ->
-                result[timing] = LaneInfo(widthFactor = width, offsetFactor = index * width)
+                val gLanes = assign(itemsGowri)
+                val cLanes = assign(itemsCenter)
+                val hLanes = assign(itemsHorai)
+
+                // Peak concurrent in the WHOLE cluster to maintain rectangle
+                val timePoints = (items.map { it.startTime } + items.map { it.endTime }).distinct().sorted()
+                var maxC = 0
+                for (i in 0 until timePoints.size - 1) {
+                    val sliceStart = timePoints[i]
+                    val actG = gLanes.count { l -> l.any { !it.startTime.isAfter(sliceStart) && it.endTime.isAfter(sliceStart) } }
+                    val actC = cLanes.count { l -> l.any { !it.startTime.isAfter(sliceStart) && it.endTime.isAfter(sliceStart) } }
+                    val actH = hLanes.count { l -> l.any { !it.startTime.isAfter(sliceStart) && it.endTime.isAfter(sliceStart) } }
+                    maxC = maxOf(maxC, actG + actC + actH)
+                }
+                
+                val width = 1.0f / maxC.coerceAtLeast(1)
+                gLanes.forEachIndexed { i, l -> l.forEach { result[it]?.add(LaneSegment(it.startTime, it.endTime, width, i * width)) } }
+                cLanes.forEachIndexed { i, l -> l.forEach { result[it]?.add(LaneSegment(it.startTime, it.endTime, width, (gLanes.size + i) * width)) } }
+                hLanes.forEachIndexed { i, l -> l.forEach { result[it]?.add(LaneSegment(it.startTime, it.endTime, width, (gLanes.size + cLanes.size + i) * width)) } }
             }
-        }
-        centerLanes.forEachIndexed { index, laneItems ->
-            laneItems.forEach { timing ->
-                result[timing] = LaneInfo(widthFactor = width, offsetFactor = (gowriLanes.size + index) * width)
-            }
-        }
-        horaiLanes.forEachIndexed { index, laneItems ->
-            laneItems.forEach { timing ->
-                result[timing] = LaneInfo(widthFactor = width, offsetFactor = (gowriLanes.size + centerLanes.size + index) * width)
+
+            TimelineViewStyle.ORTHOGONAL_STEPPED -> {
+                val timePoints = (items.map { it.startTime } + items.map { it.endTime }).distinct().sorted()
+                for (i in 0 until timePoints.size - 1) {
+                    val sliceStart = timePoints[i]
+                    val sliceEnd = timePoints[i+1]
+                    val activeItems = items.filter { !it.startTime.isAfter(sliceStart) && it.endTime.isAfter(sliceStart) }
+                        .sortedWith(compareBy({ when(it) { is GowriNeram -> 0; is Hora -> 2; else -> 1 } }, { it.startTime }))
+                    
+                    val width = 1.0f / activeItems.size.coerceAtLeast(1)
+                    activeItems.forEachIndexed { idx, t ->
+                        result[t]?.add(LaneSegment(sliceStart, sliceEnd, width, idx * width))
+                    }
+                }
             }
         }
     }
 
-    return result
+    return result.mapValues { LaneInfo(it.value) }
 }
 
 private fun overlaps(t1: Timing, t2: Timing): Boolean {

@@ -43,6 +43,7 @@ fun SettingsScreen(
     val widgetColumnOrder by viewModel.widgetColumnOrder.collectAsState()
     val language by viewModel.language.collectAsState()
     val themeMode by viewModel.themeMode.collectAsState()
+    val timelineViewStyle by viewModel.timelineViewStyle.collectAsState()
     
     @Composable
     fun getLocalizedViewModeName(mode: ViewMode): String = when (mode) {
@@ -226,6 +227,30 @@ fun SettingsScreen(
                         )
                         if (index < columnOrder.size - 1) HorizontalDivider(modifier = Modifier.padding(horizontal = 8.dp), thickness = 0.5.dp)
                     }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    val fixedTrackLabel = stringResource(R.string.settings_style_fixed_track)
+                    val equalRectLabel = stringResource(R.string.settings_style_equal_rectangular)
+                    val orthogonalSteppedLabel = stringResource(R.string.settings_style_orthogonal_stepped)
+
+                    SettingsDropdownItem(
+                        label = stringResource(R.string.settings_timeline_style),
+                        selected = when (timelineViewStyle) {
+                            "FIXED_3_TRACK" -> fixedTrackLabel
+                            "ORTHOGONAL_STEPPED" -> orthogonalSteppedLabel
+                            else -> equalRectLabel
+                        },
+                        options = listOf(fixedTrackLabel, equalRectLabel, orthogonalSteppedLabel),
+                        onOptionSelected = {
+                            val style = when (it) {
+                                fixedTrackLabel -> "FIXED_3_TRACK"
+                                orthogonalSteppedLabel -> "ORTHOGONAL_STEPPED"
+                                else -> "EQUAL_RECTANGULAR"
+                            }
+                            viewModel.setTimelineViewStyle(style)
+                        }
+                    )
                 }
             }
 

@@ -47,6 +47,7 @@ class SettingsRepository(private val context: Context) {
         val SUNRISE_DEFINITION = stringPreferencesKey("sunrise_definition")
         val SPECIAL_PERIOD_STYLE = stringPreferencesKey("special_period_style")
         val LUNAR_MONTH_SYSTEM = stringPreferencesKey("lunar_month_system")
+        val TIMELINE_VIEW_STYLE = stringPreferencesKey("timeline_view_style")
     }
 
     val compositeScale: Flow<Float> = context.dataStore.data.map { it[Keys.COMPOSITE_SCALE] ?: 1.0f }
@@ -114,6 +115,7 @@ class SettingsRepository(private val context: Context) {
     val sunriseDefinition: Flow<String> = context.dataStore.data.map { it[Keys.SUNRISE_DEFINITION] ?: "SCIENTIFIC" }
     val specialPeriodStyle: Flow<String> = context.dataStore.data.map { it[Keys.SPECIAL_PERIOD_STYLE] ?: "PROPORTIONAL" }
     val lunarMonthSystem: Flow<String> = context.dataStore.data.map { it[Keys.LUNAR_MONTH_SYSTEM] ?: "AMANTA" }
+    val timelineViewStyle: Flow<String> = context.dataStore.data.map { it[Keys.TIMELINE_VIEW_STYLE] ?: "EQUAL_RECTANGULAR" }
 
     suspend fun updateCompositeScale(scale: Float) {
         context.dataStore.edit { it[Keys.COMPOSITE_SCALE] = scale.coerceIn(0.2f, 3.0f) }
@@ -267,5 +269,9 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun setLunarMonthSystem(system: String) {
         context.dataStore.edit { it[Keys.LUNAR_MONTH_SYSTEM] = system }
+    }
+
+    suspend fun setTimelineViewStyle(style: String) {
+        context.dataStore.edit { it[Keys.TIMELINE_VIEW_STYLE] = style }
     }
 }

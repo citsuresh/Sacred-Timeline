@@ -347,7 +347,7 @@
     <string name="settings_theme_dark">Dark Theme</string>
     <string name="settings_default_launch_view">Default View on Launch</string>
     <string name="settings_time_format_24h">Use 24-Hour Format</string>
-    <string name="settings_columns_composite">Column Management (Composite View Only)</string>
+    <string name="settings_columns_composite">Column Management (Timeline)</string>
     <string name="settings_columns_desc">Reorder or hide columns for the Composite View. Single views (Hora, Gowri, etc.) always show their respective column.</string>
     <string name="settings_location">Location</string>
     <string name="settings_location_mode">Location Mode</string>
@@ -382,6 +382,10 @@
     <string name="settings_special_period_style">Special Period Style (Rahu/Yama/Kuli)</string>
     <string name="settings_style_proportional">Proportional (Astronomical)</string>
     <string name="settings_style_fixed">Fixed (1.5 Hours)</string>
+    <string name="settings_timeline_style">Timeline Layout Style</string>
+    <string name="settings_style_fixed_track">Fixed 3-Track</string>
+    <string name="settings_style_equal_rectangular">Equal Rectangular (Stable)</string>
+    <string name="settings_style_orthogonal_stepped">Orthogonal Stepped (Dynamic)</string>
     <string name="settings_lunar_month_system">Lunar Month System</string>
     <string name="settings_amanta">Amanta (South India)</string>
     <string name="settings_purnimanta">Purnimanta (North India)</string>

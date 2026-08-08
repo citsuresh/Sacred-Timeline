@@ -144,6 +144,10 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         viewModelScope, SharingStarted.WhileSubscribed(5000), "AMANTA"
     )
 
+    val timelineViewStyle: StateFlow<String> = repository.timelineViewStyle.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), "STANDARD"
+    )
+
     val language: StateFlow<String> = repository.language.stateIn(
         viewModelScope, 
         SharingStarted.WhileSubscribed(5000), 
@@ -343,6 +347,12 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     fun setLunarMonthSystem(system: String) {
         viewModelScope.launch { 
             repository.setLunarMonthSystem(system)
+        }
+    }
+
+    fun setTimelineViewStyle(style: String) {
+        viewModelScope.launch { 
+            repository.setTimelineViewStyle(style)
         }
     }
 }

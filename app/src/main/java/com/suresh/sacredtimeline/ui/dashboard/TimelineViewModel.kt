@@ -122,6 +122,10 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
         viewModelScope, SharingStarted.WhileSubscribed(5000), "PROPORTIONAL"
     )
 
+    val timelineViewStyle: StateFlow<String> = repository.timelineViewStyle.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), "EQUAL_RECTANGULAR"
+    )
+
     init {
         // Clear cache to ensure new timing structure and filters are applied
         cacheManager.clearCache()
