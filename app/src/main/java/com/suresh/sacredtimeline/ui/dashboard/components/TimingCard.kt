@@ -13,7 +13,8 @@ import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -51,6 +52,7 @@ fun TimingCard(
     val timingColor = SacredTimelineColors.getTimingColor(timing)
     val contentColor = SacredTimelineColors.getContentColor(timingColor)
     val density = LocalDensity.current
+    val interactionSource = remember { MutableInteractionSource() }
 
     BoxWithConstraints(
         modifier = Modifier
@@ -62,18 +64,19 @@ fun TimingCard(
         val totalHeightPx = with(density) { totalHeight.toPx() }
 
         // 1. Draw the Stepped Shape and Sticker Borders
-        Canvas(modifier = Modifier.fillMaxSize().clickable { onClick() }) {
+        Canvas(modifier = Modifier.fillMaxSize()) {
             val path = Path()
+            val sidePadding = 1.dp.toPx()
             
             // Build RIGHT edge (top to bottom)
             val first = segments[0]
-            path.moveTo(first.offsetFactor * containerWidthPx + 2f, 0f)
-            path.lineTo((first.offsetFactor + first.widthFactor) * containerWidthPx - 2f, 0f)
+            path.moveTo(first.offsetFactor * containerWidthPx + sidePadding, 0f)
+            path.lineTo((first.offsetFactor + first.widthFactor) * containerWidthPx - sidePadding, 0f)
             
             segments.forEachIndexed { index, seg ->
                 val segTop = (calculateOffset(seg.startTime, hourHeight) - topOffset).toPx()
                 val segBottom = (calculateOffset(seg.endTime, hourHeight) - topOffset).toPx()
-                val segRight = (seg.offsetFactor + seg.widthFactor) * containerWidthPx - 2f
+                val segRight = (seg.offsetFactor + seg.widthFactor) * containerWidthPx - sidePadding
                 
                 // Vertical line to top of segment
                 path.lineTo(segRight, segTop)
@@ -82,7 +85,7 @@ fun TimingCard(
                 
                 if (index < segments.size - 1) {
                     val next = segments[index + 1]
-                    val nextRight = (next.offsetFactor + next.widthFactor) * containerWidthPx - 2f
+                    val nextRight = (next.offsetFactor + next.widthFactor) * containerWidthPx - sidePadding
                     // Horizontal step to next segment's right edge
                     path.lineTo(nextRight, segBottom)
                 }
@@ -90,13 +93,13 @@ fun TimingCard(
             
             // Bottom edge
             val last = segments.last()
-            path.lineTo(last.offsetFactor * containerWidthPx + 2f, totalHeightPx)
+            path.lineTo(last.offsetFactor * containerWidthPx + sidePadding, totalHeightPx)
             
             // Build LEFT edge (bottom to top)
             segments.reversed().forEachIndexed { index, seg ->
                 val segTop = (calculateOffset(seg.startTime, hourHeight) - topOffset).toPx()
                 val segBottom = (calculateOffset(seg.endTime, hourHeight) - topOffset).toPx()
-                val segLeft = seg.offsetFactor * containerWidthPx + 2f
+                val segLeft = seg.offsetFactor * containerWidthPx + sidePadding
                 
                 // Vertical line to bottom of segment
                 path.lineTo(segLeft, segBottom)
@@ -105,7 +108,7 @@ fun TimingCard(
                 
                 if (index < segments.size - 1) {
                     val prev = segments.reversed()[index + 1]
-                    val prevLeft = prev.offsetFactor * containerWidthPx + 2f
+                    val prevLeft = prev.offsetFactor * containerWidthPx + sidePadding
                     // Horizontal step to previous segment's left edge
                     path.lineTo(prevLeft, segTop)
                 }
@@ -120,7 +123,23 @@ fun TimingCard(
             drawPath(path, Color.Black.copy(alpha = 0.3f), style = Stroke(width = with(density) { 0.8.dp.toPx() }))
         }
 
-        // 2. Place Text in the widest segment
+        // 2. Clickable Areas (Precise Segment-based touch targets)
+        segments.forEach { seg ->
+            val sTop = calculateOffset(seg.startTime, hourHeight) - topOffset
+            val sHeight = calculateOffset(seg.endTime, hourHeight) - calculateOffset(seg.startTime, hourHeight)
+            Box(
+                modifier = Modifier
+                    .offset(x = maxWidth * seg.offsetFactor, y = sTop)
+                    .size(width = maxWidth * seg.widthFactor, height = sHeight)
+                    .clickable(
+                        interactionSource = interactionSource,
+                        indication = ripple(),
+                        onClick = onClick
+                    )
+            )
+        }
+
+        // 3. Place Text in the widest segment
         val widestSegment = segments.maxByOrNull { it.widthFactor } ?: segments[0]
         val segTop = calculateOffset(widestSegment.startTime, hourHeight) - topOffset
         val segHeight = calculateOffset(widestSegment.endTime, hourHeight) - calculateOffset(widestSegment.startTime, hourHeight)
