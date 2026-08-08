@@ -114,6 +114,10 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
         viewModelScope, SharingStarted.WhileSubscribed(5000), false
     )
 
+    val showMaitraMuhurtham: StateFlow<Boolean> = repository.showMaitraMuhurtham.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), true
+    )
+
     val sunriseDefinition: StateFlow<String> = repository.sunriseDefinition.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), "SCIENTIFIC"
     )
@@ -416,6 +420,10 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
             )
         }
 
+        val maitra = com.suresh.sacredtimeline.logic.PanchangamCalculator.calculateMaitraMuhurtham(
+            date, lat, lng, sunResult.sunrise
+        )
+
         // Filter Tithi and Nakshatra based on user preferences
         val enabledTithisVal = repository.enabledTithis.first()
         val enabledStarsVal = repository.enabledNakshatras.first()
@@ -452,7 +460,8 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
             specialEvents = combinedEvents,
             isSubhaMuhurtham = com.suresh.sacredtimeline.data.VerifiedHolidays.isSubhaMuhurtham(date),
             brahmaMuhurtham = brahma,
-            abhijitMuhurtham = abhijit
+            abhijitMuhurtham = abhijit,
+            maitraMuhurtham = maitra
         )
     }
 }

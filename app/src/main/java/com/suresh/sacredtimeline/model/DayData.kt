@@ -34,5 +34,6 @@ data class DayData(
     val specialEvents: List<Int> = emptyList(),
     val isSubhaMuhurtham: Boolean = false,
     val brahmaMuhurtham: Muhurtham? = null,
-    val abhijitMuhurtham: Muhurtham? = null
+    val abhijitMuhurtham: Muhurtham? = null,
+    val maitraMuhurtham: List<MaitraMuhurtham> = emptyList()
 )

@@ -43,6 +43,7 @@ object Metadata {
             "Kuli", "Kuli Dawn", "Kuli Dusk" -> R.string.timing_kuli
             "Morning" -> R.string.timing_morning
             "Evening" -> R.string.timing_evening
+            "Maitra Muhurtham" -> R.string.timing_maitra
             else -> R.string.app_name
         }
     }
@@ -71,6 +72,7 @@ object Metadata {
             "Morning", "Evening" -> R.string.desc_timing_nalla
             "Abhijit Muhurtham" -> R.string.muhurtham_desc_abhijit
             "Brahma Muhurtham" -> R.string.muhurtham_desc_brahma
+            "Maitra Muhurtham" -> R.string.timing_desc_maitra
             else -> R.string.app_name
         }
     }
@@ -81,7 +83,7 @@ object Metadata {
             is NallaNeram, is SpecialPeriod -> R.string.label_neram_short
             is GowriNeram -> R.string.nav_gowri_neram
             is Hora -> R.string.nav_hora
-            is Muhurtham -> R.string.label_muhurtham_short
+            is Muhurtham, is MaitraMuhurtham -> R.string.label_muhurtham_short
         }
     }
     
@@ -304,5 +306,10 @@ object Metadata {
             "Abhijit Muhurtham" -> R.string.muhurtham_abhijit
             else -> R.string.app_name
         }
+    }
+
+    @StringRes
+    fun getMaitraPotencyRes(stars: Int): Int {
+        return if (stars == 5) R.string.maitra_potency_high else R.string.maitra_potency_standard
     }
 }

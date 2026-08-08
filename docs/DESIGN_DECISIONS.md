@@ -41,3 +41,6 @@ Historical record of architectural and UI/UX choices.
 - **Dispatcher Hoisting**: Manually providing `NavigationEventDispatcherOwner` at the root to fix Nav3/Compose integration crashes.
 - **Transition-Synchronized Updates**: Widget refreshes are timed to `endTime` of slots, not periodic intervals, ensuring 100% accuracy.
 - **AppCompat Localization**: Using `AppCompatDelegate.setApplicationLocales` for system-integrated, restart-free language switching (Android 13+).
+- **Vedic Day (Vara) Continuity**: Implemented Vara-based logic for auspicious windows (like Maitra Muhurtham). The "day quality" (potency) is anchored to the sunrise-to-sunrise cycle, not calendar midnight, ensuring traditional accuracy for late-night windows.
+- **Auspiciousness Color Gradation**: Introduced sub-levels of color coding within the "GOLD" category (e.g., Bright Gold vs. Pale Gold) to visually signal different potency levels of the same Muhurtham without introducing new conflicting colors.
+- **Shared Ephemeris Source**: Pinned all Nirayana (Sidereal) calculations to a single public Lahiri Ayanamsha function to prevent "coordinate drift" between the lunar engine and the zodiac-rise engine.

@@ -164,7 +164,7 @@ fun TimingCard(
                         }
                         if (iconPainter != null) {
                             Icon(iconPainter, contentDescription = null, modifier = Modifier.size(24.dp), tint = contentColor)
-                        } else if (timing is NallaNeram || timing is Muhurtham) {
+                        } else if (timing is NallaNeram || timing is Muhurtham || timing is MaitraMuhurtham) {
                             Icon(if (timing is NallaNeram) Icons.Default.Star else Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(20.dp), tint = contentColor)
                         }
                     }
@@ -177,6 +177,7 @@ fun TimingCard(
                     is GowriNeram -> Metadata.getGowriNameRes(timing.name)
                     is SpecialPeriod -> Metadata.getSpecialNameRes(timing.name)
                     is Muhurtham -> Metadata.getMuhurthamNameRes(timing.name)
+                    is MaitraMuhurtham -> Metadata.getSpecialNameRes("Maitra Muhurtham")
                 }
                 Text(
                     text = stringResource(labelRes),
@@ -201,6 +202,31 @@ fun TimingCard(
                         fontSize = 8.sp,
                         maxLines = 1
                     )
+                }
+
+                // Potency Stars for Maitra
+                if (timing is MaitraMuhurtham && segHeight > 40.dp) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        repeat(timing.potencyStars) {
+                            Icon(
+                                imageVector = Icons.Default.Star,
+                                contentDescription = null,
+                                modifier = Modifier.size(10.dp),
+                                tint = contentColor
+                            )
+                        }
+                    }
+                    if (segHeight > 65.dp) {
+                        Text(
+                            text = stringResource(Metadata.getMaitraPotencyRes(timing.potencyStars)),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = contentColor,
+                            fontSize = 7.sp,
+                            fontWeight = FontWeight.Medium,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(top = 2.dp)
+                        )
+                    }
                 }
             }
         }

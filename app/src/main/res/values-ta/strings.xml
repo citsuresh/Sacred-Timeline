@@ -5,10 +5,13 @@
     <string name="nav_nalla_neram">நேரம்</string>
     <string name="nav_gowri_neram">கௌரி நேரம்</string>
     <string name="nav_hora">ஹோரை</string>
+    <string name="nav_maitra">மைத்ர</string>
     <string name="nav_universal">முழுமையான காலவரிசை</string>
     <string name="nav_neram_muhurtham">நேரம் / முஹூர்த்தம்</string>
     <string name="view_mode_universal">அனைத்தும்</string>
+    <string name="view_mode_composite">கூட்டுப் பார்வை</string>
     <string name="view_mode_neram_muhurtham">நேரம் / முஹூர்த்தம்</string>
+    <string name="view_mode_maitra">மைத்ர</string>
     <string name="view_mode_hora">ஹோரை</string>
     <string name="nav_settings">அமைப்புகள்</string>
 
@@ -19,6 +22,10 @@
     <string name="timing_nalla">நல்ல நேரம்</string>
     <string name="timing_morning">காலை</string>
     <string name="timing_evening">மாலை</string>
+    <string name="timing_maitra">மைத்ர முஹூர்த்தம்</string>
+    <string name="maitra_potency_high">அதிக வீரியம்</string>
+    <string name="maitra_potency_standard">சாதாரண வீரியம்</string>
+    <string name="timing_desc_maitra">கடன் தீர்க்க உகந்த நேரம். இந்த நேரத்தில் கடனைத் திருப்பித் தரத் தொடங்கினால் கடன் விரைவில் அடையும்.</string>
 
     <!-- Gowri Categories -->
     <string name="gowri_amridha">அமிர்தம்</string>
@@ -308,6 +315,14 @@
     <string name="settings_pinch_zoom">கிள்ளுதல் மூலம் ஜூம் செய்</string>
     <string name="settings_indicators">காலவரிசை காட்சி</string>
     <string name="settings_show_now_line">இப்போது வரியைக் காட்டு</string>
+    <string name="settings_show_tamil_date">தமிழ் தேதியைக் காட்டு</string>
+    <string name="settings_show_tamil_year">தமிழ் ஆண்டைக் காட்டு</string>
+    <string name="settings_show_pirai">வளர்பிறை/தேய்பிறையைக் காட்டு</string>
+    <string name="settings_show_sunrise">சூரிய உதயத்தைக் காட்டு</string>
+    <string name="settings_show_sunset">சூரிய அஸ்தமனத்தைக் காட்டு</string>
+    <string name="settings_show_brahma_muhurtham">பிரம்ம முஹூர்த்தத்தைக் காட்டு</string>
+    <string name="settings_show_abhijit_muhurtham">அபிஜித் முஹூர்த்தத்தைக் காட்டு</string>
+    <string name="settings_show_maitra_muhurtham">மைத்ர முஹூர்த்தத்தைக் காட்டு</string>
     <string name="settings_sunrise_definition">சூரிய உதய இலக்கணம்</string>
     <string name="settings_sunrise_scientific">அறிவியல் (மேல் விளிம்பு)</string>
     <string name="settings_sunrise_traditional">பாரம்பரியம் (மையம்)</string>

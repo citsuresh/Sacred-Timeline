@@ -44,6 +44,7 @@ class SettingsRepository(private val context: Context) {
         val SHOW_SUNSET = booleanPreferencesKey("show_sunset")
         val SHOW_BRAHMA_MUHURTHAM = booleanPreferencesKey("show_brahma_muhurtham")
         val SHOW_ABHIJIT_MUHURTHAM = booleanPreferencesKey("show_abhijit_muhurtham")
+        val SHOW_MAITRA_MUHURTHAM = booleanPreferencesKey("show_maitra_muhurtham")
         val SUNRISE_DEFINITION = stringPreferencesKey("sunrise_definition")
         val SPECIAL_PERIOD_STYLE = stringPreferencesKey("special_period_style")
         val LUNAR_MONTH_SYSTEM = stringPreferencesKey("lunar_month_system")
@@ -58,7 +59,7 @@ class SettingsRepository(private val context: Context) {
     }
 
     val columnOrder: Flow<List<String>> = context.dataStore.data.map { 
-        val orderString = it[Keys.COLUMN_ORDER] ?: "NERAM_MUHURTHAM,UNIVERSAL,NERAM,BRAHMA,ABHIJIT,GOWRI,HORA"
+        val orderString = it[Keys.COLUMN_ORDER] ?: "NERAM_MUHURTHAM,UNIVERSAL,NERAM,MAITRA,BRAHMA,ABHIJIT,GOWRI,HORA"
         orderString.split(",").filter { it.isNotBlank() }
     }
 
@@ -67,7 +68,7 @@ class SettingsRepository(private val context: Context) {
     }
 
     val widgetColumnOrder: Flow<List<String>> = context.dataStore.data.map { 
-        val orderString = it[Keys.WIDGET_COLUMN_ORDER] ?: "NERAM_MUHURTHAM,UNIVERSAL,NERAM,BRAHMA,ABHIJIT,GOWRI,HORA"
+        val orderString = it[Keys.WIDGET_COLUMN_ORDER] ?: "NERAM_MUHURTHAM,UNIVERSAL,NERAM,MAITRA,BRAHMA,ABHIJIT,GOWRI,HORA"
         orderString.split(",").filter { it.isNotBlank() }
     }
 
@@ -111,6 +112,7 @@ class SettingsRepository(private val context: Context) {
     val showSunset: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_SUNSET] ?: true }
     val showBrahmaMuhurtham: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_BRAHMA_MUHURTHAM] ?: true }
     val showAbhijitMuhurtham: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_ABHIJIT_MUHURTHAM] ?: true }
+    val showMaitraMuhurtham: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_MAITRA_MUHURTHAM] ?: true }
 
     val sunriseDefinition: Flow<String> = context.dataStore.data.map { it[Keys.SUNRISE_DEFINITION] ?: "SCIENTIFIC" }
     val specialPeriodStyle: Flow<String> = context.dataStore.data.map { it[Keys.SPECIAL_PERIOD_STYLE] ?: "PROPORTIONAL" }
@@ -257,6 +259,10 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun setShowAbhijitMuhurtham(show: Boolean) {
         context.dataStore.edit { it[Keys.SHOW_ABHIJIT_MUHURTHAM] = show }
+    }
+
+    suspend fun setShowMaitraMuhurtham(show: Boolean) {
+        context.dataStore.edit { it[Keys.SHOW_MAITRA_MUHURTHAM] = show }
     }
 
     suspend fun setSunriseDefinition(definition: String) {

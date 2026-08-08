@@ -55,6 +55,7 @@ fun SettingsScreen(
         ViewMode.ABHIJIT -> stringResource(R.string.muhurtham_abhijit)
         ViewMode.GOWRI -> stringResource(R.string.view_mode_gowri)
         ViewMode.HORA -> stringResource(R.string.nav_hora)
+        ViewMode.MAITRA -> stringResource(R.string.timing_maitra)
     }
 
     val englishLabel = "English"
@@ -224,6 +225,7 @@ fun SettingsScreen(
                                 "NERAM" -> stringResource(R.string.nav_nalla_neram)
                                 "BRAHMA" -> stringResource(R.string.muhurtham_brahma)
                                 "ABHIJIT" -> stringResource(R.string.muhurtham_abhijit)
+                                "MAITRA" -> stringResource(R.string.timing_maitra)
                                 "GOWRI" -> stringResource(R.string.view_mode_gowri)
                                 "HORA" -> stringResource(R.string.nav_hora)
                                 else -> colId
@@ -365,6 +367,7 @@ fun SettingsScreen(
                                 "NERAM" -> stringResource(R.string.nav_nalla_neram)
                                 "BRAHMA" -> stringResource(R.string.muhurtham_brahma)
                                 "ABHIJIT" -> stringResource(R.string.muhurtham_abhijit)
+                                "MAITRA" -> stringResource(R.string.timing_maitra)
                                 "GOWRI" -> stringResource(R.string.view_mode_gowri)
                                 "HORA" -> stringResource(R.string.nav_hora)
                                 else -> colId

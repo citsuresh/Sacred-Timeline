@@ -84,6 +84,7 @@ fun TimelinePager(
     showSunset: Boolean = true,
     showBrahmaMuhurtham: Boolean = false,
     showAbhijitMuhurtham: Boolean = false,
+    showMaitraMuhurtham: Boolean = true,
     isHeaderExpanded: Boolean = false,
     onToggleHeaderExpanded: (Boolean) -> Unit = {},
     onScaleChange: (Float) -> Unit,
@@ -226,6 +227,7 @@ fun TimelineContent(
     showSunset: Boolean = true,
     showBrahmaMuhurtham: Boolean = false,
     showAbhijitMuhurtham: Boolean = false,
+    showMaitraMuhurtham: Boolean = true,
     isHeaderExpanded: Boolean = false,
     onToggleHeaderExpanded: (Boolean) -> Unit = {},
     viewStyle: TimelineViewStyle = TimelineViewStyle.EQUAL_RECTANGULAR
@@ -350,7 +352,7 @@ fun TimelineContent(
         }
         
         val currentBackgroundTint = remember(dayData) {
-            val hasGoldEvent = dayData.isSubhaMuhurtham || dayData.specialEvents.any { 
+            val hasGoldEvent = dayData.isSubhaMuhurtham || dayData.maitraMuhurtham.isNotEmpty() || dayData.specialEvents.any { 
                 SacredTimelineColors.getEventColors(it).first == SubhaMuhurthamGold 
             }
             val hasPurpleEvent = dayData.specialEvents.any { 
@@ -394,17 +396,23 @@ fun TimelineContent(
                                         "UNIVERSAL" -> {
                                             (dayData.nallaNeram + dayData.specialPeriods + 
                                              dayData.gowriNeram + dayData.hora +
-                                             listOfNotNull(dayData.brahmaMuhurtham, dayData.abhijitMuhurtham))
+                                             (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) +
+                                             (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) +
+                                             (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()))
                                                 .sortedBy { it.startTime }
                                         }
                                         "NERAM_MUHURTHAM" -> {
                                             (dayData.nallaNeram + dayData.specialPeriods +
-                                             listOfNotNull(dayData.brahmaMuhurtham, dayData.abhijitMuhurtham))
+                                             (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) +
+                                             (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) +
+                                             (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()))
                                                 .sortedBy { it.startTime }
                                         }
-                                        "NERAM" -> dayData.nallaNeram + dayData.specialPeriods
-                                        "BRAHMA" -> listOfNotNull(dayData.brahmaMuhurtham)
-                                        "ABHIJIT" -> listOfNotNull(dayData.abhijitMuhurtham)
+                                        "MAITRA" -> if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()
+                                        "NERAM" -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()))
+                                            .sortedBy { it.startTime }
+                                        "BRAHMA" -> if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()
+                                        "ABHIJIT" -> if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()
                                         "GOWRI" -> dayData.gowriNeram
                                         "HORA" -> dayData.hora
                                         else -> emptyList()
@@ -427,19 +435,25 @@ fun TimelineContent(
                                 ViewMode.UNIVERSAL -> {
                                     (dayData.nallaNeram + dayData.specialPeriods + 
                                      dayData.gowriNeram + dayData.hora +
-                                     listOfNotNull(dayData.brahmaMuhurtham, dayData.abhijitMuhurtham))
+                                     (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) +
+                                     (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) +
+                                     (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()))
                                         .sortedBy { it.startTime }
                                 }
                                 ViewMode.NERAM_MUHURTHAM -> {
                                     (dayData.nallaNeram + dayData.specialPeriods +
-                                     listOfNotNull(dayData.brahmaMuhurtham, dayData.abhijitMuhurtham))
+                                     (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) +
+                                     (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) +
+                                     (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()))
                                         .sortedBy { it.startTime }
                                 }
-                                ViewMode.NERAM -> dayData.nallaNeram + dayData.specialPeriods
+                                ViewMode.NERAM -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()))
+                                    .sortedBy { it.startTime }
                                 ViewMode.BRAHMA -> listOfNotNull(dayData.brahmaMuhurtham)
                                 ViewMode.ABHIJIT -> listOfNotNull(dayData.abhijitMuhurtham)
                                 ViewMode.GOWRI -> dayData.gowriNeram
                                 ViewMode.HORA -> dayData.hora
+                                ViewMode.MAITRA -> dayData.maitraMuhurtham
                                 ViewMode.COMPOSITE -> emptyList()
                             }
                             if (timings.isNotEmpty()) {
@@ -575,6 +589,7 @@ fun TimelineHeader(
                     ViewMode.ABHIJIT -> R.string.muhurtham_abhijit
                     ViewMode.GOWRI -> R.string.nav_gowri_neram
                     ViewMode.HORA -> R.string.nav_hora
+                    ViewMode.MAITRA -> R.string.nav_maitra
                     ViewMode.COMPOSITE -> R.string.app_name
                 }
                 Text(stringResource(labelRes), modifier = Modifier.weight(1f), textAlign = TextAlign.Center, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
@@ -683,7 +698,8 @@ private fun calculateLanes(timings: List<Timing>, style: TimelineViewStyle): Map
             TimelineViewStyle.FIXED_3_TRACK -> {
                 val gowri = items.filterIsInstance<GowriNeram>().sortedBy { it.startTime }
                 val horai = items.filterIsInstance<Hora>().sortedBy { it.startTime }
-                val center = items.filter { it !is GowriNeram && it !is Hora }.sortedBy { it.startTime }
+                val center = items.filter { it !is GowriNeram && it !is Hora }
+                    .sortedWith(compareBy<Timing> { it.startTime }.thenByDescending { it is MaitraMuhurtham })
 
                 fun assignFixed(list: List<Timing>, trackIndex: Int) {
                     val trackWidth = 1.0f / 3.0f
@@ -708,7 +724,8 @@ private fun calculateLanes(timings: List<Timing>, style: TimelineViewStyle): Map
             TimelineViewStyle.EQUAL_RECTANGULAR -> {
                 val itemsGowri = items.filter { it is GowriNeram }.sortedBy { it.startTime }
                 val itemsHorai = items.filter { it is Hora }.sortedBy { it.startTime }
-                val itemsCenter = items.filter { it !is GowriNeram && it !is Hora }.sortedBy { it.startTime }
+                val itemsCenter = items.filter { it !is GowriNeram && it !is Hora }
+                    .sortedWith(compareBy<Timing> { it.startTime }.thenByDescending { it is MaitraMuhurtham })
 
                 fun assign(categoryItems: List<Timing>): List<List<Timing>> {
                     val lanes = mutableListOf<MutableList<Timing>>()

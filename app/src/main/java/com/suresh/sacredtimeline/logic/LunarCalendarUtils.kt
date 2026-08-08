@@ -177,7 +177,7 @@ object LunarCalendarUtils {
         return moonLong
     }
 
-    private fun calculateLahiriAyanamsha(jd: Double): Double {
+    fun calculateLahiriAyanamsha(jd: Double): Double {
         // Lahiri Ayanamsha: 22.466... formula is too simple.
         // Better approximation for Lahiri: 23.85 + (jd - 2433282.5) * 0.01396 / 365.25
         // Chitra Paksha (Lahiri) for Jan 1 1900 was 22.4666 deg

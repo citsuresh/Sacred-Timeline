@@ -5,10 +5,12 @@
     <string name="nav_nalla_neram">Neram</string>
     <string name="nav_gowri_neram">Gowri Neram</string>
     <string name="nav_hora">Horai</string>
+    <string name="nav_maitra">Maitra</string>
     <string name="nav_universal">Universal Timeline</string>
     <string name="nav_neram_muhurtham">Neram / Muhurtham</string>
     <string name="view_mode_universal">Universal</string>
     <string name="view_mode_neram_muhurtham">Neram / Muhurtham</string>
+    <string name="view_mode_maitra">Maitra</string>
     <string name="nav_settings">Settings</string>
 
     <!-- Timing Names -->
@@ -18,6 +20,10 @@
     <string name="timing_nalla">Nalla Neram</string>
     <string name="timing_morning">Morning</string>
     <string name="timing_evening">Evening</string>
+    <string name="timing_maitra">Maitra Muhurtham</string>
+    <string name="maitra_potency_high">High Potency</string>
+    <string name="maitra_potency_standard">Standard Potency</string>
+    <string name="timing_desc_maitra">Ideal for debt repayment. Returns high results when initiated in this window.</string>
 
     <!-- Gowri Categories -->
     <string name="gowri_amridha">Amridha</string>
@@ -377,6 +383,7 @@
     <string name="settings_show_sunset">Show Sunset</string>
     <string name="settings_show_brahma_muhurtham">Show Brahma Muhurtham</string>
     <string name="settings_show_abhijit_muhurtham">Show Abhijit Muhurtham</string>
+    <string name="settings_show_maitra_muhurtham">Show Maitra Muhurtham</string>
     <string name="settings_tithi_options">Tithis to Display</string>
     <string name="settings_star_options">Nakshatras to Display</string>
     <string name="settings_show_now_line">Show NOW Line</string>

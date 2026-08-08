@@ -87,6 +87,7 @@ fun DashboardDetailSheet(
                                 is GowriNeram -> Metadata.getGowriNameRes(t.name)
                                 is SpecialPeriod -> Metadata.getSpecialNameRes(t.name)
                                 is Muhurtham -> Metadata.getMuhurthamNameRes(t.name)
+                                is MaitraMuhurtham -> Metadata.getSpecialNameRes("Maitra Muhurtham")
                             }
                             stringResource(nameRes)
                         }
@@ -133,6 +134,20 @@ fun DashboardDetailSheet(
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                    }
+
+                    if (detail is DashboardDetail.TimelineTiming && detail.timing is MaitraMuhurtham) {
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 4.dp)) {
+                            repeat(detail.timing.potencyStars) {
+                                Icon(Icons.Default.Star, null, modifier = Modifier.size(14.dp), tint = containerColor)
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = stringResource(Metadata.getMaitraPotencyRes(detail.timing.potencyStars)),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
                 }
             }
@@ -252,6 +267,7 @@ fun DashboardDetailSheet(
                         is SpecialPeriod -> Metadata.getSpecialDescription(t.name, context)
                         is NallaNeram -> Metadata.getSpecialDescription("Nalla", context)
                         is Muhurtham -> Metadata.getSpecialDescription(t.name, context)
+                        is MaitraMuhurtham -> Metadata.getSpecialDescription("Maitra Muhurtham", context)
                     }
                 }
                 is DashboardDetail.Lunar -> {
@@ -288,6 +304,7 @@ fun DetailIcon(detail: DashboardDetail, tint: Color) {
                 is Hora -> Icon(Icons.Default.Today, contentDescription = null, tint = tint)
                 is GowriNeram -> Icon(Icons.Default.Brightness4, contentDescription = null, tint = tint)
                 is Muhurtham -> Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = tint)
+                is MaitraMuhurtham -> Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = tint)
                 is SpecialPeriod -> {
                     if (t.name == "Yama") {
                         Image(

@@ -1,9 +1,12 @@
 package com.suresh.sacredtimeline.logic
 
 import com.suresh.sacredtimeline.model.*
+import java.time.LocalDate
 import java.time.DayOfWeek
 import java.time.LocalTime
 import java.time.Duration
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 object PanchangamCalculator {
 
@@ -373,6 +376,68 @@ object PanchangamCalculator {
                     calculateYamagandam(dayOfWeek, sunrise, sunset, style),
                     calculateKuligai(dayOfWeek, sunrise, sunset, style)
                 )
+    }
+
+    fun calculateMaitraMuhurtham(
+        date: LocalDate,
+        lat: Double,
+        lng: Double,
+        sunrise: LocalTime,
+        zoneId: ZoneId = ZoneId.systemDefault()
+    ): List<MaitraMuhurtham> {
+        val dayInfo = LunarCalendarUtils.getLunarDayInfo(date)
+        val windows = LagnaCalculator.calculateLagnaWindows(date, lat, lng, zoneId)
+        val result = mutableListOf<MaitraMuhurtham>()
+        
+        windows.forEach { window ->
+            // In Vedic tradition, the "day" (Vara) changes at sunrise.
+            // A window before sunrise belongs to the previous day's Vara.
+            val varaDate = if (window.startTime.isBefore(sunrise)) date.minusDays(1) else date
+            val isTuesday = varaDate.dayOfWeek == DayOfWeek.TUESDAY
+            
+            // Potency 1: Tuesday + (Ashwini/Mesha OR Anuradha/Scorpio) -> 5 Stars
+            // Potency 2: Other Day + (Ashwini/Mesha OR Anuradha/Scorpio) -> 3 Stars
+            
+            val isMeshaWindow = window.rashi == LagnaCalculator.Rashi.MESHA
+            val isScorpioWindow = window.rashi == LagnaCalculator.Rashi.VRISHCHIKA
+            
+            if (isMeshaWindow || isScorpioWindow) {
+                // Check if Ashwini (1) or Anuradha (17) overlaps with this window
+                val stars = if (isMeshaWindow) listOf(1) else listOf(17)
+                
+                val overlapsStar = dayInfo.nakshatras.any { interval ->
+                    stars.contains(interval.value) && overlapsWithInstant(window, interval, zoneId, date)
+                }
+                
+                if (overlapsStar) {
+                    result.add(MaitraMuhurtham(
+                        name = "Maitra Muhurtham",
+                        tamilName = "மைத்ர முஹூர்த்தம்",
+                        startTime = window.startTime,
+                        endTime = window.endTime,
+                        auspiciousness = Auspiciousness.GOLD,
+                        description = "Ideal for debt repayment",
+                        potencyStars = if (isTuesday) 5 else 3
+                    ))
+                }
+            }
+        }
+        return result
+    }
+
+    private fun overlapsWithInstant(
+        window: LagnaCalculator.LagnaWindow,
+        interval: LunarCalendarUtils.LunarInterval,
+        zoneId: ZoneId,
+        date: LocalDate
+    ): Boolean {
+        if (interval.startTime == null || interval.endTime == null) return true // Conservative fallback
+        
+        val windowStart = ZonedDateTime.of(date, window.startTime, zoneId).toInstant()
+        var windowEnd = ZonedDateTime.of(date, window.endTime, zoneId).toInstant()
+        if (windowEnd.isBefore(windowStart)) windowEnd = windowEnd.plus(Duration.ofDays(1))
+        
+        return windowStart.isBefore(interval.endTime) && interval.startTime.isBefore(windowEnd)
     }
 
 }

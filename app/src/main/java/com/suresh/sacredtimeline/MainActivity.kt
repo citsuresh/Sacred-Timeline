@@ -166,6 +166,18 @@ class MainActivity : AppCompatActivity() {
                             },
                             icon = { Icon(Icons.Default.Schedule, contentDescription = null) }
                         )
+                        NavigationDrawerItem(
+                            label = { Text(stringResource(R.string.nav_maitra)) },
+                            selected = currentRoute is NavRoute.Dashboard && currentRoute.mode == ViewMode.MAITRA,
+                            onClick = {
+                                scope.launch {
+                                    backStack.clear()
+                                    backStack.add(NavRoute.Dashboard(ViewMode.MAITRA))
+                                    drawerState.close()
+                                }
+                            },
+                            icon = { Icon(Icons.Default.AutoAwesome, contentDescription = null) }
+                        )
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                         NavigationDrawerItem(
                             label = { Text(stringResource(R.string.nav_settings)) },

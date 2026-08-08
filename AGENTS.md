@@ -10,10 +10,14 @@ Before considering any code change complete: after each meaningful part of a mul
 > (2) whether the change contradicts or duplicates anything already established elsewhere in the codebase; 
 > (3) if a build/test can be run, run it and report actual results, not just a read-through;
 > (4) **'Wiring' Integrity**: Pay extra attention to how state and parameters are passed through nested calls. Verify that no 'silent defaults' are ignoring user preferences, and ensure that cache-clearing or job-cancellation triggers are correctly synchronized across all ViewModels/Repositories.
-> (5) **Finding Classification**: For every finding, explicitly classify it as one of: (a) unrelated to the agreed breakdown — treat as out-of-scope per the existing rule, or (b) within the scope of an already-planned future part of the breakdown — name which part, and flag it as "expected to be addressed in Part N" so the user knows addressing it now would be redundant with the plan already agreed, rather than a new decision to make.
+> (5) **Finding Classification**: For every finding, explicitly classify it as one of: (a) unrelated to the agreed breakdown — treat as out-of-scope per the existing rule, or (b) within the scope of an already-planned future part of the breakdown — name which part, and flag it as "expected to be addressed in Part N".
 >
-> If you find an issue outside the scope of the current change, report it only — do not investigate further, do not touch it, do not suggest fixing it now, even if it looks trivial; note it as a candidate for a known-issues list instead. 
-> For issues within scope, propose a fix as a suggested diff only — never apply it yourself." 
+> **Reporting Rules**:
+> - For every finding (including out-of-scope items), **investigate fully** to understand the root cause.
+> - **Propose a specific fix** (as a code snippet or diff).
+> - **Provide an effort estimate** (e.g., "5 mins, Low Risk").
+> - **NO ACTION POLICY**: Do not touch the files or apply any fix yourself. Report the findings to the user and wait for explicit permission to apply any specific fix.
+> - If an issue is out-of-scope, note it as a candidate for a 'known-issues' list." 
 
 After the full change is complete, spawn one more sub-agent with the same brief against the complete diff. 
 
@@ -31,7 +35,7 @@ When judging whether new code is "good" or "correct" beyond functional regressio
 
 ## General Reporting & Approval Rules
 - Always surface the full Review Report to the user before proceeding.
-- Never summarize the report away; provide the detailed findings.
+- Never summarize the report away; provide the detailed findings, proposed fixes, and effort estimates.
 - Never apply any proposed fix without explicit user approval.
 - Never act on out-of-scope findings.
 - Protocol 2's proposed breakdown requires explicit user confirmation before implementation begins.

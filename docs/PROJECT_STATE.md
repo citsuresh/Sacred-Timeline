@@ -1,16 +1,19 @@
 # Project State
 
-**Phase**: Alpha/Stable (Phase 3 Complete)
+**Phase**: Alpha/Stable (Phase 4 Complete)
 
 ## 1. Recently Implemented
-- **Three-Style Layout System**: Introduced a toggle for users to choose their preferred horizontal distribution in the Universal Timeline:
+- **Maitra Muhurtham (Debt Repayment)**: Implemented a high-precision detection engine for Maitra windows:
+    - **Vara-Based Potency**: Intelligently handles day-boundary transitions (Sunrise-to-Sunrise Vara) to show 5-star potency even after midnight.
+    - **Dual-Tone Gold Styling**: High-potency windows (Tuesdays) use rich gold, while standard windows use a paler gold (`#FFE082`).
+    - **Fully Localized**: English and Tamil support for all labels and potency descriptions.
+- **Shared Astronomical Core**: Consolidated Lahiri Ayanamsha logic into `LunarCalendarUtils` to ensure perfect alignment between Lagna (zodiac rise) and Nakshatra (moon position).
+- **Comprehensive Widget Support**: Integrated Maitra windows into the Home Screen Widget with star indicators and potency labels.
+- **Universal View Refinement**: Added a dedicated Maitra column and included Maitra windows in the "Nalla Neram" (NERAM) specific view mode.
+- **Three-Style Layout System**: Introduced a toggle for users to choose their preferred horizontal distribution:
     - **Fixed 3-Track**: Predictable pillars for Gowri/Horai.
     - **Equal Rectangular**: Symmetrical widths for all overlapping items.
-    - **Orthogonal Stepped**: Dynamic width adjustment (90-degree steps) to eliminate empty gaps and maximize space.
-- **Settings Reorganization**: Structured the long settings list into 7 logical groups (General, Conventions, Layout, Indicators, Location, Widget, Advanced) to improve discoverability.
-- **Improved Marquee Stability**: Fixed a state-reset bug where marquee labels would appear fragmented after swiping dates.
-- **Enhanced Text Legibility**: Implemented 2-line text wrapping and dynamic font scaling in Timing Cards.
-- **Maitra Muhurtham Research**: Finalized the calculation rules (Tuesday + Ashwini/Anuradha + Mesha/Vrishchika Lagna) and prepared the technical implementation plan. See [MAITRA_MUHURTHAM_PLAN.md](plans/MAITRA_MUHURTHAM_PLAN.md).
+    - **Orthogonal Stepped**: Dynamic width adjustment (90-degree steps).
 
 ## 2. Technical Stack
 - **UI**: Kotlin, Jetpack Compose (Material 3), Jetpack Glance (Widgets).

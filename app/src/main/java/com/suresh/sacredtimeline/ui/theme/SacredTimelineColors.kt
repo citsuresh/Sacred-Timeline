@@ -43,6 +43,9 @@ object SacredTimelineColors {
             is Muhurtham -> {
                 if (timing.name == "Abhijit Muhurtham") Color(0xFF4CAF50) else Color(0xFFE91E63)
             }
+            is MaitraMuhurtham -> {
+                if (timing.potencyStars == 5) MaitraGold else MaitraGoldPale
+            }
         }
     }
 

@@ -39,11 +39,15 @@ class MockPanchangamProvider {
             offsetMinutes,
             durationMinutes
         )
+
+        // 3. Maitra Muhurthams
+        val yesterdayMaitra = PanchangamCalculator.calculateMaitraMuhurtham(date.minusDays(1), lat, lng, yesterdaySun.sunrise)
+        val todayMaitra = PanchangamCalculator.calculateMaitraMuhurtham(date, lat, lng, sunrise)
         
         val result = mutableListOf<Timing>()
         
         // 1. Fill 00:00 to Sunrise (from Yesterday's Night slots)
-        yesterdayCycle.forEach { timing ->
+        (yesterdayCycle + yesterdayMaitra).forEach { timing ->
             if (timing.endTime.isBefore(timing.startTime)) {
                 // Crosses midnight! (e.g. 23:30 - 00:45)
                 // The part after midnight belongs to TODAY
@@ -61,7 +65,7 @@ class MockPanchangamProvider {
         }
         
         // 2. Fill Sunrise to 23:59 (from Today's slots)
-        todayCycle.forEach { timing ->
+        (todayCycle + todayMaitra).forEach { timing ->
             if (timing.endTime.isBefore(timing.startTime)) {
                 // Crosses midnight! (e.g. 23:30 - 00:45)
                 // The part before midnight belongs to TODAY
@@ -82,6 +86,7 @@ class MockPanchangamProvider {
             is Hora -> original.copy(startTime = start, endTime = end)
             is SpecialPeriod -> original.copy(startTime = start, endTime = end)
             is Muhurtham -> original.copy(startTime = start, endTime = end)
+            is MaitraMuhurtham -> original.copy(startTime = start, endTime = end)
         }
     }
 

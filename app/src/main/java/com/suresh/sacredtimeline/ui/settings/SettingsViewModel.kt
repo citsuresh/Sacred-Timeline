@@ -132,6 +132,10 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         viewModelScope, SharingStarted.WhileSubscribed(5000), false
     )
 
+    val showMaitraMuhurtham: StateFlow<Boolean> = repository.showMaitraMuhurtham.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), true
+    )
+
     val sunriseDefinition: StateFlow<String> = repository.sunriseDefinition.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), "SCIENTIFIC"
     )
@@ -330,6 +334,10 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
     fun setShowAbhijitMuhurtham(show: Boolean) {
         viewModelScope.launch { repository.setShowAbhijitMuhurtham(show) }
+    }
+
+    fun setShowMaitraMuhurtham(show: Boolean) {
+        viewModelScope.launch { repository.setShowMaitraMuhurtham(show) }
     }
 
     fun setSunriseDefinition(definition: String) {
