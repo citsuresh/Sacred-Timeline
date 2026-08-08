@@ -276,6 +276,10 @@
 
     <!-- Settings Labels -->
     <string name="settings_title">அமைப்புகள்</string>
+    <string name="settings_general">பொதுவான அமைப்புகள்</string>
+    <string name="settings_conventions">பாரம்பரிய நடைமுறைகள்</string>
+    <string name="settings_timeline_layout">காலவரிசை தளவமைப்பு</string>
+    <string name="settings_display_indicators">காட்சி மற்றும் குறிகாட்டிகள்</string>
     <string name="settings_display">காட்சி</string>
     <string name="settings_language">பயன்பாட்டு மொழி</string>
     <string name="settings_theme">பயன்பாட்டு தீம்</string>
@@ -286,6 +290,23 @@
     <string name="settings_time_format_24h">24-மணிநேர வடிவத்தைப் பயன்படுத்தவும்</string>
     <string name="settings_columns_composite">நிரல் மேலாண்மை (காலவரிசை)</string>
     <string name="settings_columns_desc">கூட்டு காட்சிக்கான நிரல்களை மறுவரிசைப்படுத்தவும் அல்லது மறைக்கவும். தனிப்பட்ட காட்சிகள் (ஹோரை, கௌரி போன்றவை) எப்போதும் அந்தந்த நிரலைக் காட்டும்.</string>
+    <string name="settings_location">இடம்</string>
+    <string name="settings_location_mode">இருப்பிட முறை</string>
+    <string name="settings_location_auto">ஜிபிஎஸ் தானியங்கி</string>
+    <string name="settings_location_manual">கைமுறை நகரம்</string>
+    <string name="settings_city_name">நகரத்தின் பெயர்</string>
+    <string name="settings_search_city">நகரத்தைத் தேடு</string>
+    <string name="settings_widget_mgmt">விட்ஜெட் மேலாண்மை</string>
+    <string name="settings_widget_refresh">விட்ஜெட் புதுப்பிப்பு காலம்</string>
+    <string name="settings_widget_columns">நிரல் மேலாண்மை (விட்ஜெட்)</string>
+    <string name="settings_refresh_min">%1$d நிமிடம்</string>
+    <string name="settings_refresh_hr">%1$d மணி</string>
+    <string name="settings_preload_days">%1$d நாட்கள்</string>
+    <string name="settings_density">காலவரிசை அடர்த்தி</string>
+    <string name="settings_zoom_composite">கூட்டு காட்சி ஜூம்</string>
+    <string name="settings_zoom_single">தனி காட்சி ஜூம்</string>
+    <string name="settings_pinch_zoom">கிள்ளுதல் மூலம் ஜூம் செய்</string>
+    <string name="settings_indicators">காலவரிசை காட்சி</string>
     <string name="settings_show_now_line">இப்போது வரியைக் காட்டு</string>
     <string name="settings_sunrise_definition">சூரிய உதய இலக்கணம்</string>
     <string name="settings_sunrise_scientific">அறிவியல் (மேல் விளிம்பு)</string>

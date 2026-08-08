@@ -145,7 +145,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     )
 
     val timelineViewStyle: StateFlow<String> = repository.timelineViewStyle.stateIn(
-        viewModelScope, SharingStarted.WhileSubscribed(5000), "STANDARD"
+        viewModelScope, SharingStarted.WhileSubscribed(5000), "EQUAL_RECTANGULAR"
     )
 
     val language: StateFlow<String> = repository.language.stateIn(

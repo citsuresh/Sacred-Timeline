@@ -339,6 +339,10 @@
 
     <!-- Settings Labels -->
     <string name="settings_title">Settings</string>
+    <string name="settings_general">General Settings</string>
+    <string name="settings_conventions">Traditional Conventions</string>
+    <string name="settings_timeline_layout">Timeline Layout</string>
+    <string name="settings_display_indicators">Display &amp; Indicators</string>
     <string name="settings_display">Display</string>
     <string name="settings_language">App Language</string>
     <string name="settings_theme">App Theme</string>
