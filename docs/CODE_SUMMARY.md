@@ -32,8 +32,8 @@ graph TD
 - `TamilCalendarUtils`: Mapping for 60-year cycles and lunar-solar festival combinations.
 
 ### UI (`ui/`)
-- `ui/dashboard`: 24h vertical timeline, `TimelineCore` (lane logic), and `SunTimesDisplay`. `TimelineViewModel` performs iterative interval-based festival detection.
-- `ui/settings`: Hierarchical menus for general settings, Tithi/Nakshatra toggles, and Column management.
+- `ui/dashboard`: 24h vertical timeline. `TimelineCore` implements three distinct lane algorithms (**Fixed**, **Equal**, **Stepped**) using a segment-based slicing model.
+- `ui/settings`: Hierarchical menus organized into logical functional blocks. Supports dynamic View Style switching and bilingual Tamil/English label management.
 - `ui/theme`: `SacredTimelineColors` for dynamic tinting and sticker-look UI patterns.
 - `ui/navigation`: Navigation 3 state definitions and `ViewMode` routes.
 

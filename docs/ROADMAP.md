@@ -11,13 +11,32 @@ Future development phases for the Sacred Timeline project.
 - **Multi-Language Support**: Full English and Tamil support with in-app switching and persistence.
 - **Advanced Settings**: Comprehensive user preferences for zoom, time format, and column management.
 
-## Phase 3: Adaptive Ecosystem
+## Phase 3: Adaptive Ecosystem (In-Progress)
 - **Adaptive Layouts**: Optimized UI for tablets and foldables using `ListDetailPaneScaffold`.
-- **Extended Platform Support**: Exploring Wear OS tiles for quick timing checks.
+- **Wear OS Support**: Complications and Tiles for quick timing checks.
 
-## Phase 4: Precision Refinement & Traditional Depth
-- **High-Precision Ephemeris**: Upgrade `LunarCalendarUtils` to use a more accurate astronomical model (e.g., increased perturbation terms or a native wrapper for an ephemeris library) to fix Nakshatra/Tithi discrepancies.
-- **Traditional Calculations**: Implement **Yogam** and **Chandrashtamam** logic based on the refined lunar engine.
-- **Enhanced Festive Detection**: Automate detection of specific traditional events like "Aadi Kiruthigai" (Nakshatra-based festivals) and "Pradosham".
-- **Dynamic Timing Labels**: Add "Till [Time]" labels for Tithis and Nakshatras to match traditional calendar layouts.
-- **Midnight Auto-Transition**: Add a "Midnight Watcher" to automatically scroll the timeline to the new day at 12:00 AM (Nice to have).
+## Phase 4: Traditional Depth & Maitra Muhurtham
+- **Maitra Muhurtham Engine**: High-precision Lagna-based calculation for debt repayment windows (Aries/Scorpio alignment).
+- **Yogam & Chandrashtamam**: Implement traditional lunar yogas and monthly moon-sign warnings.
+
+## Phase 5: Search & Accessibility
+- **Global Search**: Search for festivals, holidays, Maitra/Subha Muhurthams by year or date range.
+- **Accessibility Suite**: 
+    - Font scaling for Tamil script.
+    - High-contrast modes.
+    - Screen reader support for Panchangam terms.
+
+## Phase 6: Performance & Reliability
+- **Background Optimization**: Battery-friendly background tasks for widget refreshes.
+- **Data Accuracy Audit**: Continuous cross-check of Hora/Neram logic with traditional references.
+- **Backup & Restore**: Export/Import user settings and column configurations.
+
+## Phase 7: UI/UX Refinement
+- **Layout Tuning**: Portrait vs. Landscape specific optimizations.
+- **Multi-column Polish**: Smooth navigation and density management for the "Universal" view.
+- **Bilingual Labels**: Perfect alignment for Tamil + English mixed-mode labels.
+
+## Phase 8: Traditional Iconography
+- **Icon Sourcing**: 
+    - Verify and integrate high-quality SVGs for Pradosham (Nandi), Shivaratri (Shiva), and Chaturthi (Ganesha).
+    - Establish a consistent "Sticker Style" icon set for Subha Muhurthams, special Tithis, and Nakshatras.
