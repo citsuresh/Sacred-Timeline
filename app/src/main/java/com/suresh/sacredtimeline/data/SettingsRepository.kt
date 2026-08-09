@@ -117,7 +117,7 @@ class SettingsRepository(private val context: Context) {
     val sunriseDefinition: Flow<String> = context.dataStore.data.map { it[Keys.SUNRISE_DEFINITION] ?: "SCIENTIFIC" }
     val specialPeriodStyle: Flow<String> = context.dataStore.data.map { it[Keys.SPECIAL_PERIOD_STYLE] ?: "PROPORTIONAL" }
     val lunarMonthSystem: Flow<String> = context.dataStore.data.map { it[Keys.LUNAR_MONTH_SYSTEM] ?: "AMANTA" }
-    val timelineViewStyle: Flow<String> = context.dataStore.data.map { it[Keys.TIMELINE_VIEW_STYLE] ?: "EQUAL_RECTANGULAR" }
+    val timelineViewStyle: Flow<String> = context.dataStore.data.map { it[Keys.TIMELINE_VIEW_STYLE] ?: "EQUAL_DISTRIBUTION" }
 
     suspend fun updateCompositeScale(scale: Float) {
         context.dataStore.edit { it[Keys.COMPOSITE_SCALE] = scale.coerceIn(0.2f, 3.0f) }

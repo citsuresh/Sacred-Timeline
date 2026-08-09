@@ -54,7 +54,7 @@ fun TimelineDashboard(
     val showMaitraMuhurtham by viewModel.showMaitraMuhurtham.collectAsState()
     val timelineViewStyleStr by viewModel.timelineViewStyle.collectAsState()
     val timelineViewStyle = remember(timelineViewStyleStr) {
-        try { TimelineViewStyle.valueOf(timelineViewStyleStr) } catch (ignore: Exception) { TimelineViewStyle.EQUAL_RECTANGULAR }
+        try { TimelineViewStyle.valueOf(timelineViewStyleStr) } catch (ignore: Exception) { TimelineViewStyle.EQUAL_DISTRIBUTION }
     }
 
     LaunchedEffect(viewMode) {

@@ -46,7 +46,7 @@ import java.time.LocalTime
 
 enum class TimelineViewStyle {
     FIXED_3_TRACK,
-    EQUAL_RECTANGULAR,
+    EQUAL_DISTRIBUTION,
     ORTHOGONAL_STEPPED
 }
 
@@ -92,7 +92,7 @@ fun TimelinePager(
     onZoomOut: () -> Unit,
     onDetailClick: (com.suresh.sacredtimeline.model.DashboardDetail) -> Unit = {},
     isLandscape: Boolean,
-    viewStyle: TimelineViewStyle = TimelineViewStyle.EQUAL_RECTANGULAR
+    viewStyle: TimelineViewStyle = TimelineViewStyle.EQUAL_DISTRIBUTION
 ) {
     val hourHeight = BASE_HOUR_HEIGHT * timelineScale
     
@@ -230,7 +230,7 @@ fun TimelineContent(
     showMaitraMuhurtham: Boolean = true,
     isHeaderExpanded: Boolean = false,
     onToggleHeaderExpanded: (Boolean) -> Unit = {},
-    viewStyle: TimelineViewStyle = TimelineViewStyle.EQUAL_RECTANGULAR
+    viewStyle: TimelineViewStyle = TimelineViewStyle.EQUAL_DISTRIBUTION
 ) {
     val scrollState = rememberScrollState()
     val density = LocalDensity.current
@@ -389,81 +389,77 @@ fun TimelineContent(
                         TimeMarkersColumn(sunrise = dayData.sunrise, sunset = dayData.sunset, hourHeight = hourHeight, is24Hour = is24Hour)
                         Box(modifier = Modifier.fillMaxHeight().width(1.dp).background(SeparatorGrey))
                         
-                        if (viewMode == ViewMode.COMPOSITE) {
-                            columnOrder.forEachIndexed { index, colId ->
-                                if (columnVisibility.contains(colId)) {
-                                    val timings = when (colId) {
-                                        "UNIVERSAL" -> {
-                                            (dayData.nallaNeram + dayData.specialPeriods + 
-                                             dayData.gowriNeram + dayData.hora +
-                                             (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) +
-                                             (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) +
-                                             (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()))
-                                                .sortedBy { it.startTime }
-                                        }
-                                        "NERAM_MUHURTHAM" -> {
-                                            (dayData.nallaNeram + dayData.specialPeriods +
-                                             (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) +
-                                             (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) +
-                                             (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()))
-                                                .sortedBy { it.startTime }
-                                        }
+                        val visibleCols = columnOrder.filter { columnVisibility.contains(it) }
+                        val isMergedLayout = viewStyle == TimelineViewStyle.ORTHOGONAL_STEPPED || viewStyle == TimelineViewStyle.FIXED_3_TRACK
+
+                        if (viewMode == ViewMode.COMPOSITE && !isMergedLayout) {
+                            // Independent Lanes for Equal Distribution
+                            visibleCols.forEachIndexed { index, colId ->
+                                val timings = when (colId) {
+                                    "UNIVERSAL" -> (dayData.nallaNeram + dayData.specialPeriods + dayData.gowriNeram + dayData.hora + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) + (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList())).sortedBy { it.startTime }
+                                    "NERAM_MUHURTHAM" -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) + (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList())).sortedBy { it.startTime }
+                                    "MAITRA" -> if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()
+                                    "NERAM" -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList())).sortedBy { it.startTime }
+                                    "BRAHMA" -> if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()
+                                    "ABHIJIT" -> if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()
+                                    "GOWRI" -> dayData.gowriNeram
+                                    "HORA" -> dayData.hora
+                                    else -> emptyList()
+                                }
+                                TimelineColumn(
+                                    timings = timings,
+                                    onTimingClick = onTimingClick,
+                                    hourHeight = hourHeight,
+                                    is24Hour = is24Hour,
+                                    modifier = Modifier.weight(1f),
+                                    viewStyle = viewStyle
+                                )
+                                if (index < visibleCols.size - 1) {
+                                    VerticalDivider(thickness = 1.dp, color = Color.LightGray.copy(alpha = 0.3f))
+                                }
+                            }
+                        } else {
+                            // Merged Layout (Universal, Solo, or Composite-Merged)
+                            val timings = if (viewMode == ViewMode.COMPOSITE) {
+                                visibleCols.flatMap { colId ->
+                                    when (colId) {
+                                        "UNIVERSAL" -> (dayData.nallaNeram + dayData.specialPeriods + dayData.gowriNeram + dayData.hora + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) + (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()))
+                                        "NERAM_MUHURTHAM" -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) + (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()))
                                         "MAITRA" -> if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()
                                         "NERAM" -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()))
-                                            .sortedBy { it.startTime }
                                         "BRAHMA" -> if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()
                                         "ABHIJIT" -> if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()
                                         "GOWRI" -> dayData.gowriNeram
                                         "HORA" -> dayData.hora
                                         else -> emptyList()
                                     }
-                                    TimelineColumn(
-                                        timings = timings, 
-                                        onTimingClick = onTimingClick,
-                                        hourHeight = hourHeight,
-                                        is24Hour = is24Hour,
-                                        modifier = Modifier.weight(1f),
-                                        viewStyle = viewStyle
-                                    )
-                                    if (index < columnOrder.size - 1 && columnVisibility.count { it in columnOrder.drop(index + 1) } > 0) {
-                                        VerticalDivider(thickness = 1.dp, color = Color.LightGray.copy(alpha = 0.3f))
-                                    }
+                                }.distinct().sortedBy { it.startTime }
+                            } else {
+                                when (viewMode) {
+                                    ViewMode.UNIVERSAL -> (dayData.nallaNeram + dayData.specialPeriods + dayData.gowriNeram + dayData.hora + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) + (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList())).sortedBy { it.startTime }
+                                    ViewMode.NERAM_MUHURTHAM -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) + (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList())).sortedBy { it.startTime }
+                                    ViewMode.NERAM -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList())).sortedBy { it.startTime }
+                                    ViewMode.BRAHMA -> listOfNotNull(dayData.brahmaMuhurtham)
+                                    ViewMode.ABHIJIT -> listOfNotNull(dayData.abhijitMuhurtham)
+                                    ViewMode.GOWRI -> dayData.gowriNeram
+                                    ViewMode.HORA -> dayData.hora
+                                    ViewMode.MAITRA -> dayData.maitraMuhurtham
+                                    else -> emptyList()
                                 }
-                            }
-                        } else {
-                            val timings = when (viewMode) {
-                                ViewMode.UNIVERSAL -> {
-                                    (dayData.nallaNeram + dayData.specialPeriods + 
-                                     dayData.gowriNeram + dayData.hora +
-                                     (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) +
-                                     (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) +
-                                     (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()))
-                                        .sortedBy { it.startTime }
-                                }
-                                ViewMode.NERAM_MUHURTHAM -> {
-                                    (dayData.nallaNeram + dayData.specialPeriods +
-                                     (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) +
-                                     (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) +
-                                     (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()))
-                                        .sortedBy { it.startTime }
-                                }
-                                ViewMode.NERAM -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()))
-                                    .sortedBy { it.startTime }
-                                ViewMode.BRAHMA -> listOfNotNull(dayData.brahmaMuhurtham)
-                                ViewMode.ABHIJIT -> listOfNotNull(dayData.abhijitMuhurtham)
-                                ViewMode.GOWRI -> dayData.gowriNeram
-                                ViewMode.HORA -> dayData.hora
-                                ViewMode.MAITRA -> dayData.maitraMuhurtham
-                                ViewMode.COMPOSITE -> emptyList()
                             }
                             if (timings.isNotEmpty()) {
                                 TimelineColumn(
-                                    timings = timings, 
-                                    onTimingClick = onTimingClick, 
-                                    hourHeight = hourHeight, 
-                                    is24Hour = is24Hour, 
+                                    timings = timings,
+                                    onTimingClick = onTimingClick,
+                                    hourHeight = hourHeight,
+                                    is24Hour = is24Hour,
                                     modifier = Modifier.weight(1f),
-                                    viewStyle = viewStyle
+                                    viewStyle = viewStyle,
+                                    pillarConfig = if (viewStyle == TimelineViewStyle.FIXED_3_TRACK) {
+                                        val leftCat = visibleCols.firstOrNull() ?: ""
+                                        val rightCat = visibleCols.lastOrNull().takeIf { it != leftCat } ?: ""
+                                        PillarConfig(leftCat, rightCat)
+                                    } else null
                                 )
                             }
                         }
@@ -639,17 +635,20 @@ fun TimelineColumn(
     hourHeight: Dp,
     is24Hour: Boolean,
     modifier: Modifier = Modifier,
-    viewStyle: TimelineViewStyle = TimelineViewStyle.EQUAL_RECTANGULAR
+    viewStyle: TimelineViewStyle = TimelineViewStyle.EQUAL_DISTRIBUTION,
+    pillarConfig: PillarConfig? = null
 ) {
     Box(modifier = modifier.fillMaxHeight()) {
-        val lanes = remember(timings, viewStyle) { calculateLanes(timings, viewStyle) }
+        val segmentsMap = remember(timings, viewStyle, hourHeight, pillarConfig) {
+            calculateLanes(timings, viewStyle, hourHeight, pillarConfig)
+        }
         
-        lanes.forEach { (timing, laneInfo) ->
+        segmentsMap.forEach { (timing, segments) ->
             TimingCard(
                 timing = timing, 
                 hourHeight = hourHeight, 
                 is24Hour = is24Hour,
-                segments = laneInfo.segments,
+                segments = segments,
                 onClick = { onTimingClick(timing) }
             )
         }
@@ -663,11 +662,14 @@ data class LaneSegment(
     val offsetFactor: Float
 )
 
-private data class LaneInfo(
-    val segments: List<LaneSegment>
-)
+data class PillarConfig(val leftCategory: String, val rightCategory: String)
 
-private fun calculateLanes(timings: List<Timing>, style: TimelineViewStyle): Map<Timing, LaneInfo> {
+private fun calculateLanes(
+    timings: List<Timing>,
+    style: TimelineViewStyle,
+    hourHeight: Dp,
+    pillarConfig: PillarConfig? = null
+): Map<Timing, List<LaneSegment>> {
     if (timings.isEmpty()) return emptyMap()
 
     // 1. Group items into transitive clusters
@@ -696,9 +698,12 @@ private fun calculateLanes(timings: List<Timing>, style: TimelineViewStyle): Map
         
         when (style) {
             TimelineViewStyle.FIXED_3_TRACK -> {
-                val gowri = items.filterIsInstance<GowriNeram>().sortedBy { it.startTime }
-                val horai = items.filterIsInstance<Hora>().sortedBy { it.startTime }
-                val center = items.filter { it !is GowriNeram && it !is Hora }
+                val leftCat = pillarConfig?.leftCategory ?: "GOWRI"
+                val rightCat = pillarConfig?.rightCategory ?: "HORA"
+
+                val leftItems = items.filter { it.getCategory() == leftCat }.sortedBy { it.startTime }
+                val rightItems = items.filter { it.getCategory() == rightCat }.sortedBy { it.startTime }
+                val centerItems = items.filter { it.getCategory() != leftCat && it.getCategory() != rightCat }
                     .sortedWith(compareBy<Timing> { it.startTime }.thenByDescending { it is MaitraMuhurtham })
 
                 fun assignFixed(list: List<Timing>, trackIndex: Int) {
@@ -716,12 +721,12 @@ private fun calculateLanes(timings: List<Timing>, style: TimelineViewStyle): Map
                         }
                     }
                 }
-                assignFixed(gowri, 0)
-                assignFixed(center, 1)
-                assignFixed(horai, 2)
+                assignFixed(leftItems, 0)
+                assignFixed(centerItems, 1)
+                assignFixed(rightItems, 2)
             }
 
-            TimelineViewStyle.EQUAL_RECTANGULAR -> {
+            TimelineViewStyle.EQUAL_DISTRIBUTION -> {
                 val itemsGowri = items.filter { it is GowriNeram }.sortedBy { it.startTime }
                 val itemsHorai = items.filter { it is Hora }.sortedBy { it.startTime }
                 val itemsCenter = items.filter { it !is GowriNeram && it !is Hora }
@@ -775,7 +780,22 @@ private fun calculateLanes(timings: List<Timing>, style: TimelineViewStyle): Map
         }
     }
 
-    return result.mapValues { LaneInfo(it.value) }
+    return result.mapValues { it.value.toList() }
+}
+
+// Extension function to map timings to our column management IDs
+private fun Timing.getCategory(): String = when (this) {
+    is GowriNeram -> "GOWRI"
+    is Hora -> "HORA"
+    is NallaNeram -> "NERAM"
+    is SpecialPeriod -> "NERAM"
+    is MaitraMuhurtham -> "MAITRA"
+    is Muhurtham -> {
+        if (this.name.contains("Brahma")) "BRAHMA"
+        else if (this.name.contains("Abhijit")) "ABHIJIT"
+        else "NERAM_MUHURTHAM"
+    }
+    else -> "UNIVERSAL"
 }
 
 private fun overlaps(t1: Timing, t2: Timing): Boolean {

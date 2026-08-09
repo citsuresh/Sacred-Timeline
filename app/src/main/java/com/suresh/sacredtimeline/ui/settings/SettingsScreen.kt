@@ -198,7 +198,7 @@ fun SettingsScreen(
                             val style = when (it) {
                                 fixedTrackLabel -> "FIXED_3_TRACK"
                                 orthogonalSteppedLabel -> "ORTHOGONAL_STEPPED"
-                                else -> "EQUAL_RECTANGULAR"
+                                else -> "EQUAL_DISTRIBUTION"
                             }
                             viewModel.setTimelineViewStyle(style)
                         }

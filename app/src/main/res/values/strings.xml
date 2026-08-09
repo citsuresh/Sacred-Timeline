@@ -395,7 +395,7 @@
     <string name="settings_style_fixed">Fixed (1.5 Hours)</string>
     <string name="settings_timeline_style">Timeline Layout Style</string>
     <string name="settings_style_fixed_track">Fixed 3-Track</string>
-    <string name="settings_style_equal_rectangular">Equal Rectangular (Stable)</string>
+    <string name="settings_style_equal_rectangular">Equally Distributed (Stable Columns)</string>
     <string name="settings_style_orthogonal_stepped">Orthogonal Stepped (Dynamic)</string>
     <string name="settings_lunar_month_system">Lunar Month System</string>
     <string name="settings_amanta">Amanta (South India)</string>

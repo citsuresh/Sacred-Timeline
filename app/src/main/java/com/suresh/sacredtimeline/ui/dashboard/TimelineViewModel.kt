@@ -127,7 +127,7 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
     )
 
     val timelineViewStyle: StateFlow<String> = repository.timelineViewStyle.stateIn(
-        viewModelScope, SharingStarted.WhileSubscribed(5000), "EQUAL_RECTANGULAR"
+        viewModelScope, SharingStarted.WhileSubscribed(5000), "EQUAL_DISTRIBUTION"
     )
 
     init {

@@ -352,7 +352,7 @@
     <string name="settings_style_fixed">நிலையான (1.5 மணிநேரம்)</string>
     <string name="settings_timeline_style">காலவரிசை தளவமைப்பு நடை</string>
     <string name="settings_style_fixed_track">நிலையான 3-தடம்</string>
-    <string name="settings_style_equal_rectangular">சமமான செவ்வக (நிலையானது)</string>
+    <string name="settings_style_equal_rectangular">சம அளவு விநியோகம் (நிலையான நிரல்கள்)</string>
     <string name="settings_style_orthogonal_stepped">செங்குத்து படிநிலை (டைனமிக்)</string>
     <string name="settings_lunar_month_system">சந்திர மாத முறை</string>
     <string name="settings_amanta">அமாந்தம் (தென்னிந்தியா)</string>
