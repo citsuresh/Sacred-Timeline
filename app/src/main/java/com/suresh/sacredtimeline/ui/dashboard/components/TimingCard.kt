@@ -141,120 +141,135 @@ fun TimingCard(
 
         // 3. Place Text in the widest segment
         val widestSegment = segments.maxByOrNull { it.widthFactor } ?: segments[0]
-        val segTop = calculateOffset(widestSegment.startTime, hourHeight) - topOffset
-        val segHeight = calculateOffset(widestSegment.endTime, hourHeight) - calculateOffset(widestSegment.startTime, hourHeight)
+        val sOffset = calculateOffset(widestSegment.startTime, hourHeight) - topOffset
+        val sHeight = calculateOffset(widestSegment.endTime, hourHeight) - calculateOffset(widestSegment.startTime, hourHeight)
         
         Box(
             modifier = Modifier
-                .offset(x = maxWidth * widestSegment.offsetFactor, y = segTop)
-                .size(width = maxWidth * widestSegment.widthFactor, height = segHeight)
-                .padding(4.dp),
-            contentAlignment = Alignment.Center
+                .offset(x = maxWidth * widestSegment.offsetFactor, y = sOffset)
+                .size(width = maxWidth * widestSegment.widthFactor, height = sHeight)
+                .padding(4.dp)
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                // CATEGORY HEADING - Only show if not too narrow and NOT a Muhurtham (to save space)
+            Column(modifier = Modifier.fillMaxSize()) {
+                // 1. Heading - Anchored to Top
                 val isMuhurthamType = timing is Muhurtham || timing is MaitraMuhurtham
-                if (widestSegment.widthFactor >= 0.28f && segHeight > 30.dp && !isMuhurthamType) {
+                if (widestSegment.widthFactor >= 0.28f && sHeight > 30.dp && !isMuhurthamType) {
                     Text(
                         text = stringResource(Metadata.getCategoryShortNameRes(timing)).uppercase(),
                         style = MaterialTheme.typography.labelSmall,
                         color = contentColor.copy(alpha = 0.8f),
                         fontSize = 7.sp,
+                        lineHeight = 8.sp,
                         fontWeight = FontWeight.Black,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(bottom = 1.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 1.dp, bottom = 2.dp)
                     )
                 }
 
-                // ICON
-                if (segHeight > 90.dp) {
-                    val iconSize = if (segHeight > 110.dp) 20.dp else 16.dp
-                    if (timing is SpecialPeriod && timing.name == "Yama") {
-                        Image(
-                            painter = painterResource(R.drawable.ic_yama_bull),
-                            contentDescription = null,
-                            modifier = Modifier.size(iconSize + 4.dp)
+                // 2. Main Content - Centered in remaining space
+                Box(
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        // ICON
+                        if (sHeight > 90.dp) {
+                            val iconSize = if (sHeight > 110.dp) 20.dp else 16.dp
+                            if (timing is SpecialPeriod && timing.name == "Yama") {
+                                Image(
+                                    painter = painterResource(R.drawable.ic_yama_bull),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(iconSize + 4.dp)
+                                )
+                            } else {
+                                val iconPainter = when {
+                                    timing is SpecialPeriod && timing.name == "Rahu" -> painterResource(R.drawable.ic_rahu)
+                                    timing is SpecialPeriod && (timing.name == "Kuli Dawn" || timing.name == "Kuli Dusk") -> painterResource(R.drawable.ic_saturn)
+                                    else -> null
+                                }
+                                if (iconPainter != null) {
+                                    Icon(iconPainter, contentDescription = null, modifier = Modifier.size(iconSize), tint = contentColor)
+                                } else if (timing is NallaNeram || timing is Muhurtham || timing is MaitraMuhurtham) {
+                                    Icon(if (timing is NallaNeram) Icons.Default.Star else Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(iconSize), tint = contentColor)
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(2.dp))
+                        }
+
+                        // LABEL
+                        val labelRes = when (timing) {
+                            is Hora -> Metadata.getPlanetNameRes(timing.name)
+                            is NallaNeram -> Metadata.getSpecialNameRes("Nalla")
+                            is GowriNeram -> Metadata.getGowriNameRes(timing.name)
+                            is SpecialPeriod -> Metadata.getSpecialNameRes(timing.name)
+                            is Muhurtham -> Metadata.getMuhurthamNameRes(timing.name)
+                            is MaitraMuhurtham -> Metadata.getSpecialNameRes("Maitra Muhurtham")
+                        }
+                        Text(
+                            text = stringResource(labelRes),
+                            style = if (sHeight < 60.dp) MaterialTheme.typography.labelSmall else MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = contentColor,
+                            textAlign = TextAlign.Center,
+                            maxLines = 3,
+                            overflow = TextOverflow.Ellipsis,
+                            lineHeight = if (sHeight < 60.dp) 9.sp else 11.sp,
+                            fontSize = when {
+                                widestSegment.widthFactor < 0.20f -> 7.sp
+                                widestSegment.widthFactor < 0.25f -> 8.sp
+                                sHeight < 40.dp -> 8.sp
+                                else -> 10.sp
+                            }
                         )
-                    } else {
-                        val iconPainter = when {
-                            timing is SpecialPeriod && timing.name == "Rahu" -> painterResource(R.drawable.ic_rahu)
-                            timing is SpecialPeriod && (timing.name == "Kuli Dawn" || timing.name == "Kuli Dusk") -> painterResource(R.drawable.ic_saturn)
-                            else -> null
-                        }
-                        if (iconPainter != null) {
-                            Icon(iconPainter, contentDescription = null, modifier = Modifier.size(iconSize), tint = contentColor)
-                        } else if (timing is NallaNeram || timing is Muhurtham || timing is MaitraMuhurtham) {
-                            Icon(if (timing is NallaNeram) Icons.Default.Star else Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(iconSize), tint = contentColor)
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(2.dp))
-                }
 
-                // LABEL
-                val labelRes = when (timing) {
-                    is Hora -> Metadata.getPlanetNameRes(timing.name)
-                    is NallaNeram -> Metadata.getSpecialNameRes("Nalla")
-                    is GowriNeram -> Metadata.getGowriNameRes(timing.name)
-                    is SpecialPeriod -> Metadata.getSpecialNameRes(timing.name)
-                    is Muhurtham -> Metadata.getMuhurthamNameRes(timing.name)
-                    is MaitraMuhurtham -> Metadata.getSpecialNameRes("Maitra Muhurtham")
-                }
-                Text(
-                    text = stringResource(labelRes),
-                    style = if (segHeight < 60.dp) MaterialTheme.typography.labelSmall else MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = contentColor,
-                    textAlign = TextAlign.Center,
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis,
-                    lineHeight = if (segHeight < 60.dp) 9.sp else 11.sp,
-                    fontSize = when {
-                        widestSegment.widthFactor < 0.20f -> 7.sp
-                        widestSegment.widthFactor < 0.25f -> 8.sp
-                        segHeight < 40.dp -> 8.sp
-                        else -> 10.sp
-                    }
-                )
-
-                // TIME RANGE
-                if (segHeight > 50.dp) {
-                    val pattern = if (is24Hour) "HH:mm" else "h:mm"
-                    val timeFormatter = DateTimeFormatter.ofPattern(pattern)
-                    Text(
-                        text = "${timing.startTime.format(timeFormatter)} - ${timing.endTime.format(timeFormatter)}",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = contentColor.copy(alpha = 0.8f),
-                        fontSize = 8.sp,
-                        maxLines = 1
-                    )
-                }
-
-                // Potency Stars for Maitra
-                if (timing is MaitraMuhurtham && segHeight > 40.dp) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        repeat(timing.potencyStars) {
-                            Icon(
-                                imageVector = Icons.Default.Star,
-                                contentDescription = null,
-                                modifier = Modifier.size(10.dp),
-                                tint = contentColor
+                        // TIME RANGE
+                        if (sHeight > 24.dp) {
+                            val pattern = if (is24Hour) "HH:mm" else "h:mm"
+                            val timeFormatter = DateTimeFormatter.ofPattern(pattern)
+                            Text(
+                                text = "${timing.startTime.format(timeFormatter)} - ${timing.endTime.format(timeFormatter)}",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = contentColor.copy(alpha = 0.8f),
+                                fontSize = if (sHeight < 50.dp) 7.sp else 8.sp,
+                                maxLines = 1
                             )
                         }
+
+                        // Potency Stars for Maitra
+                        if (timing is MaitraMuhurtham && sHeight > 40.dp) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                repeat(timing.potencyStars) {
+                                    Icon(
+                                        imageVector = Icons.Default.Star,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(10.dp),
+                                        tint = contentColor
+                                    )
+                                }
+                            }
+                            if (sHeight > 65.dp) {
+                                Text(
+                                    text = stringResource(Metadata.getMaitraPotencyRes(timing.potencyStars)),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = contentColor,
+                                    fontSize = 7.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.padding(top = 2.dp)
+                                )
+                            }
+                        }
                     }
-                    if (segHeight > 65.dp) {
-                        Text(
-                            text = stringResource(Metadata.getMaitraPotencyRes(timing.potencyStars)),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = contentColor,
-                            fontSize = 7.sp,
-                            fontWeight = FontWeight.Medium,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(top = 2.dp)
-                        )
-                    }
+                }
+                
+                // 3. Bottom Buffer
+                if (sHeight > 30.dp) {
+                    Spacer(modifier = Modifier.height(2.dp))
                 }
             }
         }

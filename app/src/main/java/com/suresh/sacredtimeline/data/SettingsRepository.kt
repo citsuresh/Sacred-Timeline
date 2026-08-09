@@ -49,6 +49,9 @@ class SettingsRepository(private val context: Context) {
         val SPECIAL_PERIOD_STYLE = stringPreferencesKey("special_period_style")
         val LUNAR_MONTH_SYSTEM = stringPreferencesKey("lunar_month_system")
         val TIMELINE_VIEW_STYLE = stringPreferencesKey("timeline_view_style")
+        val CUSTOM_VISIBILITY = stringSetPreferencesKey("custom_visibility")
+        val CUSTOM_ORDER = stringPreferencesKey("custom_order")
+        val HAS_CUSTOM_LAYOUT = booleanPreferencesKey("has_custom_layout")
     }
 
     val compositeScale: Flow<Float> = context.dataStore.data.map { it[Keys.COMPOSITE_SCALE] ?: 1.0f }
@@ -59,17 +62,33 @@ class SettingsRepository(private val context: Context) {
     }
 
     val columnOrder: Flow<List<String>> = context.dataStore.data.map { 
-        val orderString = it[Keys.COLUMN_ORDER] ?: "NERAM_MUHURTHAM,UNIVERSAL,NERAM,MAITRA,BRAHMA,ABHIJIT,GOWRI,HORA"
+        val orderString = it[Keys.COLUMN_ORDER] ?: DEFAULT_ORDER
         orderString.split(",").filter { it.isNotBlank() }
     }
+
+    val customVisibility: Flow<Set<String>> = context.dataStore.data.map { 
+        it[Keys.CUSTOM_VISIBILITY] ?: setOf("UNIVERSAL")
+    }
+
+    val customOrder: Flow<List<String>> = context.dataStore.data.map { 
+        val orderString = it[Keys.CUSTOM_ORDER] ?: DEFAULT_ORDER
+        orderString.split(",").filter { it.isNotBlank() }
+    }
+
+    val hasCustomLayout: Flow<Boolean> = context.dataStore.data.map { it[Keys.HAS_CUSTOM_LAYOUT] ?: false }
 
     val widgetColumnVisibility: Flow<Set<String>> = context.dataStore.data.map { 
         it[Keys.WIDGET_COLUMN_VISIBILITY] ?: setOf("UNIVERSAL")
     }
 
     val widgetColumnOrder: Flow<List<String>> = context.dataStore.data.map { 
-        val orderString = it[Keys.WIDGET_COLUMN_ORDER] ?: "NERAM_MUHURTHAM,UNIVERSAL,NERAM,MAITRA,BRAHMA,ABHIJIT,GOWRI,HORA"
+        val orderString = it[Keys.WIDGET_COLUMN_ORDER] ?: DEFAULT_ORDER
         orderString.split(",").filter { it.isNotBlank() }
+    }
+
+    companion object {
+        const val DEFAULT_ORDER = "NERAM_MUHURTHAM,UNIVERSAL,NERAM,MAITRA,BRAHMA,ABHIJIT,GOWRI,HORA"
+        val ALL_COLUMNS = DEFAULT_ORDER.split(",")
     }
 
     val defaultLaunchView: Flow<ViewMode> = context.dataStore.data.map { 
@@ -93,7 +112,7 @@ class SettingsRepository(private val context: Context) {
 
     val widgetRefreshMinutes: Flow<Int> = context.dataStore.data.map { it[Keys.WIDGET_REFRESH_MINUTES] ?: 30 }
     
-    val preloadDays: Flow<Int> = context.dataStore.data.map { it[Keys.PRELOAD_DAYS] ?: 3 }
+    val preloadDays: Flow<Int> = context.dataStore.data.map { it[Keys.PRELOAD_DAYS] ?: 30 }
     val language: Flow<String> = context.dataStore.data.map { it[Keys.LANGUAGE] ?: "en" }
     val themeMode: Flow<String> = context.dataStore.data.map { it[Keys.THEME_MODE] ?: "SYSTEM" }
 
@@ -117,7 +136,11 @@ class SettingsRepository(private val context: Context) {
     val sunriseDefinition: Flow<String> = context.dataStore.data.map { it[Keys.SUNRISE_DEFINITION] ?: "SCIENTIFIC" }
     val specialPeriodStyle: Flow<String> = context.dataStore.data.map { it[Keys.SPECIAL_PERIOD_STYLE] ?: "PROPORTIONAL" }
     val lunarMonthSystem: Flow<String> = context.dataStore.data.map { it[Keys.LUNAR_MONTH_SYSTEM] ?: "AMANTA" }
-    val timelineViewStyle: Flow<String> = context.dataStore.data.map { it[Keys.TIMELINE_VIEW_STYLE] ?: "EQUAL_DISTRIBUTION" }
+    val timelineViewStyle: Flow<String> = context.dataStore.data.map { 
+        val raw = it[Keys.TIMELINE_VIEW_STYLE] ?: "EQUAL_DISTRIBUTION"
+        // Migration: EQUAL_RECTANGULAR was renamed to EQUAL_DISTRIBUTION
+        if (raw == "EQUAL_RECTANGULAR") "EQUAL_DISTRIBUTION" else raw
+    }
 
     suspend fun updateCompositeScale(scale: Float) {
         context.dataStore.edit { it[Keys.COMPOSITE_SCALE] = scale.coerceIn(0.2f, 3.0f) }
@@ -138,6 +161,37 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun updateColumnOrder(order: List<String>) {
         context.dataStore.edit { it[Keys.COLUMN_ORDER] = order.joinToString(",") }
+    }
+
+    suspend fun setSingleVisibleColumn(targetColumnId: String?) {
+        context.dataStore.edit { prefs ->
+            val newVisibility = if (targetColumnId == null) {
+                ALL_COLUMNS.toSet() // Show all (Universal)
+            } else {
+                setOf(targetColumnId) // Solo mode
+            }
+            prefs[Keys.COLUMN_VISIBILITY] = newVisibility
+        }
+    }
+
+    suspend fun saveCurrentAsCustom() {
+        context.dataStore.edit { prefs ->
+            val currentVisibility = prefs[Keys.COLUMN_VISIBILITY] ?: setOf("UNIVERSAL")
+            val currentOrder = prefs[Keys.COLUMN_ORDER] ?: "NERAM_MUHURTHAM,UNIVERSAL,NERAM,MAITRA,BRAHMA,ABHIJIT,GOWRI,HORA"
+            prefs[Keys.CUSTOM_VISIBILITY] = currentVisibility
+            prefs[Keys.CUSTOM_ORDER] = currentOrder
+            prefs[Keys.HAS_CUSTOM_LAYOUT] = true
+        }
+    }
+
+    suspend fun restoreCustomLayout() {
+        context.dataStore.edit { prefs ->
+            val savedVisibility = prefs[Keys.CUSTOM_VISIBILITY] ?: setOf("UNIVERSAL")
+            val savedOrder = prefs[Keys.CUSTOM_ORDER] ?: "NERAM_MUHURTHAM,UNIVERSAL,NERAM,MAITRA,BRAHMA,ABHIJIT,GOWRI,HORA"
+            prefs[Keys.COLUMN_VISIBILITY] = savedVisibility
+            prefs[Keys.COLUMN_ORDER] = savedOrder
+            prefs[Keys.DEFAULT_LAUNCH_VIEW] = ViewMode.COMPOSITE.name
+        }
     }
 
     suspend fun updateWidgetColumnVisibility(column: String, visible: Boolean) {

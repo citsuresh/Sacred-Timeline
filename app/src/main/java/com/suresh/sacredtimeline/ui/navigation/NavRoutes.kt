@@ -13,7 +13,8 @@ enum class ViewMode {
     ABHIJIT,
     GOWRI,
     HORA,
-    MAITRA
+    MAITRA,
+    CUSTOM
 }
 
 sealed interface NavRoute : NavKey {

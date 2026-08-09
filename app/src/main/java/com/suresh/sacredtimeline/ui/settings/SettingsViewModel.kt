@@ -94,7 +94,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     )
 
     val preloadDays: StateFlow<Int> = repository.preloadDays.stateIn(
-        viewModelScope, SharingStarted.WhileSubscribed(5000), 3)
+        viewModelScope, SharingStarted.WhileSubscribed(5000), 30)
 
     val enabledTithis: StateFlow<Set<String>> = repository.enabledTithis.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), emptySet()
@@ -152,6 +152,10 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         viewModelScope, SharingStarted.WhileSubscribed(5000), "EQUAL_DISTRIBUTION"
     )
 
+    val hasCustomLayout: StateFlow<Boolean> = repository.hasCustomLayout.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), false
+    )
+
     val language: StateFlow<String> = repository.language.stateIn(
         viewModelScope, 
         SharingStarted.WhileSubscribed(5000), 
@@ -176,7 +180,10 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun updateColumnVisibility(column: String, visible: Boolean) {
-        viewModelScope.launch { repository.updateColumnVisibility(column, visible) }
+        viewModelScope.launch { 
+            repository.updateColumnVisibility(column, visible)
+            repository.saveCurrentAsCustom()
+        }
     }
 
     fun moveColumn(column: String, direction: Int) { // -1 for up, 1 for down
@@ -187,7 +194,10 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         if (newIndex in 0 until currentOrder.size) {
             currentOrder.removeAt(index)
             currentOrder.add(newIndex, column)
-            viewModelScope.launch { repository.updateColumnOrder(currentOrder) }
+            viewModelScope.launch { 
+                repository.updateColumnOrder(currentOrder)
+                repository.saveCurrentAsCustom()
+            }
         }
     }
 
@@ -361,6 +371,50 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     fun setTimelineViewStyle(style: String) {
         viewModelScope.launch { 
             repository.setTimelineViewStyle(style)
+        }
+    }
+
+    fun restoreCustomLayout() {
+        viewModelScope.launch { repository.restoreCustomLayout() }
+    }
+
+    fun setStandardView(mode: ViewMode) {
+        viewModelScope.launch {
+            repository.setDefaultLaunchView(mode)
+            // When switching to a solo mode via menu, we update the visibility to match
+            when (mode) {
+                ViewMode.UNIVERSAL -> {
+                    listOf("NERAM_MUHURTHAM", "UNIVERSAL", "NERAM", "MAITRA", "BRAHMA", "ABHIJIT", "GOWRI", "HORA").forEach {
+                        repository.updateColumnVisibility(it, true)
+                    }
+                }
+                ViewMode.NERAM_MUHURTHAM -> {
+                    listOf("NERAM_MUHURTHAM", "UNIVERSAL", "NERAM", "MAITRA", "BRAHMA", "ABHIJIT", "GOWRI", "HORA").forEach {
+                        repository.updateColumnVisibility(it, it == "NERAM_MUHURTHAM")
+                    }
+                }
+                ViewMode.NERAM -> {
+                    listOf("NERAM_MUHURTHAM", "UNIVERSAL", "NERAM", "MAITRA", "BRAHMA", "ABHIJIT", "GOWRI", "HORA").forEach {
+                        repository.updateColumnVisibility(it, it == "NERAM")
+                    }
+                }
+                ViewMode.GOWRI -> {
+                    listOf("NERAM_MUHURTHAM", "UNIVERSAL", "NERAM", "MAITRA", "BRAHMA", "ABHIJIT", "GOWRI", "HORA").forEach {
+                        repository.updateColumnVisibility(it, it == "GOWRI")
+                    }
+                }
+                ViewMode.HORA -> {
+                    listOf("NERAM_MUHURTHAM", "UNIVERSAL", "NERAM", "MAITRA", "BRAHMA", "ABHIJIT", "GOWRI", "HORA").forEach {
+                        repository.updateColumnVisibility(it, it == "HORA")
+                    }
+                }
+                ViewMode.MAITRA -> {
+                    listOf("NERAM_MUHURTHAM", "UNIVERSAL", "NERAM", "MAITRA", "BRAHMA", "ABHIJIT", "GOWRI", "HORA").forEach {
+                        repository.updateColumnVisibility(it, it == "MAITRA")
+                    }
+                }
+                else -> {}
+            }
         }
     }
 }

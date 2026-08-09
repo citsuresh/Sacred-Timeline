@@ -204,8 +204,7 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
                 repository.enabledNakshatras,
                 repository.sunriseDefinition,
                 repository.specialPeriodStyle,
-                repository.lunarMonthSystem,
-                repository.preloadDays
+                repository.lunarMonthSystem
             ) { values ->
                 // Use array for combine > 5 flows
                 DataRefreshTrigger(
@@ -213,15 +212,14 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
                     stars = values[1] as Set<String>,
                     sunDef = values[2] as String,
                     style = values[3] as String,
-                    system = values[4] as String,
-                    range = values[5] as Int
+                    system = values[4] as String
                 )
-            }.collect { trigger ->
+            }.collect { 
                 refreshJob?.cancel()
                 refreshJob = viewModelScope.launch {
                     cacheMutex.withLock { cachedDays.clear() }
                     cacheManager.clearCache() // Clear disk too
-                    preloadData(selectedDate.value, trigger.range)
+                    preloadData(selectedDate.value, repository.preloadDays.first())
                 }
             }
         }
@@ -232,12 +230,47 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
         val stars: Set<String>,
         val sunDef: String,
         val style: String,
-        val system: String,
-        val range: Int
+        val system: String
     )
 
     fun setViewMode(mode: ViewMode) {
-        _viewMode.value = mode
+        viewModelScope.launch {
+            _viewMode.value = mode
+            // If it's a standard solo mode, we update the visibility to match for consistency
+            when (mode) {
+                ViewMode.UNIVERSAL -> {
+                    listOf("NERAM_MUHURTHAM", "UNIVERSAL", "NERAM", "MAITRA", "BRAHMA", "ABHIJIT", "GOWRI", "HORA").forEach {
+                        repository.updateColumnVisibility(it, it == "UNIVERSAL")
+                    }
+                }
+                ViewMode.NERAM_MUHURTHAM -> {
+                    listOf("NERAM_MUHURTHAM", "UNIVERSAL", "NERAM", "MAITRA", "BRAHMA", "ABHIJIT", "GOWRI", "HORA").forEach {
+                        repository.updateColumnVisibility(it, it == "NERAM_MUHURTHAM")
+                    }
+                }
+                ViewMode.NERAM -> {
+                    listOf("NERAM_MUHURTHAM", "UNIVERSAL", "NERAM", "MAITRA", "BRAHMA", "ABHIJIT", "GOWRI", "HORA").forEach {
+                        repository.updateColumnVisibility(it, it == "NERAM")
+                    }
+                }
+                ViewMode.GOWRI -> {
+                    listOf("NERAM_MUHURTHAM", "UNIVERSAL", "NERAM", "MAITRA", "BRAHMA", "ABHIJIT", "GOWRI", "HORA").forEach {
+                        repository.updateColumnVisibility(it, it == "GOWRI")
+                    }
+                }
+                ViewMode.HORA -> {
+                    listOf("NERAM_MUHURTHAM", "UNIVERSAL", "NERAM", "MAITRA", "BRAHMA", "ABHIJIT", "GOWRI", "HORA").forEach {
+                        repository.updateColumnVisibility(it, it == "HORA")
+                    }
+                }
+                ViewMode.MAITRA -> {
+                    listOf("NERAM_MUHURTHAM", "UNIVERSAL", "NERAM", "MAITRA", "BRAHMA", "ABHIJIT", "GOWRI", "HORA").forEach {
+                        repository.updateColumnVisibility(it, it == "MAITRA")
+                    }
+                }
+                else -> {}
+            }
+        }
     }
 
     fun updateDate(date: LocalDate) {

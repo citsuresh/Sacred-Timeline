@@ -8,6 +8,9 @@
     <string name="nav_maitra">மைத்ர</string>
     <string name="nav_universal">முழுமையான காலவரிசை</string>
     <string name="nav_neram_muhurtham">நேரம் / முஹூர்த்தம்</string>
+    <string name="nav_custom">தனிப்பயன் காலவரிசை</string>
+    <string name="confirm_switch_title">நிலையான பார்வைக்கு மாறவா?</string>
+    <string name="confirm_switch_text">உங்கள் தனிப்பயன் தளவமைப்பு சேமிக்கப்படும் மற்றும் "தனிப்பயன் காலவரிசை" மெனுவிலிருந்து எப்போது வேண்டுமானாலும் மீட்டெடுக்கலாம்.</string>
     <string name="view_mode_universal">அனைத்தும்</string>
     <string name="view_mode_composite">கூட்டுப் பார்வை</string>
     <string name="view_mode_neram_muhurtham">நேரம் / முஹூர்த்தம்</string>

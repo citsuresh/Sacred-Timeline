@@ -56,6 +56,7 @@ fun SettingsScreen(
         ViewMode.GOWRI -> stringResource(R.string.view_mode_gowri)
         ViewMode.HORA -> stringResource(R.string.nav_hora)
         ViewMode.MAITRA -> stringResource(R.string.timing_maitra)
+        ViewMode.CUSTOM -> stringResource(R.string.nav_custom)
     }
 
     val englishLabel = "English"
@@ -385,7 +386,7 @@ fun SettingsScreen(
             item {
                 SettingsSection(title = stringResource(R.string.settings_advanced)) {
                     val preloadDays by viewModel.preloadDays.collectAsState()
-                    val preloadOptions = listOf(3, 5, 7)
+                    val preloadOptions = listOf(3, 7, 15, 30)
                     val preloadLabels = preloadOptions.map { stringResource(R.string.settings_preload_days, it) }
                     SettingsDropdownItem(
                         label = stringResource(R.string.settings_preload_range),

@@ -8,6 +8,9 @@
     <string name="nav_maitra">Maitra</string>
     <string name="nav_universal">Universal Timeline</string>
     <string name="nav_neram_muhurtham">Neram / Muhurtham</string>
+    <string name="nav_custom">Custom Timeline</string>
+    <string name="confirm_switch_title">Switch to Standard View?</string>
+    <string name="confirm_switch_text">Your custom layout will be saved and can be restored anytime from the "Custom Timeline" menu.</string>
     <string name="view_mode_universal">Universal</string>
     <string name="view_mode_neram_muhurtham">Neram / Muhurtham</string>
     <string name="view_mode_maitra">Maitra</string>

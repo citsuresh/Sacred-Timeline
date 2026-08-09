@@ -84,14 +84,55 @@ class MainActivity : AppCompatActivity() {
 
     @Composable
     fun MainShell(initialMode: ViewMode, themeMode: String) {
+        val repository = remember { SettingsRepository(this) }
         val backStack = remember { mutableStateListOf<Any>(NavRoute.Dashboard(initialMode)) }
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
         val scope = rememberCoroutineScope()
+        
+        val hasCustomLayout by repository.hasCustomLayout.collectAsState(initial = false)
+        var showSwitchConfirm by remember { mutableStateOf<ViewMode?>(null) }
 
         val isDarkTheme = when (themeMode) {
             "LIGHT" -> false
             "DARK" -> true
             else -> androidx.compose.foundation.isSystemInDarkTheme()
+        }
+
+        if (showSwitchConfirm != null) {
+            AlertDialog(
+                onDismissRequest = { showSwitchConfirm = null },
+                title = { Text(stringResource(R.string.confirm_switch_title)) },
+                text = { Text(stringResource(R.string.confirm_switch_text)) },
+                confirmButton = {
+                    TextButton(onClick = {
+                        val mode = showSwitchConfirm!!
+                        showSwitchConfirm = null
+                        scope.launch {
+                            val targetColId = when (mode) {
+                                ViewMode.UNIVERSAL -> null
+                                ViewMode.NERAM_MUHURTHAM -> "NERAM_MUHURTHAM"
+                                ViewMode.NERAM -> "NERAM"
+                                ViewMode.GOWRI -> "GOWRI"
+                                ViewMode.HORA -> "HORA"
+                                ViewMode.MAITRA -> "MAITRA"
+                                else -> null
+                            }
+                            repository.setSingleVisibleColumn(targetColId)
+                            repository.setDefaultLaunchView(mode)
+                            backStack.clear()
+                            backStack.add(NavRoute.Dashboard(mode))
+                            drawerState.close()
+                        }
+                    }) {
+                        Text(stringResource(R.string.btn_ok))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showSwitchConfirm = null }) {
+                        Text(stringResource(R.string.btn_cancel))
+                    }
+                }
+            )
         }
 
         SacredTimelineTheme(darkTheme = isDarkTheme) {
@@ -100,85 +141,137 @@ class MainActivity : AppCompatActivity() {
                 drawerContent = {
                     ModalDrawerSheet {
                         val currentRoute = backStack.lastOrNull()
+                        val currentViewMode = (currentRoute as? NavRoute.Dashboard)?.mode
+                        
                         Text(
                             stringResource(R.string.app_name),
                             modifier = Modifier.padding(16.dp),
                             style = MaterialTheme.typography.titleLarge
                         )
                         HorizontalDivider()
+                        
                         NavigationDrawerItem(
                             label = { Text(stringResource(R.string.nav_universal)) },
-                            selected = currentRoute is NavRoute.Dashboard && currentRoute.mode == ViewMode.UNIVERSAL,
+                            selected = currentViewMode == ViewMode.UNIVERSAL,
                             onClick = {
-                                scope.launch {
-                                    backStack.clear()
-                                    backStack.add(NavRoute.Dashboard(ViewMode.UNIVERSAL))
-                                    drawerState.close()
+                                if (currentViewMode == ViewMode.CUSTOM) {
+                                    showSwitchConfirm = ViewMode.UNIVERSAL
+                                } else {
+                                    scope.launch {
+                                        repository.setSingleVisibleColumn(null)
+                                        backStack.clear()
+                                        backStack.add(NavRoute.Dashboard(ViewMode.UNIVERSAL))
+                                        drawerState.close()
+                                    }
                                 }
                             },
                             icon = { Icon(Icons.Default.AllInclusive, contentDescription = null) }
                         )
                         NavigationDrawerItem(
                             label = { Text(stringResource(R.string.nav_neram_muhurtham)) },
-                            selected = currentRoute is NavRoute.Dashboard && currentRoute.mode == ViewMode.NERAM_MUHURTHAM,
+                            selected = currentViewMode == ViewMode.NERAM_MUHURTHAM,
                             onClick = {
-                                scope.launch {
-                                    backStack.clear()
-                                    backStack.add(NavRoute.Dashboard(ViewMode.NERAM_MUHURTHAM))
-                                    drawerState.close()
+                                if (currentViewMode == ViewMode.CUSTOM) {
+                                    showSwitchConfirm = ViewMode.NERAM_MUHURTHAM
+                                } else {
+                                    scope.launch {
+                                        repository.setSingleVisibleColumn("NERAM_MUHURTHAM")
+                                        backStack.clear()
+                                        backStack.add(NavRoute.Dashboard(ViewMode.NERAM_MUHURTHAM))
+                                        drawerState.close()
+                                    }
                                 }
                             },
                             icon = { Icon(Icons.Default.AutoAwesome, contentDescription = null) }
                         )
                         NavigationDrawerItem(
                             label = { Text(stringResource(R.string.nav_nalla_neram)) },
-                            selected = currentRoute is NavRoute.Dashboard && currentRoute.mode == ViewMode.NERAM,
+                            selected = currentViewMode == ViewMode.NERAM,
                             onClick = {
-                                scope.launch {
-                                    backStack.clear()
-                                    backStack.add(NavRoute.Dashboard(ViewMode.NERAM))
-                                    drawerState.close()
+                                if (currentViewMode == ViewMode.CUSTOM) {
+                                    showSwitchConfirm = ViewMode.NERAM
+                                } else {
+                                    scope.launch {
+                                        repository.setSingleVisibleColumn("NERAM")
+                                        backStack.clear()
+                                        backStack.add(NavRoute.Dashboard(ViewMode.NERAM))
+                                        drawerState.close()
+                                    }
                                 }
                             },
                             icon = { Icon(Icons.Default.Star, contentDescription = null) }
                         )
                         NavigationDrawerItem(
                             label = { Text(stringResource(R.string.nav_gowri_neram)) },
-                            selected = currentRoute is NavRoute.Dashboard && currentRoute.mode == ViewMode.GOWRI,
+                            selected = currentViewMode == ViewMode.GOWRI,
                             onClick = {
-                                scope.launch {
-                                    backStack.clear()
-                                    backStack.add(NavRoute.Dashboard(ViewMode.GOWRI))
-                                    drawerState.close()
+                                if (currentViewMode == ViewMode.CUSTOM) {
+                                    showSwitchConfirm = ViewMode.GOWRI
+                                } else {
+                                    scope.launch {
+                                        repository.setSingleVisibleColumn("GOWRI")
+                                        backStack.clear()
+                                        backStack.add(NavRoute.Dashboard(ViewMode.GOWRI))
+                                        drawerState.close()
+                                    }
                                 }
                             },
                             icon = { Icon(Icons.Default.Dashboard, contentDescription = null) }
                         )
                         NavigationDrawerItem(
                             label = { Text(stringResource(R.string.nav_hora)) },
-                            selected = currentRoute is NavRoute.Dashboard && currentRoute.mode == ViewMode.HORA,
+                            selected = currentViewMode == ViewMode.HORA,
                             onClick = {
-                                scope.launch {
-                                    backStack.clear()
-                                    backStack.add(NavRoute.Dashboard(ViewMode.HORA))
-                                    drawerState.close()
+                                if (currentViewMode == ViewMode.CUSTOM) {
+                                    showSwitchConfirm = ViewMode.HORA
+                                } else {
+                                    scope.launch {
+                                        repository.setSingleVisibleColumn("HORA")
+                                        backStack.clear()
+                                        backStack.add(NavRoute.Dashboard(ViewMode.HORA))
+                                        drawerState.close()
+                                    }
                                 }
                             },
                             icon = { Icon(Icons.Default.Schedule, contentDescription = null) }
                         )
                         NavigationDrawerItem(
                             label = { Text(stringResource(R.string.nav_maitra)) },
-                            selected = currentRoute is NavRoute.Dashboard && currentRoute.mode == ViewMode.MAITRA,
+                            selected = currentViewMode == ViewMode.MAITRA,
                             onClick = {
-                                scope.launch {
-                                    backStack.clear()
-                                    backStack.add(NavRoute.Dashboard(ViewMode.MAITRA))
-                                    drawerState.close()
+                                if (currentViewMode == ViewMode.CUSTOM) {
+                                    showSwitchConfirm = ViewMode.MAITRA
+                                } else {
+                                    scope.launch {
+                                        repository.setSingleVisibleColumn("MAITRA")
+                                        backStack.clear()
+                                        backStack.add(NavRoute.Dashboard(ViewMode.MAITRA))
+                                        drawerState.close()
+                                    }
                                 }
                             },
                             icon = { Icon(Icons.Default.AutoAwesome, contentDescription = null) }
                         )
+
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+                        if (hasCustomLayout) {
+                            NavigationDrawerItem(
+                                label = { Text(stringResource(R.string.nav_custom)) },
+                                selected = currentViewMode == ViewMode.CUSTOM,
+                                onClick = {
+                                    scope.launch {
+                                        repository.restoreCustomLayout()
+                                        repository.setDefaultLaunchView(ViewMode.CUSTOM)
+                                        backStack.clear()
+                                        backStack.add(NavRoute.Dashboard(ViewMode.CUSTOM))
+                                        drawerState.close()
+                                    }
+                                },
+                                icon = { Icon(Icons.Default.DashboardCustomize, contentDescription = null) }
+                            )
+                        }
+
                         NavigationDrawerItem(
                             label = { Text(stringResource(R.string.nav_settings)) },
                             selected = currentRoute is NavRoute.Settings,
