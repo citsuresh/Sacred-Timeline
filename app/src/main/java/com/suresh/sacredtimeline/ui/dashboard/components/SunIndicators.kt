@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -299,6 +300,7 @@ fun MuhurthamItem(
 
     fun formatWithAmPm(time: LocalTime): String {
         if (is24Hour) return time.format(timeFormatter)
+        // Explicitly use the resource strings for AM/PM
         val period = if (time.hour < 12) amLabel else pmLabel
         return "${time.format(timeFormatter)} $period"
     }
@@ -323,7 +325,9 @@ fun MuhurthamItem(
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,
             color = color,
-            maxLines = maxLines
+            maxLines = maxLines,
+            overflow = TextOverflow.Ellipsis,
+            fontSize = if (maxLines == 1) 10.sp else 11.sp
         )
     }
 }
@@ -343,6 +347,7 @@ fun SpecialEventItem(
 
     fun formatWithAmPm(time: LocalTime): String {
         if (is24Hour) return time.format(timeFormatter)
+        // Explicitly use the resource strings for AM/PM
         val period = if (time.hour < 12) amLabel else pmLabel
         return "${time.format(timeFormatter)} $period"
     }
@@ -400,6 +405,7 @@ fun LunarItem(
 
     fun formatWithAmPm(time: LocalTime): String {
         if (is24Hour) return time.format(timeFormatter)
+        // Explicitly use the resource strings for AM/PM
         val period = if (time.hour < 12) amLabel else pmLabel
         return "${time.format(timeFormatter)} $period"
     }
@@ -510,6 +516,7 @@ fun SunTimesDisplay(
 
     fun formatWithAmPm(time: LocalTime): String {
         if (is24Hour) return time.format(timeFormatter)
+        // Explicitly use the resource strings for AM/PM
         val period = if (time.hour < 12) amLabel else pmLabel
         return "${time.format(timeFormatter)} $period"
     }

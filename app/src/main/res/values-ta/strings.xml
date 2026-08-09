@@ -51,52 +51,6 @@
     <string name="label_paksha">பட்சம் / சந்திர நிலை</string>
     <string name="desc_paksha">சந்திர மாதம் இரண்டு பட்சங்களாக (வாரங்களாக) பிரிக்கப்பட்டுள்ளது. வளர்பிறை (வளரும் சந்திரன்) மற்றும் தேய்பிறை (குறையும் சந்திரன்).</string>
 
-    <!-- Thithi Descriptions (Tamil) -->
-    <string name="desc_tithi_1">பிரதமை (ஆனந்தம்): சந்திர நிலையின் ஆரம்பம். புதிய முயற்சிகள், மதச் சடங்குகள் மற்றும் விதை விதைக்க ஏற்றது.</string>
-    <string name="desc_tithi_2">துவிதியை (அதிர்ஷ்டம்): வளர்ச்சி மற்றும் நிலைத்தன்மையின் நாள். அஸ்திவாரம் போடுதல், திருமணங்கள் மற்றும் நிரந்தரப் பணிகளுக்கு உகந்தது.</string>
-    <string name="desc_tithi_3">திருதியை (வெற்றி): இசை, கலை மற்றும் புதிய வீட்டிற்கு குடிபெயர சிறந்தது. அட்சய திருதியை இந்நாளில் வரும்.</string>
-    <string name="desc_tithi_4">சதுர்த்தி (வெற்று): விநாயகப் பெருமானுக்கு உகந்த நாள். வணிகத்திற்குத் தவிர்க்கப்பட்டாலும், தடைகளை நீக்கவும் ஆன்மீகப் பணிகளுக்கும் இது சக்தி வாய்ந்தது.</string>
-    <string name="desc_tithi_5">பஞ்சமி (முழுமை): ஞானம் மற்றும் ஆரோக்கியத்தின் நாள். மருத்துவம், கல்வி மற்றும் அறிவைப் பெற சாதகமானது.</string>
-    <string name="desc_tithi_6">சஷ்டி (ஆனந்தம்): கார்த்திகேயப் பெருமானுக்கு (முருகன்) உகந்தது. அதிகாரம் பெறவும், விழாக்கள் மற்றும் நட்பை வலுப்படுத்தவும் நல்லது.</string>
-    <string name="desc_tithi_7">சப்தமி (அதிர்ஷ்டம்): சூரிய பகவானுக்கு உகந்தது. பயணங்கள் தொடங்கவும், உடற்பயிற்சி மற்றும் வாகனம் வாங்கவும் சிறந்தது.</string>
-    <string name="desc_tithi_8">அஷ்டமி (வெற்றி): துர்க்கை அம்மன் மற்றும் கிருஷ்ண பகவான் பிறந்த நாள். தைரியம் மற்றும் வலிமைக்கான நாள், ஆனால் பயணங்கள் தவிர்க்கப்பட வேண்டும்.</string>
-    <string name="desc_tithi_9">நவமி (வெற்று): ஸ்ரீராமபிரான் பிறந்த நாள். உலகியல் பணிகளுக்கு அசுபமானதாகக் கருதப்பட்டாலும், தீய பழக்கங்களை அழிக்க இது சக்தி வாய்ந்தது.</string>
-    <string name="desc_tithi_10">தசமி (முழுமை): நற்பண்புகள், கடமை (தர்மம்) மற்றும் ஆன்மீக வளர்ச்சிக்கு மிகவும் உகந்தது.</string>
-    <string name="desc_tithi_11">ஏகாதசி (ஆனந்தம்): விஷ்ணு பகவானுக்கு விரதம் மற்றும் பக்தி செலுத்த மிகவும் புனிதமான நாள். மனதையும் உடலையும் தூய்மைப்படுத்துகிறது.</string>
-    <string name="desc_tithi_12">துவாதசி (அதிர்ஷ்டம்): பணிகளை முடிக்கவும் மதச் சடங்குகள் செய்யவும் உகந்த நாள். 12 ஆதித்யர்களின் ஒளியைக் குறிக்கிறது.</string>
-    <string name="desc_tithi_13">திரயோதசி (வெற்றி): சிவபெருமானுக்கு (பிரதோஷம்) உகந்த புனித நாள். உறவுகள், காதல் மற்றும் ஆன்மீக மகிழ்ச்சிக்கு சிறந்தது.</string>
-    <string name="desc_tithi_14">சதுர்தசி (வெற்று): சிவபெருமானுக்கு (சிவராத்திரி) உகந்தது. அதிக ஆற்றல் கொண்ட நாள், தியானம் மற்றும் அக மாற்றத்திற்கு சிறந்தது.</string>
-    <string name="desc_tithi_15">பௌர்ணமி (முழுமை): முழு நிலவு நாள். வளர்ச்சி, கொண்டாட்டங்கள் மற்றும் செழிப்புக்கான ஆசீர்வாதங்களைப் பெற உகந்தது.</string>
-    <string name="desc_tithi_30">அமாவாசை (முழுமை): புது நிலவு நாள். சுயபரிசோதனை, ஆன்மீக அமைதி மற்றும் முன்னோர்களுக்கு (பித்ருக்கள்) தார்ப்பணம் செய்ய உகந்தது.</string>
-
-    <!-- Nakshatra Descriptions (Tamil) -->
-    <string name="desc_star_1">அஸ்வினி: மருத்துவம். தேவர்களின் மருத்துவர். சிகிச்சைகள் தொடங்கவும் விரைவான செயல்களுக்கும் ஏற்றது.</string>
-    <string name="desc_star_2">பரணி: மாற்றம். வாழ்வு மற்றும் மறுபிறப்பின் சுழற்சி. ஒழுக்கம் மற்றும் படைப்பாற்றலுக்கான நாள்.</string>
-    <string name="desc_star_3">கிருத்திகை: தூய்மை. நெருப்பின் நட்சத்திரம். எதிர்மறை எண்ணங்களை அழிக்கவும் கூர்மையான முடிவுகளுக்கும் உகந்தது.</string>
-    <string name="desc_star_4">ரோகிணி: வளர்ச்சி. செழிப்பு மற்றும் அழகின் நட்சத்திரம். வணிகம் மற்றும் விவசாயத்திற்கு மிகவும் சிறந்தது.</string>
-    <string name="desc_star_5">மிருகசீரிஷம்: தேடல். உண்மையை நோக்கிய ஆன்மாவின் தேடல். ஆராய்ச்சி, பயணம் மற்றும் புதியவற்றைக் கற்க ஏற்றது.</string>
-    <string name="desc_star_6">திருவாதிரை: மாற்றம். உணர்ச்சிகள் மூலம் மனமாற்றம். பழையவற்றை விடுத்து புதிய தொடக்கத்திற்கு உகந்த நாள்.</string>
-    <string name="desc_star_7">புனர்பூசம்: மீளுதல். ஒளியின் வருகை. நம்பிக்கை மற்றும் மீண்டும் முயற்சி செய்து வெற்றி பெற உகந்தது.</string>
-    <string name="desc_star_8">பூசம்: ஆன்மீகம். ஆன்மீக வளர்ச்சிக்கு மிகவும் உகந்த நட்சத்திரம். குரு வழிபாடு மற்றும் கல்விக்கு சிறந்தது.</string>
-    <string name="desc_star_9">ஆயில்யம்: நுண்ணறிவு. ஆழ்ந்த அறிவு மற்றும் தந்திரத்தின் நட்சத்திரம். திட்டமிடல் மற்றும் சுயசிந்தனைக்கு நல்லது.</string>
-    <string name="desc_star_10">மகம்: பாரம்பரியம். ராஜ சிம்மாசனம். முன்னோர்களை வழிபடவும் கடமைகளை நிறைவேற்றவும் ஏற்ற நாள்.</string>
-    <string name="desc_star_11">பூரம்: மகிழ்ச்சி. இன்பம் மற்றும் கலைகளின் நட்சத்திரம். சமூக விழாக்கள் மற்றும் ஓய்வு எடுக்க சிறந்தது.</string>
-    <string name="desc_star_12">உத்திரம்: கடமை. சேவை மற்றும் நிலையான உறவுகள். ஒப்பந்தங்கள் மற்றும் பிறருக்கு உதவ உகந்த நாள்.</string>
-    <string name="desc_star_13">அஸ்தம்: திறமை. உருவாக்கும் ஆற்றல். கைவினைப் பொருட்கள், வணிகம் மற்றும் நுணுக்கமான வேலைகளுக்கு ஏற்றது.</string>
-    <string name="desc_star_14">சித்திரை: படைப்பாற்றல். வடிவமைப்பு, அழகு மற்றும் கலை வேலைகளுக்கு சிறந்தது.</string>
-    <string name="desc_star_15">சுவாதி: சுதந்திரம். சுதந்திரம் மற்றும் அறிவாற்றல். பேச்சுவார்த்தை மற்றும் ராஜதந்திர நடவடிக்கைகளுக்கு ஏற்றது.</string>
-    <string name="desc_star_16">விசாகம்: லட்சியம். குறிக்கோளை அடையும் உறுதி. விடாமுயற்சி மற்றும் லட்சியங்களை அடைய உகந்த நாள்.</string>
-    <string name="desc_star_17">அனுஷம்: பக்தி. சவால்களை வெல்லவும் நட்பு மற்றும் பக்திக்கும் சிறந்தது.</string>
-    <string name="desc_star_18">கேட்டை: அதிகாரம். பொறுப்பு மற்றும் தலைமைப்பண்பு. தலைமை தாங்கவும் பாதுகாப்பிற்கும் ஏற்ற நட்சத்திரம்.</string>
-    <string name="desc_star_19">மூலம்: உண்மை. யதார்த்தத்தை உணரவும் ஆழ்ந்த ஆராய்ச்சி மற்றும் மௌனத்திற்கு சிறந்தது.</string>
-    <string name="desc_star_20">பூராடம்: வெற்றி. தூய்மைப்படுத்தும் ஆற்றல். எண்ணங்களைச் சீரமைக்கவும் தீயவற்றை நீக்கவும் உகந்தது.</string>
-    <string name="desc_star_21">உத்திராடம்: நீதி. ஒழுக்கம் மற்றும் தர்மம் மூலம் நிலையான வெற்றி. பொறுமை மற்றும் உறுதிக்கு ஏற்ற நாள்.</string>
-    <string name="desc_star_22">திருவோணம்: கற்றல். கல்வி, வேதம் கற்பது மற்றும் மௌன விரதத்திற்கு மிகவும் சிறந்தது.</string>
-    <string name="desc_star_23">அவிட்டம்: இசை. பிரபஞ்சத்தின் தாளம். இசை, செல்வம் மற்றும் குழு வேலைகளுக்கு உகந்த நட்சத்திரம்.</string>
-    <string name="desc_star_24">சதயம்: ரகசியம். ரகசிய மருத்துவம். தீராத நோய்களைத் தீர்க்கவும் மர்மங்களைக் கண்டறியவும் ஏற்றது.</string>
-    <string name="desc_star_25">பூரட்டாதி: தவம். மாற்றத்தை தரும் நெருப்பு. தியானம் மற்றும் ஆன்மீக முன்னேற்றத்திற்கு சிறந்தது.</string>
-    <string name="desc_star_26">உத்திரட்டாதி: ஞானம். நிதானமான அறிவு. உணர்ச்சிகளைக் கட்டுப்படுத்தவும் அமைதியான ஞானத்திற்கும் ஏற்றது.</string>
-    <string name="desc_star_27">ரேவதி: விடுதலை. பாதுகாப்பான பயணம். கருணை மற்றும் பாதுகாப்பான பயணங்களுக்கு உகந்த நாள்.</string>
     <string name="label_nakshatra">நட்சத்திரம்</string>
     <string name="label_rasi">ராசி</string>
     <string name="label_yoga">யோகம்</string>
@@ -281,6 +235,73 @@
     <string name="event_christmas">கிறிஸ்துமஸ்</string>
     <string name="event_thiruvalluvar_day">திருவள்ளுவர் தினம்</string>
 
+    <!-- Muhurthams -->
+    <string name="muhurtham_brahma">பிரம்ம முஹூர்த்தம்</string>
+    <string name="muhurtham_abhijit">அபிஜித் முஹூர்த்தம்</string>
+    <string name="muhurtham_subha">சுப முஹூர்த்தம்</string>
+
+    <!-- Tamil Years (60 Year Cycle) -->
+    <string name="year_1">பிரபவ</string>
+    <string name="year_2">விபவ</string>
+    <string name="year_3">சுக்ல</string>
+    <string name="year_4">பிரமோதூத</string>
+    <string name="year_5">பிரசோற்பத்தி</string>
+    <string name="year_6">ஆங்கீரச</string>
+    <string name="year_7">ஸ்ரீமுக</string>
+    <string name="year_8">பவ</string>
+    <string name="year_9">யுவ</string>
+    <string name="year_10">தாது</string>
+    <string name="year_11">ஈஸ்வர</string>
+    <string name="year_12">வெகுதானிய</string>
+    <string name="year_13">பிரமாதி</string>
+    <string name="year_14">விக்ரம</string>
+    <string name="year_15">விஷு</string>
+    <string name="year_16">சித்திரபானு</string>
+    <string name="year_17">சுபானு</string>
+    <string name="year_18">தாரண</string>
+    <string name="year_19">பார்த்திப</string>
+    <string name="year_20">விய</string>
+    <string name="year_21">சர்வஜித்</string>
+    <string name="year_22">சர்வதாரி</string>
+    <string name="year_23">விரோதி</string>
+    <string name="year_24">விக்ருதி</string>
+    <string name="year_25">கர</string>
+    <string name="year_26">நந்தன</string>
+    <string name="year_27">விஜய</string>
+    <string name="year_28">ஜய</string>
+    <string name="year_29">மன்மத</string>
+    <string name="year_30">துன்முகி</string>
+    <string name="year_31">ஹேவிளம்பி</string>
+    <string name="year_32">விளம்பி</string>
+    <string name="year_33">விகாரி</string>
+    <string name="year_34">சார்வரி</string>
+    <string name="year_35">பிலவ</string>
+    <string name="year_36">சுபகிருது</string>
+    <string name="year_37">சோபகிருது</string>
+    <string name="year_38">குரோதி</string>
+    <string name="year_39">விசுவாசுவ</string>
+    <string name="year_40">பராபவ</string>
+    <string name="year_41">பிலவங்க</string>
+    <string name="year_42">கீலக</string>
+    <string name="year_43">சௌமிய</string>
+    <string name="year_44">சாதாரண</string>
+    <string name="year_45">விரோதகிருது</string>
+    <string name="year_46">பரிதாபி</string>
+    <string name="year_47">பிரமாதீச</string>
+    <string name="year_48">ஆனந்த</string>
+    <string name="year_49">ராட்சச</string>
+    <string name="year_50">நள</string>
+    <string name="year_51">பிங்கள</string>
+    <string name="year_52">காளயுக்தி</string>
+    <string name="year_53">சித்தார்த்தி</string>
+    <string name="year_54">ரௌத்திரி</string>
+    <string name="year_55">துன்மதி</string>
+    <string name="year_56">துந்துபி</string>
+    <string name="year_57">ருத்ரோத்காரி</string>
+    <string name="year_58">ரக்தாட்சி</string>
+    <string name="year_59">குரோதன</string>
+    <string name="year_60">அட்சய</string>
+
     <!-- Settings Labels -->
     <string name="settings_title">அமைப்புகள்</string>
     <string name="settings_general">பொதுவான அமைப்புகள்</string>
@@ -339,5 +360,10 @@
     <string name="settings_line_color">வரி நிறம்</string>
     <string name="settings_line_thickness">வரி தடிமன்</string>
     <string name="settings_advanced">மேம்பட்ட (தற்காலிக சேமிப்பு)</string>
+    <string name="settings_preload_range">முன்பதிவு வரம்பு</string>
     <string name="settings_clear_cache">தற்காலிக சேமிப்பை அழி</string>
+
+    <string name="label_am">மு.ப</string>
+    <string name="label_pm">பி.ப</string>
+    <string name="label_zoom_value">ஜூம்: %1$.1fx</string>
 </resources>

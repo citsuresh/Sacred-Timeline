@@ -27,8 +27,9 @@ graph TD
 ### Domain/Logic (`logic/`)
 - `PanchangamCalculator`: Core engine for Nalla Neram (sunrise-relative), Gowri Neram, and Horai. Supports both proportional (astronomical) and fixed (1.5h) timing styles.
 - `MockPanchangamProvider`: Assembles 24h data by blending yesterday's night and today's day cycles.
-- `SunriseSunsetProvider`: Local wrapper for solar calculations; calculates sunrise/sunset using the Meeus algorithm based on GPS coordinates. (Network dependency removed).
-- `LunarCalendarUtils`: High-precision astronomical engine (**ELP-2000 / Meeus**) for Tithi, Nakshatra, and Paksha. Implements **Lahiri Ayanamsha** for sidereal accuracy.
+- `SunriseSunsetProvider`: Local implementation of the Meeus algorithm for sunrise/sunset based on GPS coordinates.
+- `LagnaCalculator`: Identifies zodiac rise times (Aries, Scorpio, etc.) using IAU 1982/Meeus algorithms for Maitra Muhurtham detection.
+- `LunarCalendarUtils`: High-precision astronomical engine (**ELP-2000 / Meeus**) for Tithi, Nakshatra, and Paksha. Implements shared **Lahiri Ayanamsha** for sidereal accuracy across the logic layer.
 - `TamilCalendarUtils`: Mapping for 60-year cycles and lunar-solar festival combinations.
 
 ### UI (`ui/`)
@@ -63,3 +64,5 @@ graph TD
 | `DashboardDetailSheet` | Reactive BottomSheet for all spiritual guidance. |
 | `FullDayEvent` | Model for sticky headings and background tinting. |
 | `Muhurtham` | Specialized timing model for Brahma and Abhijit windows. |
+| `MaitraMuhurtham` | Optimized model for Debt Repayment windows with star-potency data. |
+| `LagnaCalculator` | Core logic for mapping current time and location to Sidereal Zodiac signs. |

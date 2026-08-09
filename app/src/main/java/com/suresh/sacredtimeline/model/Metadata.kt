@@ -301,9 +301,11 @@ object Metadata {
 
     @StringRes
     fun getMuhurthamNameRes(name: String): Int {
-        return when (name) {
-            "Brahma Muhurtham" -> R.string.muhurtham_brahma
-            "Abhijit Muhurtham" -> R.string.muhurtham_abhijit
+        val lower = name.lowercase()
+        return when {
+            lower.contains("brahma") -> R.string.muhurtham_brahma
+            lower.contains("abhijit") -> R.string.muhurtham_abhijit
+            lower.contains("subha") -> R.string.muhurtham_subha
             else -> R.string.app_name
         }
     }

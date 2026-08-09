@@ -519,17 +519,26 @@ fun SettingsDropdownItem(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    Row(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+            .padding(vertical = 4.dp)
     ) {
-        Text(label, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
-        Box {
-            TextButton(onClick = { expanded = true }) {
-                Text(selected)
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Box(modifier = Modifier.align(Alignment.End)) {
+            TextButton(
+                onClick = { expanded = true },
+                contentPadding = PaddingValues(0.dp)
+            ) {
+                Text(
+                    text = selected,
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
             DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                 options.forEach { option ->

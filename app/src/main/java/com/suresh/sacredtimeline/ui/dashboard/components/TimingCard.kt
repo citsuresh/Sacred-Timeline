@@ -155,25 +155,28 @@ fun TimingCard(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                // CATEGORY HEADING
-                if (widestSegment.widthFactor < 0.9f && segHeight > 25.dp) {
+                // CATEGORY HEADING - Only show if not too narrow and NOT a Muhurtham (to save space)
+                val isMuhurthamType = timing is Muhurtham || timing is MaitraMuhurtham
+                if (widestSegment.widthFactor >= 0.28f && segHeight > 30.dp && !isMuhurthamType) {
                     Text(
                         text = stringResource(Metadata.getCategoryShortNameRes(timing)).uppercase(),
                         style = MaterialTheme.typography.labelSmall,
-                        color = contentColor,
-                        fontSize = 8.sp,
+                        color = contentColor.copy(alpha = 0.8f),
+                        fontSize = 7.sp,
                         fontWeight = FontWeight.Black,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(bottom = 1.dp)
                     )
                 }
 
                 // ICON
-                if (segHeight > 80.dp) {
+                if (segHeight > 90.dp) {
+                    val iconSize = if (segHeight > 110.dp) 20.dp else 16.dp
                     if (timing is SpecialPeriod && timing.name == "Yama") {
                         Image(
                             painter = painterResource(R.drawable.ic_yama_bull),
                             contentDescription = null,
-                            modifier = Modifier.size(28.dp)
+                            modifier = Modifier.size(iconSize + 4.dp)
                         )
                     } else {
                         val iconPainter = when {
@@ -182,11 +185,12 @@ fun TimingCard(
                             else -> null
                         }
                         if (iconPainter != null) {
-                            Icon(iconPainter, contentDescription = null, modifier = Modifier.size(24.dp), tint = contentColor)
+                            Icon(iconPainter, contentDescription = null, modifier = Modifier.size(iconSize), tint = contentColor)
                         } else if (timing is NallaNeram || timing is Muhurtham || timing is MaitraMuhurtham) {
-                            Icon(if (timing is NallaNeram) Icons.Default.Star else Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(20.dp), tint = contentColor)
+                            Icon(if (timing is NallaNeram) Icons.Default.Star else Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(iconSize), tint = contentColor)
                         }
                     }
+                    Spacer(modifier = Modifier.height(2.dp))
                 }
 
                 // LABEL
@@ -200,14 +204,19 @@ fun TimingCard(
                 }
                 Text(
                     text = stringResource(labelRes),
-                    style = MaterialTheme.typography.labelMedium,
+                    style = if (segHeight < 60.dp) MaterialTheme.typography.labelSmall else MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold,
                     color = contentColor,
                     textAlign = TextAlign.Center,
-                    maxLines = 2,
+                    maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
-                    lineHeight = 11.sp,
-                    fontSize = if (widestSegment.widthFactor < 0.25f) 9.sp else 11.sp
+                    lineHeight = if (segHeight < 60.dp) 9.sp else 11.sp,
+                    fontSize = when {
+                        widestSegment.widthFactor < 0.20f -> 7.sp
+                        widestSegment.widthFactor < 0.25f -> 8.sp
+                        segHeight < 40.dp -> 8.sp
+                        else -> 10.sp
+                    }
                 )
 
                 // TIME RANGE

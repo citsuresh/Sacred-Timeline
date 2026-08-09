@@ -88,7 +88,11 @@ fun TimeMarkersColumn(sunrise: LocalTime, sunset: LocalTime, hourHeight: Dp, is2
                         textAlign = TextAlign.End
                     )
                     if (!is24Hour) {
-                        val amPmLabel = if (time.hour < 12) stringResource(com.suresh.sacredtimeline.R.string.label_am) else stringResource(com.suresh.sacredtimeline.R.string.label_pm)
+                        val amPmLabel = if (time.hour < 12) {
+                            stringResource(com.suresh.sacredtimeline.R.string.label_am)
+                        } else {
+                            stringResource(com.suresh.sacredtimeline.R.string.label_pm)
+                        }
                         Text(
                             text = amPmLabel,
                             style = MaterialTheme.typography.labelSmall,
