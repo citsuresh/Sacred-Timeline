@@ -6,11 +6,12 @@
 
 ```mermaid
 graph TD
-    Calc["Logic/Calculators"] --> Prov["Providers (Mock/Sun)"]
-    Prov --> VM["TimelineViewModel"]
+    PCalc["P.Calc (Nalla Neram/Gowri)"] --> Prov["Providers (Mock/Sun)"]
+    LCalc["L.Calc (Lagna/Maitra)"] --> Prov
+    Prov --> VM["Timeline.VM"]
     VM --> UI["Dashboard UI"]
-    Prov --> Widget["PanchangamWidget"]
-    Worker["WidgetUpdateWorker"] --> Widget
+    Prov --> Widget["Panchangam.Widget"]
+    Worker["WidgetUpdate.Worker"] --> Widget
 ```
 
 ## 2. Layer Responsibilities
