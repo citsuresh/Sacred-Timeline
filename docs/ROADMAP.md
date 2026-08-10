@@ -41,6 +41,7 @@ Future development phases for the Sacred Timeline project.
     - Verify and integrate high-quality SVGs for Pradosham (Nandi), Shivaratri (Shiva), and Chaturthi (Ganesha).
     - Establish a consistent "Sticker Style" icon set for Subha Muhurthams, special Tithis, and Nakshatras.
 
-## Phase 9: Configuration Presets & Customization
-- **Column Selection Modes**: Quick-switch presets for "Traditional" (Horai/Gowri/Neram), "Full" (Everything), and "Custom" layouts.
-- **Advanced Column Picker**: Dedicated sub-screen for granularly selecting and reordering columns for both the App and the Widget.
+## Phase 9: Configuration Presets & Customization (In-Progress)
+- **Custom Timeline Persistence [COMPLETE]**: Sandbox slot in DataStore to remember user's manual column visibility and order.
+- **Side Menu Integration [COMPLETE]**: One-click restoration of custom setups with "Hidden until Born" shortcut logic.
+- **Advanced Column Picker**: Future dedicated sub-screen for even more granular control.

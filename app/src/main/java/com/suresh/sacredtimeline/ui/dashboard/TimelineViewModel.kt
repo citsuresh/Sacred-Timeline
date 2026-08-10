@@ -412,22 +412,22 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
         val tamilCalendar = com.suresh.sacredtimeline.logic.TamilCalendarUtils.getTamilDate(date)
         val lunarDayInfo = com.suresh.sacredtimeline.logic.LunarCalendarUtils.getLunarDayInfo(date)
         
-        // Aggregate festivals from all Tithis and Nakshatras occurring during the day (Part 2: Interval Wiring)
-        val festivalSet = mutableSetOf<Int>()
-        lunarDayInfo.tithis.forEach { tithiInterval ->
-            lunarDayInfo.nakshatras.forEach { nakshatraInterval ->
-                val info = com.suresh.sacredtimeline.logic.LunarCalendarUtils.LunarInfo(
-                    tithi = tithiInterval.value,
-                    nakshatra = nakshatraInterval.value,
-                    pakshaResId = lunarDayInfo.pakshaResId,
-                    pakshaDay = lunarDayInfo.pakshaDay,
-                    tithiResId = tithiInterval.resId,
-                    nakshatraResId = nakshatraInterval.resId
-                )
-                festivalSet.addAll(com.suresh.sacredtimeline.logic.TamilCalendarUtils.getSpecialEvents(tamilCalendar, info))
-            }
-        }
-        val festivals = festivalSet.toList()
+        // Ritual Context calculation for anchored festivals (Part 3: Anchor Wiring)
+        val zoneId = java.time.ZoneId.systemDefault()
+        val sunriseInstant = date.atTime(sunResult.sunrise).atZone(zoneId).toInstant()
+        val pradoshaWindow = com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculatePradoshaWindow(lat, lng, date, sunDef, zoneId)
+        val nishitaWindow = com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculateNishitaKala(lat, lng, date, sunDef, zoneId)
+        
+        val ritualContext = com.suresh.sacredtimeline.logic.TamilCalendarUtils.RitualContext(
+            tithis = lunarDayInfo.tithis,
+            nakshatras = lunarDayInfo.nakshatras,
+            sunrise = sunriseInstant,
+            pradosham = pradoshaWindow,
+            nishita = nishitaWindow,
+            zoneId = zoneId
+        )
+        
+        val festivals = com.suresh.sacredtimeline.logic.TamilCalendarUtils.getSpecialEvents(tamilCalendar, ritualContext)
         val holidays = com.suresh.sacredtimeline.data.VerifiedHolidays.getHolidays(date)
         val combinedEvents = (holidays + festivals).distinct()
         

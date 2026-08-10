@@ -34,6 +34,21 @@ object LunarCalendarUtils {
         val pakshaDay: Int
     )
 
+    data class RitualWindow(
+        val startTime: Instant,
+        val endTime: Instant
+    ) {
+        fun overlaps(interval: LunarInterval): Boolean {
+            val iStart = interval.startTime ?: Instant.MIN
+            val iEnd = interval.endTime ?: Instant.MAX
+            return iStart.isBefore(endTime) && iEnd.isAfter(startTime)
+        }
+        
+        fun contains(instant: Instant): Boolean {
+            return !instant.isBefore(startTime) && instant.isBefore(endTime)
+        }
+    }
+
     fun getLunarDayInfo(date: LocalDate): LunarDayInfo {
         val zoneId = ZoneId.systemDefault()
         val dayStart = date.atStartOfDay(zoneId).toInstant()
@@ -185,8 +200,7 @@ object LunarCalendarUtils {
         return 23.852777 + 1.39697127 * t + 0.0003086 * t * t
     }
 
-    fun calculateSunriseSunset(lat: Double, lng: Double, date: LocalDate, zenith: Double = 90.83): Pair<LocalTime, LocalTime> {
-        val zoneId = ZoneId.systemDefault()
+    fun calculateSunriseSunset(lat: Double, lng: Double, date: LocalDate, zenith: Double = 90.83, zoneId: ZoneId = ZoneId.systemDefault()): Pair<LocalTime, LocalTime> {
         val zonedDateTime = date.atStartOfDay(zoneId)
         val jd = (zonedDateTime.toInstant().toEpochMilli() / 86400000.0) + 2440587.5
         
@@ -210,7 +224,7 @@ object LunarCalendarUtils {
         val sunriseMinutes = centerNoon - h0 * 4
         val sunsetMinutes = centerNoon + h0 * 4
         
-        val offsetMinutes = zoneId.rules.getOffset(Instant.now()).totalSeconds / 60
+        val offsetMinutes = zoneId.rules.getOffset(zonedDateTime.toInstant()).totalSeconds / 60
         val localSunrise = sunriseMinutes + offsetMinutes
         val localSunset = sunsetMinutes + offsetMinutes
         
@@ -239,6 +253,46 @@ object LunarCalendarUtils {
         val start = midday.minusMinutes(24)
         val end = midday.plusMinutes(24)
         return start to end
+    }
+
+    fun calculateNishitaKala(
+        lat: Double,
+        lng: Double,
+        date: LocalDate,
+        sunDef: String,
+        zoneId: ZoneId = ZoneId.systemDefault()
+    ): RitualWindow {
+        val zenith = if (sunDef == "TRADITIONAL") 90.0 else 90.83
+        val todaySunset = calculateSunriseSunset(lat, lng, date, zenith, zoneId).second
+        val tomorrowSunrise = calculateSunriseSunset(lat, lng, date.plusDays(1), zenith, zoneId).first
+        
+        val sunsetInstant = date.atTime(todaySunset).atZone(zoneId).toInstant()
+        val sunriseInstant = date.plusDays(1).atTime(tomorrowSunrise).atZone(zoneId).toInstant()
+        
+        val nightDuration = Duration.between(sunsetInstant, sunriseInstant)
+        val part = nightDuration.toMillis() / 15
+        
+        return RitualWindow(
+            startTime = sunsetInstant.plusMillis(part * 7),
+            endTime = sunsetInstant.plusMillis(part * 8)
+        )
+    }
+
+    fun calculatePradoshaWindow(
+        lat: Double,
+        lng: Double,
+        date: LocalDate,
+        sunDef: String,
+        zoneId: ZoneId = ZoneId.systemDefault()
+    ): RitualWindow {
+        val zenith = if (sunDef == "TRADITIONAL") 90.0 else 90.83
+        val sunset = calculateSunriseSunset(lat, lng, date, zenith, zoneId).second
+        val sunsetInstant = date.atTime(sunset).atZone(zoneId).toInstant()
+        
+        return RitualWindow(
+            startTime = sunsetInstant.minus(Duration.ofMinutes(90)),
+            endTime = sunsetInstant
+        )
     }
 
     private fun findStartTime(

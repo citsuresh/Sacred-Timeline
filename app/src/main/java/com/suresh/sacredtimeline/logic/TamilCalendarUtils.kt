@@ -119,16 +119,26 @@ object TamilCalendarUtils {
         return TamilDate(tamilDay, monthResId, yearResId)
     }
 
+    data class RitualContext(
+        val tithis: List<LunarCalendarUtils.LunarInterval>,
+        val nakshatras: List<LunarCalendarUtils.LunarInterval>,
+        val sunrise: java.time.Instant,
+        val pradosham: LunarCalendarUtils.RitualWindow,
+        val nishita: LunarCalendarUtils.RitualWindow,
+        val zoneId: java.time.ZoneId = java.time.ZoneId.systemDefault()
+    )
+
     /**
      * Identifies special events/festivals based on Solar and Lunar combinations.
+     * Uses traditional anchoring (Sunrise, Sunset, Nishita Kala) to prevent double-counting.
      */
     fun getSpecialEvents(
         tamilDate: TamilDate,
-        lunarInfo: LunarCalendarUtils.LunarInfo
+        context: RitualContext
     ): List<Int> {
         val events = mutableListOf<Int>()
 
-        // 1. Solar Fixed Festivals
+        // 1. Solar Fixed Festivals (Day-based)
         if (tamilDate.monthResId == R.string.month_aadi && tamilDate.day == 18) {
             events.add(R.string.event_aadi_perukku)
         }
@@ -139,30 +149,43 @@ object TamilCalendarUtils {
             events.add(R.string.event_tamil_new_year)
         }
 
-        // 2. Lunar/Star Based Festivals
+        // 2. Window-Based Festivals
+        // Pradosham: Trayodashi (13 or 28) during Pradosha window [Sunset - 90m, Sunset]
+        if (context.tithis.any { (it.value == 13 || it.value == 28) && context.pradosham.overlaps(it) }) {
+            events.add(R.string.event_pradosham)
+        }
+
+        // Shivaratri: Krishna Chaturdashi (29) during Nishita Kala (Midnight window)
+        if (context.tithis.any { it.value == 29 && context.nishita.overlaps(it) }) {
+            events.add(R.string.event_sivaratri)
+        }
+
+        // 3. Sunrise-Based Festivals (Udaya Vyapini)
+        val tithiAtSunrise = context.tithis.find { interval ->
+            val start = interval.startTime ?: java.time.Instant.MIN
+            val end = interval.endTime ?: java.time.Instant.MAX
+            !context.sunrise.isBefore(start) && context.sunrise.isBefore(end)
+        }?.value
+        
+        val nakshatraAtSunrise = context.nakshatras.find { interval ->
+            val start = interval.startTime ?: java.time.Instant.MIN
+            val end = interval.endTime ?: java.time.Instant.MAX
+            !context.sunrise.isBefore(start) && context.sunrise.isBefore(end)
+        }?.value
+
         // Aadi Pooram: Aadi Month + Pooram Star (11)
-        if (tamilDate.monthResId == R.string.month_aadi && lunarInfo.nakshatra == 11) {
+        if (tamilDate.monthResId == R.string.month_aadi && nakshatraAtSunrise == 11) {
             events.add(R.string.event_aadi_pooram)
         }
         
         // Aadi Kiruthigai: Aadi Month + Krittika Star (3)
-        if (tamilDate.monthResId == R.string.month_aadi && lunarInfo.nakshatra == 3) {
+        if (tamilDate.monthResId == R.string.month_aadi && nakshatraAtSunrise == 3) {
             events.add(R.string.event_aadi_kiruthigai)
         }
         
         // Naga Chaturthi: Sawan/Aavani Shukla Chaturthi (4)
-        if (tamilDate.monthResId == R.string.month_avani && lunarInfo.tithi == 4) {
+        if (tamilDate.monthResId == R.string.month_avani && tithiAtSunrise == 4) {
             events.add(R.string.event_naga_chaturthi)
-        }
-
-        // Pradosham: Trayodashi (13 or 28)
-        if (lunarInfo.tithi == 13 || lunarInfo.tithi == 28) {
-            events.add(R.string.event_pradosham)
-        }
-
-        // Sivaratri: Krishna Chaturdashi (29)
-        if (lunarInfo.tithi == 29) {
-            events.add(R.string.event_sivaratri)
         }
 
         return events

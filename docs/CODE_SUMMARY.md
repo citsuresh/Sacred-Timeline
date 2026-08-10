@@ -17,7 +17,7 @@ graph TD
 
     PanchangamCalculator --> MockPanchangamProvider
     MockPanchangamProvider --> TimelineViewModel
-    TimelineViewModel --> TimelineDashboard
+    TimelineViewModel --> Dashboard
     MockPanchangamProvider --> PanchangamWidget
     WidgetUpdateWorker --> PanchangamWidget
 ```
@@ -25,44 +25,34 @@ graph TD
 ## 2. Layer Responsibilities
 
 ### Domain/Logic (`logic/`)
-- `PanchangamCalculator`: Core engine for Nalla Neram (sunrise-relative), Gowri Neram, and Horai. Supports both proportional (astronomical) and fixed (1.5h) timing styles.
-- `MockPanchangamProvider`: Assembles 24h data by blending yesterday's night and today's day cycles.
-- `SunriseSunsetProvider`: Local implementation of the Meeus algorithm for sunrise/sunset based on GPS coordinates.
-- `LagnaCalculator`: Identifies zodiac rise times (Aries, Scorpio, etc.) using IAU 1982/Meeus algorithms for Maitra Muhurtham detection.
-- `LunarCalendarUtils`: High-precision astronomical engine (**ELP-2000 / Meeus**) for Tithi, Nakshatra, and Paksha. Implements shared **Lahiri Ayanamsha** for sidereal accuracy across the logic layer.
+- `PanchangamCalculator`: Core engine for Nalla Neram, Gowri, and Horai. Supports both proportional and fixed styles.
+- `LagnaCalculator`: Identifies zodiac rise times using IAU 1982/Meeus for Maitra Muhurtham detection.
+- `LunarCalendarUtils`: High-precision astronomical engine (**ELP-2000 / Meeus**). Implements shared **Lahiri Ayanamsha**.
 - `TamilCalendarUtils`: Mapping for 60-year cycles and lunar-solar festival combinations.
 
 ### UI (`ui/`)
-- `ui/dashboard`: 24h vertical timeline. `TimelineCore` implements three distinct lane algorithms (**Fixed**, **Equal**, **Stepped**) using a segment-based slicing model.
-- `ui/settings`: Hierarchical menus organized into logical functional blocks. Supports dynamic View Style switching and bilingual Tamil/English label management.
-- `ui/theme`: `SacredTimelineColors` for dynamic tinting and sticker-look UI patterns.
-- `ui/navigation`: Navigation 3 state definitions and `ViewMode` routes.
+- `ui/dashboard`: 24h vertical timeline. `TimelineCore` implements a **transitive clustering** layout model with an **8-pass iterative harmony refiner** for gap-filling.
+- `ui/settings`: Reorganized into 7 logical blocks. Manages persistent **Custom Timeline** configurations and two-way menu sync.
+- `ui/theme`: `SacredTimelineColors` for dynamic dual-tone gold and sticker-look patterns.
 
 ### Data (`data/`)
-- `SettingsRepository`: Jetpack DataStore for user preferences (now including Theme and Lunar filters).
-- `VerifiedHolidays`: Static dataset for 2024-2026 confirmed TN Public Holidays and Subha Muhurthams.
-- `CacheManager`: Shared JSON caching for App/Widget offline support.
+- `SettingsRepository`: DataStore source of truth. Includes a dedicated **Sandbox Slot** for saving user's manual column selections and orders.
+- `VerifiedHolidays`: Static dataset for confirmed TN Public Holidays and Subha Muhurthams.
 
-## 3. Infrastructure
-- **Background**: `WorkManager` synchronized with time-slot transitions.
-- **Localization**: `AppCompatDelegate` for dynamic English/Tamil switching.
+## 3. Key Algorithms
+
+### "Harmony" Layout Engine (`TimelineCore.kt`)
+1. **Pass 1 (Anchor)**: Assign items to logical "Lane Ranks" based on category (Gowri Left, Horai Right).
+2. **Pass 2-9 (Co-operative Refinement)**: Iteratively expand boxes halfway into available dead space. Items meet at midpoints, ensuring symmetrical distribution.
+3. **Pass 10 (Render)**: Identify the **Best Segment** (widest + tallest) within a box to anchor content, preventing clipping in stepped shapes.
 
 ## 4. Symbol Index
 | Symbol | Responsibility |
 | :--- | :--- |
-| `PanchangamCalculator` | Math for all time slots (Gowri, Horai, Nalla Neram). |
-| `MockPanchangamProvider` | Coordinates yesterday/today cycles to fill a 24h window. |
-| `SunriseSunsetProvider` | Retrofit-based API client for location-specific solar data. |
-| `MainActivity` | App lifecycle & Navigation 3 host. |
-| `TimelineViewModel` | MVI state holder; manages location, date, and filtered data. |
-| `SettingsRepository` | DataStore source of truth for all user preferences. |
-| `PanchangamWidget` | Glance-based Home Screen summary widget. |
-| `Metadata` | UI mapping for localized strings and spiritual icons. |
-| `TimelineCore` | The heart of the UI; manages vertical 24h layout and lane distribution. |
-| `TimingCard` | Multi-layered "sticker-look" card for individual time slots. |
-| `DashboardDetail` | Unified model for significance data (header & timeline). |
-| `DashboardDetailSheet` | Reactive BottomSheet for all spiritual guidance. |
-| `FullDayEvent` | Model for sticky headings and background tinting. |
-| `Muhurtham` | Specialized timing model for Brahma and Abhijit windows. |
-| `MaitraMuhurtham` | Optimized model for Debt Repayment windows with star-potency data. |
-| `LagnaCalculator` | Core logic for mapping current time and location to Sidereal Zodiac signs. |
+| `TimelineCore` | Vertical 24h grid with dynamic lane scaling and gap-filling. |
+| `TimingCard` | Adaptive "Sticker" card with top-centered headings and best-segment text placement. |
+| `RitualContext` | Centralized data structure for anchored events (Sunrise, Pradosha, and Nishita windows). |
+| `Custom Timeline` | A persistent ViewMode that remembers a user's unique column arrangement. |
+| `SettingsRepository` | Manages both active settings and saved "Custom" presets. |
+| `LagnaCalculator` | Mathematical core for sidereal ascendants and Maitra Muhurtham. |
+| `Tamil Date Anchor` | Calendar-style UI widget providing a date reference in the timeline header. |
