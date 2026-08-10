@@ -44,3 +44,8 @@ Historical record of architectural and UI/UX choices.
 - **Vedic Day (Vara) Continuity**: Implemented Vara-based logic for auspicious windows (like Maitra Muhurtham). The "day quality" (potency) is anchored to the sunrise-to-sunrise cycle, not calendar midnight, ensuring traditional accuracy for late-night windows.
 - **Auspiciousness Color Gradation**: Introduced sub-levels of color coding within the "GOLD" category (e.g., Bright Gold vs. Pale Gold) to visually signal different potency levels of the same Muhurtham without introducing new conflicting colors.
 - **Shared Ephemeris Source**: Pinned all Nirayana (Sidereal) calculations to a single public Lahiri Ayanamsha function to prevent "coordinate drift" between the lunar engine and the zodiac-rise engine.
+- **Traditional Event Anchoring (Ritual Windows)**: 
+    - Resolved the "Double Festival" bug where lunar events appeared on two days if a Tithi crossed midnight.
+    - Implemented **Ritual Windows**: Pradosham is anchored to the Sunset window, and Shivaratri to Nishita Kala.
+    - Implemented **Udaya Vyapini Anchoring**: Star and Tithi-based festivals (Aadi Pooram, Naga Chaturthi) are anchored to their presence at Sunrise, ensuring a single, traditional occurrence per calendar day.
+    - **Date-Specific DST Correction**: Sun calculations now dynamically calculate timezone offsets for the target date, ensuring sub-minute precision for historical and future dates.
