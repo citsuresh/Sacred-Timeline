@@ -1,58 +1,63 @@
 # Code Summary & Structural Map
 
-Technical overview of the project architecture and data flow.
-
-## 1. Module & Data Flow
-- **:app**: Monolithic module containing all features.
-- **Architecture**: MVI-lite (StateFlow driven UI).
+## 1. Architecture & Data Flow
+- **Pattern**: MVI-lite (StateFlow driven). Monolithic `:app` module.
+- **Flow**: `Logic (Calculators)` -> `Providers` -> `ViewModel/Widget` -> `UI (Compose/Glance)`.
 
 ```mermaid
 graph TD
-    PanchangamCalculator["PanchangamCalculator (Logic)"]
-    MockPanchangamProvider["MockPanchangamProvider (Data)"]
-    TimelineViewModel["TimelineViewModel (State)"]
-    TimelineDashboard["TimelineDashboard (UI)"]
-    PanchangamWidget["PanchangamWidget (Glance Widget)"]
-    WidgetUpdateWorker["WidgetUpdateWorker (WorkManager)"]
-
-    PanchangamCalculator --> MockPanchangamProvider
-    MockPanchangamProvider --> TimelineViewModel
-    TimelineViewModel --> Dashboard
-    MockPanchangamProvider --> PanchangamWidget
-    WidgetUpdateWorker --> PanchangamWidget
+    Calc["Logic/Calculators"] --> Prov["Providers (Mock/Sun)"]
+    Prov --> VM["TimelineViewModel"]
+    VM --> UI["Dashboard UI"]
+    Prov --> Widget["PanchangamWidget"]
+    Worker["WidgetUpdateWorker"] --> Widget
 ```
 
 ## 2. Layer Responsibilities
 
-### Domain/Logic (`logic/`)
-- `PanchangamCalculator`: Core engine for Nalla Neram, Gowri, and Horai. Supports both proportional and fixed styles.
-- `LagnaCalculator`: Identifies zodiac rise times using IAU 1982/Meeus for Maitra Muhurtham detection.
-- `LunarCalendarUtils`: High-precision astronomical engine (**ELP-2000 / Meeus**). Implements shared **Lahiri Ayanamsha**.
-- `TamilCalendarUtils`: Mapping for 60-year cycles and lunar-solar festival combinations.
+### `logic/` (Domain)
+- `PanchangamCalculator`: Core engine (Nalla Neram, Gowri, Horai). Proportional/Fixed styles.
+- `LagnaCalculator`: Sidereal ascendants & Maitra Muhurtham (IAU 1982/Meeus).
+- `LunarCalendarUtils`: Ephemeris (ELP-2000), Lahiri Ayanamsha, ritual windows.
+- `TamilCalendarUtils`: 60-year cycles, anchored festival detection (`RitualContext`).
+- `SunriseSunsetProvider` & `MockPanchangamProvider`: Solar calculations & slot clipping/transitions.
 
-### UI (`ui/`)
-- `ui/dashboard`: 24h vertical timeline. `TimelineCore` implements a **transitive clustering** layout model with an **8-pass iterative harmony refiner** for gap-filling.
-- `ui/settings`: Reorganized into 7 logical blocks. Manages persistent **Custom Timeline** configurations and two-way menu sync.
-- `ui/theme`: `SacredTimelineColors` for dynamic dual-tone gold and sticker-look patterns.
+### `ui/` & `widget/` (Presentation)
+- `dashboard/`: 24h timeline. `TimelineCore` handles lane-scaling & harmony refinement.
+- `navigation/`: State-driven Nav3 routing and custom `ViewMode` logic.
+- `settings/`: DataStore-backed config (7 blocks), Custom Timeline management.
+- `PanchangamWidget`: Glance-based M3 widget for at-a-glance timings.
+- `theme/`: `SacredTimelineColors` (Dual-tone gold/sticker-look).
 
-### Data (`data/`)
-- `SettingsRepository`: DataStore source of truth. Includes a dedicated **Sandbox Slot** for saving user's manual column selections and orders.
-- `VerifiedHolidays`: Static dataset for confirmed TN Public Holidays and Subha Muhurthams.
+### `data/` & `worker/` (Infrastructure)
+- `SettingsRepository`: SSOT for config & Custom Timeline presets.
+- `CacheManager`: Atomic JSON storage for `DayData` (keyed by lat/lng/date).
+- `WidgetUpdateWorker`: Background cache maintenance & transition-aware updates.
+- `VerifiedHolidays`: Static TN Public Holidays & Muhurthams.
 
-## 3. Key Algorithms
+### `model/` (State & Resources)
+- `Metadata`: Logic-to-Resource bridge (localized strings, traditional guidance).
+- `DayData`: Primary 24h snapshot ( Muhurthams, Tithis, Festivals).
+- `Serializers`: K-Serialization for Java Time types.
 
-### "Harmony" Layout Engine (`TimelineCore.kt`)
-1. **Pass 1 (Anchor)**: Assign items to logical "Lane Ranks" based on category (Gowri Left, Horai Right).
-2. **Pass 2-9 (Co-operative Refinement)**: Iteratively expand boxes halfway into available dead space. Items meet at midpoints, ensuring symmetrical distribution.
-3. **Pass 10 (Render)**: Identify the **Best Segment** (widest + tallest) within a box to anchor content, preventing clipping in stepped shapes.
+## 3. Core Algorithms
+
+### Harmony Layout (`TimelineCore.kt`)
+1. **Anchor**: Assign items to Lane Ranks (Gowri Left, Horai Right).
+2. **Refine**: 8-pass iterative expansion into dead space; items meet at midpoints.
+3. **Render**: "Best Segment" (max width/height) anchor for content to prevent clipping.
+
+### Event Anchoring (`TamilCalendarUtils.kt`)
+- **Ritual Windows**: Pradosha (Sunset -90m), Nishita (Midnight window).
+- **Udaya Vyapini**: Festivals anchored to Sunrise state to prevent calendar duplication.
 
 ## 4. Symbol Index
 | Symbol | Responsibility |
 | :--- | :--- |
-| `TimelineCore` | Vertical 24h grid with dynamic lane scaling and gap-filling. |
-| `TimingCard` | Adaptive "Sticker" card with top-centered headings and best-segment text placement. |
-| `RitualContext` | Centralized data structure for anchored events (Sunrise, Pradosha, and Nishita windows). |
-| `Custom Timeline` | A persistent ViewMode that remembers a user's unique column arrangement. |
-| `SettingsRepository` | Manages both active settings and saved "Custom" presets. |
-| `LagnaCalculator` | Mathematical core for sidereal ascendants and Maitra Muhurtham. |
-| `Tamil Date Anchor` | Calendar-style UI widget providing a date reference in the timeline header. |
+| `TimelineCore` | 24h grid with dynamic lane scaling and harmony gap-filling. |
+| `RitualContext` | Anchor data (Sunrise, Pradosha, Nishita) for event detection. |
+| `CacheManager` | Versioned atomic storage for timeline performance. |
+| `Metadata` | Mapping between calculation results and localized traditional text. |
+| `LagnaCalculator` | Math core for zodiac rise times and Maitra potency. |
+| `WidgetUpdateWorker` | Transition-triggered background updates and cache refills. |
+| `Custom Timeline` | Persistent user-defined column arrangements in `SettingsRepository`. |
