@@ -253,8 +253,6 @@ class MainActivity : AppCompatActivity() {
                             icon = { Icon(Icons.Default.AutoAwesome, contentDescription = null) }
                         )
 
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-
                         if (hasCustomLayout) {
                             NavigationDrawerItem(
                                 label = { Text(stringResource(R.string.nav_custom)) },
@@ -271,6 +269,8 @@ class MainActivity : AppCompatActivity() {
                                 icon = { Icon(Icons.Default.DashboardCustomize, contentDescription = null) }
                             )
                         }
+
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
                         NavigationDrawerItem(
                             label = { Text(stringResource(R.string.nav_settings)) },

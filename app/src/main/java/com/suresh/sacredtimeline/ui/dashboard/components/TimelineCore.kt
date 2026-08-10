@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.ui.input.pointer.changedToUp
@@ -23,6 +24,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
@@ -347,7 +349,9 @@ fun TimelineContent(
                             add(FullDayEvent(stringResource(resId), c, bg))
                         }
                     }
-                }
+                },
+                tamilDay = dayData.tamilDay,
+                tamilMonthResId = dayData.tamilMonthResId
             )
         }
         
@@ -539,7 +543,9 @@ fun TimelineHeader(
     viewMode: ViewMode, 
     columnVisibility: Set<String> = emptySet(), 
     columnOrder: List<String> = emptyList(),
-    fullDayEvents: List<FullDayEvent> = emptyList()
+    fullDayEvents: List<FullDayEvent> = emptyList(),
+    tamilDay: Int = 0,
+    tamilMonthResId: Int = 0
 ) {
     Column(
         modifier = Modifier
@@ -549,10 +555,54 @@ fun TimelineHeader(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 12.dp)
+                .padding(vertical = 8.dp)
                 .height(IntrinsicSize.Min)
         ) {
-            Spacer(modifier = Modifier.width(TIME_COLUMN_WIDTH))
+            // Tamil Date Anchor (Calendar Style)
+            Box(
+                modifier = Modifier.width(TIME_COLUMN_WIDTH),
+                contentAlignment = Alignment.Center
+            ) {
+                if (tamilMonthResId != 0) {
+                    Column(
+                        modifier = Modifier
+                            .width(42.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(MaterialTheme.colorScheme.surface)
+                            .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(4.dp)),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        // Month Header
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.primary)
+                                .padding(vertical = 1.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = stringResource(tamilMonthResId),
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                style = MaterialTheme.typography.labelSmall,
+                                fontSize = 8.sp,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1
+                            )
+                        }
+                        // Day Number
+                        Text(
+                            text = tamilDay.toString(),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontWeight = FontWeight.Black,
+                            fontSize = 16.sp,
+                            lineHeight = 18.sp,
+                            modifier = Modifier.padding(vertical = 2.dp)
+                        )
+                    }
+                }
+            }
+
             Box(modifier = Modifier.fillMaxHeight().width(1.dp).background(SeparatorGrey))
             
             val isCompositeMode = viewMode == ViewMode.COMPOSITE || viewMode == ViewMode.CUSTOM
@@ -755,10 +805,20 @@ private fun calculateLanes(
                 val totalLanesCount = (gLanes.size + cLanes.size + hLanes.size).coerceAtLeast(1)
                 val laneWidth = 1.0f / totalLanesCount
                 val itemBounds = mutableMapOf<Timing, Pair<Float, Float>>()
+                val baseLanes = mutableMapOf<Timing, Int>()
 
-                gLanes.forEachIndexed { i, l -> l.forEach { itemBounds[it] = (i * laneWidth) to ((i + 1) * laneWidth) } }
-                cLanes.forEachIndexed { i, l -> l.forEach { itemBounds[it] = ((gLanes.size + i) * laneWidth) to ((gLanes.size + i + 1) * laneWidth) } }
-                hLanes.forEachIndexed { i, l -> l.forEach { itemBounds[it] = ((gLanes.size + cLanes.size + i) * laneWidth) to ((gLanes.size + cLanes.size + i + 1) * laneWidth) } }
+                gLanes.forEachIndexed { i, l -> l.forEach { 
+                    itemBounds[it] = (i * laneWidth) to ((i + 1) * laneWidth)
+                    baseLanes[it] = i 
+                } }
+                cLanes.forEachIndexed { i, l -> l.forEach { 
+                    itemBounds[it] = ((gLanes.size + i) * laneWidth) to ((gLanes.size + i + 1) * laneWidth)
+                    baseLanes[it] = gLanes.size + i
+                } }
+                hLanes.forEachIndexed { i, l -> l.forEach { 
+                    itemBounds[it] = ((gLanes.size + cLanes.size + i) * laneWidth) to ((gLanes.size + cLanes.size + i + 1) * laneWidth)
+                    baseLanes[it] = gLanes.size + cLanes.size + i
+                } }
 
                 // 2. Iterative Co-operative Refinement (8 passes for near-perfect gap filling)
                 repeat(8) {
@@ -766,12 +826,18 @@ private fun calculateLanes(
                         val bounds = itemBounds[t] ?: return@forEach
                         val currentStart = bounds.first
                         val currentEnd = bounds.second
+                        val myBaseLane = baseLanes[t] ?: 0
                         
                         // Find constraint boundaries (closest overlapping neighbors)
-                        val leftNeighbors = items.filter { it != t && overlaps(it, t) && (itemBounds[it]?.second ?: 0f) <= (currentStart + 0.001f) }
+                        // A neighbor is a constraint only if it was originally placed to my left or right
+                        val leftNeighbors = items.filter { it != t && overlaps(it, t) && 
+                            (baseLanes[it] ?: 0) < myBaseLane 
+                        }
                         val leftBoundary = leftNeighbors.maxOfOrNull { itemBounds[it]?.second ?: 0f } ?: 0f
                         
-                        val rightNeighbors = items.filter { it != t && overlaps(it, t) && (itemBounds[it]?.first ?: 1f) >= (currentEnd - 0.001f) }
+                        val rightNeighbors = items.filter { it != t && overlaps(it, t) && 
+                            (baseLanes[it] ?: 0) > myBaseLane 
+                        }
                         val rightBoundary = rightNeighbors.minOfOrNull { itemBounds[it]?.first ?: 1f } ?: 1f
                         
                         // Co-operative Expand: Move halfway toward the empty space
