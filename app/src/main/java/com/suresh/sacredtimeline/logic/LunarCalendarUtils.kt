@@ -49,7 +49,7 @@ object LunarCalendarUtils {
         }
     }
 
-    fun getLunarDayInfo(date: LocalDate): LunarDayInfo {
+    fun getLunarDayInfo(date: LocalDate, system: String = "AMANTA"): LunarDayInfo {
         val zoneId = ZoneId.systemDefault()
         val dayStart = date.atStartOfDay(zoneId).toInstant()
         val dayEnd = date.plusDays(1).atStartOfDay(zoneId).toInstant()
@@ -61,7 +61,19 @@ object LunarCalendarUtils {
             .map { it.copy(resId = getNakshatraResId(it.value)) }
 
         val noonValue = getLunarValues(date.atTime(12, 0).atZone(zoneId).toInstant()).first
-        val isValarpirai = noonValue <= 15
+        
+        // Handle Amanta (South) vs Purnimanta (North) Paksha logic
+        val isValarpirai = if (system == "PURNIMANTA") {
+            // Purnimanta: Month starts at Purnima (15).
+            // Valarpirai (Bright half) is Tithis 1-15 (same as Amanta).
+            // Theipirai (Dark half) is Tithis 16-30.
+            // In some contexts, Purnimanta shifts the *month name*, but the *Paksha* 
+            // of a specific day remains defined by the Tithi (1-15 is Bright, 16-30 is Dark).
+            // If the user wants to swap the *definition* of Paksha, we adjust here.
+            noonValue <= 15
+        } else {
+            noonValue <= 15
+        }
 
         return LunarDayInfo(
             tithis = tithis,

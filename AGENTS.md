@@ -10,7 +10,12 @@ Before considering any code change complete: after each meaningful part of a mul
 > (2) whether the change contradicts or duplicates anything already established elsewhere in the codebase; 
 > (3) if a build/test can be run, run it and report actual results, not just a read-through;
 > (4) **'Wiring' Integrity**: Pay extra attention to how state and parameters are passed through nested calls. Verify that no 'silent defaults' are ignoring user preferences, and ensure that cache-clearing or job-cancellation triggers are correctly synchronized across all ViewModels/Repositories.
-> (5) **Finding Classification**: For every finding, explicitly classify it as one of: (a) unrelated to the agreed breakdown — treat as out-of-scope per the existing rule, or (b) within the scope of an already-planned future part of the breakdown — name which part, and flag it as "expected to be addressed in Part N".
+> (5) **Feature Parity Checklist**: For any new timing, slot, or column added to the Timeline, verify it is also implemented in:
+>     - **PanchangamWidget.kt** (UI visibility)
+>     - **WidgetUpdateWorker.kt** (Transition/Boundary scheduling)
+>     - **DayDataProvider.kt** (Calculation inclusion)
+>     - **SettingsRepository.kt** (User toggle/visibility persistence)
+> (6) **Finding Classification**: For every finding, explicitly classify it as one of: (a) unrelated to the agreed breakdown — treat as out-of-scope per the existing rule, or (b) within the scope of an already-planned future part of the breakdown — name which part, and flag it as "expected to be addressed in Part N".
 >
 > **Reporting Rules**:
 > - For every finding (including out-of-scope items), **investigate fully** to understand the root cause.

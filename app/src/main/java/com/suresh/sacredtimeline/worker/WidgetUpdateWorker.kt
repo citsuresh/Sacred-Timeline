@@ -5,8 +5,7 @@ import androidx.glance.appwidget.updateAll
 import androidx.work.*
 import com.suresh.sacredtimeline.data.CacheManager
 import com.suresh.sacredtimeline.data.SettingsRepository
-import com.suresh.sacredtimeline.logic.MockPanchangamProvider
-import com.suresh.sacredtimeline.logic.SunriseSunsetProvider
+import com.suresh.sacredtimeline.logic.DayDataProvider
 import com.suresh.sacredtimeline.model.DayData
 import com.suresh.sacredtimeline.widget.PanchangamWidget
 import kotlinx.coroutines.flow.first
@@ -63,33 +62,7 @@ class WidgetUpdateWorker(
     }
 
     private suspend fun fetchDayData(lat: Double, lng: Double, date: LocalDate, repository: SettingsRepository): DayData {
-        val sunProvider = SunriseSunsetProvider()
-        val provider = MockPanchangamProvider()
-        
-        val sunDef = repository.sunriseDefinition.first()
-        val style = repository.specialPeriodStyle.first()
-        
-        val sunResult = sunProvider.getSunTimes(lat, lng, date, sunDef)
-        val timings = provider.getTimings(date, sunResult.sunrise, sunResult.sunset, style, sunDef, lat, lng)
-        
-        return DayData(
-            nallaNeram = timings.filterIsInstance<com.suresh.sacredtimeline.model.NallaNeram>(),
-            gowriNeram = timings.filterIsInstance<com.suresh.sacredtimeline.model.GowriNeram>(),
-            hora = timings.filterIsInstance<com.suresh.sacredtimeline.model.Hora>(),
-            specialPeriods = timings.filterIsInstance<com.suresh.sacredtimeline.model.SpecialPeriod>(),
-            sunrise = sunResult.sunrise,
-            sunset = sunResult.sunset,
-            isFallback = sunResult.isFallback,
-            brahmaMuhurtham = com.suresh.sacredtimeline.model.Muhurtham(
-                "Brahma Muhurtham", "",
-                com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculateBrahmaMuhurtham(sunResult.sunrise).first,
-                com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculateBrahmaMuhurtham(sunResult.sunrise).second,
-                com.suresh.sacredtimeline.model.Auspiciousness.GREEN
-            ),
-            abhijitMuhurtham = com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculateAbhijitMuhurtham(sunResult.sunrise, sunResult.sunset)?.let {
-                com.suresh.sacredtimeline.model.Muhurtham("Abhijit Muhurtham", "", it.first, it.second, com.suresh.sacredtimeline.model.Auspiciousness.GREEN)
-            }
-        )
+        return DayDataProvider(applicationContext).fetchDayData(date, lat, lng)
     }
 
     private suspend fun refillCache(lat: Double, lng: Double, centerDate: LocalDate, repository: SettingsRepository, cacheManager: CacheManager) {
@@ -116,25 +89,22 @@ class WidgetUpdateWorker(
     private suspend fun scheduleNextTransition(context: Context, lat: Double, lng: Double) {
         val now = LocalTime.now()
         val date = LocalDate.now()
-        val sunProvider = SunriseSunsetProvider()
-        val provider = MockPanchangamProvider()
-        val repository = SettingsRepository(context)
+        val todayData = DayDataProvider(context).fetchDayData(date, lat, lng)
 
-        val sunDef = repository.sunriseDefinition.first()
-        val style = repository.specialPeriodStyle.first()
-
-        val sunTimes = sunProvider.getSunTimes(lat, lng, date, sunDef)
-        val timings = provider.getTimings(date, sunTimes.sunrise, sunTimes.sunset, style, sunDef, lat, lng)
+        // Find all transition boundaries (start and end times) to ensure 100% update accuracy
+        val allBoundaries = mutableSetOf<LocalTime>()
         
-        val brahma = com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculateBrahmaMuhurtham(sunTimes.sunrise)
-        val abhijit = com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculateAbhijitMuhurtham(sunTimes.sunrise, sunTimes.sunset)
-
-        // Find the earliest endTime that is in the future across ALL possible blocks
-        val allEndTimes = timings.map { it.endTime }.toMutableList()
-        allEndTimes.add(brahma.second)
-        abhijit?.let { allEndTimes.add(it.second) }
+        // Collate all boundaries from the unified DayData
+        todayData.nallaNeram.forEach { allBoundaries.add(it.startTime); allBoundaries.add(it.endTime) }
+        todayData.gowriNeram.forEach { allBoundaries.add(it.startTime); allBoundaries.add(it.endTime) }
+        todayData.hora.forEach { allBoundaries.add(it.startTime); allBoundaries.add(it.endTime) }
+        todayData.specialPeriods.forEach { allBoundaries.add(it.startTime); allBoundaries.add(it.endTime) }
         
-        val nextTransition = allEndTimes
+        todayData.brahmaMuhurtham?.let { allBoundaries.add(it.startTime); allBoundaries.add(it.endTime) }
+        todayData.abhijitMuhurtham?.let { allBoundaries.add(it.startTime); allBoundaries.add(it.endTime) }
+        todayData.maitraMuhurtham.forEach { allBoundaries.add(it.startTime); allBoundaries.add(it.endTime) }
+        
+        val nextTransition = allBoundaries
             .filter { it.isAfter(now) }
             .minByOrNull { it }
 
@@ -143,7 +113,6 @@ class WidgetUpdateWorker(
             
             val workRequest = OneTimeWorkRequestBuilder<WidgetUpdateWorker>()
                 .setInitialDelay(delay, TimeUnit.MILLISECONDS)
-                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 .addTag("TransitionUpdate")
                 .build()
 

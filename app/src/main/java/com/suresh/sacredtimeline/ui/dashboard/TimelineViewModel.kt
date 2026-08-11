@@ -9,15 +9,16 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.suresh.sacredtimeline.data.CacheManager
 import com.suresh.sacredtimeline.data.SettingsRepository
-import com.suresh.sacredtimeline.logic.MockPanchangamProvider
-import com.suresh.sacredtimeline.logic.SunriseSunsetProvider
+import com.suresh.sacredtimeline.logic.DayDataProvider
 import com.suresh.sacredtimeline.model.*
 import com.suresh.sacredtimeline.ui.navigation.ViewMode
+import com.suresh.sacredtimeline.worker.WidgetUpdateWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -31,8 +32,6 @@ import java.util.Locale
 class TimelineViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = SettingsRepository(application)
     private val cacheManager = CacheManager(application)
-    private val provider = MockPanchangamProvider()
-    private val sunProvider = SunriseSunsetProvider()
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(application)
     
     private var currentLocation: Pair<Double, Double> = Pair(11.0168, 76.9558) // Default to Coimbatore
@@ -51,6 +50,7 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
     val timelineScale: StateFlow<Float> = _timelineScale
 
     private var refreshJob: kotlinx.coroutines.Job? = null
+    private var widgetSyncJob: kotlinx.coroutines.Job? = null
     private val cachedDays = mutableMapOf<LocalDate, DayData>()
     private val cacheMutex = Mutex()
 
@@ -131,9 +131,6 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
     )
 
     init {
-        // Clear cache to ensure new timing structure and filters are applied
-        cacheManager.clearCache()
-
         // Observe scale settings based on view mode
         viewModelScope.launch {
             combine(repository.compositeScale, repository.singleViewScale, _viewMode) { composite, single, mode ->
@@ -167,6 +164,7 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
                     if (hasChanged) {
                         cacheMutex.withLock { cachedDays.clear() }
                         preloadData(selectedDate.value, repository.preloadDays.first())
+                        triggerWidgetSync()
                     } else if (cachedDays.isEmpty()) {
                         // Cold start in Manual Mode: Try to load from disk
                         val diskData = cacheManager.loadCache(coords.first, coords.second)
@@ -214,12 +212,13 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
                     style = values[3] as String,
                     system = values[4] as String
                 )
-            }.collect { 
+            }.drop(1).collect { 
                 refreshJob?.cancel()
                 refreshJob = viewModelScope.launch {
                     cacheMutex.withLock { cachedDays.clear() }
                     cacheManager.clearCache() // Clear disk too
                     preloadData(selectedDate.value, repository.preloadDays.first())
+                    triggerWidgetSync()
                 }
             }
         }
@@ -319,6 +318,7 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
                             }
                             if (diskData != null) updateSuccessState()
                             preloadData(selectedDate.value, repository.preloadDays.first())
+                            triggerWidgetSync()
                         }
                     } else if (cachedDays.isEmpty()) {
                         refreshJob?.cancel()
@@ -358,6 +358,14 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch {
             repository.setLocationMode("MANUAL")
             repository.setManualCityName(name)
+        }
+    }
+
+    private fun triggerWidgetSync() {
+        widgetSyncJob?.cancel()
+        widgetSyncJob = viewModelScope.launch {
+            kotlinx.coroutines.delay(500)
+            WidgetUpdateWorker.triggerImmediateUpdate(getApplication<Application>())
         }
     }
 
@@ -402,100 +410,7 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
     }
 
     private suspend fun fetchDayData(date: LocalDate): DayData {
-        val (lat, lng) = currentLocation
-        val sunDef = repository.sunriseDefinition.first()
-        val style = repository.specialPeriodStyle.first()
-
-        val sunResult = sunProvider.getSunTimes(lat, lng, date, sunDef)
-        val timings = provider.getTimings(date, sunResult.sunrise, sunResult.sunset, style, sunDef, lat, lng)
-        
-        val tamilCalendar = com.suresh.sacredtimeline.logic.TamilCalendarUtils.getTamilDate(date)
-        val lunarDayInfo = com.suresh.sacredtimeline.logic.LunarCalendarUtils.getLunarDayInfo(date)
-        
-        // Ritual Context calculation for anchored festivals (Part 3: Anchor Wiring)
-        val zoneId = java.time.ZoneId.systemDefault()
-        val sunriseInstant = date.atTime(sunResult.sunrise).atZone(zoneId).toInstant()
-        val pradoshaWindow = com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculatePradoshaWindow(lat, lng, date, sunDef, zoneId)
-        val nishitaWindow = com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculateNishitaKala(lat, lng, date, sunDef, zoneId)
-        
-        val ritualContext = com.suresh.sacredtimeline.logic.TamilCalendarUtils.RitualContext(
-            tithis = lunarDayInfo.tithis,
-            nakshatras = lunarDayInfo.nakshatras,
-            sunrise = sunriseInstant,
-            pradosham = pradoshaWindow,
-            nishita = nishitaWindow,
-            zoneId = zoneId
-        )
-        
-        val festivals = com.suresh.sacredtimeline.logic.TamilCalendarUtils.getSpecialEvents(tamilCalendar, ritualContext)
-        val holidays = com.suresh.sacredtimeline.data.VerifiedHolidays.getHolidays(date)
-        val combinedEvents = (holidays + festivals).distinct()
-        
-        val brahmaTimes = com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculateBrahmaMuhurtham(sunResult.sunrise)
-        val brahma = Muhurtham(
-            name = "Brahma Muhurtham",
-            tamilName = "",
-            startTime = brahmaTimes.first,
-            endTime = brahmaTimes.second,
-            auspiciousness = Auspiciousness.GREEN,
-            description = ""
-        )
-
-        val abhijitTimes = com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculateAbhijitMuhurtham(sunResult.sunrise, sunResult.sunset)
-        val abhijit = abhijitTimes?.let {
-            Muhurtham(
-                name = "Abhijit Muhurtham",
-                tamilName = "",
-                startTime = it.first,
-                endTime = it.second,
-                auspiciousness = Auspiciousness.GREEN,
-                description = ""
-            )
-        }
-
-        val maitra = com.suresh.sacredtimeline.logic.PanchangamCalculator.calculateMaitraMuhurtham(
-            date, lat, lng, sunResult.sunrise
-        )
-
-        // Filter Tithi and Nakshatra based on user preferences
-        val enabledTithisVal = repository.enabledTithis.first()
-        val enabledStarsVal = repository.enabledNakshatras.first()
-        
-        val filteredTithis = lunarDayInfo.tithis.filter { interval ->
-            val normalizedValue = if (interval.value > 15) interval.value - 15 else interval.value
-            enabledTithisVal.contains("TITHI_${interval.value}") || 
-            (interval.value > 15 && enabledTithisVal.contains("TITHI_$normalizedValue"))
-        }.map { 
-            LunarInterval(it.value, it.resId, it.startTime, it.endTime)
-        }
-
-        val filteredNakshatras = lunarDayInfo.nakshatras.filter { interval ->
-            enabledStarsVal.contains("STAR_${interval.value}") 
-        }.map { 
-            LunarInterval(it.value, it.resId, it.startTime, it.endTime)
-        }
-
-        return DayData(
-            nallaNeram = timings.filterIsInstance<NallaNeram>(),
-            gowriNeram = timings.filterIsInstance<GowriNeram>(),
-            hora = timings.filterIsInstance<Hora>(),
-            specialPeriods = timings.filterIsInstance<SpecialPeriod>(),
-            sunrise = sunResult.sunrise,
-            sunset = sunResult.sunset,
-            isFallback = sunResult.isFallback,
-            tamilDay = tamilCalendar.day,
-            tamilMonthResId = tamilCalendar.monthResId,
-            tamilYearResId = tamilCalendar.yearResId,
-            pakshaResId = lunarDayInfo.pakshaResId,
-            pakshaDay = lunarDayInfo.pakshaDay,
-            tithis = filteredTithis,
-            nakshatras = filteredNakshatras,
-            specialEvents = combinedEvents,
-            isSubhaMuhurtham = com.suresh.sacredtimeline.data.VerifiedHolidays.isSubhaMuhurtham(date),
-            brahmaMuhurtham = brahma,
-            abhijitMuhurtham = abhijit,
-            maitraMuhurtham = maitra
-        )
+        return DayDataProvider(getApplication()).fetchDayData(date, currentLocation.first, currentLocation.second)
     }
 }
 

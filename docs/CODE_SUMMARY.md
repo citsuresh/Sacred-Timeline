@@ -55,6 +55,7 @@ graph TD
 ## 4. Symbol Index
 | Symbol | Responsibility |
 | :--- | :--- |
+| `DayDataProvider` | SSOT for unified Panchangam calculation (App, Widget, Worker). |
 | `TimelineCore` | 24h grid with dynamic lane scaling and harmony gap-filling. |
 | `RitualContext` | Anchor data (Sunrise, Pradosha, Nishita) for event detection. |
 | `CacheManager` | Versioned atomic storage for timeline performance. |

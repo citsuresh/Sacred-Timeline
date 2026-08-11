@@ -12,7 +12,10 @@ class RefreshActionCallback : ActionCallback {
         glanceId: GlanceId,
         parameters: ActionParameters
     ) {
-        // Trigger an immediate update via WorkManager (Expedited)
+        // Instant update for the current widget instance
+        PanchangamWidget().update(context, glanceId)
+        
+        // Also trigger the background worker to ensure all widgets and cache are synchronized
         WidgetUpdateWorker.triggerImmediateUpdate(context)
     }
 }
