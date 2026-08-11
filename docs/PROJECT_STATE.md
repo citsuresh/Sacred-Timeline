@@ -10,10 +10,10 @@
     - Full persistence for "Custom Timeline" (hidden until first use).
     - Calendar-style Tamil Date Anchor in header.
     - Two-way sync between Nav Drawer and Settings; added switch confirmation dialogs.
-    - **Widget Synchronization**: Implemented high-precision transition scheduling and instant refresh logic.
+    - **Widget Synchronization**: Fixed transition scheduling (Start/End boundaries), instant manual refresh, and debounced app-to-widget sync.
 - **Architecture**:
-    - **Unified Data Pipeline**: Introduced `DayDataProvider` to eliminate logic drift between App and Widget.
-- **Performance**: Smart Refresh logic prevents full cache clears for non-mathematical setting changes. default preload increased to 30 days.
+    - **Unified Data Pipeline**: Introduced `DayDataProvider` to eliminate logic drift between App and Widget; wired all settings (including Lunar Month System) through the new pipeline.
+- **Performance**: Smart Refresh logic prevents full cache clears for non-mathematical setting changes. default preload increased to 30 days. Fix: Cache now correctly persists across app launches.
 
 ## 2. Technical Stack
 - **UI**: Kotlin, Compose (M3), Jetpack Glance (Widgets), Navigation 3.

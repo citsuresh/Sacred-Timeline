@@ -39,7 +39,11 @@ Historical record of architectural and UI/UX choices.
 - **North/South Convention Toggle**: Implemented a global switch for Amanta (South) and Purnimanta (North) lunar month systems to ensure universal applicability across India.
 - **Navigation 3**: Reactive, state-driven routing managed in `MainActivity`.
 - **Dispatcher Hoisting**: Manually providing `NavigationEventDispatcherOwner` at the root to fix Nav3/Compose integration crashes.
-- **Transition-Synchronized Updates**: Widget refreshes are timed to `endTime` of slots, not periodic intervals, ensuring 100% accuracy.
+- **Unified Calculation Source (`DayDataProvider`)**: 
+    - Decoupled Panchangam calculation from the UI layer. 
+    - Both `TimelineViewModel` and `PanchangamWidget` now consume data from a shared `DayDataProvider`, ensuring 100% parity between what the user sees in the app and on their home screen.
+- **Transition-Synchronized Updates**: Widget refreshes are timed to `startTime` AND `endTime` of slots, not periodic intervals, ensuring 100% accuracy.
+- **App-to-Widget Debouncing**: Implemented a 500ms debounce for widget updates triggered by app settings changes to conserve system resources and prevent expedited job quota exhaustion.
 - **AppCompat Localization**: Using `AppCompatDelegate.setApplicationLocales` for system-integrated, restart-free language switching (Android 13+).
 - **Vedic Day (Vara) Continuity**: Implemented Vara-based logic for auspicious windows (like Maitra Muhurtham). The "day quality" (potency) is anchored to the sunrise-to-sunrise cycle, not calendar midnight, ensuring traditional accuracy for late-night windows.
 - **Auspiciousness Color Gradation**: Introduced sub-levels of color coding within the "GOLD" category (e.g., Bright Gold vs. Pale Gold) to visually signal different potency levels of the same Muhurtham without introducing new conflicting colors.
