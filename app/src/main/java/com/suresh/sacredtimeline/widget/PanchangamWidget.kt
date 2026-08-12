@@ -29,8 +29,7 @@ import com.suresh.sacredtimeline.R
 import com.suresh.sacredtimeline.MainActivity
 import com.suresh.sacredtimeline.data.CacheManager
 import com.suresh.sacredtimeline.data.SettingsRepository
-import com.suresh.sacredtimeline.logic.MockPanchangamProvider
-import com.suresh.sacredtimeline.logic.SunriseSunsetProvider
+import com.suresh.sacredtimeline.logic.DayDataProvider
 import com.suresh.sacredtimeline.model.*
 import com.suresh.sacredtimeline.ui.theme.*
 import kotlinx.coroutines.flow.first
@@ -44,8 +43,6 @@ class PanchangamWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val repository = SettingsRepository(context)
         val cacheManager = CacheManager(context)
-        val provider = MockPanchangamProvider()
-        val sunProvider = SunriseSunsetProvider()
         
         val now = LocalTime.now()
         val date = LocalDate.now()
@@ -62,8 +59,6 @@ class PanchangamWidget : GlanceAppWidget() {
         val is24Hour = repository.timeFormat24h.first()
         val columnVisibility = repository.widgetColumnVisibility.first()
         val columnOrder = repository.widgetColumnOrder.first()
-        val sunDef = repository.sunriseDefinition.first()
-        val style = repository.specialPeriodStyle.first()
         
         val lat: Double
         val lng: Double
@@ -81,33 +76,8 @@ class PanchangamWidget : GlanceAppWidget() {
         val dayData: DayData = if (cache?.containsKey(date) == true) {
             cache[date]!!
         } else {
-            val sunResult = sunProvider.getSunTimes(lat, lng, date, sunDef)
-            val timings = provider.getTimings(date, sunResult.sunrise, sunResult.sunset, style, sunDef, lat, lng)
+            val data = DayDataProvider(context).fetchDayData(date, lat, lng)
             
-            // Maitra calculation for widget
-            val maitra = com.suresh.sacredtimeline.logic.PanchangamCalculator.calculateMaitraMuhurtham(
-                date, lat, lng, sunResult.sunrise
-            )
-
-            val data = DayData(
-                nallaNeram = timings.filterIsInstance<NallaNeram>(),
-                gowriNeram = timings.filterIsInstance<GowriNeram>(),
-                hora = timings.filterIsInstance<Hora>(),
-                specialPeriods = timings.filterIsInstance<SpecialPeriod>(),
-                maitraMuhurtham = maitra,
-                sunrise = sunResult.sunrise,
-                sunset = sunResult.sunset,
-                isFallback = sunResult.isFallback,
-                brahmaMuhurtham = Muhurtham(
-                    "Brahma Muhurtham", "",
-                    com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculateBrahmaMuhurtham(sunResult.sunrise).first,
-                    com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculateBrahmaMuhurtham(sunResult.sunrise).second,
-                    Auspiciousness.GREEN
-                ),
-                abhijitMuhurtham = com.suresh.sacredtimeline.logic.LunarCalendarUtils.calculateAbhijitMuhurtham(sunResult.sunrise, sunResult.sunset)?.let {
-                    Muhurtham("Abhijit Muhurtham", "", it.first, it.second, Auspiciousness.GREEN)
-                }
-            )
             // Fix: Cache Write-Back
             val newCache = cache?.toMutableMap() ?: mutableMapOf()
             newCache[date] = data

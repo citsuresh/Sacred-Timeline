@@ -117,7 +117,7 @@ class SettingsRepository(private val context: Context) {
     val themeMode: Flow<String> = context.dataStore.data.map { it[Keys.THEME_MODE] ?: "SYSTEM" }
 
     val enabledTithis: Flow<Set<String>> = context.dataStore.data.map { 
-        it[Keys.ENABLED_TITHIS] ?: setOf("TITHI_11", "TITHI_15", "TITHI_19", "TITHI_26", "TITHI_30") 
+        it[Keys.ENABLED_TITHIS] ?: setOf("TITHI_11", "TITHI_15", "TITHI_19", "TITHI_30") 
     }
 
     val enabledNakshatras: Flow<Set<String>> = context.dataStore.data.map { 

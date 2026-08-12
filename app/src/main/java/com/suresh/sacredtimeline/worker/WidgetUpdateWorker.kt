@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.first
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
+import java.time.ZoneId
 import java.util.concurrent.TimeUnit
 
 class WidgetUpdateWorker(
@@ -103,6 +104,11 @@ class WidgetUpdateWorker(
         todayData.brahmaMuhurtham?.let { allBoundaries.add(it.startTime); allBoundaries.add(it.endTime) }
         todayData.abhijitMuhurtham?.let { allBoundaries.add(it.startTime); allBoundaries.add(it.endTime) }
         todayData.maitraMuhurtham.forEach { allBoundaries.add(it.startTime); allBoundaries.add(it.endTime) }
+        
+        // Fix: Also monitor Tithi and Nakshatra boundaries for header accuracy
+        val zoneId = ZoneId.systemDefault()
+        todayData.tithis.forEach { it.startTime?.let { s -> allBoundaries.add(s.atZone(zoneId).toLocalTime()) }; it.endTime?.let { e -> allBoundaries.add(e.atZone(zoneId).toLocalTime()) } }
+        todayData.nakshatras.forEach { it.startTime?.let { s -> allBoundaries.add(s.atZone(zoneId).toLocalTime()) }; it.endTime?.let { e -> allBoundaries.add(e.atZone(zoneId).toLocalTime()) } }
         
         val nextTransition = allBoundaries
             .filter { it.isAfter(now) }

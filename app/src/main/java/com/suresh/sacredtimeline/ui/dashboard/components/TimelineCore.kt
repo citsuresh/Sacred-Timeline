@@ -169,6 +169,7 @@ fun TimelinePager(
                             showSunset = showSunset,
                             showBrahmaMuhurtham = showBrahmaMuhurtham,
                             showAbhijitMuhurtham = showAbhijitMuhurtham,
+                            showMaitraMuhurtham = showMaitraMuhurtham,
                             isHeaderExpanded = isHeaderExpanded,
                             onToggleHeaderExpanded = onToggleHeaderExpanded,
                             viewStyle = viewStyle
