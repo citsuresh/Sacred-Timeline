@@ -11,9 +11,10 @@
     - Calendar-style Tamil Date Anchor in header.
     - Two-way sync between Nav Drawer and Settings; added switch confirmation dialogs.
     - **Widget Synchronization**: Fixed transition scheduling (Start/End boundaries), instant manual refresh, and debounced app-to-widget sync.
+    - **UI Integrity**: Resolved parameter-shift bug in `TimelinePager` that affected header and marquee visibility.
 - **Architecture**:
     - **Unified Data Pipeline**: Introduced `DayDataProvider` to eliminate logic drift between App and Widget; wired all settings (including Lunar Month System) through the new pipeline.
-- **Performance**: Smart Refresh logic prevents full cache clears for non-mathematical setting changes. default preload increased to 30 days. Fix: Cache now correctly persists across app launches.
+- **Performance**: Smart Refresh logic prevents full cache clears for non-mathematical setting changes. default preload increased to 30 days. Fix: Cache now correctly persists across app launches (v4).
 
 ## 2. Technical Stack
 - **UI**: Kotlin, Compose (M3), Jetpack Glance (Widgets), Navigation 3.
