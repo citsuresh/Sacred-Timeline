@@ -26,7 +26,7 @@ graph TD
 ### `ui/` & `widget/` (Presentation)
 - `dashboard/`: 24h timeline. `TimelineCore` handles lane-scaling & harmony refinement.
 - `navigation/`: State-driven Nav3 routing and custom `ViewMode` logic.
-- `settings/`: DataStore-backed config (7 blocks), Custom Timeline management.
+- `settings/`: DataStore-backed config (7 blocks), Custom Timeline and Chandrashtamam management.
 - `PanchangamWidget`: Glance-based M3 widget for at-a-glance timings.
 - `theme/`: `SacredTimelineColors` (Dual-tone gold/sticker-look).
 
