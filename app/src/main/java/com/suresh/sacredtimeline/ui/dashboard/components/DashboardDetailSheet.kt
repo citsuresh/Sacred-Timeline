@@ -81,16 +81,21 @@ fun DashboardDetailSheet(
                 Column {
                     val title = when (detail) {
                         is DashboardDetail.TimelineTiming -> {
-                            val nameRes = when (val t = detail.timing) {
-                                is Hora -> Metadata.getPlanetNameRes(t.name)
-                                is NallaNeram -> Metadata.getSpecialNameRes("Nalla")
-                                is GowriNeram -> Metadata.getGowriNameRes(t.name)
-                                is SpecialPeriod -> Metadata.getSpecialNameRes(t.name)
-                                is Muhurtham -> Metadata.getMuhurthamNameRes(t.name)
-                                is MaitraMuhurtham -> Metadata.getSpecialNameRes("Maitra Muhurtham")
-                                is ChandrashtamamTiming -> R.string.label_chandrashtamam
+                            val t = detail.timing
+                            if (t is ChandrashtamamTiming) {
+                                Metadata.getChandrashtamamLabel(t, LocalContext.current)
+                            } else {
+                                val nameRes = when (t) {
+                                    is Hora -> Metadata.getPlanetNameRes(t.name)
+                                    is NallaNeram -> Metadata.getSpecialNameRes("Nalla")
+                                    is GowriNeram -> Metadata.getGowriNameRes(t.name)
+                                    is SpecialPeriod -> Metadata.getSpecialNameRes(t.name)
+                                    is Muhurtham -> Metadata.getMuhurthamNameRes(t.name)
+                                    is MaitraMuhurtham -> Metadata.getSpecialNameRes("Maitra Muhurtham")
+                                    else -> R.string.app_name
+                                }
+                                stringResource(nameRes)
                             }
-                            stringResource(nameRes)
                         }
                         is DashboardDetail.Lunar -> stringResource(detail.item.resId)
                         is DashboardDetail.SpecialEvent -> stringResource(detail.resId)
@@ -108,6 +113,7 @@ fun DashboardDetailSheet(
                             when (detail.timing) {
                                 is Hora -> stringResource(R.string.nav_hora)
                                 is GowriNeram -> stringResource(R.string.nav_gowri_neram)
+                                is ChandrashtamamTiming -> stringResource(R.string.label_chandrashtamam)
                                 else -> ""
                             }
                         }
