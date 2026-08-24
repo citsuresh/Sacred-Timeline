@@ -339,6 +339,7 @@ fun LandscapeTimelineLayout(
                                 isSubhaMuhurtham = dayData.isSubhaMuhurtham,
                                 abhijitMuhurtham = dayData.abhijitMuhurtham,
                                 brahmaMuhurtham = dayData.brahmaMuhurtham,
+                                chandrashtamam = dayData.chandrashtamam,
                                 showTamilDate = showTamilDate,
                                 showTamilYear = showTamilYear,
                                 showPirai = showPirai,

@@ -46,6 +46,7 @@ object SacredTimelineColors {
             is MaitraMuhurtham -> {
                 if (timing.potencyStars == 5) MaitraGold else MaitraGoldPale
             }
+            is ChandrashtamamTiming -> ChandrashtamamRed
         }
     }
 

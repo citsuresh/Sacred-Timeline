@@ -42,19 +42,19 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     )
 
     val columnVisibility: StateFlow<Set<String>> = repository.columnVisibility.stateIn(
-        viewModelScope, SharingStarted.WhileSubscribed(5000), setOf("UNIVERSAL")
+        viewModelScope, SharingStarted.WhileSubscribed(5000), setOf("UNIVERSAL", "CHANDRASHTAMAM")
     )
 
     val columnOrder: StateFlow<List<String>> = repository.columnOrder.stateIn(
-        viewModelScope, SharingStarted.WhileSubscribed(5000), listOf("NERAM_MUHURTHAM", "UNIVERSAL", "NERAM", "BRAHMA", "ABHIJIT", "GOWRI", "HORA")
+        viewModelScope, SharingStarted.WhileSubscribed(5000), SettingsRepository.ALL_COLUMNS
     )
 
     val widgetColumnVisibility: StateFlow<Set<String>> = repository.widgetColumnVisibility.stateIn(
-        viewModelScope, SharingStarted.WhileSubscribed(5000), setOf("UNIVERSAL")
+        viewModelScope, SharingStarted.WhileSubscribed(5000), setOf("UNIVERSAL", "CHANDRASHTAMAM")
     )
 
     val widgetColumnOrder: StateFlow<List<String>> = repository.widgetColumnOrder.stateIn(
-        viewModelScope, SharingStarted.WhileSubscribed(5000), listOf("NERAM_MUHURTHAM", "UNIVERSAL", "NERAM", "BRAHMA", "ABHIJIT", "GOWRI", "HORA")
+        viewModelScope, SharingStarted.WhileSubscribed(5000), SettingsRepository.ALL_COLUMNS
     )
 
     val defaultLaunchView: StateFlow<ViewMode> = repository.defaultLaunchView.stateIn(
@@ -101,6 +101,10 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     )
 
     val enabledNakshatras: StateFlow<Set<String>> = repository.enabledNakshatras.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), emptySet()
+    )
+
+    val enabledChandrashtamamStars: StateFlow<Set<String>> = repository.enabledChandrashtamamStars.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), emptySet()
     )
 
@@ -311,11 +315,17 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun updateEnabledTithi(tithi: String, enabled: Boolean) {
-        viewModelScope.launch { repository.updateEnabledTithi(tithi, enabled) }
+        viewModelScope.launch { 
+            repository.updateEnabledTithi(tithi, enabled)
+            cacheManager.clearCache()
+        }
     }
 
     fun updateEnabledNakshatra(star: String, enabled: Boolean) {
-        viewModelScope.launch { repository.updateEnabledNakshatra(star, enabled) }
+        viewModelScope.launch { 
+            repository.updateEnabledNakshatra(star, enabled)
+            cacheManager.clearCache()
+        }
     }
 
     fun setShowTamilDate(show: Boolean) {
@@ -353,24 +363,34 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     fun setSunriseDefinition(definition: String) {
         viewModelScope.launch { 
             repository.setSunriseDefinition(definition)
+            cacheManager.clearCache()
         }
     }
 
     fun setSpecialPeriodStyle(style: String) {
         viewModelScope.launch { 
             repository.setSpecialPeriodStyle(style)
+            cacheManager.clearCache()
         }
     }
 
     fun setLunarMonthSystem(system: String) {
         viewModelScope.launch { 
             repository.setLunarMonthSystem(system)
+            cacheManager.clearCache()
         }
     }
 
     fun setTimelineViewStyle(style: String) {
         viewModelScope.launch { 
             repository.setTimelineViewStyle(style)
+        }
+    }
+
+    fun updateEnabledChandrashtamamStar(starId: String, enabled: Boolean) {
+        viewModelScope.launch { 
+            repository.updateEnabledChandrashtamamStar(starId, enabled)
+            cacheManager.clearCache()
         }
     }
 
@@ -382,35 +402,41 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch {
             repository.setDefaultLaunchView(mode)
             // When switching to a solo mode via menu, we update the visibility to match
+            val allColumns = SettingsRepository.ALL_COLUMNS
             when (mode) {
                 ViewMode.UNIVERSAL -> {
-                    listOf("NERAM_MUHURTHAM", "UNIVERSAL", "NERAM", "MAITRA", "BRAHMA", "ABHIJIT", "GOWRI", "HORA").forEach {
+                    allColumns.forEach {
                         repository.updateColumnVisibility(it, true)
                     }
                 }
                 ViewMode.NERAM_MUHURTHAM -> {
-                    listOf("NERAM_MUHURTHAM", "UNIVERSAL", "NERAM", "MAITRA", "BRAHMA", "ABHIJIT", "GOWRI", "HORA").forEach {
+                    allColumns.forEach {
                         repository.updateColumnVisibility(it, it == "NERAM_MUHURTHAM")
                     }
                 }
                 ViewMode.NERAM -> {
-                    listOf("NERAM_MUHURTHAM", "UNIVERSAL", "NERAM", "MAITRA", "BRAHMA", "ABHIJIT", "GOWRI", "HORA").forEach {
+                    allColumns.forEach {
                         repository.updateColumnVisibility(it, it == "NERAM")
                     }
                 }
                 ViewMode.GOWRI -> {
-                    listOf("NERAM_MUHURTHAM", "UNIVERSAL", "NERAM", "MAITRA", "BRAHMA", "ABHIJIT", "GOWRI", "HORA").forEach {
+                    allColumns.forEach {
                         repository.updateColumnVisibility(it, it == "GOWRI")
                     }
                 }
                 ViewMode.HORA -> {
-                    listOf("NERAM_MUHURTHAM", "UNIVERSAL", "NERAM", "MAITRA", "BRAHMA", "ABHIJIT", "GOWRI", "HORA").forEach {
+                    allColumns.forEach {
                         repository.updateColumnVisibility(it, it == "HORA")
                     }
                 }
                 ViewMode.MAITRA -> {
-                    listOf("NERAM_MUHURTHAM", "UNIVERSAL", "NERAM", "MAITRA", "BRAHMA", "ABHIJIT", "GOWRI", "HORA").forEach {
+                    allColumns.forEach {
                         repository.updateColumnVisibility(it, it == "MAITRA")
+                    }
+                }
+                ViewMode.CHANDRASHTAMAM -> {
+                    allColumns.forEach {
+                        repository.updateColumnVisibility(it, it == "CHANDRASHTAMAM")
                     }
                 }
                 else -> {}

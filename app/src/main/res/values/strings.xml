@@ -6,6 +6,7 @@
     <string name="nav_gowri_neram">Gowri Neram</string>
     <string name="nav_hora">Horai</string>
     <string name="nav_maitra">Maitra</string>
+    <string name="nav_chandrashtamam">Chandrashtamam</string>
     <string name="nav_universal">Universal Timeline</string>
     <string name="nav_neram_muhurtham">Neram / Muhurtham</string>
     <string name="nav_custom">Custom Timeline</string>
@@ -109,6 +110,7 @@
     <string name="label_now_line">NOW</string>
     <string name="label_from">From</string>
     <string name="label_to">To</string>
+    <string name="label_in">|</string>
     <string name="label_sunrise">Sunrise</string>
     <string name="label_sunset">Sunset</string>
     <string name="label_starts_at">Starts %s</string>
@@ -216,6 +218,20 @@
     <string name="star_25">Purva Bhadrapada</string>
     <string name="star_26">Uttara Bhadrapada</string>
     <string name="star_27">Revati</string>
+
+    <!-- Rasis -->
+    <string name="rasi_1">Mesham</string>
+    <string name="rasi_2">Rishabham</string>
+    <string name="rasi_3">Mithunam</string>
+    <string name="rasi_4">Katakam</string>
+    <string name="rasi_5">Simmam</string>
+    <string name="rasi_6">Kanni</string>
+    <string name="rasi_7">Thulam</string>
+    <string name="rasi_8">Vrischigam</string>
+    <string name="rasi_9">Dhanusu</string>
+    <string name="rasi_10">Makaram</string>
+    <string name="rasi_11">Kumbam</string>
+    <string name="rasi_12">Meenam</string>
 
     <!-- Muhurthams -->
     <string name="muhurtham_brahma">Brahma Muhurtham</string>
@@ -379,6 +395,7 @@
     <string name="settings_zoom_single">Single View Zoom</string>
     <string name="settings_pinch_zoom">Enable Pinch-to-Zoom</string>
     <string name="settings_indicators">Timeline Display</string>
+    <string name="settings_chandrashtamam_options">Chandrashtamams for display</string>
     <string name="settings_show_tamil_date">Show Tamil Date</string>
     <string name="settings_show_tamil_year">Show Tamil Year</string>
     <string name="settings_show_pirai">Show Pirai</string>
@@ -446,6 +463,7 @@
     <string name="desc_timing_yama">Inauspicious period. Often associated with loss or obstacles. Avoid beginning anything new.\n\nDo: Repaying debts, finishing pending work, letting go.\nDon\'t: New projects, medical treatments, long journeys.</string>
     <string name="desc_timing_kuli">Expansion period. What is done during this time tends to repeat. Good for buying assets, not for bad deeds.\n\nDo: Charity, investments, starting positive habits.\nDon\'t: Incurring debt, funeral rituals, negative behaviors.</string>
     <string name="desc_timing_nalla">Most auspicious time of the day for important activities.</string>
+    <string name="desc_timing_chandrashtamam">Chandrashtamam: A period of caution when the Moon transits the 8th Rasi from your birth star. Avoid major new decisions or risky activities.</string>
 
     <!-- Metadata: Planet Qualities -->
     <string name="quality_sun">Authority, Vitality, Leadership. Focus on administration and meetings with superiors.</string>

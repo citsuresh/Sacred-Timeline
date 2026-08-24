@@ -53,3 +53,13 @@ Historical record of architectural and UI/UX choices.
     - Implemented **Ritual Windows**: Pradosham is anchored to the Sunset window, and Shivaratri to Nishita Kala.
     - Implemented **Udaya Vyapini Anchoring**: Star and Tithi-based festivals (Aadi Pooram, Naga Chaturthi) are anchored to their presence at Sunrise, ensuring a single, traditional occurrence per calendar day.
     - **Date-Specific DST Correction**: Sun calculations now dynamically calculate timezone offsets for the target date, ensuring sub-minute precision for historical and future dates.
+- **Dual-Time Model (Clipping vs. Context)**: 
+    - For events spanning multiple days (like Chandrashtamam or long Nakshatras), the data model now separates the **Absolute Instant** (true astronomical boundary for marquees) from the **Clipped LocalTime** (00:00 - 23:59 for vertical grid rendering). This prevents rendering artifacts where boxes start "yesterday" and fail to appear on the current day's grid.
+- **DataStore Reconciliation (Ghost Column Prevention)**: 
+    - Implemented a proactive reconciliation layer in `SettingsRepository`. When loading saved column lists, the system now automatically identifies and appends newly implemented features (like `CHANDRASHTAMAM`) if they are missing from the user's legacy disk preferences. This ensures code-side defaults are respected without requiring a manual cache clear.
+- **Personal Warning UX (Anchor Priority)**: 
+    - For personal warning systems, the **Birth Anchor** (e.g., "Pushya - Katakam") takes priority over the **Transit Anchor** (e.g., "Kumbam"). Users recognize warnings based on their own attributes; technical transit locations are secondary information.
+- **Glance Resource Constraints**: 
+    - Learned that Jetpack Glance is more restrictive with dynamic `ColorProvider` usage than standard Compose. To ensure stability across Android versions, certain system colors (like black/white icons) must use `android.R.color` resource IDs rather than dynamic code-defined colors to avoid internal library-group access errors.
+- **Multi-Boundary Transition Pruning**: 
+    - Optimized background worker scheduling for high-density settings (e.g., multiple birth stars). The system now collates all possible transition boundaries for a given day but prunes the set to schedule only the **single next closest event**, preventing excessive WorkManager overhead while maintaining 100% accuracy.

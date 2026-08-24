@@ -200,6 +200,7 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
             combine(
                 repository.enabledTithis, 
                 repository.enabledNakshatras,
+                repository.enabledChandrashtamamStars,
                 repository.sunriseDefinition,
                 repository.specialPeriodStyle,
                 repository.lunarMonthSystem
@@ -208,9 +209,10 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
                 DataRefreshTrigger(
                     tithis = values[0] as Set<String>,
                     stars = values[1] as Set<String>,
-                    sunDef = values[2] as String,
-                    style = values[3] as String,
-                    system = values[4] as String
+                    chandrashtamam = values[2] as Set<String>,
+                    sunDef = values[3] as String,
+                    style = values[4] as String,
+                    system = values[5] as String
                 )
             }.drop(1).collect { 
                 refreshJob?.cancel()
@@ -227,6 +229,7 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
     private data class DataRefreshTrigger(
         val tithis: Set<String>,
         val stars: Set<String>,
+        val chandrashtamam: Set<String>,
         val sunDef: String,
         val style: String,
         val system: String
@@ -236,35 +239,41 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch {
             _viewMode.value = mode
             // If it's a standard solo mode, we update the visibility to match for consistency
+            val allCols = SettingsRepository.ALL_COLUMNS
             when (mode) {
                 ViewMode.UNIVERSAL -> {
-                    listOf("NERAM_MUHURTHAM", "UNIVERSAL", "NERAM", "MAITRA", "BRAHMA", "ABHIJIT", "GOWRI", "HORA").forEach {
+                    allCols.forEach {
                         repository.updateColumnVisibility(it, it == "UNIVERSAL")
                     }
                 }
                 ViewMode.NERAM_MUHURTHAM -> {
-                    listOf("NERAM_MUHURTHAM", "UNIVERSAL", "NERAM", "MAITRA", "BRAHMA", "ABHIJIT", "GOWRI", "HORA").forEach {
+                    allCols.forEach {
                         repository.updateColumnVisibility(it, it == "NERAM_MUHURTHAM")
                     }
                 }
                 ViewMode.NERAM -> {
-                    listOf("NERAM_MUHURTHAM", "UNIVERSAL", "NERAM", "MAITRA", "BRAHMA", "ABHIJIT", "GOWRI", "HORA").forEach {
+                    allCols.forEach {
                         repository.updateColumnVisibility(it, it == "NERAM")
                     }
                 }
                 ViewMode.GOWRI -> {
-                    listOf("NERAM_MUHURTHAM", "UNIVERSAL", "NERAM", "MAITRA", "BRAHMA", "ABHIJIT", "GOWRI", "HORA").forEach {
+                    allCols.forEach {
                         repository.updateColumnVisibility(it, it == "GOWRI")
                     }
                 }
                 ViewMode.HORA -> {
-                    listOf("NERAM_MUHURTHAM", "UNIVERSAL", "NERAM", "MAITRA", "BRAHMA", "ABHIJIT", "GOWRI", "HORA").forEach {
+                    allCols.forEach {
                         repository.updateColumnVisibility(it, it == "HORA")
                     }
                 }
                 ViewMode.MAITRA -> {
-                    listOf("NERAM_MUHURTHAM", "UNIVERSAL", "NERAM", "MAITRA", "BRAHMA", "ABHIJIT", "GOWRI", "HORA").forEach {
+                    allCols.forEach {
                         repository.updateColumnVisibility(it, it == "MAITRA")
+                    }
+                }
+                ViewMode.CHANDRASHTAMAM -> {
+                    allCols.forEach {
+                        repository.updateColumnVisibility(it, it == "CHANDRASHTAMAM")
                     }
                 }
                 else -> {}

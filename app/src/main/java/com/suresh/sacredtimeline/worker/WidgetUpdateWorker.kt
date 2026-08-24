@@ -104,6 +104,7 @@ class WidgetUpdateWorker(
         todayData.brahmaMuhurtham?.let { allBoundaries.add(it.startTime); allBoundaries.add(it.endTime) }
         todayData.abhijitMuhurtham?.let { allBoundaries.add(it.startTime); allBoundaries.add(it.endTime) }
         todayData.maitraMuhurtham.forEach { allBoundaries.add(it.startTime); allBoundaries.add(it.endTime) }
+        todayData.chandrashtamam.forEach { allBoundaries.add(it.startTime); allBoundaries.add(it.endTime) }
         
         // Fix: Also monitor Tithi and Nakshatra boundaries for header accuracy
         val zoneId = ZoneId.systemDefault()

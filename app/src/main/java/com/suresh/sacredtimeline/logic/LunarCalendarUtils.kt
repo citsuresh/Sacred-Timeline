@@ -83,6 +83,67 @@ object LunarCalendarUtils {
         )
     }
 
+    fun getMoonRasiInfo(date: LocalDate): List<LunarInterval> {
+        val zoneId = ZoneId.systemDefault()
+        val dayStart = date.atStartOfDay(zoneId).toInstant()
+        val dayEnd = date.plusDays(1).atStartOfDay(zoneId).toInstant()
+
+        return findIntervalsForDay(dayStart, dayEnd) { getMoonRasi(it) }
+            .map { it.copy(resId = getRasiResId(it.value)) }
+    }
+
+    fun getMoonRasi(instant: Instant): Int {
+        val jd = (instant.toEpochMilli() / 86400000.0) + 2440587.5
+        val moonLong = calculateMoonLongitudeHighPrecision((jd - 2451545.0) / 36525.0)
+        val ayanamsha = calculateLahiriAyanamsha(jd)
+        var siderealMoon = moonLong - ayanamsha
+        while (siderealMoon < 0) siderealMoon += 360.0
+        while (siderealMoon >= 360.0) siderealMoon -= 360.0
+        return (floor(siderealMoon / 30.0).toInt() + 1).coerceIn(1, 12)
+    }
+
+    fun getBirthRasi(starConfigId: String): Int {
+        return when (starConfigId) {
+            "STAR_1" -> 1   // Ashwini -> Mesham
+            "STAR_2" -> 1   // Bharani -> Mesham
+            "STAR_3_1" -> 1 // Krittika -> Mesham
+            "STAR_3_2" -> 2 // Krittika -> Rishabham
+            "STAR_4" -> 2   // Rohini -> Rishabham
+            "STAR_5_1" -> 2 // Mrigashirsha -> Rishabham
+            "STAR_5_2" -> 3 // Mrigashirsha -> Mithunam
+            "STAR_6" -> 3   // Ardra -> Mithunam
+            "STAR_7_1" -> 3 // Punarvasu -> Mithunam
+            "STAR_7_2" -> 4 // Punarvasu -> Katakam
+            "STAR_8" -> 4   // Pushya -> Katakam
+            "STAR_9" -> 4   // Ashlesha -> Katakam
+            "STAR_10" -> 5  // Magha -> Simmam
+            "STAR_11" -> 5  // Purva Phalguni -> Simmam
+            "STAR_12_1" -> 5 // Uttara Phalguni -> Simmam
+            "STAR_12_2" -> 6 // Uttara Phalguni -> Kanni
+            "STAR_13" -> 6   // Hasta -> Kanni
+            "STAR_14_1" -> 6 // Chitra -> Kanni
+            "STAR_14_2" -> 7 // Chitra -> Thulam
+            "STAR_15" -> 7   // Swati -> Thulam
+            "STAR_16_1" -> 7 // Vishakha -> Thulam
+            "STAR_16_2" -> 8 // Vishakha -> Vrischigam
+            "STAR_17" -> 8   // Anuradha -> Vrischigam
+            "STAR_18" -> 8   // Jyeshtha -> Vrischigam
+            "STAR_19" -> 9   // Mula -> Dhanusu
+            "STAR_20" -> 9   // Purva Ashadha -> Dhanusu
+            "STAR_21_1" -> 9 // Uttara Ashadha -> Dhanusu
+            "STAR_21_2" -> 10 // Uttara Ashadha -> Makaram
+            "STAR_22" -> 10  // Shravana -> Makaram
+            "STAR_23_1" -> 10 // Dhanishta -> Makaram
+            "STAR_23_2" -> 11 // Dhanishta -> Kumbam
+            "STAR_24" -> 11  // Shatabhisha -> Kumbam
+            "STAR_25_1" -> 11 // Purva Bhadrapada -> Kumbam
+            "STAR_25_2" -> 12 // Purva Bhadrapada -> Meenam
+            "STAR_26" -> 12  // Uttara Bhadrapada -> Meenam
+            "STAR_27" -> 12  // Revati -> Meenam
+            else -> 1
+        }
+    }
+
     private fun findIntervalsForDay(
         dayStart: Instant,
         dayEnd: Instant,
@@ -93,9 +154,9 @@ object LunarCalendarUtils {
         
         while (currentSearchStart.isBefore(dayEnd)) {
             val currentVal = getter(currentSearchStart)
-            val windowStart = currentSearchStart.minus(Duration.ofDays(2))
+            val windowStart = currentSearchStart.minus(Duration.ofDays(5))
             val absoluteStart = findStartTime(windowStart, currentSearchStart, currentVal, getter)
-            val windowEnd = currentSearchStart.plus(Duration.ofDays(2))
+            val windowEnd = currentSearchStart.plus(Duration.ofDays(5))
             val absoluteEnd = findEndTime(currentSearchStart, windowEnd, currentVal, getter)
             
             intervals.add(
@@ -412,5 +473,21 @@ object LunarCalendarUtils {
         26 -> R.string.star_26
         27 -> R.string.star_27
         else -> R.string.star_1
+    }
+
+    fun getRasiResId(rasi: Int): Int = when (rasi) {
+        1 -> R.string.rasi_1
+        2 -> R.string.rasi_2
+        3 -> R.string.rasi_3
+        4 -> R.string.rasi_4
+        5 -> R.string.rasi_5
+        6 -> R.string.rasi_6
+        7 -> R.string.rasi_7
+        8 -> R.string.rasi_8
+        9 -> R.string.rasi_9
+        10 -> R.string.rasi_10
+        11 -> R.string.rasi_11
+        12 -> R.string.rasi_12
+        else -> R.string.rasi_1
     }
 }

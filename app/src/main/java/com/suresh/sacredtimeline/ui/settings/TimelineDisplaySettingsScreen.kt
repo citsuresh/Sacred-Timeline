@@ -20,6 +20,7 @@ fun TimelineDisplaySettingsScreen(
     onBack: () -> Unit,
     onNavigateToTithiSettings: () -> Unit,
     onNavigateToNakshatraSettings: () -> Unit,
+    onNavigateToChandrashtamamSettings: () -> Unit,
     viewModel: SettingsViewModel = viewModel()
 ) {
     val showTamilDate by viewModel.showTamilDate.collectAsState()
@@ -147,6 +148,30 @@ fun TimelineDisplaySettingsScreen(
                     ) {
                         Text(
                             text = stringResource(R.string.settings_star_options),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Icon(
+                            Icons.Default.ChevronRight, 
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+
+            item {
+                TextButton(
+                    onClick = onNavigateToChandrashtamamSettings,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(R.string.settings_chandrashtamam_options),
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurface
                         )

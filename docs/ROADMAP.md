@@ -13,11 +13,16 @@ Future development phases for the Sacred Timeline project.
 
 ## Phase 3: Adaptive Ecosystem (In-Progress)
 - **Adaptive Layouts**: Optimized UI for tablets and foldables using `ListDetailPaneScaffold`.
+    - **Phone**: Sequential navigation (List -> Click -> Detail).
+    - **Tablet**: Side-by-side view (Timeline + Detailed Significance) to eliminate back-and-forth navigation.
 - **Wear OS Support**: Complications and Tiles for quick timing checks.
 
 ## Phase 4: Traditional Depth (In-Progress)
 - **Maitra Muhurtham Engine [COMPLETE]**: High-precision Lagna-based calculation for debt repayment windows (Aries/Scorpio alignment).
-- **Yogam & Chandrashtamam**: Implement traditional lunar yogas and monthly moon-sign warnings.
+- **Yogam & Chandrashtamam**: 
+    - **Chandrashtamam [COMPLETE]**: Monthly moon-sign warning system relative to birth star.
+    - **Amritadhi Yogams**: Implement detection for universal daily combinations (Amrita, Siddha, Marana Yoga) based on Weekday + Nakshatra. These are universal (not relative) and define the day's background energy.
+    - **Tara Bala**: Future personal strength calculation relative to birth star (Janma, Sampat, Vipat, etc.).
 
 ## Phase 5: Search & Accessibility
 - **Global Search**: Search for festivals, holidays, Maitra/Subha Muhurthams by year or date range.

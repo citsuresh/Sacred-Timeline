@@ -56,6 +56,7 @@ fun SettingsScreen(
         ViewMode.GOWRI -> stringResource(R.string.view_mode_gowri)
         ViewMode.HORA -> stringResource(R.string.nav_hora)
         ViewMode.MAITRA -> stringResource(R.string.timing_maitra)
+        ViewMode.CHANDRASHTAMAM -> stringResource(R.string.label_chandrashtamam)
         ViewMode.CUSTOM -> stringResource(R.string.nav_custom)
     }
 
@@ -229,6 +230,7 @@ fun SettingsScreen(
                                 "MAITRA" -> stringResource(R.string.timing_maitra)
                                 "GOWRI" -> stringResource(R.string.view_mode_gowri)
                                 "HORA" -> stringResource(R.string.nav_hora)
+                                "CHANDRASHTAMAM" -> stringResource(R.string.label_chandrashtamam)
                                 else -> colId
                             },
                             isVisible = isVisible,
@@ -371,6 +373,7 @@ fun SettingsScreen(
                                 "MAITRA" -> stringResource(R.string.timing_maitra)
                                 "GOWRI" -> stringResource(R.string.view_mode_gowri)
                                 "HORA" -> stringResource(R.string.nav_hora)
+                                "CHANDRASHTAMAM" -> stringResource(R.string.label_chandrashtamam)
                                 else -> colId
                             },
                             isVisible = isVisible, onToggleVisibility = { viewModel.updateWidgetColumnVisibility(colId, it) },

@@ -18,8 +18,8 @@ data class CacheContainer(
 )
 
 class CacheManager(private val context: Context) {
-    private val fileName = "panchangam_cache_v4.json"
-    private val currentVersion = 4
+    private val fileName = "panchangam_cache_v12.json"
+    private val currentVersion = 12
     
     private val json = Json {
         ignoreUnknownKeys = true

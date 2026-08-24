@@ -14,7 +14,8 @@
     - **UI Integrity**: Resolved parameter-shift bug in `TimelinePager` that affected header and marquee visibility.
 - **Architecture**:
     - **Unified Data Pipeline**: Introduced `DayDataProvider` to eliminate logic drift between App and Widget; wired all settings (including Lunar Month System) through the new pipeline.
-- **Performance**: Smart Refresh logic prevents full cache clears for non-mathematical setting changes. default preload increased to 30 days. Fix: Cache now correctly persists across app launches (v4).
+- **Performance**: Smart Refresh logic prevents full cache clears for non-mathematical setting changes. default preload increased to 30 days. Fix: Cache now correctly persists across app launches (v5).
+- **Chandrashtamam**: Full stack implementation complete. High-precision 8th-sign transit detection wired to user birth stars. Features a 36-item selection UI (handling boundary stars), vertical "Muted Red" sticker-look cards in the timeline, and high-visibility header warnings (marquee + expanded). Parity maintained across App, Widget, and Worker with automated cache syncing (v5).
 
 ## 2. Technical Stack
 - **UI**: Kotlin, Compose (M3), Jetpack Glance (Widgets), Navigation 3.

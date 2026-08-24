@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -20,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -192,24 +194,35 @@ fun TimingCard(
                         }
                         if (iconPainter != null) {
                             Icon(iconPainter, contentDescription = null, modifier = Modifier.size(iconSize), tint = contentColor)
-                        } else if (timing is NallaNeram || timing is Muhurtham || timing is MaitraMuhurtham) {
-                            Icon(if (timing is NallaNeram) Icons.Default.Star else Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(iconSize), tint = contentColor)
+                        } else if (timing is NallaNeram || timing is Muhurtham || timing is MaitraMuhurtham || timing is ChandrashtamamTiming) {
+                            val icon = when (timing) {
+                                is NallaNeram -> Icons.Default.Star
+                                is ChandrashtamamTiming -> Icons.Default.Warning
+                                else -> Icons.Default.AutoAwesome
+                            }
+                            Icon(icon, contentDescription = null, modifier = Modifier.size(iconSize), tint = contentColor)
                         }
                     }
                     Spacer(modifier = Modifier.height(2.dp))
                 }
 
                 // 3. Label (The primary text)
-                val labelRes = when (timing) {
-                    is Hora -> Metadata.getPlanetNameRes(timing.name)
-                    is NallaNeram -> Metadata.getSpecialNameRes("Nalla")
-                    is GowriNeram -> Metadata.getGowriNameRes(timing.name)
-                    is SpecialPeriod -> Metadata.getSpecialNameRes(timing.name)
-                    is Muhurtham -> Metadata.getMuhurthamNameRes(timing.name)
-                    is MaitraMuhurtham -> Metadata.getSpecialNameRes("Maitra Muhurtham")
+                val label = if (timing is ChandrashtamamTiming) {
+                    Metadata.getChandrashtamamLabel(timing, LocalContext.current)
+                } else {
+                    val labelRes = when (timing) {
+                        is Hora -> Metadata.getPlanetNameRes(timing.name)
+                        is NallaNeram -> Metadata.getSpecialNameRes("Nalla")
+                        is GowriNeram -> Metadata.getGowriNameRes(timing.name)
+                        is SpecialPeriod -> Metadata.getSpecialNameRes(timing.name)
+                        is Muhurtham -> Metadata.getMuhurthamNameRes(timing.name)
+                        is MaitraMuhurtham -> Metadata.getSpecialNameRes("Maitra Muhurtham")
+                        else -> R.string.app_name
+                    }
+                    stringResource(labelRes)
                 }
                 Text(
-                    text = stringResource(labelRes),
+                    text = label,
                     style = if (sHeight < 60.dp) MaterialTheme.typography.labelSmall else MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold,
                     color = contentColor,
@@ -227,7 +240,7 @@ fun TimingCard(
 
                 // 4. Time Range
                 if (sHeight > 28.dp) {
-                    val pattern = if (is24Hour) "HH:mm" else "h:mm"
+                    val pattern = if (is24Hour) "HH:mm" else "h:mm a"
                     val timeFormatter = DateTimeFormatter.ofPattern(pattern)
                     Text(
                         text = "${timing.startTime.format(timeFormatter)} - ${timing.endTime.format(timeFormatter)}",

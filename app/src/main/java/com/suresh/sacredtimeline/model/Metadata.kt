@@ -84,6 +84,7 @@ object Metadata {
             is GowriNeram -> R.string.nav_gowri_neram
             is Hora -> R.string.nav_hora
             is Muhurtham, is MaitraMuhurtham -> R.string.label_muhurtham_short
+            is ChandrashtamamTiming -> R.string.label_special_short
         }
     }
     
@@ -313,5 +314,18 @@ object Metadata {
     @StringRes
     fun getMaitraPotencyRes(stars: Int): Int {
         return if (stars == 5) R.string.maitra_potency_high else R.string.maitra_potency_standard
+    }
+
+    fun getChandrashtamamLabel(timing: ChandrashtamamTiming, context: Context): String {
+        val base = context.getString(R.string.label_chandrashtamam)
+        val star = if (timing.starResId != 0) context.getString(timing.starResId) else ""
+        val birthRasi = if (timing.birthRasiResId != 0) context.getString(timing.birthRasiResId) else ""
+        
+        return when {
+            star.isNotEmpty() && birthRasi.isNotEmpty() -> "$base ($star - $birthRasi)"
+            star.isNotEmpty() -> "$base ($star)"
+            birthRasi.isNotEmpty() -> "$base ($birthRasi)"
+            else -> base
+        }
     }
 }

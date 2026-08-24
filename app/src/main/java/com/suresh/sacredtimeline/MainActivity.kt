@@ -28,6 +28,7 @@ import com.suresh.sacredtimeline.ui.settings.SettingsScreen
 import com.suresh.sacredtimeline.ui.settings.TimelineDisplaySettingsScreen
 import com.suresh.sacredtimeline.ui.settings.TithiSettingsScreen
 import com.suresh.sacredtimeline.ui.settings.NakshatraSettingsScreen
+import com.suresh.sacredtimeline.ui.settings.ChandrashtamamSettingsScreen
 import com.suresh.sacredtimeline.ui.theme.SacredTimelineTheme
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -115,6 +116,7 @@ class MainActivity : AppCompatActivity() {
                                 ViewMode.GOWRI -> "GOWRI"
                                 ViewMode.HORA -> "HORA"
                                 ViewMode.MAITRA -> "MAITRA"
+                                ViewMode.CHANDRASHTAMAM -> "CHANDRASHTAMAM"
                                 else -> null
                             }
                             repository.setSingleVisibleColumn(targetColId)
@@ -252,6 +254,23 @@ class MainActivity : AppCompatActivity() {
                             },
                             icon = { Icon(Icons.Default.AutoAwesome, contentDescription = null) }
                         )
+                        NavigationDrawerItem(
+                            label = { Text(stringResource(R.string.nav_chandrashtamam)) },
+                            selected = currentViewMode == ViewMode.CHANDRASHTAMAM,
+                            onClick = {
+                                if (currentViewMode == ViewMode.CUSTOM) {
+                                    showSwitchConfirm = ViewMode.CHANDRASHTAMAM
+                                } else {
+                                    scope.launch {
+                                        repository.setSingleVisibleColumn("CHANDRASHTAMAM")
+                                        backStack.clear()
+                                        backStack.add(NavRoute.Dashboard(ViewMode.CHANDRASHTAMAM))
+                                        drawerState.close()
+                                    }
+                                }
+                            },
+                            icon = { Icon(Icons.Default.Warning, contentDescription = null) }
+                        )
 
                         if (hasCustomLayout) {
                             NavigationDrawerItem(
@@ -337,6 +356,16 @@ class MainActivity : AppCompatActivity() {
                                     },
                                     onNavigateToNakshatraSettings = {
                                         backStack.add(NavRoute.NakshatraSettings)
+                                    },
+                                    onNavigateToChandrashtamamSettings = {
+                                        backStack.add(NavRoute.ChandrashtamamSettings)
+                                    }
+                                )
+                            }
+                            NavRoute.ChandrashtamamSettings -> NavEntry(key) {
+                                ChandrashtamamSettingsScreen(
+                                    onBack = {
+                                        backStack.removeLastOrNull()
                                     }
                                 )
                             }

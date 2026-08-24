@@ -14,6 +14,7 @@ enum class ViewMode {
     GOWRI,
     HORA,
     MAITRA,
+    CHANDRASHTAMAM,
     CUSTOM
 }
 
@@ -32,4 +33,7 @@ sealed interface NavRoute : NavKey {
 
     @Serializable
     data object NakshatraSettings : NavRoute
+
+    @Serializable
+    data object ChandrashtamamSettings : NavRoute
 }

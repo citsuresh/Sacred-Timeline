@@ -39,6 +39,14 @@ If the Regression Auditor reports the same underlying issue two or more times ac
 When judging whether new code is "good" or "correct" beyond functional regressions, anchor the judgment to something concrete rather than general taste: prefer existing conventions already established elsewhere in this codebase (naming, structure, error-handling patterns), explicit written acceptance criteria for genuinely new functionality, or passing tests — in that order of preference. Avoid open-ended quality judgments with no concrete reference point.
 
 ## General Reporting & Approval Rules
+- **CRITICAL SAFEGUARD**: The "Approval to Proceed" with an implementation plan NEVER applies to audit findings. 
+- **STRICT SEQUENCING**: 
+    1. Builder implements a part.
+    2. Auditor reports findings.
+    3. **Builder STOPS completely.**
+    4. User gives explicit permission for EACH proposed fix (e.g., "Apply Fix 1 and 2").
+    5. ONLY THEN does the Builder apply the approved fixes.
+- **NO UNILATERAL CORRECTIONS**: Even if a finding is a "Quality Bar FAIL" or a simple compilation error, the Builder is STRICTLY PROHIBITED from fixing it without a fresh command from the user after the report is issued.
 - Always surface the full Review Report to the user before proceeding.
 - Never summarize the report away; provide the detailed findings, proposed fixes, and effort estimates.
 - Never apply any proposed fix without explicit user approval.

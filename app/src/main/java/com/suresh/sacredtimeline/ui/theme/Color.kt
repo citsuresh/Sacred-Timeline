@@ -49,3 +49,5 @@ val HolidayPale = Color(0xFFE1BEE7).copy(alpha = 0.25f)
 val MaitraGold = Color(0xFFFFD700)
 val MaitraGoldDark = Color(0xFFA68900)
 val MaitraGoldPale = Color(0xFFFFE082)
+
+val ChandrashtamamRed = Color(0xFFE57373)

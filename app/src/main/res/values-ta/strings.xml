@@ -6,6 +6,7 @@
     <string name="nav_gowri_neram">கௌரி நேரம்</string>
     <string name="nav_hora">ஹோரை</string>
     <string name="nav_maitra">மைத்ர</string>
+    <string name="nav_chandrashtamam">சந்திராஷ்டமம்</string>
     <string name="nav_universal">முழுமையான காலவரிசை</string>
     <string name="nav_neram_muhurtham">நேரம் / முஹூர்த்தம்</string>
     <string name="nav_custom">தனிப்பயன் காலவரிசை</string>
@@ -65,6 +66,7 @@
     <string name="label_now_line">இப்போது</string>
     <string name="label_from">தொடக்கம்</string>
     <string name="label_to">முடிவு</string>
+    <string name="label_in">|</string>
     <string name="label_sunrise">சூரிய உதயம்</string>
     <string name="label_sunset">சூரிய அஸ்தமனம்</string>
     <string name="label_starts_at">தொடக்கம் %s</string>
@@ -238,6 +240,20 @@
     <string name="event_christmas">கிறிஸ்துமஸ்</string>
     <string name="event_thiruvalluvar_day">திருவள்ளுவர் தினம்</string>
 
+    <!-- Rasis -->
+    <string name="rasi_1">மேஷம்</string>
+    <string name="rasi_2">ரிஷபம்</string>
+    <string name="rasi_3">மிதுனம்</string>
+    <string name="rasi_4">கடகம்</string>
+    <string name="rasi_5">சிம்மம்</string>
+    <string name="rasi_6">கன்னி</string>
+    <string name="rasi_7">துலாம்</string>
+    <string name="rasi_8">விருச்சிகம்</string>
+    <string name="rasi_9">தனுசு</string>
+    <string name="rasi_10">மகரம்</string>
+    <string name="rasi_11">கும்பம்</string>
+    <string name="rasi_12">மீனம்</string>
+
     <!-- Muhurthams -->
     <string name="muhurtham_brahma">பிரம்ம முஹூர்த்தம்</string>
     <string name="muhurtham_abhijit">அபிஜித் முஹூர்த்தம்</string>
@@ -338,6 +354,7 @@
     <string name="settings_zoom_single">தனி காட்சி ஜூம்</string>
     <string name="settings_pinch_zoom">கிள்ளுதல் மூலம் ஜூம் செய்</string>
     <string name="settings_indicators">காலவரிசை காட்சி</string>
+    <string name="settings_chandrashtamam_options">காட்டப்பட வேண்டிய சந்திராஷ்டமங்கள்</string>
     <string name="settings_show_now_line">இப்போது வரியைக் காட்டு</string>
     <string name="settings_show_tamil_date">தமிழ் தேதியைக் காட்டு</string>
     <string name="settings_show_tamil_year">தமிழ் ஆண்டைக் காட்டு</string>
@@ -369,4 +386,11 @@
     <string name="label_am">மு.ப</string>
     <string name="label_pm">பி.ப</string>
     <string name="label_zoom_value">ஜூம்: %1$.1fx</string>
+
+    <!-- Metadata Descriptions -->
+    <string name="desc_timing_rahu">ராகு காலம்: அசுபமான காலம். புதிய முயற்சிகள், முக்கிய கொள்முதல் அல்லது முக்கியமான சந்திப்புகளைத் தவிர்க்கவும்.\n\nசெய்ய வேண்டியவை: வழக்கமான பணிகள், சுத்தம் செய்தல், ஆன்மீகப் பயிற்சிகள்.\nசெய்யக்கூடாதவை: பயணம், ஒப்பந்தங்களில் கையெழுத்திடுதல், சொத்துக்கள் வாங்குதல்.</string>
+    <string name="desc_timing_yama">எம கண்டம்: அசுபமான காலம். பெரும்பாலும் இழப்பு அல்லது தடைகளுடன் தொடர்புடையது. எதையும் புதிதாகத் தொடங்குவதைத் தவிர்க்கவும்.\n\nசெய்ய வேண்டியவை: கடன்களைத் திருப்பிச் செலுத்துதல், நிலுவையில் உள்ள வேலைகளை முடித்தல்.\nசெய்யக்கூடாதவை: புதிய திட்டங்கள், மருத்துவ சிகிச்சைகள், நீண்ட பயணங்கள்.</string>
+    <string name="desc_timing_kuli">குளிகை காலம்: விரிவாக்க காலம். இந்த நேரத்தில் செய்யப்படும் காரியங்கள் மீண்டும் மீண்டும் நடக்கும். சொத்துக்கள் வாங்க நல்லது, தீய செயல்களுக்கு அல்ல.\n\nசெய்ய வேண்டியவை: தானம், முதலீடுகள், நேர்மறையான பழக்கங்களைத் தொடங்குதல்.\nசெய்யக்கூடாதவை: கடன் வாங்குதல், இறுதிச் சடங்குகள், எதிர்மறையான நடத்தைகள்.</string>
+    <string name="desc_timing_nalla">நல்ல நேரம்: முக்கியமான நடவடிக்கைகளுக்கு அன்றைய நாளின் மிகவும் மங்களகரமான நேரம்.</string>
+    <string name="desc_timing_chandrashtamam">சந்திராஷ்டமம்: உங்கள் பிறப்பு நட்சத்திரத்திற்கு 8-வது ராசியில் சந்திரன் சஞ்சரிக்கும் காலம். புதிய முக்கிய முடிவுகள் அல்லது ஆபத்தான செயல்களைத் தவிர்க்கவும்.</string>
 </resources>

@@ -35,5 +35,6 @@ data class DayData(
     val isSubhaMuhurtham: Boolean = false,
     val brahmaMuhurtham: Muhurtham? = null,
     val abhijitMuhurtham: Muhurtham? = null,
-    val maitraMuhurtham: List<MaitraMuhurtham> = emptyList()
+    val maitraMuhurtham: List<MaitraMuhurtham> = emptyList(),
+    val chandrashtamam: List<ChandrashtamamTiming> = emptyList()
 )

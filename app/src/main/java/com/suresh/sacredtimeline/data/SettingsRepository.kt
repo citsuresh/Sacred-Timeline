@@ -52,42 +52,65 @@ class SettingsRepository(private val context: Context) {
         val CUSTOM_VISIBILITY = stringSetPreferencesKey("custom_visibility")
         val CUSTOM_ORDER = stringPreferencesKey("custom_order")
         val HAS_CUSTOM_LAYOUT = booleanPreferencesKey("has_custom_layout")
+        val ENABLED_CHANDRASHTAMAM_STARS = stringSetPreferencesKey("enabled_chandrashtamam_stars")
     }
 
     val compositeScale: Flow<Float> = context.dataStore.data.map { it[Keys.COMPOSITE_SCALE] ?: 1.0f }
     val singleViewScale: Flow<Float> = context.dataStore.data.map { it[Keys.SINGLE_VIEW_SCALE] ?: 0.5f }
     
     val columnVisibility: Flow<Set<String>> = context.dataStore.data.map { 
-        it[Keys.COLUMN_VISIBILITY] ?: setOf("UNIVERSAL")
+        it[Keys.COLUMN_VISIBILITY] ?: setOf("UNIVERSAL", "CHANDRASHTAMAM")
     }
 
     val columnOrder: Flow<List<String>> = context.dataStore.data.map { 
         val orderString = it[Keys.COLUMN_ORDER] ?: DEFAULT_ORDER
-        orderString.split(",").filter { it.isNotBlank() }
+        val currentOrder = orderString.split(",").filter { it.isNotBlank() }.toMutableList()
+        
+        // Reconciliation: Ensure new columns are added if missing from saved prefs
+        ALL_COLUMNS.forEach { col ->
+            if (!currentOrder.contains(col)) currentOrder.add(col)
+        }
+        currentOrder
     }
 
     val customVisibility: Flow<Set<String>> = context.dataStore.data.map { 
-        it[Keys.CUSTOM_VISIBILITY] ?: setOf("UNIVERSAL")
+        it[Keys.CUSTOM_VISIBILITY] ?: setOf("UNIVERSAL", "CHANDRASHTAMAM")
     }
 
     val customOrder: Flow<List<String>> = context.dataStore.data.map { 
         val orderString = it[Keys.CUSTOM_ORDER] ?: DEFAULT_ORDER
-        orderString.split(",").filter { it.isNotBlank() }
+        val currentOrder = orderString.split(",").filter { it.isNotBlank() }.toMutableList()
+
+        // Reconciliation: Ensure new columns are added if missing from saved prefs
+        ALL_COLUMNS.forEach { col ->
+            if (!currentOrder.contains(col)) currentOrder.add(col)
+        }
+        currentOrder
     }
 
     val hasCustomLayout: Flow<Boolean> = context.dataStore.data.map { it[Keys.HAS_CUSTOM_LAYOUT] ?: false }
 
+    val enabledChandrashtamamStars: Flow<Set<String>> = context.dataStore.data.map { 
+        it[Keys.ENABLED_CHANDRASHTAMAM_STARS] ?: emptySet()
+    }
+
     val widgetColumnVisibility: Flow<Set<String>> = context.dataStore.data.map { 
-        it[Keys.WIDGET_COLUMN_VISIBILITY] ?: setOf("UNIVERSAL")
+        it[Keys.WIDGET_COLUMN_VISIBILITY] ?: setOf("UNIVERSAL", "CHANDRASHTAMAM")
     }
 
     val widgetColumnOrder: Flow<List<String>> = context.dataStore.data.map { 
         val orderString = it[Keys.WIDGET_COLUMN_ORDER] ?: DEFAULT_ORDER
-        orderString.split(",").filter { it.isNotBlank() }
+        val currentOrder = orderString.split(",").filter { it.isNotBlank() }.toMutableList()
+
+        // Reconciliation: Ensure new columns are added if missing from saved prefs
+        ALL_COLUMNS.forEach { col ->
+            if (!currentOrder.contains(col)) currentOrder.add(col)
+        }
+        currentOrder
     }
 
     companion object {
-        const val DEFAULT_ORDER = "NERAM_MUHURTHAM,UNIVERSAL,NERAM,MAITRA,BRAHMA,ABHIJIT,GOWRI,HORA"
+        const val DEFAULT_ORDER = "NERAM_MUHURTHAM,UNIVERSAL,NERAM,MAITRA,BRAHMA,ABHIJIT,CHANDRASHTAMAM,GOWRI,HORA"
         val ALL_COLUMNS = DEFAULT_ORDER.split(",")
     }
 
@@ -177,7 +200,7 @@ class SettingsRepository(private val context: Context) {
     suspend fun saveCurrentAsCustom() {
         context.dataStore.edit { prefs ->
             val currentVisibility = prefs[Keys.COLUMN_VISIBILITY] ?: setOf("UNIVERSAL")
-            val currentOrder = prefs[Keys.COLUMN_ORDER] ?: "NERAM_MUHURTHAM,UNIVERSAL,NERAM,MAITRA,BRAHMA,ABHIJIT,GOWRI,HORA"
+            val currentOrder = prefs[Keys.COLUMN_ORDER] ?: DEFAULT_ORDER
             prefs[Keys.CUSTOM_VISIBILITY] = currentVisibility
             prefs[Keys.CUSTOM_ORDER] = currentOrder
             prefs[Keys.HAS_CUSTOM_LAYOUT] = true
@@ -187,7 +210,7 @@ class SettingsRepository(private val context: Context) {
     suspend fun restoreCustomLayout() {
         context.dataStore.edit { prefs ->
             val savedVisibility = prefs[Keys.CUSTOM_VISIBILITY] ?: setOf("UNIVERSAL")
-            val savedOrder = prefs[Keys.CUSTOM_ORDER] ?: "NERAM_MUHURTHAM,UNIVERSAL,NERAM,MAITRA,BRAHMA,ABHIJIT,GOWRI,HORA"
+            val savedOrder = prefs[Keys.CUSTOM_ORDER] ?: DEFAULT_ORDER
             prefs[Keys.COLUMN_VISIBILITY] = savedVisibility
             prefs[Keys.COLUMN_ORDER] = savedOrder
             prefs[Keys.DEFAULT_LAUNCH_VIEW] = ViewMode.COMPOSITE.name
@@ -333,5 +356,14 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun setTimelineViewStyle(style: String) {
         context.dataStore.edit { it[Keys.TIMELINE_VIEW_STYLE] = style }
+    }
+
+    suspend fun updateEnabledChandrashtamamStar(starId: String, enabled: Boolean) {
+        context.dataStore.edit { prefs ->
+            val current = prefs[Keys.ENABLED_CHANDRASHTAMAM_STARS] ?: emptySet()
+            val newSet = current.toMutableSet()
+            if (enabled) newSet.add(starId) else newSet.remove(starId)
+            prefs[Keys.ENABLED_CHANDRASHTAMAM_STARS] = newSet
+        }
     }
 }

@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material.icons.filled.WbTwilight
 import androidx.compose.material3.*
@@ -29,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -37,7 +39,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.suresh.sacredtimeline.R
+import com.suresh.sacredtimeline.model.*
 import java.time.LocalTime
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
@@ -478,6 +482,59 @@ fun LunarItem(
     }
 }
 
+@Composable
+private fun formatTransitRange(start: java.time.Instant?, end: java.time.Instant?, viewDate: java.time.LocalDate, is24Hour: Boolean): String {
+    val zone = java.time.ZoneId.systemDefault()
+    val now = java.time.ZonedDateTime.now(zone)
+    
+    val startTime = start?.atZone(zone)
+    val endTime = end?.atZone(zone)
+
+    val timeFormatter = DateTimeFormatter.ofPattern(if (is24Hour) "HH:mm" else "h:mm a")
+    val amLabel = stringResource(R.string.label_am)
+    val pmLabel = stringResource(R.string.label_pm)
+
+    fun formatWithAmPm(time: LocalTime): String {
+        if (is24Hour) return time.format(timeFormatter)
+        val period = if (time.hour < 12) amLabel else pmLabel
+        return "${time.format(timeFormatter)} $period"
+    }
+
+    // 1. If looking at TODAY, and now is within the range, show "Till"
+    val today = java.time.LocalDate.now()
+    if (viewDate == today && startTime != null && endTime != null && now.toInstant().isAfter(startTime.toInstant()) && now.toInstant().isBefore(endTime.toInstant())) {
+         return "(" + stringResource(R.string.label_till, formatWithAmPm(endTime.toLocalTime())) + ")"
+    }
+
+    val startStr = when {
+        startTime == null -> null
+        startTime.toLocalDate() == viewDate -> stringResource(R.string.label_starts_at, formatWithAmPm(startTime.toLocalTime()))
+        startTime.toLocalDate() == viewDate.minusDays(1) -> stringResource(R.string.label_started_yesterday_at, formatWithAmPm(startTime.toLocalTime()))
+        else -> {
+            val df = DateTimeFormatter.ofPattern("MMM d")
+            "Started ${startTime.format(df)} ${formatWithAmPm(startTime.toLocalTime())}"
+        }
+    }
+
+    val endStr = when {
+        endTime == null -> null
+        endTime.toLocalDate() == viewDate -> stringResource(R.string.label_ends_at, formatWithAmPm(endTime.toLocalTime()))
+        endTime.toLocalDate() == viewDate.plusDays(1) -> stringResource(R.string.label_ends_tomorrow_at, formatWithAmPm(endTime.toLocalTime()))
+        else -> {
+            val df = DateTimeFormatter.ofPattern("MMM d")
+            "Ends ${endTime.format(df)} ${formatWithAmPm(endTime.toLocalTime())}"
+        }
+    }
+
+    return if (startStr != null && endStr != null) {
+        "($startStr - $endStr)"
+    } else if (startStr != null) {
+        "($startStr)"
+    } else if (endStr != null) {
+        "($endStr)"
+    } else ""
+}
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SunTimesDisplay(
@@ -496,6 +553,7 @@ fun SunTimesDisplay(
     isSubhaMuhurtham: Boolean,
     abhijitMuhurtham: com.suresh.sacredtimeline.model.Muhurtham?,
     brahmaMuhurtham: com.suresh.sacredtimeline.model.Muhurtham? = null,
+    chandrashtamam: List<com.suresh.sacredtimeline.model.ChandrashtamamTiming> = emptyList(),
     showTamilDate: Boolean,
     showTamilYear: Boolean,
     showPirai: Boolean,
@@ -575,7 +633,26 @@ fun SunTimesDisplay(
                     LunarItem(item, com.suresh.sacredtimeline.model.DashboardDetail.LunarType.NAKSHATRA, viewDate, is24Hour) {
                         onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.Lunar(item, com.suresh.sacredtimeline.model.DashboardDetail.LunarType.NAKSHATRA))
                     }
-                    if (item != nakshatras.last()) Text("  •  ", color = Color.Gray)
+                    if (item != nakshatras.last() || chandrashtamam.isNotEmpty()) Text("  •  ", color = Color.Gray)
+                }
+                chandrashtamam.forEach { item ->
+                    val label = Metadata.getChandrashtamamLabel(item, androidx.compose.ui.platform.LocalContext.current)
+                    val range = formatTransitRange(item.startTimeInstant, item.endTimeInstant, viewDate, is24Hour)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.clickable { onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.TimelineTiming(item)) }
+                    ) {
+                        Icon(Icons.Default.Warning, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color.Red)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = if (range.isNotEmpty()) "$label $range" else label,
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Red,
+                            maxLines = 1
+                        )
+                    }
+                    if (item != chandrashtamam.last()) Text("  •  ", color = Color.Gray)
                 }
             }
         } else {
@@ -602,6 +679,23 @@ fun SunTimesDisplay(
                 nakshatras.forEach { item ->
                     LunarItem(item, com.suresh.sacredtimeline.model.DashboardDetail.LunarType.NAKSHATRA, viewDate, is24Hour, maxLines = Int.MAX_VALUE) {
                         onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.Lunar(item, com.suresh.sacredtimeline.model.DashboardDetail.LunarType.NAKSHATRA))
+                    }
+                }
+                chandrashtamam.forEach { item ->
+                    val label = Metadata.getChandrashtamamLabel(item, androidx.compose.ui.platform.LocalContext.current)
+                    val range = formatTransitRange(item.startTimeInstant, item.endTimeInstant, viewDate, is24Hour)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.clickable { onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.TimelineTiming(item)) }
+                    ) {
+                        Icon(Icons.Default.Warning, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color.Red)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = if (range.isNotEmpty()) "$label $range" else label,
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Red
+                        )
                     }
                 }
                 if (showBrahmaMuhurtham && brahmaMuhurtham != null) {
@@ -739,7 +833,7 @@ fun SunTimesDisplay(
                 }
             }
 
-            val eventsExist = specialEvents.isNotEmpty() || isSubhaMuhurtham || tithis.isNotEmpty() || nakshatras.isNotEmpty()
+            val eventsExist = specialEvents.isNotEmpty() || isSubhaMuhurtham || tithis.isNotEmpty() || nakshatras.isNotEmpty() || chandrashtamam.isNotEmpty()
             if (eventsExist) {
                 Surface(
                     color = MaterialTheme.colorScheme.surface.copy(alpha = 0.4f),

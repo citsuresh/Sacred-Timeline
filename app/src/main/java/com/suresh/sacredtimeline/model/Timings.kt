@@ -97,3 +97,22 @@ data class MaitraMuhurtham(
     override val description: String = "",
     val potencyStars: Int
 ) : Timing
+
+@Serializable
+data class ChandrashtamamTiming(
+    override val name: String,
+    override val tamilName: String,
+    @Serializable(with = LocalTimeSerializer::class)
+    override val startTime: LocalTime,
+    @Serializable(with = LocalTimeSerializer::class)
+    override val endTime: LocalTime,
+    override val auspiciousness: Auspiciousness = Auspiciousness.RED,
+    override val description: String = "",
+    val starResId: Int = 0,
+    val birthRasiResId: Int = 0,
+    val transitRasiResId: Int = 0,
+    @Serializable(with = InstantSerializer::class)
+    val startTimeInstant: java.time.Instant? = null,
+    @Serializable(with = InstantSerializer::class)
+    val endTimeInstant: java.time.Instant? = null
+) : Timing

@@ -321,6 +321,7 @@ fun TimelineContent(
                     isSubhaMuhurtham = dayData.isSubhaMuhurtham,
                     abhijitMuhurtham = dayData.abhijitMuhurtham,
                     brahmaMuhurtham = dayData.brahmaMuhurtham,
+                    chandrashtamam = dayData.chandrashtamam,
                     showTamilDate = showTamilDate,
                     showTamilYear = showTamilYear,
                     showPirai = showPirai,
@@ -402,14 +403,15 @@ fun TimelineContent(
                             // Independent Lanes for Equal Distribution
                             visibleCols.forEachIndexed { index, colId ->
                                 val timings = when (colId) {
-                                    "UNIVERSAL" -> (dayData.nallaNeram + dayData.specialPeriods + dayData.gowriNeram + dayData.hora + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) + (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList())).sortedBy { it.startTime }
-                                    "NERAM_MUHURTHAM" -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) + (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList())).sortedBy { it.startTime }
+                                    "UNIVERSAL" -> (dayData.nallaNeram + dayData.specialPeriods + dayData.gowriNeram + dayData.hora + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) + (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()) + dayData.chandrashtamam).sortedBy { it.startTime }
+                                    "NERAM_MUHURTHAM" -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) + (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()) + dayData.chandrashtamam).sortedBy { it.startTime }
                                     "MAITRA" -> if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()
-                                    "NERAM" -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList())).sortedBy { it.startTime }
+                                    "NERAM" -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + dayData.chandrashtamam).sortedBy { it.startTime }
                                     "BRAHMA" -> if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()
                                     "ABHIJIT" -> if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()
                                     "GOWRI" -> dayData.gowriNeram
                                     "HORA" -> dayData.hora
+                                    "CHANDRASHTAMAM" -> dayData.chandrashtamam
                                     else -> emptyList()
                                 }
                                 TimelineColumn(
@@ -429,27 +431,29 @@ fun TimelineContent(
                             val timings = if (viewMode == ViewMode.COMPOSITE || viewMode == ViewMode.CUSTOM) {
                                 visibleCols.flatMap { colId ->
                                     when (colId) {
-                                    "UNIVERSAL" -> (dayData.nallaNeram + dayData.specialPeriods + dayData.gowriNeram + dayData.hora + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) + (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()))
-                                    "NERAM_MUHURTHAM" -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) + (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()))
+                                    "UNIVERSAL" -> (dayData.nallaNeram + dayData.specialPeriods + dayData.gowriNeram + dayData.hora + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) + (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()) + dayData.chandrashtamam)
+                                    "NERAM_MUHURTHAM" -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) + (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()) + dayData.chandrashtamam)
                                     "MAITRA" -> if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()
-                                    "NERAM" -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()))
+                                    "NERAM" -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + dayData.chandrashtamam)
                                     "BRAHMA" -> if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()
                                     "ABHIJIT" -> if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()
                                     "GOWRI" -> dayData.gowriNeram
                                     "HORA" -> dayData.hora
+                                    "CHANDRASHTAMAM" -> dayData.chandrashtamam
                                     else -> emptyList()
                                 }
                             }.distinct().sortedBy { it.startTime }
                         } else {
                                 when (viewMode) {
-                                    ViewMode.UNIVERSAL -> (dayData.nallaNeram + dayData.specialPeriods + dayData.gowriNeram + dayData.hora + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) + (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList())).sortedBy { it.startTime }
-                                    ViewMode.NERAM_MUHURTHAM -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) + (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList())).sortedBy { it.startTime }
-                                    ViewMode.NERAM -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList())).sortedBy { it.startTime }
+                                    ViewMode.UNIVERSAL -> (dayData.nallaNeram + dayData.specialPeriods + dayData.gowriNeram + dayData.hora + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) + (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()) + dayData.chandrashtamam).sortedBy { it.startTime }
+                                    ViewMode.NERAM_MUHURTHAM -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) + (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()) + dayData.chandrashtamam).sortedBy { it.startTime }
+                                    ViewMode.NERAM -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + dayData.chandrashtamam).sortedBy { it.startTime }
                                     ViewMode.BRAHMA -> listOfNotNull(dayData.brahmaMuhurtham)
                                     ViewMode.ABHIJIT -> listOfNotNull(dayData.abhijitMuhurtham)
                                     ViewMode.GOWRI -> dayData.gowriNeram
                                     ViewMode.HORA -> dayData.hora
                                     ViewMode.MAITRA -> dayData.maitraMuhurtham
+                                    ViewMode.CHANDRASHTAMAM -> dayData.chandrashtamam
                                     else -> emptyList()
                                 }
                             }
@@ -619,6 +623,7 @@ fun TimelineHeader(
                             "GOWRI" -> stringResource(R.string.nav_gowri_neram)
                             "HORA" -> stringResource(R.string.nav_hora)
                             "MAITRA" -> stringResource(R.string.timing_maitra)
+                            "CHANDRASHTAMAM" -> stringResource(R.string.label_chandrashtamam)
                             else -> stringResource(R.string.app_name)
                         }
                         Text(
@@ -640,6 +645,7 @@ fun TimelineHeader(
                     ViewMode.GOWRI -> R.string.nav_gowri_neram
                     ViewMode.HORA -> R.string.nav_hora
                     ViewMode.MAITRA -> R.string.nav_maitra
+                    ViewMode.CHANDRASHTAMAM -> R.string.label_chandrashtamam
                     ViewMode.CUSTOM -> R.string.nav_custom
                     ViewMode.COMPOSITE -> R.string.app_name
                 }
@@ -881,6 +887,7 @@ private fun Timing.getCategory(): String = when (this) {
     is NallaNeram -> "NERAM"
     is SpecialPeriod -> "NERAM"
     is MaitraMuhurtham -> "MAITRA"
+    is ChandrashtamamTiming -> "CHANDRASHTAMAM"
     is Muhurtham -> {
         if (this.name.contains("Brahma")) "BRAHMA"
         else if (this.name.contains("Abhijit")) "ABHIJIT"

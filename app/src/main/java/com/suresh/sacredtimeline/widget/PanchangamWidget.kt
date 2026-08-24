@@ -167,6 +167,18 @@ class PanchangamWidget : GlanceAppWidget() {
                                 val label = if (currentAbhijit != null) context.getString(R.string.muhurtham_abhijit) else "None"
                                 TimingColumn(context, context.getString(R.string.muhurtham_abhijit), label, currentAbhijit, nextAbhijit, timeFormatter, GlanceModifier.defaultWeight())
                             }
+                            "BRAHMA" -> {
+                                val current = if (dayData.brahmaMuhurtham?.isCurrent(now) == true) dayData.brahmaMuhurtham else null
+                                val next = if (dayData.brahmaMuhurtham?.startTime?.isAfter(now) == true) dayData.brahmaMuhurtham else null
+                                val label = if (current != null) context.getString(R.string.muhurtham_brahma) else "None"
+                                TimingColumn(context, context.getString(R.string.muhurtham_brahma), label, current, next, timeFormatter, GlanceModifier.defaultWeight())
+                            }
+                            "MAITRA" -> {
+                                val current = dayData.maitraMuhurtham.find { it.isCurrent(now) }
+                                val next = dayData.maitraMuhurtham.filter { it.startTime.isAfter(now) }.minByOrNull { it.startTime }
+                                val label = if (current != null) context.getString(R.string.timing_maitra) else "None"
+                                TimingColumn(context, context.getString(R.string.nav_maitra), label, current, next, timeFormatter, GlanceModifier.defaultWeight())
+                            }
                             "NERAM" -> {
                                 val currentNalla = dayData.nallaNeram.find { it.isCurrent(now) }
                                 val currentSpecial = dayData.specialPeriods.find { it.isCurrent(now) }
@@ -201,6 +213,12 @@ class PanchangamWidget : GlanceAppWidget() {
                                 val label = currentHora?.let { context.getString(Metadata.getPlanetNameRes(it.name)) } ?: "None"
                                 TimingColumn(context, context.getString(R.string.nav_hora), label, currentHora, nextHora, timeFormatter, GlanceModifier.defaultWeight())
                             }
+                            "CHANDRASHTAMAM" -> {
+                                val current = dayData.chandrashtamam.find { it.isCurrent(now) }
+                                val next = dayData.chandrashtamam.filter { it.startTime.isAfter(now) }.minByOrNull { it.startTime }
+                                val label = if (current != null) Metadata.getChandrashtamamLabel(current, context) else "None"
+                                TimingColumn(context, context.getString(R.string.label_chandrashtamam), label, current, next, timeFormatter, GlanceModifier.defaultWeight())
+                            }
                         }
                     }
                 }
@@ -223,7 +241,7 @@ class PanchangamWidget : GlanceAppWidget() {
                         provider = ImageProvider(R.drawable.ic_refresh_glance),
                         contentDescription = "Refresh",
                         modifier = GlanceModifier.size(18.dp),
-                        colorFilter = ColorFilter.tint(ColorProvider(Color.Black))
+                        colorFilter = ColorFilter.tint(ColorProvider(android.R.color.black))
                     )
                 }
             }
@@ -244,8 +262,9 @@ class PanchangamWidget : GlanceAppWidget() {
         val currentSpecial = dayData.specialPeriods.find { it.isCurrent(now) }
         val currentAbhijit = if (dayData.abhijitMuhurtham?.isCurrent(now) == true) dayData.abhijitMuhurtham else null
         val currentBrahma = if (dayData.brahmaMuhurtham?.isCurrent(now) == true) dayData.brahmaMuhurtham else null
+        val currentChandrashtamam = dayData.chandrashtamam.find { it.isCurrent(now) }
 
-        val middleTiming = currentSpecial ?: currentAbhijit ?: currentBrahma ?: currentNalla
+        val middleTiming = currentChandrashtamam ?: currentSpecial ?: currentAbhijit ?: currentBrahma ?: currentNalla
 
         Box(
             modifier = modifier
@@ -289,9 +308,10 @@ class PanchangamWidget : GlanceAppWidget() {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         val currentMaitra = dayData.maitraMuhurtham.find { it.isCurrent(now) }
+                        val currentChandrashtamam = dayData.chandrashtamam.find { it.isCurrent(now) }
                         val activeLanes = buildList {
                             if (currentGowri != null) add("GOWRI")
-                            if (middleTiming != null || currentMaitra != null) add("NERAM")
+                            if (middleTiming != null || currentMaitra != null || currentChandrashtamam != null) add("NERAM")
                             if (currentHora != null) add("HORAI")
                         }
 
@@ -302,22 +322,27 @@ class PanchangamWidget : GlanceAppWidget() {
                                         title = context.getString(R.string.nav_gowri_neram),
                                         timing = currentGowri,
                                         context = context,
-                                        labelProvider = { Metadata.getGowriNameRes(it.name) },
+                                        labelProvider = { context.getString(Metadata.getGowriNameRes(it.name)) },
                                         modifier = GlanceModifier.defaultWeight()
                                     )
                                 }
                                 "NERAM" -> {
-                                    val finalMiddleTiming = currentMaitra ?: middleTiming
+                                    val finalMiddleTiming = currentChandrashtamam ?: currentMaitra ?: middleTiming
                                     UniversalMiniLane(
-                                        title = context.getString(if (currentMaitra != null) R.string.view_mode_maitra else R.string.label_neram_short),
+                                        title = context.getString(when {
+                                            currentChandrashtamam != null -> R.string.label_chandrashtamam
+                                            currentMaitra != null -> R.string.view_mode_maitra
+                                            else -> R.string.label_neram_short
+                                        }),
                                         timing = finalMiddleTiming,
                                         context = context,
                                         labelProvider = { 
                                             when (it) {
-                                                is MaitraMuhurtham -> R.string.timing_maitra
-                                                is SpecialPeriod -> Metadata.getSpecialNameRes(it.name)
-                                                is Muhurtham -> if (it.name.contains("Abhijit")) R.string.muhurtham_abhijit else R.string.muhurtham_brahma
-                                                else -> Metadata.getSpecialNameRes("Nalla")
+                                                is ChandrashtamamTiming -> Metadata.getChandrashtamamLabel(it, context)
+                                                is MaitraMuhurtham -> context.getString(R.string.timing_maitra)
+                                                is SpecialPeriod -> context.getString(Metadata.getSpecialNameRes(it.name))
+                                                is Muhurtham -> context.getString(if (it.name.contains("Abhijit")) R.string.muhurtham_abhijit else R.string.muhurtham_brahma)
+                                                else -> context.getString(Metadata.getSpecialNameRes("Nalla"))
                                             }
                                         },
                                         modifier = GlanceModifier.defaultWeight()
@@ -328,7 +353,7 @@ class PanchangamWidget : GlanceAppWidget() {
                                         title = context.getString(R.string.nav_hora),
                                         timing = currentHora,
                                         context = context,
-                                        labelProvider = { Metadata.getPlanetNameRes(it.name) },
+                                        labelProvider = { context.getString(Metadata.getPlanetNameRes(it.name)) },
                                         modifier = GlanceModifier.defaultWeight()
                                     )
                                 }
@@ -348,7 +373,7 @@ class PanchangamWidget : GlanceAppWidget() {
         title: String,
         timing: Timing?,
         context: Context,
-        labelProvider: (Timing) -> Int,
+        labelProvider: (Timing) -> String,
         modifier: GlanceModifier = GlanceModifier
     ) {
         val color = timing?.let { SacredTimelineColors.getTimingColor(it) } ?: Color.LightGray.copy(alpha = 0.3f)
@@ -383,11 +408,21 @@ class PanchangamWidget : GlanceAppWidget() {
                 Spacer(modifier = GlanceModifier.defaultWeight())
 
                 Text(
-                    text = if (timing != null) context.getString(labelProvider(timing)) else "None",
+                    text = if (timing != null) labelProvider(timing) else "None",
                     style = TextStyle(fontSize = 11.sp, fontWeight = FontWeight.Bold, color = ColorProvider(contentColor), textAlign = TextAlign.Center),
                     maxLines = 1
                 )
                 
+                if (timing is SpecialPeriod && (timing.name == "Yama" || timing.name == "Rahu")) {
+                    val iconRes = if (timing.name == "Yama") R.drawable.ic_yama_bull else R.drawable.ic_rahu
+                    Image(
+                        provider = ImageProvider(iconRes),
+                        contentDescription = null,
+                        modifier = GlanceModifier.size(10.dp),
+                        colorFilter = ColorFilter.tint(ColorProvider(contentColor))
+                    )
+                }
+
                 if (timing is MaitraMuhurtham) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Image(
@@ -492,9 +527,10 @@ class PanchangamWidget : GlanceAppWidget() {
                         )
                     )
                     
-                    if (timing is SpecialPeriod && timing.name == "Yama") {
+                    if (timing is SpecialPeriod && (timing.name == "Yama" || timing.name == "Rahu")) {
+                        val iconRes = if (timing.name == "Yama") R.drawable.ic_yama_bull else R.drawable.ic_rahu
                         Image(
-                            provider = ImageProvider(R.drawable.ic_yama_bull),
+                            provider = ImageProvider(iconRes),
                             contentDescription = null,
                             modifier = GlanceModifier.size(32.dp)
                         )
