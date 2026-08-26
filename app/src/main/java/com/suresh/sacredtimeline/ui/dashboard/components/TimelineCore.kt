@@ -5,6 +5,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -31,6 +32,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -316,7 +318,7 @@ fun TimelineContent(
                     pakshaDay = dayData.pakshaDay,
                     tithis = dayData.tithis,
                     nakshatras = dayData.nakshatras,
-                    tithiValue = dayData.tithis.firstOrNull()?.value ?: 0,
+                    tithiValue = if (dayData.currentTithiValue != 0) dayData.currentTithiValue else (dayData.tithis.firstOrNull()?.value ?: 0),
                     specialEvents = dayData.specialEvents,
                     isSubhaMuhurtham = dayData.isSubhaMuhurtham,
                     abhijitMuhurtham = dayData.abhijitMuhurtham,
@@ -396,6 +398,7 @@ fun TimelineContent(
                         Box(modifier = Modifier.fillMaxHeight().width(1.dp).background(SeparatorGrey))
                         
                         val visibleCols = columnOrder.filter { columnVisibility.contains(it) }
+
                         val isCompositeMode = viewMode == ViewMode.COMPOSITE || viewMode == ViewMode.CUSTOM
                         val isMergedLayout = viewStyle == TimelineViewStyle.ORTHOGONAL_STEPPED || viewStyle == TimelineViewStyle.FIXED_3_TRACK
 
@@ -479,8 +482,8 @@ fun TimelineContent(
                         SunGridMarker(
                             time = dayData.sunrise, 
                             label = "Sunrise", 
-                            icon = Icons.Default.WbSunny, 
-                            iconTint = Color(0xFFFF9800),
+                            painter = painterResource(R.drawable.ic_sun), 
+                            iconTint = Color.Unspecified, // Don't tint the multi-color sun
                             hourHeight = hourHeight,
                             is24Hour = is24Hour
                         )
@@ -624,6 +627,8 @@ fun TimelineHeader(
                             "HORA" -> stringResource(R.string.nav_hora)
                             "MAITRA" -> stringResource(R.string.timing_maitra)
                             "CHANDRASHTAMAM" -> stringResource(R.string.label_chandrashtamam)
+                            "YOGAM" -> stringResource(R.string.label_yoga)
+                            "THARA_BALAM" -> stringResource(R.string.label_thara_balam)
                             else -> stringResource(R.string.app_name)
                         }
                         Text(

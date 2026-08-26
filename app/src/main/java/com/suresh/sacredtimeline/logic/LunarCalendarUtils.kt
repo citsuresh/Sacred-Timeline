@@ -31,7 +31,8 @@ object LunarCalendarUtils {
         val tithis: List<LunarInterval>,
         val nakshatras: List<LunarInterval>,
         val pakshaResId: Int,
-        val pakshaDay: Int
+        val pakshaDay: Int,
+        val currentTithi: Int
     )
 
     data class RitualWindow(
@@ -79,7 +80,8 @@ object LunarCalendarUtils {
             tithis = tithis,
             nakshatras = nakshatras,
             pakshaResId = if (isValarpirai) R.string.paksha_valarpirai else R.string.paksha_theipirai,
-            pakshaDay = if (isValarpirai) noonValue else noonValue - 15
+            pakshaDay = if (isValarpirai) noonValue else noonValue - 15,
+            currentTithi = noonValue
         )
     }
 
@@ -489,5 +491,67 @@ object LunarCalendarUtils {
         11 -> R.string.rasi_11
         12 -> R.string.rasi_12
         else -> R.string.rasi_1
+    }
+
+    /**
+     * Calculates Thara Balam category (1-9) based on birth star and current star.
+     */
+    fun getTharaBalamCategory(birthStarIndex: Int, currentStarIndex: Int): Int {
+        var diff = currentStarIndex - birthStarIndex + 1
+        while (diff <= 0) diff += 27
+        val category = diff % 9
+        return if (category == 0) 9 else category
+    }
+
+    /**
+     * Identifies Amritadhi Yogam based on Weekday and Current Nakshatra.
+     * 1: Amirtha, 2: Siddha, 3: Marana, 4: Vadha (Prabalarishta)
+     */
+    fun getYogamCategory(dayOfWeek: java.time.DayOfWeek, nakshatraIndex: Int): Int {
+        return when (dayOfWeek) {
+            java.time.DayOfWeek.SUNDAY -> when (nakshatraIndex) {
+                1, 10, 19 -> 1 // Amirtha
+                2, 4, 5, 7, 8, 11, 13, 14, 16, 17, 20, 22, 23, 25, 26 -> 2 // Siddha
+                3, 6, 9, 12, 15, 18, 21, 24, 27 -> 3 // Marana
+                else -> 2
+            }
+            java.time.DayOfWeek.MONDAY -> when (nakshatraIndex) {
+                4, 13, 22 -> 1
+                1, 2, 3, 5, 7, 8, 10, 11, 12, 14, 16, 17, 19, 20, 21, 23, 25, 26 -> 2
+                6, 9, 15, 18, 24, 27 -> 3
+                else -> 2
+            }
+            java.time.DayOfWeek.TUESDAY -> when (nakshatraIndex) {
+                5, 14, 23 -> 1
+                1, 3, 4, 6, 7, 10, 12, 13, 15, 16, 19, 21, 22, 24, 25 -> 2
+                2, 8, 11, 17, 20, 26 -> 3
+                else -> 2
+            }
+            java.time.DayOfWeek.WEDNESDAY -> when (nakshatraIndex) {
+                6, 15, 24 -> 1
+                2, 3, 4, 5, 7, 8, 11, 12, 13, 14, 16, 17, 20, 21, 22, 23, 25, 26 -> 2
+                1, 10, 19 -> 3
+                9, 18, 27 -> 4 // Vadha (Prabalarishta) - specifically Wed + Jyeshtha/Revati/Ashlesha
+                else -> 2
+            }
+            java.time.DayOfWeek.THURSDAY -> when (nakshatraIndex) {
+                7, 16, 25 -> 1
+                1, 2, 4, 5, 6, 8, 9, 10, 11, 13, 14, 15, 17, 18, 19, 20, 22, 23, 24, 26, 27 -> 2
+                3, 12, 21 -> 3
+                else -> 2
+            }
+            java.time.DayOfWeek.FRIDAY -> when (nakshatraIndex) {
+                8, 17, 26 -> 1
+                1, 2, 3, 5, 6, 7, 9, 10, 11, 12, 14, 15, 16, 18, 19, 20, 21, 23, 24, 25, 27 -> 2
+                4, 13, 22 -> 3
+                else -> 2
+            }
+            java.time.DayOfWeek.SATURDAY -> when (nakshatraIndex) {
+                9, 18, 27 -> 1
+                1, 3, 4, 6, 7, 10, 12, 13, 15, 16, 19, 21, 22, 24, 25 -> 2
+                2, 5, 8, 11, 14, 17, 20, 23, 26 -> 3
+                else -> 2
+            }
+        }
     }
 }

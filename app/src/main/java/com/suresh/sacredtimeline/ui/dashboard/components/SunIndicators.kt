@@ -46,6 +46,8 @@ import java.time.format.DateTimeFormatter
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.ui.input.pointer.pointerInput
 import kotlinx.coroutines.delay
@@ -121,52 +123,86 @@ fun MoonPhaseIcon(
         val center = Offset(size.width / 2, size.height / 2)
         val rect = Rect(center.x - radius, center.y - radius, center.x + radius, center.y + radius)
 
-        // 1. Fill the background (Dark part)
-        drawCircle(
-            color = darkColor,
-            radius = radius,
-            center = center
-        )
+        // 1. Base Dark Circle
+        drawCircle(color = darkColor, radius = radius, center = center)
 
         val t = tithi % 30
-        
-        // 2. Draw the illuminated part
-        if (t != 0) {
-            val angleRad = Math.toRadians(t * 12.0)
-            val innerWidth = radius * cos(angleRad).toFloat()
-            val innerRect = Rect(center.x - abs(innerWidth), center.y - radius, center.x + abs(innerWidth), center.y + radius)
-            
-            val path = Path()
-            if (t <= 15) {
-                // Waxing: Right side lit
-                path.addArc(rect, -90f, 180f)
-                path.arcTo(
-                    rect = innerRect,
-                    startAngleDegrees = 90f,
-                    sweepAngleDegrees = if (innerWidth > 0) -180f else 180f,
-                    forceMoveTo = false
-                )
-            } else {
-                // Waning: Left side lit
-                path.addArc(rect, 90f, 180f)
-                path.arcTo(
-                    rect = innerRect,
-                    startAngleDegrees = -90f,
-                    sweepAngleDegrees = if (innerWidth > 0) -180f else 180f,
-                    forceMoveTo = false
-                )
-            }
-            path.close()
-            drawPath(path, lightColor)
+        if (t == 0) {
+            drawCircle(color = strokeColor, radius = radius, center = center, style = Stroke(width = 0.5.dp.toPx()))
+            return@Canvas
         }
 
-        // 3. Draw the thin black outline
-        drawCircle(
-            color = strokeColor,
-            radius = radius,
-            center = center,
-            style = Stroke(width = 0.5.dp.toPx())
-        )
+        // 2. Draw the illuminated part
+        val phi = (t * 12.0)
+        val cosPhi = cos(Math.toRadians(phi)).toFloat()
+        val ellipseWidth = abs(cosPhi) * radius * 2f
+        val ellipseRect = Rect(center.x - ellipseWidth / 2f, center.y - radius, center.x + ellipseWidth / 2f, center.y + radius)
+
+        val path = Path()
+        if (t <= 15) {
+            // Waxing (Valarpirai): Light is on the right. 
+            // Edge is the right semi-circle.
+            path.arcTo(rect, -90f, 180f, true) 
+            if (cosPhi >= 0) {
+                // Crescent: Terminator is on the right side (concave)
+                path.arcTo(ellipseRect, 90f, -180f, false)
+            } else {
+                // Gibbous: Terminator is on the left side (convex)
+                path.arcTo(ellipseRect, 90f, 180f, false)
+            }
+        } else {
+            // Waning (Theipirai): Light is on the left.
+            // Edge is the left semi-circle.
+            path.arcTo(rect, 90f, 180f, true)
+            if (cosPhi <= 0) {
+                // Gibbous: Terminator is on the right side (convex)
+                path.arcTo(ellipseRect, -90f, 180f, false)
+            } else {
+                // Crescent: Terminator is on the left side (concave)
+                path.arcTo(ellipseRect, 270f, -180f, false)
+            }
+        }
+        path.close()
+        drawPath(path, lightColor)
+
+        // 3. Outline
+        drawCircle(color = strokeColor, radius = radius, center = center, style = Stroke(width = 0.5.dp.toPx()))
+    }
+}
+
+@androidx.compose.ui.tooling.preview.Preview(showBackground = true, backgroundColor = 0xFFF0F0F0)
+@Composable
+fun MoonPhaseGalleryPreview() {
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text("Valar Pirai (1-15)", fontWeight = FontWeight.Bold)
+        Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
+            (1..15).forEach { t ->
+                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(4.dp)) {
+                    MoonPhaseIcon(tithi = t, modifier = Modifier.size(64.dp))
+                    Text(t.toString(), fontSize = 10.sp)
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Text("Problematic Tithis (Testing)", fontWeight = FontWeight.Bold)
+        Row {
+            listOf(10, 13, 14, 17, 18).forEach { t ->
+                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(4.dp)) {
+                    MoonPhaseIcon(tithi = t, modifier = Modifier.size(64.dp))
+                    Text(t.toString(), fontSize = 10.sp)
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Text("Theipirai (16-30)", fontWeight = FontWeight.Bold)
+        Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
+            (16..30).forEach { t ->
+                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(4.dp)) {
+                    MoonPhaseIcon(tithi = t, modifier = Modifier.size(64.dp))
+                    Text(t.toString(), fontSize = 10.sp)
+                }
+            }
+        }
     }
 }
 
@@ -214,40 +250,88 @@ fun KalashIcon(modifier: Modifier = Modifier, color: Color = Color.Unspecified) 
 }
 
 @Composable
-fun NandiIcon(modifier: Modifier = Modifier, light: Boolean) {
-    Image(
-        painter = painterResource(id = if (light) R.drawable.ic_nandi_white else R.drawable.ic_nandi_black),
-        contentDescription = null,
+fun NandiIcon(modifier: Modifier = Modifier, isWhite: Boolean) {
+    val bgColor = if (isWhite) Color.Black else Color.White
+    val iconColor = if (isWhite) Color.White else Color.Black
+    
+    Surface(
+        color = bgColor,
+        shape = CircleShape,
         modifier = modifier
-    )
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_nandi_black),
+            contentDescription = null,
+            modifier = Modifier.padding(2.dp).fillMaxSize(),
+            colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(iconColor)
+        )
+    }
 }
 
 @Composable
-fun ShivaIcon(modifier: Modifier = Modifier) {
-    Image(
-        painter = painterResource(id = R.drawable.ic_shiva),
-        contentDescription = null,
+fun ShivaIcon(modifier: Modifier = Modifier, isWhite: Boolean) {
+    val bgColor = if (isWhite) Color.Black else Color.White
+    val iconColor = if (isWhite) Color.White else Color.Black
+    
+    Surface(
+        color = bgColor,
+        shape = CircleShape,
         modifier = modifier
-    )
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_shiva),
+            contentDescription = null,
+            modifier = Modifier.padding(2.dp).fillMaxSize(),
+            colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(iconColor)
+        )
+    }
 }
 
 @Composable
-fun GaneshaIcon(modifier: Modifier = Modifier, light: Boolean) {
-    Image(
-        painter = painterResource(id = if (light) R.drawable.ic_ganesha_white else R.drawable.ic_ganesha_black),
-        contentDescription = null,
+fun GaneshaIcon(modifier: Modifier = Modifier, isWhite: Boolean) {
+    val bgColor = if (isWhite) Color.Black else Color.White
+    val iconColor = if (isWhite) Color.White else Color.Black
+
+    Surface(
+        color = bgColor,
+        shape = CircleShape,
         modifier = modifier
-    )
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_ganesha_black),
+            contentDescription = null,
+            modifier = Modifier.padding(2.dp).fillMaxSize(),
+            colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(iconColor)
+        )
+    }
 }
 
 @Composable
-fun VelIcon(modifier: Modifier = Modifier, lightColor: Color, darkColor: Color, strokeColor: Color) {
-    Canvas(modifier = modifier.size(18.dp)) {
+fun VelIcon(modifier: Modifier = Modifier, isWhite: Boolean) {
+    val bgColor = if (isWhite) Color.Black else Color.White
+    val iconColor = if (isWhite) Color.White else Color.Black
+    
+    Surface(
+        color = bgColor,
+        shape = CircleShape,
+        modifier = modifier
+    ) {
+        VelDrawing(
+            modifier = Modifier.padding(2.dp).fillMaxSize(),
+            lightColor = iconColor,
+            darkColor = bgColor,
+            strokeColor = iconColor
+        )
+    }
+}
+
+@Composable
+private fun VelDrawing(modifier: Modifier = Modifier, lightColor: Color, darkColor: Color, strokeColor: Color) {
+    Canvas(modifier = modifier) {
         val w = size.width
         val h = size.height
         
         // 1. Shaft (Pole)
-        // Balanced thickness for visibility without being too bulky
         drawLine(
             color = strokeColor, 
             start = Offset(w * 0.5f, h * 0.5f), 
@@ -272,7 +356,6 @@ fun VelIcon(modifier: Modifier = Modifier, lightColor: Color, darkColor: Color, 
         }
         
         drawPath(blade, lightColor)
-        // Reduced border thickness
         drawPath(blade, strokeColor, style = Stroke(width = 1.2.dp.toPx())) 
         
         // 3. Vibhuti lines
@@ -339,7 +422,7 @@ fun MuhurthamItem(
 @Composable
 fun SpecialEventItem(
     resId: Int,
-    tithiValue: Int,
+    isWhite: Boolean,
     sunset: LocalTime,
     is24Hour: Boolean,
     maxLines: Int = 1,
@@ -371,11 +454,15 @@ fun SpecialEventItem(
     ) {
         when (resId) {
             R.string.event_pradosham -> {
-                NandiIcon(modifier = Modifier.size(16.dp), light = tithiValue <= 15)
+                NandiIcon(modifier = Modifier.size(16.dp), isWhite = isWhite)
                 Spacer(modifier = Modifier.width(4.dp))
             }
             R.string.event_sivaratri -> {
-                ShivaIcon(modifier = Modifier.size(16.dp))
+                ShivaIcon(modifier = Modifier.size(16.dp), isWhite = isWhite)
+                Spacer(modifier = Modifier.width(4.dp))
+            }
+            R.string.event_vinayagar_chaturthi, R.string.event_sankatahara_chaturthi -> {
+                GaneshaIcon(modifier = Modifier.size(16.dp), isWhite = isWhite)
                 Spacer(modifier = Modifier.width(4.dp))
             }
         }
@@ -447,22 +534,21 @@ fun LunarItem(
         } else ""
     }
 
+    val onSurface = MaterialTheme.colorScheme.onSurfaceVariant
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.clickable { onClick() }
     ) {
         if (type == com.suresh.sacredtimeline.model.DashboardDetail.LunarType.TITHI || type == com.suresh.sacredtimeline.model.DashboardDetail.LunarType.PAKSHA) {
             when (item.value) {
-                4 -> GaneshaIcon(modifier = Modifier.size(16.dp), light = true)
-                19 -> GaneshaIcon(modifier = Modifier.size(16.dp), light = false)
-                6 -> VelIcon(modifier = Modifier.size(18.dp), lightColor = Color.White, darkColor = Color.Black, strokeColor = Color.Black)
-                21 -> VelIcon(modifier = Modifier.size(18.dp), lightColor = Color.Black, darkColor = Color.White, strokeColor = Color.White)
+                4, 19 -> GaneshaIcon(modifier = Modifier.size(16.dp), isWhite = item.value <= 15)
+                6, 21 -> VelIcon(modifier = Modifier.size(18.dp), isWhite = item.value <= 15)
                 else -> MoonPhaseIcon(
                     tithi = item.value, 
                     modifier = Modifier.size(12.dp),
                     lightColor = Color.White, 
                     darkColor = Color.Black, 
-                    strokeColor = Color.Black
+                    strokeColor = onSurface
                 )
             }
         } else {
@@ -490,7 +576,7 @@ private fun formatTransitRange(start: java.time.Instant?, end: java.time.Instant
     val startTime = start?.atZone(zone)
     val endTime = end?.atZone(zone)
 
-    val timeFormatter = DateTimeFormatter.ofPattern(if (is24Hour) "HH:mm" else "h:mm a")
+    val timeFormatter = DateTimeFormatter.ofPattern(if (is24Hour) "HH:mm" else "h:mm")
     val amLabel = stringResource(R.string.label_am)
     val pmLabel = stringResource(R.string.label_pm)
 
@@ -598,6 +684,7 @@ fun SunTimesDisplay(
         }
     }
     
+    val isValarpiraiMain = pakshaResId == R.string.paksha_valarpirai
     val showPiraiWithIcon = showPirai && paksha.isNotEmpty()
 
     val surfaceModifier = Modifier
@@ -618,7 +705,7 @@ fun SunTimesDisplay(
                     Text("  •  ", color = Color.Gray)
                 }
                 specialEvents.forEach { resId ->
-                    SpecialEventItem(resId, tithiValue, sunset, is24Hour) { start, end ->
+                    SpecialEventItem(resId, isValarpiraiMain, sunset, is24Hour) { start, end ->
                         onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.SpecialEvent(resId, start, end))
                     }
                     Text("  •  ", color = Color.Gray)
@@ -667,7 +754,7 @@ fun SunTimesDisplay(
                     }
                 }
                 specialEvents.forEach { resId ->
-                    SpecialEventItem(resId, tithiValue, sunset, is24Hour, maxLines = Int.MAX_VALUE) { start, end ->
+                    SpecialEventItem(resId, isValarpiraiMain, sunset, is24Hour, maxLines = Int.MAX_VALUE) { start, end ->
                         onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.SpecialEvent(resId, start, end))
                     }
                 }
@@ -769,10 +856,15 @@ fun SunTimesDisplay(
                             }
                             
                             if (showPiraiWithIcon) {
+                                val tithiValueToUse = remember(tithiValue, pakshaDay, pakshaResId) {
+                                    if (tithiValue != 0) tithiValue
+                                    else if (pakshaResId == R.string.paksha_theipirai) pakshaDay + 15
+                                    else pakshaDay
+                                }
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier.clickable {
-                                        val primaryTithi = tithis.firstOrNull { it.value == tithiValue } ?: tithis.firstOrNull()
+                                        val primaryTithi = tithis.firstOrNull { it.value == tithiValueToUse } ?: tithis.firstOrNull()
                                         if (primaryTithi != null) {
                                             onDetailClick(com.suresh.sacredtimeline.model.DashboardDetail.Lunar(
                                                 primaryTithi, com.suresh.sacredtimeline.model.DashboardDetail.LunarType.PAKSHA
@@ -781,11 +873,11 @@ fun SunTimesDisplay(
                                     }
                                 ) {
                                     MoonPhaseIcon(
-                                        tithi = tithiValue, 
+                                        tithi = tithiValueToUse, 
                                         modifier = Modifier.size(16.dp),
                                         lightColor = Color.White, 
                                         darkColor = Color.Black, 
-                                        strokeColor = Color.Black
+                                        strokeColor = MaterialTheme.colorScheme.onPrimaryContainer
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text(
@@ -858,7 +950,11 @@ fun SunTimesDisplay(
                 ) {
                     if (showSunrise) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.WbSunny, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color(0xFFFF9800))
+                            Image(
+                                painter = painterResource(R.drawable.ic_sun),
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(formatWithAmPm(sunrise), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
                         }
@@ -905,7 +1001,15 @@ fun SunTimesDisplay(
 }
 
 @Composable
-fun SunGridMarker(time: LocalTime, label: String, icon: ImageVector, iconTint: Color, hourHeight: Dp, is24Hour: Boolean) {
+fun SunGridMarker(
+    time: LocalTime, 
+    label: String, 
+    icon: ImageVector? = null, 
+    painter: androidx.compose.ui.graphics.painter.Painter? = null,
+    iconTint: Color, 
+    hourHeight: Dp, 
+    is24Hour: Boolean
+) {
     val topOffset = calculateOffset(time, hourHeight)
     val timeFormatter = DateTimeFormatter.ofPattern(if (is24Hour) "HH:mm" else "h:mm")
     
@@ -928,13 +1032,14 @@ fun SunGridMarker(time: LocalTime, label: String, icon: ImageVector, iconTint: C
             .heightIn(min = 36.dp)
     ) {
         Canvas(modifier = Modifier.fillMaxWidth().height(2.dp).align(Alignment.Center)) {
+            val drawTint = if (iconTint != Color.Unspecified) iconTint else Color(0xFFFF9800)
             drawRect(
-                color = iconTint.copy(alpha = 0.3f),
+                color = drawTint.copy(alpha = 0.3f),
                 topLeft = Offset(0f, -4f),
                 size = Size(size.width, 10f)
             )
             drawLine(
-                color = iconTint,
+                color = drawTint,
                 start = Offset.Zero,
                 end = Offset(size.width, 0f),
                 strokeWidth = 4f
@@ -949,10 +1054,11 @@ fun SunGridMarker(time: LocalTime, label: String, icon: ImageVector, iconTint: C
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            val drawTint = if (iconTint != Color.Unspecified) iconTint else Color(0xFFFF9800)
             Surface(
                 color = Color.Black.copy(alpha = 0.9f),
                 shape = RoundedCornerShape(8.dp),
-                border = BorderStroke(2.dp, iconTint.copy(alpha = 0.8f))
+                border = BorderStroke(2.dp, drawTint.copy(alpha = 0.8f))
             ) {
                 Row(
                     modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp),
@@ -974,13 +1080,17 @@ fun SunGridMarker(time: LocalTime, label: String, icon: ImageVector, iconTint: C
             Surface(
                 color = Color.Black.copy(alpha = 0.9f),
                 shape = RoundedCornerShape(8.dp),
-                border = BorderStroke(2.dp, iconTint.copy(alpha = 0.8f))
+                border = BorderStroke(2.dp, drawTint.copy(alpha = 0.8f))
             ) {
                 Row(
                     modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(icon, contentDescription = null, modifier = Modifier.size(12.dp), tint = iconTint)
+                    if (painter != null) {
+                        Image(painter = painter, contentDescription = null, modifier = Modifier.size(14.dp))
+                    } else if (icon != null) {
+                        Icon(icon, contentDescription = null, modifier = Modifier.size(12.dp), tint = iconTint)
+                    }
                     Spacer(modifier = Modifier.width(4.dp))
                     val localizedLabelFull = if (label == "Sunrise") stringResource(R.string.label_sunrise) else stringResource(R.string.label_sunset)
                     Text(

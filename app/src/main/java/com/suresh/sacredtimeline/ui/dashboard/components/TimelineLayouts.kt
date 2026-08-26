@@ -334,7 +334,7 @@ fun LandscapeTimelineLayout(
                                 pakshaDay = dayData.pakshaDay,
                                 tithis = dayData.tithis,
                                 nakshatras = dayData.nakshatras,
-                                tithiValue = dayData.tithis.firstOrNull()?.value ?: 0,
+                                tithiValue = if (dayData.currentTithiValue != 0) dayData.currentTithiValue else (dayData.tithis.firstOrNull()?.value ?: 0),
                                 specialEvents = dayData.specialEvents,
                                 isSubhaMuhurtham = dayData.isSubhaMuhurtham,
                                 abhijitMuhurtham = dayData.abhijitMuhurtham,

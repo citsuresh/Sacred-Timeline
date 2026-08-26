@@ -29,6 +29,7 @@ data class DayData(
     val tamilYearResId: Int = 0,
     val pakshaResId: Int = 0,
     val pakshaDay: Int = 0,
+    val currentTithiValue: Int = 0,
     val tithis: List<LunarInterval> = emptyList(),
     val nakshatras: List<LunarInterval> = emptyList(),
     val specialEvents: List<Int> = emptyList(),
@@ -36,5 +37,7 @@ data class DayData(
     val brahmaMuhurtham: Muhurtham? = null,
     val abhijitMuhurtham: Muhurtham? = null,
     val maitraMuhurtham: List<MaitraMuhurtham> = emptyList(),
-    val chandrashtamam: List<ChandrashtamamTiming> = emptyList()
+    val chandrashtamam: List<ChandrashtamamTiming> = emptyList(),
+    val tharaBalam: List<TharaBalamTiming> = emptyList(),
+    val yogam: List<YogamTiming> = emptyList()
 )
