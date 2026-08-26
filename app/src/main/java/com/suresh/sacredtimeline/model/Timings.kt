@@ -116,3 +116,32 @@ data class ChandrashtamamTiming(
     @Serializable(with = InstantSerializer::class)
     val endTimeInstant: java.time.Instant? = null
 ) : Timing
+
+@Serializable
+data class YogamTiming(
+    override val name: String, // Amirtha, Siddha, Marana, Vadha
+    override val tamilName: String,
+    @Serializable(with = LocalTimeSerializer::class)
+    override val startTime: LocalTime,
+    @Serializable(with = LocalTimeSerializer::class)
+    override val endTime: LocalTime,
+    override val auspiciousness: Auspiciousness,
+    override val description: String = "",
+    val categoryResId: Int = 0,
+    val sanskritNameResId: Int = 0
+) : Timing
+
+@Serializable
+data class TharaBalamTiming(
+    override val name: String, // 1 to 9
+    override val tamilName: String,
+    @Serializable(with = LocalTimeSerializer::class)
+    override val startTime: LocalTime,
+    @Serializable(with = LocalTimeSerializer::class)
+    override val endTime: LocalTime,
+    override val auspiciousness: Auspiciousness,
+    override val description: String = "",
+    val categoryIndex: Int, // 1 to 9
+    val categoryResId: Int = 0,
+    val sanskritNameResId: Int = 0
+) : Timing

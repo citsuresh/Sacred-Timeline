@@ -101,13 +101,62 @@
     <string name="desc_star_27">Revati: Liberation. Safe journey back to the source. Star of compassion and safe travel.</string>
     <string name="label_nakshatra">Nakshatra</string>
     <string name="label_rasi">Rasi</string>
-    <string name="label_yoga">Yoga / Yogam</string>
+    <string name="label_thara_balam">Thara Balam</string>
+    <string name="label_yoga">Yogam</string>
     <string name="label_nama_yoga">Nama Yogam</string>
-    <string name="label_amritadi_yoga">Amritadi Yogam</string>
+    <string name="label_amritadi_yoga">Amirthathi Yogam</string>
     <string name="label_chandrashtamam">Chandrashtamam</string>
     <string name="label_nethiram">Nethiram</string>
     <string name="label_jeevan">Jeevan</string>
     <string name="label_now_line">NOW</string>
+
+    <!-- Thara Balam Names -->
+    <string name="thara_1">Jenma Tharai</string>
+    <string name="thara_2">Selva Tharai</string>
+    <string name="thara_3">Vipathu Tharai</string>
+    <string name="thara_4">Suga Tharai</string>
+    <string name="thara_5">Pagai Tharai</string>
+    <string name="thara_6">Sadhaka Tharai</string>
+    <string name="thara_7">Azhivu Tharai</string>
+    <string name="thara_8">Natpu Tharai</string>
+    <string name="thara_9">Peru Natpu Tharai</string>
+
+    <string name="thara_1_sanskrit">Janma</string>
+    <string name="thara_2_sanskrit">Sampat</string>
+    <string name="thara_3_sanskrit">Vipat</string>
+    <string name="thara_4_sanskrit">Kshema</string>
+    <string name="thara_5_sanskrit">Pratyak</string>
+    <string name="thara_6_sanskrit">Sadhana</string>
+    <string name="thara_7_sanskrit">Naidhana</string>
+    <string name="thara_8_sanskrit">Mitra</string>
+    <string name="thara_9_sanskrit">Parama Mitra</string>
+
+    <!-- Amirthathi Yogam Names -->
+    <string name="yoga_amirtha">Amirtha Yogam</string>
+    <string name="yoga_siddha">Siddha Yogam</string>
+    <string name="yoga_marana">Marana Yogam</string>
+    <string name="yoga_vadha">Vadha Yogam</string>
+
+    <string name="yoga_amirtha_sanskrit">Amrita</string>
+    <string name="yoga_siddha_sanskrit">Siddha</string>
+    <string name="yoga_marana_sanskrit">Marana</string>
+    <string name="yoga_vadha_sanskrit">Prabalarishta</string>
+
+    <!-- Metadata: Energy Descriptions -->
+    <string name="desc_thara_1">Body/Self focus. Neutral energy for routine activities.</string>
+    <string name="desc_thara_2">Wealth and Prosperity. Good for financial deals and investments.</string>
+    <string name="desc_thara_3">Danger and Accidents. Avoid travel or high-risk ventures.</string>
+    <string name="desc_thara_4">Comfort and Well-being. Excellent for family and health matters.</string>
+    <string name="desc_thara_5">Opposition and Obstacles. Expect delays; keep a low profile.</string>
+    <string name="desc_thara_6">Achievement and Success. Highly auspicious for starting new efforts.</string>
+    <string name="desc_thara_7">Suffering and Critical. Most dangerous period; avoid all major tasks.</string>
+    <string name="desc_thara_8">Friendly and Helpful. Good for networking and seeking favors.</string>
+    <string name="desc_thara_9">Best Friend/Ultimate Support. Supreme strength for any noble task.</string>
+
+    <string name="desc_yoga_amirtha">Most auspicious background energy. Like nectar, it makes everything sweet and successful.</string>
+    <string name="desc_yoga_siddha">Achievement energy. Best for completion of tasks and reaching milestones.</string>
+    <string name="desc_yoga_marana">Obstacle energy. Atmospheric tension; focus on routine maintenance only.</string>
+    <string name="desc_yoga_vadha">Critical warning. High potential for failure or conflict. Best for prayer and internal work.</string>
     <string name="label_from">From</string>
     <string name="label_to">To</string>
     <string name="label_in">|</string>

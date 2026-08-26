@@ -85,6 +85,8 @@ object Metadata {
             is Hora -> R.string.nav_hora
             is Muhurtham, is MaitraMuhurtham -> R.string.label_muhurtham_short
             is ChandrashtamamTiming -> R.string.label_special_short
+            is TharaBalamTiming -> R.string.label_thara_balam
+            is YogamTiming -> R.string.label_yoga
         }
     }
     

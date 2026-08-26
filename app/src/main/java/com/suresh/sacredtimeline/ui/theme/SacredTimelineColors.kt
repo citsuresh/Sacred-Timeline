@@ -47,6 +47,19 @@ object SacredTimelineColors {
                 if (timing.potencyStars == 5) MaitraGold else MaitraGoldPale
             }
             is ChandrashtamamTiming -> ChandrashtamamRed
+            is TharaBalamTiming -> when (timing.auspiciousness) {
+                Auspiciousness.GOLD -> TharaGold
+                Auspiciousness.WHITE -> TharaNeutralWhite
+                Auspiciousness.ORANGE -> TharaCautionOrange
+                Auspiciousness.RED -> TharaCriticalCrimson
+                else -> TharaNeutralWhite
+            }
+            is YogamTiming -> when (timing.auspiciousness) {
+                Auspiciousness.GREEN -> YogamEmerald
+                Auspiciousness.BLUE -> YogamPaleGreen
+                Auspiciousness.RED -> YogamDeepRed
+                else -> YogamEmerald
+            }
         }
     }
 

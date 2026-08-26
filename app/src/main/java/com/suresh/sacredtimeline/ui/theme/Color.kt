@@ -51,3 +51,14 @@ val MaitraGoldDark = Color(0xFFA68900)
 val MaitraGoldPale = Color(0xFFFFE082)
 
 val ChandrashtamamRed = Color(0xFFE57373)
+
+// Energy Indicators (Yogam & Thara Balam)
+val YogamEmerald = Color(0xFF2E7D32)    // Bright Emerald Green
+val YogamPaleGreen = Color(0xFFC5E1A5)  // Pale/Lime Green for Siddha
+val YogamDeepRed = Color(0xFFB71C1C)    // Deep Red for Marana/Vadha
+
+val TharaGold = Color(0xFFFFD700)       // Pure Gold for Good
+val TharaAmber = Color(0xFFFFA000)      // Amber for Good
+val TharaNeutralWhite = Color(0xFFFFFFFF)
+val TharaCautionOrange = Color(0xFFFF9800)
+val TharaCriticalCrimson = Color(0xFFD32F2F)

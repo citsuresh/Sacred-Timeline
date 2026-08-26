@@ -57,6 +57,7 @@
 
     <string name="label_nakshatra">நட்சத்திரம்</string>
     <string name="label_rasi">ராசி</string>
+    <string name="label_thara_balam">தார பலம்</string>
     <string name="label_yoga">யோகம்</string>
     <string name="label_nama_yoga">நாம யோகம்</string>
     <string name="label_amritadi_yoga">அமிர்தாதி யோகம்</string>
@@ -64,6 +65,54 @@
     <string name="label_nethiram">நேத்திரம்</string>
     <string name="label_jeevan">ஜீவன்</string>
     <string name="label_now_line">இப்போது</string>
+
+    <!-- Thara Balam Names -->
+    <string name="thara_1">உடல் தாரை / ஜென்ம தாரை</string>
+    <string name="thara_2">செல்வ தாரை / தன தாரை</string>
+    <string name="thara_3">விபத்து தாரை / கண்ட தாரை</string>
+    <string name="thara_4">சுக தாரை / க்ஷேம தாரை</string>
+    <string name="thara_5">பகை தாரை / மாரக தாரை</string>
+    <string name="thara_6">காரிய சித்தி தாரை / சாதக தாரை</string>
+    <string name="thara_7">அழிவு தாரை / வதை தாரை</string>
+    <string name="thara_8">நட்பு தாரை / மித்ர தாரை</string>
+    <string name="thara_9">பெரு நட்பு தாரை / அதி நட்பு தாரை</string>
+
+    <string name="thara_1_sanskrit">Janma</string>
+    <string name="thara_2_sanskrit">Sampat</string>
+    <string name="thara_3_sanskrit">Vipat</string>
+    <string name="thara_4_sanskrit">Kshema</string>
+    <string name="thara_5_sanskrit">Pratyak</string>
+    <string name="thara_6_sanskrit">Sadhana</string>
+    <string name="thara_7_sanskrit">Naidhana</string>
+    <string name="thara_8_sanskrit">Mitra</string>
+    <string name="thara_9_sanskrit">Parama Mitra</string>
+
+    <!-- Amirthathi Yogam Names -->
+    <string name="yoga_amirtha">அமிர்த யோகம்</string>
+    <string name="yoga_siddha">சித்த யோகம்</string>
+    <string name="yoga_marana">மரண யோகம்</string>
+    <string name="yoga_vadha">கூடா நாள் / வதை யோகம்</string>
+
+    <string name="yoga_amirtha_sanskrit">Amrita</string>
+    <string name="yoga_siddha_sanskrit">Siddha</string>
+    <string name="yoga_marana_sanskrit">Marana</string>
+    <string name="yoga_vadha_sanskrit">Prabalarishta</string>
+
+    <!-- Metadata: Energy Descriptions -->
+    <string name="desc_thara_1">ஜென்ம தாரை: உங்கள் உடல் மற்றும் மனம் சார்ந்த நிலை. வழக்கமான பணிகளுக்கு ஏற்றது.</string>
+    <string name="desc_thara_2">செல்வ தாரை: செல்வம் மற்றும் லாபம் தரும் காலம். புதிய முதலீடுகளுக்கு மிகச் சிறப்பு.</string>
+    <string name="desc_thara_3">விபத்து தாரை: விபத்து மற்றும் ஆபத்து ஏற்பட வாய்ப்புள்ள காலம். பயணங்களைத் தவிர்க்கவும்.</string>
+    <string name="desc_thara_4">சுக தாரை: சுகம் மற்றும் ஆரோக்கியம் தரும் காலம். குடும்ப விசேஷங்களுக்கு ஏற்றது.</string>
+    <string name="desc_thara_5">பகை தாரை: காரியத் தடை மற்றும் எதிர்ப்புகள் வரலாம். நிதானம் தேவை.</string>
+    <string name="desc_thara_6">சாதக தாரை: காரிய சித்தி மற்றும் வெற்றி தரும் காலம். புதிய முயற்சிகளைத் தொடங்கலாம்.</string>
+    <string name="desc_thara_7">வதைய தாரை: மிகவும் ஆபத்தான காலம். எந்த ஒரு முக்கிய காரியத்தையும் தவிர்க்கவும்.</string>
+    <string name="desc_thara_8">நட்பு தாரை: உதவிகளும் ஒத்துழைப்பும் கிடைக்கும் காலம். மற்றவர்களுடன் பழக ஏற்றது.</string>
+    <string name="desc_thara_9">பரம நட்பு தாரை: அதீத பலமும் பாதுகாப்பும் தரும் காலம். மிக உயரிய பணிகளுக்கு ஏற்றது.</string>
+
+    <string name="desc_yoga_amirtha">அமிர்த யோகம்: அமிர்தம் போன்ற இனிமையான காலம். அனைத்து சுப காரியங்களுக்கும் மிகச் சிறப்பு.</string>
+    <string name="desc_yoga_siddha">சித்த யோகம்: சித்தி தரும் காலம். தொடங்கிய காரியங்களை வெற்றிகரமாக முடிக்க ஏற்றது.</string>
+    <string name="desc_yoga_marana">மரண யோகம்: மரண யோக காலத்தில் சுப காரியங்களைத் தவிர்க்கவும். வழக்கமான பணிகளை மட்டும் செய்யவும்.</string>
+    <string name="desc_yoga_vadha">வதை யோகம்: காரியங்கள் தோல்வியடைய வாய்ப்புள்ள காலம். இறை வழிபாடு மற்றும் தியானத்திற்கு ஏற்றது.</string>
     <string name="label_from">தொடக்கம்</string>
     <string name="label_to">முடிவு</string>
     <string name="label_in">|</string>

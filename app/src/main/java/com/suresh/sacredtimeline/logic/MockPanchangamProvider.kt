@@ -88,6 +88,8 @@ class MockPanchangamProvider {
             is Muhurtham -> original.copy(startTime = start, endTime = end)
             is MaitraMuhurtham -> original.copy(startTime = start, endTime = end)
             is ChandrashtamamTiming -> original.copy(startTime = start, endTime = end)
+            is TharaBalamTiming -> original.copy(startTime = start, endTime = end)
+            is YogamTiming -> original.copy(startTime = start, endTime = end)
         }
     }
 

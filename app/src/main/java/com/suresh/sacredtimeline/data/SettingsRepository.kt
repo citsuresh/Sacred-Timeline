@@ -59,7 +59,7 @@ class SettingsRepository(private val context: Context) {
     val singleViewScale: Flow<Float> = context.dataStore.data.map { it[Keys.SINGLE_VIEW_SCALE] ?: 0.5f }
     
     val columnVisibility: Flow<Set<String>> = context.dataStore.data.map { 
-        it[Keys.COLUMN_VISIBILITY] ?: setOf("UNIVERSAL", "CHANDRASHTAMAM")
+        it[Keys.COLUMN_VISIBILITY] ?: setOf("UNIVERSAL", "CHANDRASHTAMAM", "YOGAM", "THARA_BALAM")
     }
 
     val columnOrder: Flow<List<String>> = context.dataStore.data.map { 
@@ -74,7 +74,7 @@ class SettingsRepository(private val context: Context) {
     }
 
     val customVisibility: Flow<Set<String>> = context.dataStore.data.map { 
-        it[Keys.CUSTOM_VISIBILITY] ?: setOf("UNIVERSAL", "CHANDRASHTAMAM")
+        it[Keys.CUSTOM_VISIBILITY] ?: setOf("UNIVERSAL", "CHANDRASHTAMAM", "YOGAM", "THARA_BALAM")
     }
 
     val customOrder: Flow<List<String>> = context.dataStore.data.map { 
@@ -95,7 +95,7 @@ class SettingsRepository(private val context: Context) {
     }
 
     val widgetColumnVisibility: Flow<Set<String>> = context.dataStore.data.map { 
-        it[Keys.WIDGET_COLUMN_VISIBILITY] ?: setOf("UNIVERSAL", "CHANDRASHTAMAM")
+        it[Keys.WIDGET_COLUMN_VISIBILITY] ?: setOf("UNIVERSAL", "CHANDRASHTAMAM", "YOGAM", "THARA_BALAM")
     }
 
     val widgetColumnOrder: Flow<List<String>> = context.dataStore.data.map { 
@@ -110,7 +110,7 @@ class SettingsRepository(private val context: Context) {
     }
 
     companion object {
-        const val DEFAULT_ORDER = "NERAM_MUHURTHAM,UNIVERSAL,NERAM,MAITRA,BRAHMA,ABHIJIT,CHANDRASHTAMAM,GOWRI,HORA"
+        const val DEFAULT_ORDER = "YOGAM,THARA_BALAM,NERAM_MUHURTHAM,UNIVERSAL,NERAM,MAITRA,BRAHMA,ABHIJIT,CHANDRASHTAMAM,GOWRI,HORA"
         val ALL_COLUMNS = DEFAULT_ORDER.split(",")
     }
 
