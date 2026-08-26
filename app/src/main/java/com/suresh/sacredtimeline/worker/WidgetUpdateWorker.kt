@@ -6,6 +6,7 @@ import androidx.work.*
 import com.suresh.sacredtimeline.data.CacheManager
 import com.suresh.sacredtimeline.data.SettingsRepository
 import com.suresh.sacredtimeline.logic.DayDataProvider
+import com.suresh.sacredtimeline.logic.LunarCalendarUtils
 import com.suresh.sacredtimeline.model.DayData
 import com.suresh.sacredtimeline.widget.PanchangamWidget
 import kotlinx.coroutines.flow.first
@@ -107,9 +108,12 @@ class WidgetUpdateWorker(
         todayData.chandrashtamam.forEach { allBoundaries.add(it.startTime); allBoundaries.add(it.endTime) }
         
         // Fix: Also monitor Tithi and Nakshatra boundaries for header accuracy
+        // We use the UNFILTERED data from a fresh calculation to ensure boundaries are caught 
+        // even if the user has disabled the specific Tithi/Star from being listed.
+        val freshInfo = LunarCalendarUtils.getLunarDayInfo(date)
         val zoneId = ZoneId.systemDefault()
-        todayData.tithis.forEach { it.startTime?.let { s -> allBoundaries.add(s.atZone(zoneId).toLocalTime()) }; it.endTime?.let { e -> allBoundaries.add(e.atZone(zoneId).toLocalTime()) } }
-        todayData.nakshatras.forEach { it.startTime?.let { s -> allBoundaries.add(s.atZone(zoneId).toLocalTime()) }; it.endTime?.let { e -> allBoundaries.add(e.atZone(zoneId).toLocalTime()) } }
+        freshInfo.tithis.forEach { it.startTime?.let { s -> allBoundaries.add(s.atZone(zoneId).toLocalTime()) }; it.endTime?.let { e -> allBoundaries.add(e.atZone(zoneId).toLocalTime()) } }
+        freshInfo.nakshatras.forEach { it.startTime?.let { s -> allBoundaries.add(s.atZone(zoneId).toLocalTime()) }; it.endTime?.let { e -> allBoundaries.add(e.atZone(zoneId).toLocalTime()) } }
         
         val nextTransition = allBoundaries
             .filter { it.isAfter(now) }

@@ -9,6 +9,7 @@
 - **UI & Customization**: 
     - Full persistence for "Custom Timeline" (hidden until first use).
     - Calendar-style Tamil Date Anchor in header.
+    - Fixed `MoonPhaseIcon` rendering logic for Valarpirai (Waxing) phases.
     - Two-way sync between Nav Drawer and Settings; added switch confirmation dialogs.
     - **Widget Synchronization**: Fixed transition scheduling (Start/End boundaries), instant manual refresh, and debounced app-to-widget sync.
     - **UI Integrity**: Resolved parameter-shift bug in `TimelinePager` that affected header and marquee visibility.

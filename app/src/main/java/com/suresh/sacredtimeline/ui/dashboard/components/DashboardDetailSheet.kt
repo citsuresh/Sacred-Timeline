@@ -276,6 +276,8 @@ fun DashboardDetailSheet(
                         is Muhurtham -> Metadata.getSpecialDescription(t.name, context)
                         is MaitraMuhurtham -> Metadata.getSpecialDescription("Maitra Muhurtham", context)
                         is ChandrashtamamTiming -> context.getString(R.string.desc_timing_chandrashtamam)
+                        is TharaBalamTiming -> t.description
+                        is YogamTiming -> t.description
                     }
                 }
                 is DashboardDetail.Lunar -> {
@@ -314,12 +316,14 @@ fun DetailIcon(detail: DashboardDetail, tint: Color) {
                 is Muhurtham -> Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = tint)
                 is MaitraMuhurtham -> Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = tint)
                 is ChandrashtamamTiming -> Icon(Icons.Default.Warning, contentDescription = null, tint = tint)
+                is TharaBalamTiming, is YogamTiming -> Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = tint)
                 is SpecialPeriod -> {
                     if (t.name == "Yama") {
-                        Image(
+                        Icon(
                             painter = painterResource(R.drawable.ic_yama_bull),
                             contentDescription = null,
-                            modifier = Modifier.size(32.dp)
+                            modifier = Modifier.size(32.dp),
+                            tint = tint
                         )
                     } else {
                         val iconPainter = when (t.name) {
@@ -345,8 +349,8 @@ fun DetailIcon(detail: DashboardDetail, tint: Color) {
         }
         is DashboardDetail.SpecialEvent -> {
             when (detail.resId) {
-                R.string.event_pradosham -> NandiIcon(modifier = Modifier.size(32.dp), light = true)
-                R.string.event_sivaratri -> ShivaIcon(modifier = Modifier.size(32.dp))
+                R.string.event_pradosham -> NandiIcon(modifier = Modifier.size(32.dp), isWhite = true) // Fallback to white for detail
+                R.string.event_sivaratri -> ShivaIcon(modifier = Modifier.size(32.dp), isWhite = false) // Always dark
                 else -> Icon(Icons.Default.Celebration, contentDescription = null, tint = tint)
             }
         }

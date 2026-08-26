@@ -532,7 +532,8 @@ class PanchangamWidget : GlanceAppWidget() {
                         Image(
                             provider = ImageProvider(iconRes),
                             contentDescription = null,
-                            modifier = GlanceModifier.size(32.dp)
+                            modifier = GlanceModifier.size(32.dp),
+                            colorFilter = ColorFilter.tint(ColorProvider(contentColor))
                         )
                     }
 
