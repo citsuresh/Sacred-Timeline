@@ -181,10 +181,11 @@ fun TimingCard(
                 if (sHeight > 95.dp) {
                     val iconSize = if (sHeight > 120.dp) 20.dp else 16.dp
                     if (timing is SpecialPeriod && timing.name == "Yama") {
-                        Image(
+                        Icon(
                             painter = painterResource(R.drawable.ic_yama_bull),
                             contentDescription = null,
-                            modifier = Modifier.size(iconSize + 4.dp)
+                            modifier = Modifier.size(iconSize + 4.dp),
+                            tint = contentColor
                         )
                     } else {
                         val iconPainter = when {
