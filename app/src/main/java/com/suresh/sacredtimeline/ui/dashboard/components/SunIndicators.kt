@@ -1022,7 +1022,7 @@ fun SunGridMarker(
 
     val sectionLabel = if (label == "Sunrise") stringResource(R.string.label_day_muhurat) else stringResource(R.string.label_night_muhurat)
     
-    val timeColumnWidth = 65.dp
+    val timeColumnWidth = 50.dp
 
     Box(
         modifier = Modifier

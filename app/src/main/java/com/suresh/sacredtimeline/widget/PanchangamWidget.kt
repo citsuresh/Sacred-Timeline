@@ -201,6 +201,16 @@ class PanchangamWidget : GlanceAppWidget() {
                                 
                                 TimingColumn(context, context.getString(R.string.nav_nalla_neram), label, timing, next, timeFormatter, GlanceModifier.defaultWeight())
                             }
+                            "YOGAM" -> {
+                                val current = dayData.yogam.find { it.isCurrent(now) }
+                                val next = dayData.yogam.filter { it.startTime.isAfter(now) }.minByOrNull { it.startTime }
+                                TimingColumn(context, context.getString(R.string.label_yoga), current?.tamilName ?: "None", current, next, timeFormatter, GlanceModifier.defaultWeight())
+                            }
+                            "THARA_BALAM" -> {
+                                val current = dayData.tharaBalam.find { it.isCurrent(now) }
+                                val next = dayData.tharaBalam.filter { it.startTime.isAfter(now) }.minByOrNull { it.startTime }
+                                TimingColumn(context, context.getString(R.string.label_thara_balam), current?.tamilName ?: "None", current, next, timeFormatter, GlanceModifier.defaultWeight())
+                            }
                             "GOWRI" -> {
                                 val currentGowri = dayData.gowriNeram.find { it.isCurrent(now) }
                                 val nextGowri = dayData.gowriNeram.filter { it.startTime.isAfter(now) }.minByOrNull { it.startTime }
@@ -309,10 +319,16 @@ class PanchangamWidget : GlanceAppWidget() {
                     ) {
                         val currentMaitra = dayData.maitraMuhurtham.find { it.isCurrent(now) }
                         val currentChandrashtamam = dayData.chandrashtamam.find { it.isCurrent(now) }
+                        val currentYogam = dayData.yogam.find { it.isCurrent(now) }
+                        val currentThara = dayData.tharaBalam.find { it.isCurrent(now) }
+
                         val activeLanes = buildList {
                             if (currentGowri != null) add("GOWRI")
-                            if (middleTiming != null || currentMaitra != null || currentChandrashtamam != null) add("NERAM")
+                            if (currentChandrashtamam != null) add("CHANDRASHTAMAM")
+                            if (middleTiming != null || currentMaitra != null) add("NERAM")
                             if (currentHora != null) add("HORAI")
+                            if (currentYogam != null) add("YOGAM")
+                            if (currentThara != null) add("THARA_BALAM")
                         }
 
                         activeLanes.forEachIndexed { index, laneId ->
@@ -326,11 +342,19 @@ class PanchangamWidget : GlanceAppWidget() {
                                         modifier = GlanceModifier.defaultWeight()
                                     )
                                 }
+                                "CHANDRASHTAMAM" -> {
+                                    UniversalMiniLane(
+                                        title = context.getString(R.string.label_chandrashtamam),
+                                        timing = currentChandrashtamam,
+                                        context = context,
+                                        labelProvider = { Metadata.getChandrashtamamLabel(it as ChandrashtamamTiming, context) },
+                                        modifier = GlanceModifier.defaultWeight()
+                                    )
+                                }
                                 "NERAM" -> {
-                                    val finalMiddleTiming = currentChandrashtamam ?: currentMaitra ?: middleTiming
+                                    val finalMiddleTiming = currentMaitra ?: middleTiming
                                     UniversalMiniLane(
                                         title = context.getString(when {
-                                            currentChandrashtamam != null -> R.string.label_chandrashtamam
                                             currentMaitra != null -> R.string.view_mode_maitra
                                             else -> R.string.label_neram_short
                                         }),
@@ -338,13 +362,30 @@ class PanchangamWidget : GlanceAppWidget() {
                                         context = context,
                                         labelProvider = { 
                                             when (it) {
-                                                is ChandrashtamamTiming -> Metadata.getChandrashtamamLabel(it, context)
                                                 is MaitraMuhurtham -> context.getString(R.string.timing_maitra)
                                                 is SpecialPeriod -> context.getString(Metadata.getSpecialNameRes(it.name))
                                                 is Muhurtham -> context.getString(if (it.name.contains("Abhijit")) R.string.muhurtham_abhijit else R.string.muhurtham_brahma)
                                                 else -> context.getString(Metadata.getSpecialNameRes("Nalla"))
                                             }
                                         },
+                                        modifier = GlanceModifier.defaultWeight()
+                                    )
+                                }
+                                "YOGAM" -> {
+                                    UniversalMiniLane(
+                                        title = context.getString(R.string.label_yoga),
+                                        timing = currentYogam,
+                                        context = context,
+                                        labelProvider = { it.tamilName },
+                                        modifier = GlanceModifier.defaultWeight()
+                                    )
+                                }
+                                "THARA_BALAM" -> {
+                                    UniversalMiniLane(
+                                        title = context.getString(R.string.label_thara_balam),
+                                        timing = currentThara,
+                                        context = context,
+                                        labelProvider = { it.tamilName },
                                         modifier = GlanceModifier.defaultWeight()
                                     )
                                 }

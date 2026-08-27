@@ -38,6 +38,10 @@ Future development phases for the Sacred Timeline project.
 
 ## Phase 7: UI/UX Refinement
 - **Layout Tuning**: Portrait vs. Landscape specific optimizations.
+- **Sticky Timeline Labels (Floating Text)**: Implement "Sticky" labels for long timing cards (Yogam, Thara Balam, etc.).
+    - Text and icons will dynamically float within the visible portion of a box as the user scrolls.
+    - Ensures key information is always visible without manual scrolling to the center of a block.
+    - Context-aware support for Orthogonal Stepped views (finding the "best" visible segment).
 - **Multi-column Polish**: Smooth navigation and density management for the "Universal" view.
 - **Bilingual Labels**: Perfect alignment for Tamil + English mixed-mode labels.
 

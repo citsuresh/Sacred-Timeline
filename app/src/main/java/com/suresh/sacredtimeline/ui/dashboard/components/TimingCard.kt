@@ -165,16 +165,19 @@ fun TimingCard(
                 // 1. Heading - Top Center (Only if enough height and NOT redundant)
                 val isMuhurthamType = timing is Muhurtham || timing is MaitraMuhurtham
                 if (widestSegment.widthFactor >= 0.28f && sHeight > 45.dp && !isMuhurthamType) {
-                    Text(
-                        text = stringResource(Metadata.getCategoryShortNameRes(timing)).uppercase(),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = contentColor.copy(alpha = 0.8f),
-                        fontSize = 7.sp,
-                        lineHeight = 8.sp,
-                        fontWeight = FontWeight.Black,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(bottom = 2.dp)
-                    )
+                    val headingRes = Metadata.getCategoryShortNameRes(timing)
+                    if (headingRes != 0 && headingRes != R.string.app_name) {
+                        Text(
+                            text = stringResource(headingRes).uppercase(),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = contentColor.copy(alpha = 0.8f),
+                            fontSize = 7.sp,
+                            lineHeight = 8.sp,
+                            fontWeight = FontWeight.Black,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(bottom = 2.dp)
+                        )
+                    }
                 }
 
                 // 2. Main Icon (Higher threshold)
@@ -208,19 +211,22 @@ fun TimingCard(
                 }
 
                 // 3. Label (The primary text)
-                val label = if (timing is ChandrashtamamTiming) {
-                    Metadata.getChandrashtamamLabel(timing, LocalContext.current)
-                } else {
-                    val labelRes = when (timing) {
-                        is Hora -> Metadata.getPlanetNameRes(timing.name)
-                        is NallaNeram -> Metadata.getSpecialNameRes("Nalla")
-                        is GowriNeram -> Metadata.getGowriNameRes(timing.name)
-                        is SpecialPeriod -> Metadata.getSpecialNameRes(timing.name)
-                        is Muhurtham -> Metadata.getMuhurthamNameRes(timing.name)
-                        is MaitraMuhurtham -> Metadata.getSpecialNameRes("Maitra Muhurtham")
-                        else -> R.string.app_name
+                val label = when (timing) {
+                    is ChandrashtamamTiming -> Metadata.getChandrashtamamLabel(timing, LocalContext.current)
+                    is YogamTiming -> timing.tamilName
+                    is TharaBalamTiming -> timing.tamilName
+                    else -> {
+                        val labelRes = when (timing) {
+                            is Hora -> Metadata.getPlanetNameRes(timing.name)
+                            is NallaNeram -> Metadata.getSpecialNameRes("Nalla")
+                            is GowriNeram -> Metadata.getGowriNameRes(timing.name)
+                            is SpecialPeriod -> Metadata.getSpecialNameRes(timing.name)
+                            is Muhurtham -> Metadata.getMuhurthamNameRes(timing.name)
+                            is MaitraMuhurtham -> Metadata.getSpecialNameRes("Maitra Muhurtham")
+                            else -> 0
+                        }
+                        if (labelRes != 0 && labelRes != R.string.app_name) stringResource(labelRes) else timing.tamilName
                     }
-                    stringResource(labelRes)
                 }
                 Text(
                     text = label,
@@ -228,7 +234,7 @@ fun TimingCard(
                     fontWeight = FontWeight.Bold,
                     color = contentColor,
                     textAlign = TextAlign.Center,
-                    maxLines = 3,
+                    maxLines = 6,
                     overflow = TextOverflow.Ellipsis,
                     lineHeight = if (sHeight < 60.dp) 9.sp else 11.sp,
                     fontSize = when {
@@ -243,12 +249,18 @@ fun TimingCard(
                 if (sHeight > 28.dp) {
                     val pattern = if (is24Hour) "HH:mm" else "h:mm a"
                     val timeFormatter = DateTimeFormatter.ofPattern(pattern)
+                    val timeRangeText = if (widestSegment.widthFactor < 0.22f) {
+                        "${timing.startTime.format(timeFormatter)}\n-\n${timing.endTime.format(timeFormatter)}"
+                    } else {
+                        "${timing.startTime.format(timeFormatter)} - ${timing.endTime.format(timeFormatter)}"
+                    }
                     Text(
-                        text = "${timing.startTime.format(timeFormatter)} - ${timing.endTime.format(timeFormatter)}",
+                        text = timeRangeText,
                         style = MaterialTheme.typography.labelSmall,
                         color = contentColor.copy(alpha = 0.8f),
                         fontSize = if (sHeight < 50.dp) 7.sp else 8.sp,
-                        maxLines = 1
+                        textAlign = TextAlign.Center,
+                        lineHeight = if (sHeight < 50.dp) 8.sp else 9.sp
                     )
                 }
 
@@ -270,7 +282,14 @@ fun TimingCard(
         
         // Compatibility Icon for Hora
         if (timing is Hora && totalHeight > 30.dp) {
-             Box(modifier = Modifier.fillMaxSize().padding(2.dp), contentAlignment = Alignment.TopEnd) {
+             val iconX = maxWidth * (widestSegment.offsetFactor + widestSegment.widthFactor) - (if (totalHeight > 60.dp) 18.dp else 12.dp) - 2.dp
+             Box(modifier = Modifier
+                .offset(x = iconX, y = sOffset + 2.dp)
+                .size(if (totalHeight > 60.dp) 18.dp else 12.dp)
+                .background(Color.White, RoundedCornerShape(9.dp))
+                .zIndex(2f),
+                contentAlignment = Alignment.Center
+             ) {
                 val (icon, tint) = when (timing.compatibility) {
                     HoraCompatibility.FAVORABLE -> Icons.Default.CheckCircle to CompatibilityFavorable
                     HoraCompatibility.CONFLICTING -> Icons.Default.Cancel to CompatibilityConflicting
@@ -279,7 +298,7 @@ fun TimingCard(
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    modifier = Modifier.size(if (totalHeight > 60.dp) 18.dp else 12.dp).background(Color.White, RoundedCornerShape(9.dp)),
+                    modifier = Modifier.fillMaxSize(),
                     tint = tint
                 )
             }

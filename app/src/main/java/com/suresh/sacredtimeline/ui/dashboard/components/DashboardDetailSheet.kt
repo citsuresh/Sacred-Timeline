@@ -82,19 +82,22 @@ fun DashboardDetailSheet(
                     val title = when (detail) {
                         is DashboardDetail.TimelineTiming -> {
                             val t = detail.timing
-                            if (t is ChandrashtamamTiming) {
-                                Metadata.getChandrashtamamLabel(t, LocalContext.current)
-                            } else {
-                                val nameRes = when (t) {
-                                    is Hora -> Metadata.getPlanetNameRes(t.name)
-                                    is NallaNeram -> Metadata.getSpecialNameRes("Nalla")
-                                    is GowriNeram -> Metadata.getGowriNameRes(t.name)
-                                    is SpecialPeriod -> Metadata.getSpecialNameRes(t.name)
-                                    is Muhurtham -> Metadata.getMuhurthamNameRes(t.name)
-                                    is MaitraMuhurtham -> Metadata.getSpecialNameRes("Maitra Muhurtham")
-                                    else -> R.string.app_name
+                            when (t) {
+                                is ChandrashtamamTiming -> Metadata.getChandrashtamamLabel(t, context)
+                                is YogamTiming -> t.tamilName
+                                is TharaBalamTiming -> t.tamilName
+                                else -> {
+                                    val nameRes = when (t) {
+                                        is Hora -> Metadata.getPlanetNameRes(t.name)
+                                        is NallaNeram -> Metadata.getSpecialNameRes("Nalla")
+                                        is GowriNeram -> Metadata.getGowriNameRes(t.name)
+                                        is SpecialPeriod -> Metadata.getSpecialNameRes(t.name)
+                                        is Muhurtham -> Metadata.getMuhurthamNameRes(t.name)
+                                        is MaitraMuhurtham -> Metadata.getSpecialNameRes("Maitra Muhurtham")
+                                        else -> 0
+                                    }
+                                    if (nameRes != 0 && nameRes != R.string.app_name) stringResource(nameRes) else t.tamilName
                                 }
-                                stringResource(nameRes)
                             }
                         }
                         is DashboardDetail.Lunar -> stringResource(detail.item.resId)
@@ -114,6 +117,8 @@ fun DashboardDetailSheet(
                                 is Hora -> stringResource(R.string.nav_hora)
                                 is GowriNeram -> stringResource(R.string.nav_gowri_neram)
                                 is ChandrashtamamTiming -> stringResource(R.string.label_chandrashtamam)
+                                is YogamTiming -> stringResource(R.string.label_yoga)
+                                is TharaBalamTiming -> stringResource(R.string.label_thara_balam)
                                 else -> ""
                             }
                         }
@@ -140,6 +145,18 @@ fun DashboardDetailSheet(
                             text = subTitle,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+
+                    if (detail is DashboardDetail.TimelineTiming && detail.timing is TharaBalamTiming) {
+                        val birthStarId by viewModel.birthStar.collectAsState()
+                        val birthStarRes = Metadata.getStarResIdFromConfigId(birthStarId)
+                        Text(
+                            text = stringResource(R.string.settings_birth_star) + ": " + stringResource(birthStarRes),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(top = 2.dp)
                         )
                     }
 
@@ -198,33 +215,23 @@ fun DashboardDetailSheet(
             }
 
             // Guidance / Significance
-            val guidance = when (detail) {
-                is DashboardDetail.TimelineTiming -> {
-                    if (detail.timing is Hora) {
-                        Metadata.getHoraGuidance(detail.timing.name, detail.timing.compatibility, context)
-                    } else ""
-                }
-                else -> ""
-            }
-            
-            if (guidance.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(16.dp))
-                Surface(
-                    color = if (detail is DashboardDetail.TimelineTiming && detail.timing is Hora) {
-                        when (detail.timing.compatibility) {
+            if (detail is DashboardDetail.TimelineTiming && detail.timing is Hora) {
+                val guidance = Metadata.getHoraGuidance(detail.timing.name, detail.timing.compatibility, context)
+                if (guidance.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Surface(
+                        color = when (detail.timing.compatibility) {
                             HoraCompatibility.FAVORABLE -> CompatibilityFavorable.copy(alpha = 0.1f)
                             HoraCompatibility.CONFLICTING -> CompatibilityConflicting.copy(alpha = 0.1f)
                             HoraCompatibility.NEUTRAL -> CompatibilityNeutral.copy(alpha = 0.1f)
-                        }
-                    } else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                    shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        modifier = Modifier.padding(12.dp),
-                        verticalAlignment = Alignment.Top
+                        },
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        if (detail is DashboardDetail.TimelineTiming && detail.timing is Hora) {
+                        Row(
+                            modifier = Modifier.padding(12.dp),
+                            verticalAlignment = Alignment.Top
+                        ) {
                             val (icon, tint) = when (detail.timing.compatibility) {
                                 HoraCompatibility.FAVORABLE -> Icons.Default.CheckCircle to CompatibilityFavorable
                                 HoraCompatibility.CONFLICTING -> Icons.Default.Cancel to CompatibilityConflicting
@@ -232,12 +239,12 @@ fun DashboardDetailSheet(
                             }
                             Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(20.dp).padding(top = 2.dp))
                             Spacer(modifier = Modifier.width(12.dp))
+                            Text(
+                                text = guidance,
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Medium
+                            )
                         }
-                        Text(
-                            text = guidance,
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Medium
-                        )
                     }
                 }
             }
@@ -295,11 +302,18 @@ fun DashboardDetailSheet(
                 Spacer(modifier = Modifier.height(24.dp))
                 Text(stringResource(R.string.label_significance), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.bodyLarge,
-                    lineHeight = 24.sp
-                )
+                Surface(
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = description,
+                        modifier = Modifier.padding(12.dp),
+                        style = MaterialTheme.typography.bodyLarge,
+                        lineHeight = 24.sp
+                    )
+                }
             }
         }
     }
@@ -316,7 +330,8 @@ fun DetailIcon(detail: DashboardDetail, tint: Color) {
                 is Muhurtham -> Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = tint)
                 is MaitraMuhurtham -> Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = tint)
                 is ChandrashtamamTiming -> Icon(Icons.Default.Warning, contentDescription = null, tint = tint)
-                is TharaBalamTiming, is YogamTiming -> Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = tint)
+                is TharaBalamTiming -> Icon(Icons.Default.Stars, contentDescription = null, tint = tint)
+                is YogamTiming -> Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = tint)
                 is SpecialPeriod -> {
                     if (t.name == "Yama") {
                         Icon(

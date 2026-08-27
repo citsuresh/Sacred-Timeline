@@ -24,6 +24,8 @@ class DayDataProvider(private val context: Context) {
         val enabledChandrashtamamStars = repository.enabledChandrashtamamStars.first()
 
         val system = repository.lunarMonthSystem.first()
+        val birthStarConfigId = repository.birthStar.first()
+        val birthStarIndex = try { birthStarConfigId.split("_")[1].toInt() } catch(e: Exception) { 1 }
 
         val sunResult = sunProvider.getSunTimes(lat, lng, date, sunDef)
         val timings = provider.getTimings(date, sunResult.sunrise, sunResult.sunset, style, sunDef, lat, lng)
@@ -131,9 +133,6 @@ class DayDataProvider(private val context: Context) {
         val tharaBalamTimings = mutableListOf<TharaBalamTiming>()
         val yogamTimings = mutableListOf<YogamTiming>()
         
-        val birthStarConfigId = enabledChandrashtamamStars.firstOrNull() ?: "STAR_1"
-        val birthStarIndex = birthStarConfigId.split("_")[1].toInt()
-
         val dayStart = date.atStartOfDay(zoneId).toInstant()
         val dayEnd = date.plusDays(1).atStartOfDay(zoneId).toInstant()
 

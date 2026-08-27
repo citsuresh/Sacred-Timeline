@@ -7,6 +7,8 @@
     <string name="nav_hora">ஹோரை</string>
     <string name="nav_maitra">மைத்ர</string>
     <string name="nav_chandrashtamam">சந்திராஷ்டமம்</string>
+    <string name="nav_yoga">யோகம்</string>
+    <string name="nav_thara_balam">தார பலம்</string>
     <string name="nav_universal">முழுமையான காலவரிசை</string>
     <string name="nav_neram_muhurtham">நேரம் / முஹூர்த்தம்</string>
     <string name="nav_custom">தனிப்பயன் காலவரிசை</string>
@@ -378,6 +380,9 @@
     <string name="settings_display_indicators">காட்சி மற்றும் குறிகாட்டிகள்</string>
     <string name="settings_display">காட்சி</string>
     <string name="settings_language">பயன்பாட்டு மொழி</string>
+    <string name="settings_birth_star">எனது பிறந்த நட்சத்திரம்</string>
+    <string name="settings_birth_star_desc">தனிப்பட்ட தாராபலத்தை (தினசரி வலிமை) கணக்கிடப் பயன்படுகிறது.</string>
+    <string name="label_used_for_tharabalam">தாராபலத்திற்குப் பயன்படுகிறது</string>
     <string name="settings_theme">பயன்பாட்டு தீம்</string>
     <string name="settings_theme_system">கணினி இயல்புநிலை</string>
     <string name="settings_theme_light">ஒளி தீம்</string>
@@ -413,6 +418,8 @@
     <string name="settings_show_brahma_muhurtham">பிரம்ம முஹூர்த்தத்தைக் காட்டு</string>
     <string name="settings_show_abhijit_muhurtham">அபிஜித் முஹூர்த்தத்தைக் காட்டு</string>
     <string name="settings_show_maitra_muhurtham">மைத்ர முஹூர்த்தத்தைக் காட்டு</string>
+    <string name="settings_show_yogam">யோகத்தைக் காட்டு (அமிர்த, சித்த)</string>
+    <string name="settings_show_thara_balam">தாராபலத்தைக் காட்டு (தினசரி வலிமை)</string>
     <string name="settings_sunrise_definition">சூரிய உதய இலக்கணம்</string>
     <string name="settings_sunrise_scientific">அறிவியல் (மேல் விளிம்பு)</string>
     <string name="settings_sunrise_traditional">பாரம்பரியம் (மையம்)</string>

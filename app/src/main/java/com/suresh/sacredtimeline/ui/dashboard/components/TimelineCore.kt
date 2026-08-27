@@ -57,7 +57,7 @@ enum class TimelineViewStyle {
 private val BASE_HOUR_HEIGHT = 160.dp
 private const val START_HOUR = 0
 private const val END_HOUR = 24
-private val TIME_COLUMN_WIDTH = 65.dp
+private val TIME_COLUMN_WIDTH = 50.dp
 
 data class FullDayEvent(
     val label: String,
@@ -89,6 +89,8 @@ fun TimelinePager(
     showBrahmaMuhurtham: Boolean = false,
     showAbhijitMuhurtham: Boolean = false,
     showMaitraMuhurtham: Boolean = true,
+    showYogam: Boolean = true,
+    showTharaBalam: Boolean = true,
     isHeaderExpanded: Boolean = false,
     onToggleHeaderExpanded: (Boolean) -> Unit = {},
     onScaleChange: (Float) -> Unit,
@@ -172,6 +174,8 @@ fun TimelinePager(
                             showBrahmaMuhurtham = showBrahmaMuhurtham,
                             showAbhijitMuhurtham = showAbhijitMuhurtham,
                             showMaitraMuhurtham = showMaitraMuhurtham,
+                            showYogam = showYogam,
+                            showTharaBalam = showTharaBalam,
                             isHeaderExpanded = isHeaderExpanded,
                             onToggleHeaderExpanded = onToggleHeaderExpanded,
                             viewStyle = viewStyle
@@ -233,6 +237,8 @@ fun TimelineContent(
     showBrahmaMuhurtham: Boolean = false,
     showAbhijitMuhurtham: Boolean = false,
     showMaitraMuhurtham: Boolean = true,
+    showYogam: Boolean = true,
+    showTharaBalam: Boolean = true,
     isHeaderExpanded: Boolean = false,
     onToggleHeaderExpanded: (Boolean) -> Unit = {},
     viewStyle: TimelineViewStyle = TimelineViewStyle.EQUAL_DISTRIBUTION
@@ -397,33 +403,47 @@ fun TimelineContent(
                         TimeMarkersColumn(sunrise = dayData.sunrise, sunset = dayData.sunset, hourHeight = hourHeight, is24Hour = is24Hour)
                         Box(modifier = Modifier.fillMaxHeight().width(1.dp).background(SeparatorGrey))
                         
-                        val visibleCols = columnOrder.filter { columnVisibility.contains(it) }
+                        val visibleCols = if (viewMode == ViewMode.UNIVERSAL) {
+                            buildList {
+                                add("GOWRI")
+                                if (dayData.chandrashtamam.isNotEmpty()) add("CHANDRASHTAMAM")
+                                add("NERAM_MUHURTHAM")
+                                add("HORA")
+                                add("YOGAM")
+                                add("THARA_BALAM")
+                            }
+                        } else {
+                            columnOrder.filter { columnVisibility.contains(it) }
+                        }
 
-                        val isCompositeMode = viewMode == ViewMode.COMPOSITE || viewMode == ViewMode.CUSTOM
+                        val isCompositeMode = viewMode == ViewMode.COMPOSITE || viewMode == ViewMode.CUSTOM || viewMode == ViewMode.UNIVERSAL
                         val isMergedLayout = viewStyle == TimelineViewStyle.ORTHOGONAL_STEPPED || viewStyle == TimelineViewStyle.FIXED_3_TRACK
 
                         if (isCompositeMode && !isMergedLayout) {
                             // Independent Lanes for Equal Distribution
                             visibleCols.forEachIndexed { index, colId ->
                                 val timings = when (colId) {
-                                    "UNIVERSAL" -> (dayData.nallaNeram + dayData.specialPeriods + dayData.gowriNeram + dayData.hora + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) + (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()) + dayData.chandrashtamam).sortedBy { it.startTime }
-                                    "NERAM_MUHURTHAM" -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) + (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()) + dayData.chandrashtamam).sortedBy { it.startTime }
+                                    "GOWRI" -> dayData.gowriNeram
+                                    "CHANDRASHTAMAM" -> dayData.chandrashtamam
+                                    "NERAM_MUHURTHAM" -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) + (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()))
+                                    "HORA" -> dayData.hora
+                                    "YOGAM" -> dayData.yogam
+                                    "THARA_BALAM" -> dayData.tharaBalam
                                     "MAITRA" -> if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()
-                                    "NERAM" -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + dayData.chandrashtamam).sortedBy { it.startTime }
+                                    "NERAM" -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()))
                                     "BRAHMA" -> if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()
                                     "ABHIJIT" -> if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()
-                                    "GOWRI" -> dayData.gowriNeram
-                                    "HORA" -> dayData.hora
-                                    "CHANDRASHTAMAM" -> dayData.chandrashtamam
                                     else -> emptyList()
-                                }
+                                }.sortedBy { it.startTime }
+
                                 TimelineColumn(
                                     timings = timings,
                                     onTimingClick = onTimingClick,
                                     hourHeight = hourHeight,
                                     is24Hour = is24Hour,
                                     modifier = Modifier.weight(1f),
-                                    viewStyle = viewStyle
+                                    viewStyle = viewStyle,
+                                    forceSingleLane = colId == "YOGAM" || colId == "THARA_BALAM" || colId == "HORA" || colId == "GOWRI" || colId == "CHANDRASHTAMAM"
                                 )
                                 if (index < visibleCols.size - 1) {
                                     VerticalDivider(thickness = 1.dp, color = Color.LightGray.copy(alpha = 0.3f))
@@ -434,8 +454,8 @@ fun TimelineContent(
                             val timings = if (viewMode == ViewMode.COMPOSITE || viewMode == ViewMode.CUSTOM) {
                                 visibleCols.flatMap { colId ->
                                     when (colId) {
-                                    "UNIVERSAL" -> (dayData.nallaNeram + dayData.specialPeriods + dayData.gowriNeram + dayData.hora + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) + (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()) + dayData.chandrashtamam)
-                                    "NERAM_MUHURTHAM" -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) + (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()) + dayData.chandrashtamam)
+                                    "UNIVERSAL" -> (dayData.nallaNeram + dayData.specialPeriods + dayData.gowriNeram + dayData.hora + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) + (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()) + dayData.chandrashtamam + (if (showYogam) dayData.yogam else emptyList()) + (if (showTharaBalam) dayData.tharaBalam else emptyList()))
+                                    "NERAM_MUHURTHAM" -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) + (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()) + dayData.chandrashtamam + (if (showYogam) dayData.yogam else emptyList()) + (if (showTharaBalam) dayData.tharaBalam else emptyList()))
                                     "MAITRA" -> if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()
                                     "NERAM" -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + dayData.chandrashtamam)
                                     "BRAHMA" -> if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()
@@ -443,20 +463,24 @@ fun TimelineContent(
                                     "GOWRI" -> dayData.gowriNeram
                                     "HORA" -> dayData.hora
                                     "CHANDRASHTAMAM" -> dayData.chandrashtamam
+                                    "YOGAM" -> dayData.yogam
+                                    "THARA_BALAM" -> dayData.tharaBalam
                                     else -> emptyList()
                                 }
                             }.distinct().sortedBy { it.startTime }
                         } else {
                                 when (viewMode) {
-                                    ViewMode.UNIVERSAL -> (dayData.nallaNeram + dayData.specialPeriods + dayData.gowriNeram + dayData.hora + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) + (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()) + dayData.chandrashtamam).sortedBy { it.startTime }
-                                    ViewMode.NERAM_MUHURTHAM -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) + (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()) + dayData.chandrashtamam).sortedBy { it.startTime }
-                                    ViewMode.NERAM -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + dayData.chandrashtamam).sortedBy { it.startTime }
+                                    ViewMode.UNIVERSAL -> (dayData.nallaNeram + dayData.specialPeriods + dayData.gowriNeram + dayData.hora + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) + (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()) + dayData.chandrashtamam + (if (showYogam) dayData.yogam else emptyList()) + (if (showTharaBalam) dayData.tharaBalam else emptyList())).sortedBy { it.startTime }
+                                    ViewMode.NERAM_MUHURTHAM -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + (if (showBrahmaMuhurtham) listOfNotNull(dayData.brahmaMuhurtham) else emptyList()) + (if (showAbhijitMuhurtham) listOfNotNull(dayData.abhijitMuhurtham) else emptyList()) + dayData.chandrashtamam + (if (showYogam) dayData.yogam else emptyList()) + (if (showTharaBalam) dayData.tharaBalam else emptyList())).sortedBy { it.startTime }
+                                    ViewMode.NERAM -> (dayData.nallaNeram + dayData.specialPeriods + (if (showMaitraMuhurtham) dayData.maitraMuhurtham else emptyList()) + dayData.chandrashtamam + (if (showYogam) dayData.yogam else emptyList()) + (if (showTharaBalam) dayData.tharaBalam else emptyList())).sortedBy { it.startTime }
                                     ViewMode.BRAHMA -> listOfNotNull(dayData.brahmaMuhurtham)
                                     ViewMode.ABHIJIT -> listOfNotNull(dayData.abhijitMuhurtham)
                                     ViewMode.GOWRI -> dayData.gowriNeram
                                     ViewMode.HORA -> dayData.hora
                                     ViewMode.MAITRA -> dayData.maitraMuhurtham
                                     ViewMode.CHANDRASHTAMAM -> dayData.chandrashtamam
+                                    ViewMode.YOGAM -> dayData.yogam
+                                    ViewMode.THARA_BALAM -> dayData.tharaBalam
                                     else -> emptyList()
                                 }
                             }
@@ -651,6 +675,8 @@ fun TimelineHeader(
                     ViewMode.HORA -> R.string.nav_hora
                     ViewMode.MAITRA -> R.string.nav_maitra
                     ViewMode.CHANDRASHTAMAM -> R.string.label_chandrashtamam
+                    ViewMode.YOGAM -> R.string.nav_yoga
+                    ViewMode.THARA_BALAM -> R.string.nav_thara_balam
                     ViewMode.CUSTOM -> R.string.nav_custom
                     ViewMode.COMPOSITE -> R.string.app_name
                 }
@@ -702,11 +728,12 @@ fun TimelineColumn(
     is24Hour: Boolean,
     modifier: Modifier = Modifier,
     viewStyle: TimelineViewStyle = TimelineViewStyle.EQUAL_DISTRIBUTION,
-    pillarConfig: PillarConfig? = null
+    pillarConfig: PillarConfig? = null,
+    forceSingleLane: Boolean = false
 ) {
     Box(modifier = modifier.fillMaxHeight()) {
-        val segmentsMap = remember(timings, viewStyle, pillarConfig) {
-            calculateLanes(timings, viewStyle, pillarConfig)
+        val segmentsMap = remember(timings, viewStyle, pillarConfig, forceSingleLane) {
+            calculateLanes(timings, viewStyle, pillarConfig, forceSingleLane)
         }
         
         segmentsMap.forEach { (timing, segments) ->
@@ -733,150 +760,43 @@ data class PillarConfig(val leftCategory: String, val rightCategory: String)
 private fun calculateLanes(
     timings: List<Timing>,
     style: TimelineViewStyle,
-    pillarConfig: PillarConfig? = null
+    pillarConfig: PillarConfig? = null,
+    forceSingleLane: Boolean = false
 ): Map<Timing, List<LaneSegment>> {
     if (timings.isEmpty()) return emptyMap()
-
-    // 1. Group items into transitive clusters
-    val clusters = mutableListOf<MutableSet<Timing>>()
-    timings.forEach { timing ->
-        val overlappingClusters = clusters.filter { cluster ->
-            cluster.any { overlaps(it, timing) }
-        }
-        
-        if (overlappingClusters.isEmpty()) {
-            clusters.add(mutableSetOf(timing))
-        } else {
-            val combined = overlappingClusters.reduce { acc, set -> acc.apply { addAll(set) } }
-            combined.add(timing)
-            clusters.removeAll(overlappingClusters)
-            clusters.add(combined)
-        }
-    }
 
     val result = mutableMapOf<Timing, MutableList<LaneSegment>>()
     timings.forEach { result[it] = mutableListOf() }
 
-    // 2. Process each cluster independently
-    clusters.forEach { cluster ->
-        val items = cluster.toList()
-        
-        when (style) {
-            TimelineViewStyle.FIXED_3_TRACK -> {
-                // If the user selects the "UNIVERSAL" bundle as a pillar, 
-                // we interpret it as a request for the standard Traditional pillars.
-                val leftCat = if (pillarConfig?.leftCategory == "UNIVERSAL") "GOWRI" else (pillarConfig?.leftCategory ?: "GOWRI")
-                val rightCat = if (pillarConfig?.leftCategory == "UNIVERSAL") "HORA" else (pillarConfig?.rightCategory ?: "HORA")
-
-                val leftItems = items.filter { it.getCategory() == leftCat }.sortedBy { it.startTime }
-                val rightItems = items.filter { it.getCategory() == rightCat }.sortedBy { it.startTime }
-                val centerItems = items.filter { it.getCategory() != leftCat && it.getCategory() != rightCat }
-                    .sortedWith(compareBy<Timing> { it.startTime }.thenByDescending { it is MaitraMuhurtham })
-
-                fun assignFixed(list: List<Timing>, trackIndex: Int) {
-                    val trackWidth = 1.0f / 3.0f
-                    val lanes = mutableListOf<MutableList<Timing>>()
-                    list.forEach { t ->
-                        var placed = false
-                        for (l in lanes) if (l.none { overlaps(it, t) }) { l.add(t); placed = true; break }
-                        if (!placed) lanes.add(mutableListOf(t))
-                    }
-                    val subWidth = trackWidth / (lanes.size.coerceAtLeast(1))
-                    lanes.forEachIndexed { lIdx, lItems ->
-                        lItems.forEach { t ->
-                            result[t]?.add(LaneSegment(t.startTime, t.endTime, subWidth, (trackIndex * trackWidth) + (lIdx * subWidth)))
-                        }
-                    }
-                }
-                assignFixed(leftItems, 0)
-                assignFixed(centerItems, 1)
-                assignFixed(rightItems, 2)
-            }
-
-            TimelineViewStyle.EQUAL_DISTRIBUTION -> {
-                val itemsGowri = items.filter { it is GowriNeram }.sortedBy { it.startTime }
-                val itemsHorai = items.filter { it is Hora }.sortedBy { it.startTime }
-                val itemsCenter = items.filter { it !is GowriNeram && it !is Hora }
-                    .sortedWith(compareBy<Timing> { it.startTime }.thenByDescending { it is MaitraMuhurtham })
-
-                fun assign(categoryItems: List<Timing>): List<List<Timing>> {
-                    val lanes = mutableListOf<MutableList<Timing>>()
-                    categoryItems.forEach { timing ->
-                        var placed = false
-                        for (lane in lanes) if (lane.none { overlaps(it, timing) }) { lane.add(timing); placed = true; break }
-                        if (!placed) lanes.add(mutableListOf(timing))
-                    }
-                    return lanes
-                }
-
-                val gLanes = assign(itemsGowri)
-                val cLanes = assign(itemsCenter)
-                val hLanes = assign(itemsHorai)
-
-                // 1. Initial Lane Anchors (Fractions)
-                val totalLanesCount = (gLanes.size + cLanes.size + hLanes.size).coerceAtLeast(1)
-                val laneWidth = 1.0f / totalLanesCount
-                val itemBounds = mutableMapOf<Timing, Pair<Float, Float>>()
-                val baseLanes = mutableMapOf<Timing, Int>()
-
-                gLanes.forEachIndexed { i, l -> l.forEach { 
-                    itemBounds[it] = (i * laneWidth) to ((i + 1) * laneWidth)
-                    baseLanes[it] = i 
-                } }
-                cLanes.forEachIndexed { i, l -> l.forEach { 
-                    itemBounds[it] = ((gLanes.size + i) * laneWidth) to ((gLanes.size + i + 1) * laneWidth)
-                    baseLanes[it] = gLanes.size + i
-                } }
-                hLanes.forEachIndexed { i, l -> l.forEach { 
-                    itemBounds[it] = ((gLanes.size + cLanes.size + i) * laneWidth) to ((gLanes.size + cLanes.size + i + 1) * laneWidth)
-                    baseLanes[it] = gLanes.size + cLanes.size + i
-                } }
-
-                // 2. Iterative Co-operative Refinement (8 passes for near-perfect gap filling)
-                repeat(8) {
-                    items.forEach { t ->
-                        val bounds = itemBounds[t] ?: return@forEach
-                        val currentStart = bounds.first
-                        val currentEnd = bounds.second
-                        val myBaseLane = baseLanes[t] ?: 0
-                        
-                        // Find constraint boundaries (closest overlapping neighbors)
-                        // A neighbor is a constraint only if it was originally placed to my left or right
-                        val leftNeighbors = items.filter { it != t && overlaps(it, t) && 
-                            (baseLanes[it] ?: 0) < myBaseLane 
-                        }
-                        val leftBoundary = leftNeighbors.maxOfOrNull { itemBounds[it]?.second ?: 0f } ?: 0f
-                        
-                        val rightNeighbors = items.filter { it != t && overlaps(it, t) && 
-                            (baseLanes[it] ?: 0) > myBaseLane 
-                        }
-                        val rightBoundary = rightNeighbors.minOfOrNull { itemBounds[it]?.first ?: 1f } ?: 1f
-                        
-                        // Co-operative Expand: Move halfway toward the empty space
-                        val refinedStart = currentStart - (currentStart - leftBoundary) / 2f
-                        val refinedEnd = currentEnd + (rightBoundary - currentEnd) / 2f
-                        
-                        itemBounds[t] = refinedStart to refinedEnd
-                    }
-                }
-
-                itemBounds.forEach { (t, bounds) ->
-                    result[t]?.add(LaneSegment(t.startTime, t.endTime, bounds.second - bounds.first, bounds.first))
+    when (style) {
+        TimelineViewStyle.EQUAL_DISTRIBUTION, TimelineViewStyle.FIXED_3_TRACK -> {
+            val lanes = mutableListOf<MutableList<Timing>>()
+            if (forceSingleLane) {
+                lanes.add(timings.toMutableList())
+            } else {
+                timings.sortedBy { it.startTime }.forEach { t ->
+                    var placed = false
+                    for (lane in lanes) if (lane.none { overlaps(it, t) }) { lane.add(t); placed = true; break }
+                    if (!placed) lanes.add(mutableListOf(t))
                 }
             }
-
-            TimelineViewStyle.ORTHOGONAL_STEPPED -> {
-                val timePoints = (items.map { it.startTime } + items.map { it.endTime }).distinct().sorted()
-                for (i in 0 until timePoints.size - 1) {
-                    val sliceStart = timePoints[i]
-                    val sliceEnd = timePoints[i+1]
-                    val activeItems = items.filter { !it.startTime.isAfter(sliceStart) && it.endTime.isAfter(sliceStart) }
-                        .sortedWith(compareBy({ when(it) { is GowriNeram -> 0; is Hora -> 2; else -> 1 } }, { it.startTime }))
-                    
-                    val width = 1.0f / activeItems.size.coerceAtLeast(1)
-                    activeItems.forEachIndexed { idx, t ->
-                        result[t]?.add(LaneSegment(sliceStart, sliceEnd, width, idx * width))
-                    }
+            val width = 1.0f / lanes.size.coerceAtLeast(1)
+            lanes.forEachIndexed { i, items ->
+                items.forEach { t ->
+                    result[t]?.add(LaneSegment(t.startTime, t.endTime, width, i * width))
+                }
+            }
+        }
+        TimelineViewStyle.ORTHOGONAL_STEPPED -> {
+            val timePoints = (timings.map { it.startTime } + timings.map { it.endTime }).distinct().sorted()
+            for (i in 0 until timePoints.size - 1) {
+                val s = timePoints[i]
+                val e = timePoints[i+1]
+                val active = timings.filter { !it.startTime.isAfter(s) && it.endTime.isAfter(s) }
+                    .sortedBy { it.startTime }
+                val w = 1.0f / active.size.coerceAtLeast(1)
+                active.forEachIndexed { idx, t ->
+                    result[t]?.add(LaneSegment(s, e, w, idx * w))
                 }
             }
         }

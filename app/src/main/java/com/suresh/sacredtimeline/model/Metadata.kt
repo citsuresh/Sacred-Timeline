@@ -330,4 +330,39 @@ object Metadata {
             else -> base
         }
     }
+
+    @StringRes
+    fun getStarResIdFromConfigId(configId: String): Int {
+        val starIdx = try { configId.split("_")[1].toInt() } catch (e: Exception) { 1 }
+        return when (starIdx) {
+            1 -> R.string.star_1
+            2 -> R.string.star_2
+            3 -> R.string.star_3
+            4 -> R.string.star_4
+            5 -> R.string.star_5
+            6 -> R.string.star_6
+            7 -> R.string.star_7
+            8 -> R.string.star_8
+            9 -> R.string.star_9
+            10 -> R.string.star_10
+            11 -> R.string.star_11
+            12 -> R.string.star_12
+            13 -> R.string.star_13
+            14 -> R.string.star_14
+            15 -> R.string.star_15
+            16 -> R.string.star_16
+            17 -> R.string.star_17
+            18 -> R.string.star_18
+            19 -> R.string.star_19
+            20 -> R.string.star_20
+            21 -> R.string.star_21
+            22 -> R.string.star_22
+            23 -> R.string.star_23
+            24 -> R.string.star_24
+            25 -> R.string.star_25
+            26 -> R.string.star_26
+            27 -> R.string.star_27
+            else -> R.string.star_1
+        }
+    }
 }

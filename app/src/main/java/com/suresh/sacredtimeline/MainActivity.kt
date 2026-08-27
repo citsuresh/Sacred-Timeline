@@ -117,6 +117,8 @@ class MainActivity : AppCompatActivity() {
                                 ViewMode.HORA -> "HORA"
                                 ViewMode.MAITRA -> "MAITRA"
                                 ViewMode.CHANDRASHTAMAM -> "CHANDRASHTAMAM"
+                                ViewMode.YOGAM -> "YOGAM"
+                                ViewMode.THARA_BALAM -> "THARA_BALAM"
                                 else -> null
                             }
                             repository.setSingleVisibleColumn(targetColId)
@@ -270,6 +272,40 @@ class MainActivity : AppCompatActivity() {
                                 }
                             },
                             icon = { Icon(Icons.Default.Warning, contentDescription = null) }
+                        )
+                        NavigationDrawerItem(
+                            label = { Text(stringResource(R.string.nav_yoga)) },
+                            selected = currentViewMode == ViewMode.YOGAM,
+                            onClick = {
+                                if (currentViewMode == ViewMode.CUSTOM) {
+                                    showSwitchConfirm = ViewMode.YOGAM
+                                } else {
+                                    scope.launch {
+                                        repository.setSingleVisibleColumn("YOGAM")
+                                        backStack.clear()
+                                        backStack.add(NavRoute.Dashboard(ViewMode.YOGAM))
+                                        drawerState.close()
+                                    }
+                                }
+                            },
+                            icon = { Icon(Icons.Default.AutoAwesome, contentDescription = null) }
+                        )
+                        NavigationDrawerItem(
+                            label = { Text(stringResource(R.string.nav_thara_balam)) },
+                            selected = currentViewMode == ViewMode.THARA_BALAM,
+                            onClick = {
+                                if (currentViewMode == ViewMode.CUSTOM) {
+                                    showSwitchConfirm = ViewMode.THARA_BALAM
+                                } else {
+                                    scope.launch {
+                                        repository.setSingleVisibleColumn("THARA_BALAM")
+                                        backStack.clear()
+                                        backStack.add(NavRoute.Dashboard(ViewMode.THARA_BALAM))
+                                        drawerState.close()
+                                    }
+                                }
+                            },
+                            icon = { Icon(Icons.Default.Stars, contentDescription = null) }
                         )
 
                         if (hasCustomLayout) {

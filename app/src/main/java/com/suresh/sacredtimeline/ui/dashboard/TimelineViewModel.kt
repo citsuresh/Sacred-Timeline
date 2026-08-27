@@ -118,6 +118,14 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
         viewModelScope, SharingStarted.WhileSubscribed(5000), true
     )
 
+    val showYogam: StateFlow<Boolean> = repository.showYogam.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), true
+    )
+
+    val showTharaBalam: StateFlow<Boolean> = repository.showTharaBalam.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), true
+    )
+
     val sunriseDefinition: StateFlow<String> = repository.sunriseDefinition.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), "SCIENTIFIC"
     )
@@ -128,6 +136,10 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
 
     val timelineViewStyle: StateFlow<String> = repository.timelineViewStyle.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), "EQUAL_DISTRIBUTION"
+    )
+
+    val birthStar: StateFlow<String> = repository.birthStar.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), "STAR_1"
     )
 
     init {
@@ -274,6 +286,16 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
                 ViewMode.CHANDRASHTAMAM -> {
                     allCols.forEach {
                         repository.updateColumnVisibility(it, it == "CHANDRASHTAMAM")
+                    }
+                }
+                ViewMode.YOGAM -> {
+                    allCols.forEach {
+                        repository.updateColumnVisibility(it, it == "YOGAM")
+                    }
+                }
+                ViewMode.THARA_BALAM -> {
+                    allCols.forEach {
+                        repository.updateColumnVisibility(it, it == "THARA_BALAM")
                     }
                 }
                 else -> {}

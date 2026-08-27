@@ -106,6 +106,8 @@ class WidgetUpdateWorker(
         todayData.abhijitMuhurtham?.let { allBoundaries.add(it.startTime); allBoundaries.add(it.endTime) }
         todayData.maitraMuhurtham.forEach { allBoundaries.add(it.startTime); allBoundaries.add(it.endTime) }
         todayData.chandrashtamam.forEach { allBoundaries.add(it.startTime); allBoundaries.add(it.endTime) }
+        todayData.yogam.forEach { allBoundaries.add(it.startTime); allBoundaries.add(it.endTime) }
+        todayData.tharaBalam.forEach { allBoundaries.add(it.startTime); allBoundaries.add(it.endTime) }
         
         // Fix: Also monitor Tithi and Nakshatra boundaries for header accuracy
         // We use the UNFILTERED data from a fresh calculation to ensure boundaries are caught 

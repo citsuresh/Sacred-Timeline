@@ -7,6 +7,8 @@
     <string name="nav_hora">Horai</string>
     <string name="nav_maitra">Maitra</string>
     <string name="nav_chandrashtamam">Chandrashtamam</string>
+    <string name="nav_yoga">Yogam</string>
+    <string name="nav_thara_balam">Thara Balam</string>
     <string name="nav_universal">Universal Timeline</string>
     <string name="nav_neram_muhurtham">Neram / Muhurtham</string>
     <string name="nav_custom">Custom Timeline</string>
@@ -419,6 +421,9 @@
     <string name="settings_display_indicators">Display &amp; Indicators</string>
     <string name="settings_display">Display</string>
     <string name="settings_language">App Language</string>
+    <string name="settings_birth_star">My Birth Star</string>
+    <string name="settings_birth_star_desc">Used for personal Thara Balam (Daily Strength) calculation.</string>
+    <string name="label_used_for_tharabalam">Used for Thara Balam</string>
     <string name="settings_theme">App Theme</string>
     <string name="settings_theme_system">System Default</string>
     <string name="settings_theme_light">Light Theme</string>
@@ -453,6 +458,8 @@
     <string name="settings_show_brahma_muhurtham">Show Brahma Muhurtham</string>
     <string name="settings_show_abhijit_muhurtham">Show Abhijit Muhurtham</string>
     <string name="settings_show_maitra_muhurtham">Show Maitra Muhurtham</string>
+    <string name="settings_show_yogam">Show Yogam (Amrita, Siddha)</string>
+    <string name="settings_show_thara_balam">Show Thara Balam (Daily Strength)</string>
     <string name="settings_tithi_options">Tithis to Display</string>
     <string name="settings_star_options">Nakshatras to Display</string>
     <string name="settings_show_now_line">Show NOW Line</string>

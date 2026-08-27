@@ -23,7 +23,7 @@ import java.time.format.DateTimeFormatter
 
 private const val START_HOUR = 0
 private const val END_HOUR = 24
-private val TIME_COLUMN_WIDTH = 65.dp
+private val TIME_COLUMN_WIDTH = 50.dp
 
 @Composable
 fun TimeGrid(hourHeight: Dp) {

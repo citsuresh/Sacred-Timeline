@@ -15,6 +15,8 @@ enum class ViewMode {
     HORA,
     MAITRA,
     CHANDRASHTAMAM,
+    YOGAM,
+    THARA_BALAM,
     CUSTOM
 }
 

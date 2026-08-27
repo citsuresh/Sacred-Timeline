@@ -57,6 +57,8 @@ fun SettingsScreen(
         ViewMode.HORA -> stringResource(R.string.nav_hora)
         ViewMode.MAITRA -> stringResource(R.string.timing_maitra)
         ViewMode.CHANDRASHTAMAM -> stringResource(R.string.label_chandrashtamam)
+        ViewMode.YOGAM -> stringResource(R.string.nav_yoga)
+        ViewMode.THARA_BALAM -> stringResource(R.string.nav_thara_balam)
         ViewMode.CUSTOM -> stringResource(R.string.nav_custom)
     }
 
@@ -137,6 +139,20 @@ fun SettingsScreen(
                         label = stringResource(R.string.settings_time_format_24h),
                         checked = timeFormat24h,
                         onCheckedChange = { viewModel.setTimeFormat24h(it) }
+                    )
+
+                    val birthStar by viewModel.birthStar.collectAsState()
+                    val starOptions = (1..27).map { "STAR_$it" }
+                    val starLabels = starOptions.map { stringResource(com.suresh.sacredtimeline.model.Metadata.getStarResIdFromConfigId(it)) }
+                    SettingsDropdownItem(
+                        label = stringResource(R.string.settings_birth_star),
+                        selected = stringResource(com.suresh.sacredtimeline.model.Metadata.getStarResIdFromConfigId(birthStar)),
+                        options = starLabels,
+                        onOptionSelected = { label ->
+                            val index = starLabels.indexOf(label)
+                            if (index != -1) viewModel.setBirthStar(starOptions[index])
+                        },
+                        description = "(${stringResource(R.string.label_used_for_tharabalam)})"
                     )
                 }
             }
@@ -519,7 +535,8 @@ fun SettingsDropdownItem(
     label: String,
     selected: String,
     options: List<String>,
-    onOptionSelected: (String) -> Unit
+    onOptionSelected: (String) -> Unit,
+    description: String? = null
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -533,6 +550,14 @@ fun SettingsDropdownItem(
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurface
         )
+        if (description != null) {
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 2.dp)
+            )
+        }
         Box(modifier = Modifier.align(Alignment.End)) {
             TextButton(
                 onClick = { expanded = true },

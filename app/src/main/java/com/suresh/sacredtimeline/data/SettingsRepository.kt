@@ -45,6 +45,8 @@ class SettingsRepository(private val context: Context) {
         val SHOW_BRAHMA_MUHURTHAM = booleanPreferencesKey("show_brahma_muhurtham")
         val SHOW_ABHIJIT_MUHURTHAM = booleanPreferencesKey("show_abhijit_muhurtham")
         val SHOW_MAITRA_MUHURTHAM = booleanPreferencesKey("show_maitra_muhurtham")
+        val SHOW_YOGAM = booleanPreferencesKey("show_yogam")
+        val SHOW_THARA_BALAM = booleanPreferencesKey("show_thara_balam")
         val SUNRISE_DEFINITION = stringPreferencesKey("sunrise_definition")
         val SPECIAL_PERIOD_STYLE = stringPreferencesKey("special_period_style")
         val LUNAR_MONTH_SYSTEM = stringPreferencesKey("lunar_month_system")
@@ -53,6 +55,7 @@ class SettingsRepository(private val context: Context) {
         val CUSTOM_ORDER = stringPreferencesKey("custom_order")
         val HAS_CUSTOM_LAYOUT = booleanPreferencesKey("has_custom_layout")
         val ENABLED_CHANDRASHTAMAM_STARS = stringSetPreferencesKey("enabled_chandrashtamam_stars")
+        val BIRTH_STAR = stringPreferencesKey("birth_star")
     }
 
     val compositeScale: Flow<Float> = context.dataStore.data.map { it[Keys.COMPOSITE_SCALE] ?: 1.0f }
@@ -92,6 +95,10 @@ class SettingsRepository(private val context: Context) {
 
     val enabledChandrashtamamStars: Flow<Set<String>> = context.dataStore.data.map { 
         it[Keys.ENABLED_CHANDRASHTAMAM_STARS] ?: emptySet()
+    }
+
+    val birthStar: Flow<String> = context.dataStore.data.map { 
+        it[Keys.BIRTH_STAR] ?: "STAR_1" 
     }
 
     val widgetColumnVisibility: Flow<Set<String>> = context.dataStore.data.map { 
@@ -155,6 +162,8 @@ class SettingsRepository(private val context: Context) {
     val showBrahmaMuhurtham: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_BRAHMA_MUHURTHAM] ?: true }
     val showAbhijitMuhurtham: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_ABHIJIT_MUHURTHAM] ?: true }
     val showMaitraMuhurtham: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_MAITRA_MUHURTHAM] ?: true }
+    val showYogam: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_YOGAM] ?: true }
+    val showTharaBalam: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_THARA_BALAM] ?: true }
 
     val sunriseDefinition: Flow<String> = context.dataStore.data.map { it[Keys.SUNRISE_DEFINITION] ?: "SCIENTIFIC" }
     val specialPeriodStyle: Flow<String> = context.dataStore.data.map { it[Keys.SPECIAL_PERIOD_STYLE] ?: "PROPORTIONAL" }
@@ -342,6 +351,14 @@ class SettingsRepository(private val context: Context) {
         context.dataStore.edit { it[Keys.SHOW_MAITRA_MUHURTHAM] = show }
     }
 
+    suspend fun setShowYogam(show: Boolean) {
+        context.dataStore.edit { it[Keys.SHOW_YOGAM] = show }
+    }
+
+    suspend fun setShowTharaBalam(show: Boolean) {
+        context.dataStore.edit { it[Keys.SHOW_THARA_BALAM] = show }
+    }
+
     suspend fun setSunriseDefinition(definition: String) {
         context.dataStore.edit { it[Keys.SUNRISE_DEFINITION] = definition }
     }
@@ -365,5 +382,9 @@ class SettingsRepository(private val context: Context) {
             if (enabled) newSet.add(starId) else newSet.remove(starId)
             prefs[Keys.ENABLED_CHANDRASHTAMAM_STARS] = newSet
         }
+    }
+
+    suspend fun setBirthStar(starId: String) {
+        context.dataStore.edit { it[Keys.BIRTH_STAR] = starId }
     }
 }

@@ -140,6 +140,14 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         viewModelScope, SharingStarted.WhileSubscribed(5000), true
     )
 
+    val showYogam: StateFlow<Boolean> = repository.showYogam.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), true
+    )
+
+    val showTharaBalam: StateFlow<Boolean> = repository.showTharaBalam.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), true
+    )
+
     val sunriseDefinition: StateFlow<String> = repository.sunriseDefinition.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), "SCIENTIFIC"
     )
@@ -290,6 +298,10 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    val birthStar: StateFlow<String> = repository.birthStar.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), "STAR_1"
+    )
+
     fun clearSearch() {
         _searchState.value = SearchState.Idle
     }
@@ -360,6 +372,14 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch { repository.setShowMaitraMuhurtham(show) }
     }
 
+    fun setShowYogam(show: Boolean) {
+        viewModelScope.launch { repository.setShowYogam(show) }
+    }
+
+    fun setShowTharaBalam(show: Boolean) {
+        viewModelScope.launch { repository.setShowTharaBalam(show) }
+    }
+
     fun setSunriseDefinition(definition: String) {
         viewModelScope.launch { 
             repository.setSunriseDefinition(definition)
@@ -390,6 +410,13 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     fun updateEnabledChandrashtamamStar(starId: String, enabled: Boolean) {
         viewModelScope.launch { 
             repository.updateEnabledChandrashtamamStar(starId, enabled)
+            cacheManager.clearCache()
+        }
+    }
+
+    fun setBirthStar(starId: String) {
+        viewModelScope.launch {
+            repository.setBirthStar(starId)
             cacheManager.clearCache()
         }
     }
