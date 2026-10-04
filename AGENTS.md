@@ -15,7 +15,10 @@ Before considering any code change complete: after each meaningful part of a mul
 >     - **WidgetUpdateWorker.kt** (Transition/Boundary scheduling)
 >     - **DayDataProvider.kt** (Calculation inclusion)
 >     - **SettingsRepository.kt** (User toggle/visibility persistence)
-> (6) **Finding Classification**: For every finding, explicitly classify it as one of: (a) unrelated to the agreed breakdown — treat as out-of-scope per the existing rule, or (b) within the scope of an already-planned future part of the breakdown — name which part, and flag it as "expected to be addressed in Part N".
+> (6) **Notification & Background Reliability**: Verify background tasks use WorkManager (`ReminderWorker`) with WakeLocks, and that all reminder categories have exact 1-to-1 pre-created notification channels in `SacredTimelineApp.kt`.
+> (7) **Navigation & Back Button**: Verify hardware back button handling (`MainActivity.onBackPressed()`) correctly pops the navigation stack rather than finishing the activity.
+> (8) **Strict Localization Parity**: Verify that *every* user-facing string, card description, metadata, title, button, guidance, and activity list uses `stringResource` and has complete, non-fallback translations in both English (`values/strings.xml`) and Tamil (`values-ta/strings.xml`).
+> (9) **Finding Classification**: For every finding, explicitly classify it as one of: (a) unrelated to the agreed breakdown — treat as out-of-scope per the existing rule, or (b) within the scope of an already-planned future part of the breakdown — name which part, and flag it as "expected to be addressed in Part N".
 >
 > **Reporting Rules**:
 > - For every finding (including out-of-scope items), **investigate fully** to understand the root cause.

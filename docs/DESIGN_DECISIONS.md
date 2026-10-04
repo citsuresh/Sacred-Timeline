@@ -63,3 +63,9 @@ Historical record of architectural and UI/UX choices.
     - Learned that Jetpack Glance is more restrictive with dynamic `ColorProvider` usage than standard Compose. To ensure stability across Android versions, certain system colors (like black/white icons) must use `android.R.color` resource IDs rather than dynamic code-defined colors to avoid internal library-group access errors.
 - **Multi-Boundary Transition Pruning**: 
     - Optimized background worker scheduling for high-density settings (e.g., multiple birth stars). The system now collates all possible transition boundaries for a given day but prunes the set to schedule only the **single next closest event**, preventing excessive WorkManager overhead while maintaining 100% accuracy.
+- **WorkManager Reminders (`ReminderWorker`)**: 
+    - Migrated alarm scheduling from raw `AlarmManager` broadcasts to WorkManager `ReminderWorker` with built-in WakeLocks to ensure 100% reliable background notification delivery and automatic recurring rescheduling across aggressive OEM power-management ROMs.
+- **Dedicated 1-to-1 Notification Channels**: 
+    - Established exact 1-to-1 mapping between all 12 reminder categories and pre-created notification channels in `SacredTimelineApp` so users can customize sound, vibration, and banner settings per category.
+- **Activity-Level Backstack Hoisting**: 
+    - Hoisted navigation `backStack` state to `MainActivity` and overridden `onBackPressed()` to ensure reliable hardware back button navigation across settings sub-screens without closing the app.

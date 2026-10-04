@@ -23,5 +23,14 @@ This checklist MUST be completed whenever a new timing slot, traditional period,
 - [ ] Toggle added to `SettingsScreen` (with appropriate Material 3 icon).
 - [ ] Added to `VerifiedHolidays` or `RitualContext` if it's a date-anchored event.
 
-## 5. Regression Audit
+## 5. Reminders & Notifications Integration
+- [ ] **Prompt User**: Explicitly ask the user if the feature requires reminder/notification support.
+- [ ] **Category & Channel 1-to-1 Sync**: Add the category to `ReminderDialog` / `AddGenericReminderDialog` and create its dedicated notification channel in `SacredTimelineApp.kt` & `ReminderWorker.kt`.
+- [ ] **Background Execution**: Ensure scheduling via WorkManager (`ReminderWorker`) for OEM reliability.
+
+## 6. Localization & Translation Audit
+- [ ] **Zero Hardcoded Strings**: Verify all UI labels, titles, buttons, and descriptions use `stringResource(R.string...)`.
+- [ ] **Bilingual Parity**: Verify every new string added to `values/strings.xml` has an accurate Tamil translation in `values-ta/strings.xml` (including descriptions, metadata, guidance, and activity lists).
+
+## 7. Regression Audit
 - [ ] Verified by Regression Auditor sub-agent using the **Feature Parity Checklist** in `AGENTS.md`.
