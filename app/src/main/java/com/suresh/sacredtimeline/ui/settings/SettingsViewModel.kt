@@ -421,6 +421,27 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    fun setAllEnabledTithis(enabled: Boolean) {
+        viewModelScope.launch {
+            repository.setAllEnabledTithis(enabled)
+            cacheManager.clearCache()
+        }
+    }
+
+    fun setAllEnabledNakshatras(enabled: Boolean) {
+        viewModelScope.launch {
+            repository.setAllEnabledNakshatras(enabled)
+            cacheManager.clearCache()
+        }
+    }
+
+    fun setAllEnabledChandrashtamamStars(enabled: Boolean) {
+        viewModelScope.launch {
+            repository.setAllEnabledChandrashtamamStars(enabled)
+            cacheManager.clearCache()
+        }
+    }
+
     fun restoreCustomLayout() {
         viewModelScope.launch { repository.restoreCustomLayout() }
     }

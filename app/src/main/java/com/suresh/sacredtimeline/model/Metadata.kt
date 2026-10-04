@@ -87,6 +87,7 @@ object Metadata {
             is ChandrashtamamTiming -> R.string.label_special_short
             is TharaBalamTiming -> R.string.label_thara_balam
             is YogamTiming -> R.string.label_yoga
+            is SolarTiming -> R.string.label_special_short
         }
     }
     
@@ -159,23 +160,23 @@ object Metadata {
         val t = value % 30
         val normalized = if (t == 0) 30 else t
         return when (normalized) {
-            1 -> R.string.desc_tithi_1
-            2 -> R.string.desc_tithi_2
-            3 -> R.string.desc_tithi_3
-            4 -> R.string.desc_tithi_4
-            5 -> R.string.desc_tithi_5
-            6 -> R.string.desc_tithi_6
-            7 -> R.string.desc_tithi_7
-            8 -> R.string.desc_tithi_8
-            9 -> R.string.desc_tithi_9
-            10 -> R.string.desc_tithi_10
-            11 -> R.string.desc_tithi_11
-            12 -> R.string.desc_tithi_12
-            13 -> R.string.desc_tithi_13
-            14 -> R.string.desc_tithi_14
-            15 -> R.string.desc_tithi_15
-            30 -> R.string.desc_tithi_30
-            else -> R.string.desc_tithi_1
+            1 -> R.string.tithi_desc_1
+            2 -> R.string.tithi_desc_2
+            3 -> R.string.tithi_desc_3
+            4 -> R.string.tithi_desc_4
+            5 -> R.string.tithi_desc_5
+            6 -> R.string.tithi_desc_6
+            7 -> R.string.tithi_desc_7
+            8 -> R.string.tithi_desc_8
+            9 -> R.string.tithi_desc_9
+            10 -> R.string.tithi_desc_10
+            11 -> R.string.tithi_desc_11
+            12 -> R.string.tithi_desc_12
+            13 -> R.string.tithi_desc_13
+            14 -> R.string.tithi_desc_14
+            15 -> R.string.tithi_desc_15
+            30 -> R.string.tithi_desc_30
+            else -> R.string.tithi_desc_generic
         }
     }
 

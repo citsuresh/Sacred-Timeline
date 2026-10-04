@@ -387,4 +387,46 @@ class SettingsRepository(private val context: Context) {
     suspend fun setBirthStar(starId: String) {
         context.dataStore.edit { it[Keys.BIRTH_STAR] = starId }
     }
+
+    suspend fun setAllEnabledTithis(enabled: Boolean) {
+        context.dataStore.edit { prefs ->
+            if (enabled) {
+                val allTithis = (1..30).map { "TITHI_$it" }.toSet()
+                prefs[Keys.ENABLED_TITHIS] = allTithis
+            } else {
+                prefs[Keys.ENABLED_TITHIS] = emptySet()
+            }
+        }
+    }
+
+    suspend fun setAllEnabledNakshatras(enabled: Boolean) {
+        context.dataStore.edit { prefs ->
+            if (enabled) {
+                val allStars = (1..27).map { "STAR_$it" }.toSet()
+                prefs[Keys.ENABLED_NAKSHATRAS] = allStars
+            } else {
+                prefs[Keys.ENABLED_NAKSHATRAS] = emptySet()
+            }
+        }
+    }
+
+    suspend fun setAllEnabledChandrashtamamStars(enabled: Boolean) {
+        context.dataStore.edit { prefs ->
+            if (enabled) {
+                val allChandrashtamam = mutableSetOf<String>()
+                for (i in 1..27) {
+                    val isSplit = i == 3 || i == 5 || i == 7 || i == 12 || i == 14 || i == 16 || i == 21 || i == 23 || i == 25
+                    if (isSplit) {
+                        allChandrashtamam.add("STAR_${i}_1")
+                        allChandrashtamam.add("STAR_${i}_2")
+                    } else {
+                        allChandrashtamam.add("STAR_$i")
+                    }
+                }
+                prefs[Keys.ENABLED_CHANDRASHTAMAM_STARS] = allChandrashtamam
+            } else {
+                prefs[Keys.ENABLED_CHANDRASHTAMAM_STARS] = emptySet()
+            }
+        }
+    }
 }

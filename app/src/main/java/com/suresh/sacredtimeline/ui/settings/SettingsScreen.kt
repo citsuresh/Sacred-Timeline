@@ -29,6 +29,7 @@ import java.util.Locale
 fun SettingsScreen(
     onBack: () -> Unit,
     onNavigateToTimelineDisplaySettings: () -> Unit,
+    onNavigateToRemindersSettings: () -> Unit,
     viewModel: SettingsViewModel = viewModel()
 ) {
     val compositeScale by viewModel.compositeScale.collectAsState()
@@ -153,6 +154,16 @@ fun SettingsScreen(
                             if (index != -1) viewModel.setBirthStar(starOptions[index])
                         },
                         description = "(${stringResource(R.string.label_used_for_tharabalam)})"
+                    )
+                }
+            }
+
+            // Reminders & Alerts
+            item {
+                SettingsSection(title = "Reminders & Alerts") {
+                    SettingsClickableItem(
+                        label = "Manage Scheduled Reminders",
+                        onClick = onNavigateToRemindersSettings
                     )
                 }
             }
@@ -581,5 +592,27 @@ fun SettingsDropdownItem(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun SettingsClickableItem(
+    label: String,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = label, 
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.weight(1f).padding(end = 16.dp)
+        )
+        Icon(Icons.Default.ChevronRight, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

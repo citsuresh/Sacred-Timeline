@@ -29,12 +29,17 @@ fun TimelineDashboard(
     modifier: Modifier = Modifier,
     viewModel: TimelineViewModel = viewModel(),
     viewMode: ViewMode = ViewMode.COMPOSITE,
+    initialTargetDate: LocalDate? = null,
     onMenuClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val selectedDate by viewModel.selectedDate.collectAsState()
     val timelineScale by viewModel.timelineScale.collectAsState()
     val pinchToZoomEnabled by viewModel.pinchToZoomEnabled.collectAsState(initial = true)
+
+    LaunchedEffect(initialTargetDate) {
+        initialTargetDate?.let { viewModel.updateDate(it) }
+    }
     
     // Use initial = null or handle properly to avoid flicker during state load
     val timeFormat24h by viewModel.timeFormat24h.collectAsState(initial = false)
@@ -72,6 +77,16 @@ fun TimelineDashboard(
             viewModel.onLocationPermissionGranted()
         } else {
             locationPermissionState.launchPermissionRequest()
+        }
+    }
+
+    val notificationPermissionState = rememberPermissionState(
+        "android.permission.POST_NOTIFICATIONS"
+    )
+
+    LaunchedEffect(notificationPermissionState.status) {
+        if (!notificationPermissionState.status.isGranted) {
+            notificationPermissionState.launchPermissionRequest()
         }
     }
     

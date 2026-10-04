@@ -145,3 +145,15 @@ data class TharaBalamTiming(
     val categoryResId: Int = 0,
     val sanskritNameResId: Int = 0
 ) : Timing
+
+@Serializable
+data class SolarTiming(
+    override val name: String,
+    override val tamilName: String,
+    @Serializable(with = LocalTimeSerializer::class)
+    override val startTime: LocalTime,
+    @Serializable(with = LocalTimeSerializer::class)
+    override val endTime: LocalTime,
+    override val auspiciousness: Auspiciousness,
+    override val description: String = ""
+) : Timing

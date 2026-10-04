@@ -449,4 +449,212 @@
     <string name="desc_timing_kuli">குளிகை காலம்: விரிவாக்க காலம். இந்த நேரத்தில் செய்யப்படும் காரியங்கள் மீண்டும் மீண்டும் நடக்கும். சொத்துக்கள் வாங்க நல்லது, தீய செயல்களுக்கு அல்ல.\n\nசெய்ய வேண்டியவை: தானம், முதலீடுகள், நேர்மறையான பழக்கங்களைத் தொடங்குதல்.\nசெய்யக்கூடாதவை: கடன் வாங்குதல், இறுதிச் சடங்குகள், எதிர்மறையான நடத்தைகள்.</string>
     <string name="desc_timing_nalla">நல்ல நேரம்: முக்கியமான நடவடிக்கைகளுக்கு அன்றைய நாளின் மிகவும் மங்களகரமான நேரம்.</string>
     <string name="desc_timing_chandrashtamam">சந்திராஷ்டமம்: உங்கள் பிறப்பு நட்சத்திரத்திற்கு 8-வது ராசியில் சந்திரன் சஞ்சரிக்கும் காலம். புதிய முக்கிய முடிவுகள் அல்லது ஆபத்தான செயல்களைத் தவிர்க்கவும்.</string>
+    <string name="set_reminder">நினைவூட்டல் அமைக்க</string>
+    <string name="reminders_title">திட்டமிடப்பட்ட நினைவூட்டல்கள்</string>
+    <string name="no_reminders">நினைவூட்டல்கள் எதுவும் இல்லை</string>
+    <string name="desc_sunrise">உள்ளூர் சூரிய உதய நேரம்.</string>
+    <string name="desc_sunset">உள்ளூர் சூரிய அஸ்தமன நேரம்.</string>
+    <string name="desc_gowri_amridha">மிகவும் மங்களகரமானது. எந்தவொரு புதிய வேலை, பயணம் மற்றும் புதிய முயற்சிகளைத் தொடங்க சிறந்தது.</string>
+    <string name="desc_gowri_uthi">முன்னேற்றகரமானது மற்றும் சாதகமானது. வளர்ச்சி, விரிவாக்கம் மற்றும் நிர்வாகப் பணிகளுக்கு நல்லது.</string>
+    <string name="desc_gowri_labam">லாபகரமானது. வணிக ஒப்பந்தங்கள், நிதிப் பரிவர்த்தனைகள் மற்றும் வர்த்தகத்திற்கு ஏற்றது.</string>
+    <string name="desc_gowri_dhanam">செல்வத்தை உருவாக்கக் கூடியது. முதலீடுகள் மற்றும் சொத்துக்கள் வாங்குவதற்குச் சாதகமானது.</string>
+    <string name="desc_gowri_sugam">சுகமானது. அமைதியான செயல்பாடுகள் மற்றும் குடும்ப விவகாரங்களுக்கு நல்லது.</string>
+    <string name="desc_gowri_soram">திருட்டு / இழப்பு அபாயம். பெரிய தொகை பணத்தை கையாளுவதைத் தவிர்க்கவும் அல்லது அதிக ஆபத்தான பணிகளைத் தவிர்க்கவும்.</string>
+    <string name="desc_gowri_visham">நச்சுத் தன்மை வாய்ந்தது. மருத்துவ சிகிச்சைகள் அல்லது புதிய திட்டங்களைத் தொடங்குவதைத் தவிர்க்கவும்.</string>
+    <string name="desc_gowri_rogam">நோய் / உடல் நலக்குறைவு. அசுபமானது; உடல்நலம் தொடர்பான செயல்கள் அல்லது பயணங்களைத் தவிர்க்கவும்.</string>
+    <string name="quality_sun">அதிகாரம், வீரியம், தலைமைத்துவம். நிர்வாகம் மற்றும் உயர் அதிகாரிகளுடனான சந்திப்புகளுக்கு ஏற்றது.</string>
+    <string name="quality_moon">உணர்ச்சி, பராமரிப்பு, மாற்றம். படைப்பாற்றல் பணிகள் மற்றும் இல்லம் சார்ந்த விஷயங்களுக்கு நல்லது.</string>
+    <string name="quality_mars">ஆற்றல், செயல், தைரியம். உடல் உழைப்பு சார்ந்த பணிகளில் கவனம் செலுத்தவும், மோதல்களைத் தவிர்க்கவும்.</string>
+    <string name="quality_mercury">அறிவு, தொடர்பு, வர்த்தகம். படிப்பு, எழுதுதல் மற்றும் வணிகத்திற்கு உகந்தது.</string>
+    <string name="quality_jupiter">ஞானம், விரிவாக்கம், அதிர்ஷ்டம். கற்றல், கற்பித்தல் மற்றும் வழிபாடுகளுக்குச் சிறந்தது.</string>
+    <string name="quality_venus">அழகு, நல்லிணக்கம், ஆடம்பரம். கலை, காதல் மற்றும் சமூக நிகழ்வுகளுக்கு நல்லது.</string>
+    <string name="quality_saturn">ஒழுக்கம், தாமதம், கடின உழைப்பு. வழக்கமான பணிகள் மற்றும் நிலுவைப் பணிகளை முடிப்பதில் கவனம் செலுத்தவும்.</string>
+    <string name="active_reminders">செயலில் உள்ள நினைவூட்டல்கள்</string>
+    <string name="reminder_active">செயலில் உள்ள நினைவூட்டல்</string>
+    <string name="frequency">அதிர்வெண்</string>
+    <string name="single_occurrence">ஒரு முறை மட்டும்</string>
+    <string name="all_occurrences">அனைத்து நிகழ்வுகளும்</string>
+    <string name="reminder_strategy">நினைவூட்டல் முறை</string>
+    <string name="relative_to_start">தொடக்கத்திலிருந்து</string>
+    <string name="relative_to_end">முடிவிலிருந்து</string>
+    <string name="custom_time_before">குறிப்பிட்ட நேரம்</string>
+    <string name="offset_before_event">நிகழ்வுக்கு முன்</string>
+    <string name="days_before">நாட்கள் முன்பு</string>
+    <string name="hours">மணிநேரம்</string>
+    <string name="mins">நிமிடங்கள்</string>
+    <string name="add_reminder">நினைவூட்டல் சேர்</string>
+    <string name="test_notification">சோதனை அறிவிப்பு</string>
+    <string name="edit_reminder">நினைவூட்டலைத் திருத்து</string>
+    <string name="event_title_label">நிகழ்வு பெயர் / தலைப்பு</string>
+    <string name="category_label">வகை</string>
+    <string name="event_date_label">நிகழ்வு தேதி</string>
+    <string name="start_time_label">தொடங்கும் நேரம்</string>
+    <string name="target_time_label">அறிவிப்பு நேரம்</string>
+    <string name="save">சேமி</string>
+    <string name="cancel">ரத்து செய்</string>
+    <string name="alert_fires">அறிவிப்பு நேரம்</string>
+
+    <!-- Hora Guidance & Activities -->
+    <string name="guidance_sun_fav">தலைமைத்துவம் மற்றும் அதிகாரத்திற்கு மிகவும் மங்களகரமானது. உயர் அதிகாரிகளுடனான சந்திப்புகள் மற்றும் புதிய பொறுப்புகளைத் தொடங்க உகந்தது.</string>
+    <string name="guidance_sun_conf">முரண்பட்ட சூரிய ஆற்றல். அகம்பாவம் ஏற்பட வாய்ப்புள்ளது. பிடிவாதத்தைத் தவிர்க்கவும்.</string>
+    <string name="guidance_sun_neut">சீரான வீரியம். நிர்வாகம் மற்றும் திட்டமிடலுக்கு நல்லது. தனிப்பட்ட இலக்குகளில் கவனம் செலுத்துங்கள்.</string>
+    <string name="guidance_moon_fav">உணர்ச்சி ரீதியான நல்லிணக்கம். வீட்டுப் பணிகள், படைப்புக் கலைகள் மற்றும் அமைதிக்கு ஏற்றது.</string>
+    <string name="guidance_moon_conf">மனநிலை மாறுபாடுகள். உணர்ச்சிகளின் அடிப்படையில் முக்கிய முடிவுகளை எடுப்பதைத் தவிர்க்கவும்.</string>
+    <string name="guidance_moon_neut">மென்மையான ஆற்றல். வழக்கமான சமையல் மற்றும் சிறிய வீட்டு மாற்றங்களுக்கு ஏற்றது.</string>
+    <string name="guidance_mars_fav">அதிக ஆற்றல் மற்றும் தைரியம். உடல் உழைப்பு, விளையாட்டு மற்றும் போட்டிகளுக்குச் சிறந்தது.</string>
+    <string name="guidance_mars_conf">அதிக உராய்வு. விபத்துகள் அல்லது வாதங்கள் ஏற்பட வாய்ப்பு. அவசரம் மற்றும் கூர்மையான கருவிகளைத் தவிர்க்கவும்.</string>
+    <string name="guidance_mars_neut">செயலில் உள்ள ஆற்றல். தொழில்நுட்பப் பணிகள் அல்லது வீட்டுப் பழுதுபார்ப்புகளில் கவனம் செலுத்துங்கள்.</string>
+    <string name="guidance_mercury_fav">அறிவுத் கூர்மை. வணிக ஒப்பந்தங்கள், எழுத்து மற்றும் கற்றலுக்கு மிகவும் சிறந்தது.</string>
+    <string name="guidance_mercury_conf">தகவல் குழப்பம். தொடர்பு பிழைகள் ஏற்படலாம். ஆவணங்களை இருமுறை சரிபார்க்கவும்.</string>
+    <string name="guidance_mercury_neut">மனத் தெளிவு. அமைப்புப் பணிகள் மற்றும் கணக்குப் பராமரிப்புக்கு நல்லது.</string>
+    <string name="guidance_jupiter_fav">மிகவும் மங்களகரமானது. புதிய கல்வி தொடங்குதல், முக்கிய நிதி முதலீடுகள் மற்றும் ஆன்மீகச் சடங்குகளுக்குச் சிறந்தது.</string>
+    <string name="guidance_jupiter_conf">முரண்பட்ட ஆற்றல்கள். சுக்கிரனும் குருவும் மோதலாம்; பொறுமையைக் கடைப்பிடிக்கவும்.</string>
+    <string name="guidance_jupiter_neut">கற்றல் மற்றும் பொதுவான வளர்ச்சிக்கு நல்ல நேரம். சீரான முன்னேற்றத்தில் கவனம் செலுத்துங்கள்.</string>
+    <string name="guidance_venus_fav">நல்லிணக்கம் மற்றும் படைப்பாற்றல். கலைகள், சமூகக் கூட்டங்கள் மற்றும் ஷாப்பிங் செய்ய ஏற்றது.</string>
+    <string name="guidance_venus_conf">அதிகப்படியான உணர்ச்சிச் செலவுகள். ஆடம்பர செலவுகளைத் தவிர்க்கவும்.</string>
+    <string name="guidance_venus_neut">மகிழ்ச்சியான சூழல். சிறிய அழகுபடுத்துதல் மற்றும் ஓய்வெடுக்க நல்லது.</string>
+    <string name="guidance_saturn_fav">திடமான அடித்தளம். நீண்ட காலத் திட்டம், கடன்களை அடைத்தல் மற்றும் ஆழமான ஆராய்ச்சிக்குச் சிறந்தது.</string>
+    <string name="guidance_saturn_conf">கனமான தாமதங்கள். மெதுவான முன்னேற்றத்தால் சோர்வு ஏற்படலாம். புதிய தொடக்கங்களைத் தவிர்க்கவும்.</string>
+    <string name="guidance_saturn_neut">யதார்த்தமான ஆற்றல். வழக்கமான பணிகள் மற்றும் துப்புரவுப் பணிகளில் கவனம் செலுத்துங்கள்.</string>
+    <string name="guidance_default">சமநிலையான செயல் மற்றும் விழிப்புணர்வுக்கான நேரம்.</string>
+
+    <string-array name="activities_sun_fav">
+        <item>அதிகாரப்பூர்வ சந்திப்புகள்</item>
+        <item>புதிய பொறுப்பேற்பது</item>
+        <item>அரசு சார்ந்த பணிகள்</item>
+    </string-array>
+    <string-array name="activities_sun_conf">
+        <item>ஒப்புதல்களைப் பெறுதல்</item>
+        <item>விவாதங்கள்</item>
+        <item>சுய பரிசோதனை</item>
+    </string-array>
+    <string-array name="activities_sun_neut">
+        <item>நிர்வாகத் திட்டமிடல்</item>
+        <item>அலுவலகப் பணிகள்</item>
+        <item>பதிவுகளைச் சரிபார்த்தல்</item>
+    </string-array>
+
+    <string-array name="activities_moon_fav">
+        <item>குடும்ப இரவு உணவு</item>
+        <item>படைப்பு எழுத்து</item>
+        <item>தோட்டக்கலை</item>
+    </string-array>
+    <string-array name="activities_moon_conf">
+        <item>வழக்கமான வேலைகள்</item>
+        <item>அமைதியான சிந்தனை</item>
+        <item>இலகுவான வாசிப்பு</item>
+    </string-array>
+    <string-array name="activities_moon_neut">
+        <item>சமையலறை அமைப்பு</item>
+        <item>சமூக நிகழ்வு திட்டமிடல்</item>
+        <item>வீட்டுப் பொருட்கள் வாங்குதல்</item>
+    </string-array>
+
+    <string-array name="activities_mars_fav">
+        <item>தீவிர உடற்பயிற்சி</item>
+        <item>கட்டுமானம் தொடங்குதல்</item>
+        <item>போட்டி விளையாட்டுகள்</item>
+    </string-array>
+    <string-array name="activities_mars_conf">
+        <item>பாதுகாப்பு தணிக்கை</item>
+        <item>உபகரணங்களைச் சுத்தம் செய்தல்</item>
+        <item>யோகா</item>
+    </string-array>
+    <string-array name="activities_mars_neut">
+        <item>வீட்டுப் பழுதுபார்ப்பு</item>
+        <item>தர்க்கரீதியான சிக்கல் தீர்வு</item>
+        <item>தொழில்நுட்ப வரைவு</item>
+    </string-array>
+
+    <string-array name="activities_mercury_fav">
+        <item>ஒப்பந்தங்களில் கையெழுத்திடுதல்</item>
+        <item>உரை நிகழ்த்துதல்</item>
+        <item>புதிய படிப்பு தொடங்குதல்</item>
+    </string-array>
+    <string-array name="activities_mercury_conf">
+        <item>ஆவணங்களைச் சரிபார்த்தல்</item>
+        <item>தரவு உள்ளீடு</item>
+        <item>மேசை சுத்தம் செய்தல்</item>
+    </string-array>
+    <string-array name="activities_mercury_neut">
+        <item>மின்னஞ்சல் காப்பகப்படுத்துதல்</item>
+        <item>கணக்குகளைச் சமன் செய்தல்</item>
+        <item>குறுகிய தூரப் பயணம்</item>
+    </string-array>
+
+    <string-array name="activities_jupiter_fav">
+        <item>பங்குச் சந்தையில் முதலீடு</item>
+        <item>ஆன்மீக வழிபாடு</item>
+        <item>கல்வி சேர்க்கை</item>
+    </string-array>
+    <string-array name="activities_jupiter_conf">
+        <item>ஒப்பந்தங்களை மதிப்பாய்வு செய்தல்</item>
+        <item>தியானம்</item>
+        <item>நீண்ட காலத் திட்டம்</item>
+    </string-array>
+    <string-array name="activities_jupiter_neut">
+        <item>வழிகாட்டியுடன் ஆலோசனை</item>
+        <item>பொது ஆராய்ச்சி</item>
+        <item>இலக்குகளை நிர்ணயித்தல்</item>
+    </string-array>
+
+    <string-array name="activities_venus_fav">
+        <item>கலை கண்காட்சி</item>
+        <item>வெளியிடங்கள்</item>
+        <item>ஆடை வாங்குதல்</item>
+    </string-array>
+    <string-array name="activities_venus_conf">
+        <item>நிதி திட்டமிடல்</item>
+        <item>சுய பராமரிப்பு</item>
+        <item>உள் சுத்தம்</item>
+    </string-array>
+    <string-array name="activities_venus_neut">
+        <item>இசை கேட்டல்</item>
+        <item>மலர் அலங்காரம்</item>
+        <item>நண்பர்களுடன் பேசுதல்</item>
+    </string-array>
+
+    <string-array name="activities_saturn_fav">
+        <item>நீண்ட காலத் திட்டம்</item>
+        <item>கடன்களை அடைத்தல்</item>
+        <item>ஆழமான ஆராய்ச்சி</item>
+    </string-array>
+    <string-array name="activities_saturn_conf">
+        <item>வழக்கமான பராமரிப்பு</item>
+        <item>சீக்கிரம் தூங்குதல்</item>
+        <item>வரி தாக்கல் செய்தல்</item>
+    </string-array>
+    <string-array name="activities_saturn_neut">
+        <item>சேமிப்பகத்தைச் சுத்தம் செய்தல்</item>
+        <item>உடல் உழைப்பு</item>
+        <item>பொறுமை பயிற்சி</item>
+    </string-array>
+
+    <string name="desc_star_1">அசுவினி: குணப்படுத்தும் சக்தி. மருத்துவ சிகிச்சை மற்றும் புதிய பயணங்களுக்கு சிறந்தது.</string>
+    <string name="desc_star_2">பரணி: கட்டுப்பாடு மற்றும் மாற்றம். ஒழுக்கம் மற்றும் படைப்பாற்றலுக்கான நாள்.</string>
+    <string name="desc_star_3">கிருத்திகை: சுத்திகரிப்பு. நெருப்புடன் தொடர்புடையது. கடின உழைப்பு மற்றும் தொழில்நுட்ப பணிகளுக்கு நல்லது.</string>
+    <string name="desc_star_4">ரோகிணி: வளர்ச்சி மற்றும் செல்வம். விவசாயம், கலை மற்றும் அனைத்து மங்களகரமான தொடக்கங்களுக்கும் உகந்தது.</string>
+    <string name="desc_star_5">மிருகசீரிடம்: தேடுதல். ஆய்வு, ஆராய்ச்சி மற்றும் பயணங்களுக்கு சிறந்தது.</string>
+    <string name="desc_star_6">திருவாதிரை: திருப்புமுனை. உணர்ச்சி வாயிலாக மாற்றம். பழையவற்றை அகற்றி புதிய தொடக்கத்தை உருவாக்குவதற்கான நாள்.</string>
+    <string name="desc_star_7">புனர்பூசம்: ஒளியின் மீள்வருகை. புதுப்பித்தல் மற்றும் மீட்புக்கான நட்சத்திரம்.</string>
+    <string name="desc_star_8">பூசம்: ஊட்டச்சத்து. ஆன்மீக வளர்ச்சிக்கு மிகவும் மங்களகரமான நட்சத்திரம்.</string>
+    <string name="desc_star_9">ஆயில்யம்: குண்டலினி சக்தி மற்றும் நுண்ணறிவு. ஆன்மீக ஆராய்ச்சி மற்றும் யோகாவுக்கு சிறந்தது.</string>
+    <string name="desc_star_10">மகம்: பாரம்பரியம் மற்றும் முன்னோர்கள். நமது வேர்களை நினைவு கூர்தல் மற்றும் தலைமைத்துவத்திற்கு நல்லது.</string>
+    <string name="desc_star_11">பூரம்: மகிழ்ச்சி மற்றும் ஆடம்பரம். சமூகக் கூட்டங்கள் மற்றும் கலைகளுக்கு சிறந்தது.</string>
+    <string name="desc_star_12">உத்திரம்: கடமை மற்றும் சேவை. நிலையான உறவுகள் மற்றும் உதவிகளுக்கு நல்லது.</string>
+    <string name="desc_star_13">அஸ்தம்: கைவினைத் திறன் மற்றும் வணிகத்திற்கு ஏற்றது.</string>
+    <string name="desc_star_14">சித்திரை: படைப்பாற்றல் மற்றும் அழகு. வடிவமைப்பு மற்றும் கலைகளுக்கு நல்லது.</string>
+    <string name="desc_star_15">சுவாதி: சுதந்திரம் மற்றும் புத்தி கூர்மை. தொடர்பு மற்றும் பேச்சுவார்த்தைக்கு சிறந்தது.</string>
+    <string name="desc_star_16">விசாகம்: நோக்கம் மற்றும் உறுதி. இலக்குகளை அடைய கவனம் மற்றும் லட்சியத்திற்கு நல்லது.</string>
+    <string name="desc_star_17">அனுஷம்: பக்தி மற்றும் நட்பு. சவால்களை சமாளிப்பதில் சிறந்தது.</string>
+    <string name="desc_star_18">கேட்டை: அதிகாரம் மற்றும் பொறுப்பு. தலைமைத்துவம் மற்றும் பாதுகாப்பிற்கு நல்லது.</string>
+    <string name="desc_star_19">மூலம்: உண்மை மற்றும் வேர்கள். ஆழமான ஆராய்ச்சி மற்றும் மௌனத்திற்குச் சிறந்தது.</string>
+    <string name="desc_star_20">பூராடம்: தூய்மைப்படுத்தும் சக்தி. சுத்திகரிப்பு மற்றும் புதிய கருத்துகளுக்கு நல்லது.</string>
+    <string name="desc_star_21">உத்திராடம்: நீதி மற்றும் ஒழுக்கம். நிரந்தர வெற்றிக்கு நல்லது.</string>
+    <string name="desc_star_22">திருவோணம்: கேட்டல் மற்றும் கற்றல். கல்வி மற்றும் ஞானத்திற்கு சிறந்தது.</string>
+    <string name="desc_star_23">அவிட்டம்: இசை, செல்வம் மற்றும் குழு செயல்பாடுகளுக்கு நல்லது.</string>
+    <string name="desc_star_24">சதயம்: மருத்துவம் மற்றும் இரகசிய குணப்படுத்துதலுக்கான நட்சத்திரம்.</string>
+    <string name="desc_star_25">பூரட்டாதி: தவம் மற்றும் ஆன்மீக மாற்றத்திற்கு ஏற்றது.</string>
+    <string name="desc_star_26">உத்திரட்டாதி: ஞானம் மற்றும் உணர்ச்சி கட்டுப்பாடு.</string>
+    <string name="desc_star_27">ரேவதி: கருணை மற்றும் பாதுகாப்பான பயணம்.</string>
 </resources>

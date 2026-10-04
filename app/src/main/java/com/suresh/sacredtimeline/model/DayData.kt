@@ -39,5 +39,7 @@ data class DayData(
     val maitraMuhurtham: List<MaitraMuhurtham> = emptyList(),
     val chandrashtamam: List<ChandrashtamamTiming> = emptyList(),
     val tharaBalam: List<TharaBalamTiming> = emptyList(),
-    val yogam: List<YogamTiming> = emptyList()
+    val yogam: List<YogamTiming> = emptyList(),
+    val sunriseTiming: Timing? = null,
+    val sunsetTiming: Timing? = null
 )

@@ -38,4 +38,7 @@ sealed interface NavRoute : NavKey {
 
     @Serializable
     data object ChandrashtamamSettings : NavRoute
+
+    @Serializable
+    data object RemindersSettings : NavRoute
 }

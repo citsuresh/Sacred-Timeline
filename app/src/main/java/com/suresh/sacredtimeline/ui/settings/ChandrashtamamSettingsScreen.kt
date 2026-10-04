@@ -7,8 +7,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.suresh.sacredtimeline.R
@@ -86,6 +88,22 @@ fun ChandrashtamamSettingsScreen(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            item {
+                val allSelected = options.all { enabledStars.contains(it.first) }
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Select All / Deselect All", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                    Switch(
+                        checked = allSelected,
+                        onCheckedChange = { viewModel.setAllEnabledChandrashtamamStars(it) }
+                    )
+                }
+                HorizontalDivider()
+            }
+
             items(options) { (id, starResId) ->
                 val rasiIdx = LunarCalendarUtils.getBirthRasi(id)
                 val rasiResId = when (rasiIdx) {

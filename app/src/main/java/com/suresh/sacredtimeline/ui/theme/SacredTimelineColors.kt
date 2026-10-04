@@ -60,6 +60,7 @@ object SacredTimelineColors {
                 Auspiciousness.RED -> YogamDeepRed
                 else -> YogamEmerald
             }
+            is SolarTiming -> Color(0xFFFF9800)
         }
     }
 

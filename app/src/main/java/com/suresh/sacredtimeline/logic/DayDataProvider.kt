@@ -207,6 +207,23 @@ class DayDataProvider(private val context: Context) {
             }
         }
 
+        val sunriseTiming = SolarTiming(
+            name = "Sunrise",
+            tamilName = "சூரிய உதயம்",
+            startTime = sunResult.sunrise,
+            endTime = sunResult.sunrise.plusMinutes(5),
+            auspiciousness = Auspiciousness.GREEN,
+            description = "Local sunrise time."
+        )
+        val sunsetTiming = SolarTiming(
+            name = "Sunset",
+            tamilName = "சூரிய அஸ்தமனம்",
+            startTime = sunResult.sunset,
+            endTime = sunResult.sunset.plusMinutes(5),
+            auspiciousness = Auspiciousness.GREEN,
+            description = "Local sunset time."
+        )
+
         return DayData(
             nallaNeram = timings.filterIsInstance<NallaNeram>(),
             gowriNeram = timings.filterIsInstance<GowriNeram>(),
@@ -230,7 +247,9 @@ class DayDataProvider(private val context: Context) {
             maitraMuhurtham = maitra,
             chandrashtamam = chandrashtamamTimings,
             tharaBalam = tharaBalamTimings,
-            yogam = yogamTimings
+            yogam = yogamTimings,
+            sunriseTiming = sunriseTiming,
+            sunsetTiming = sunsetTiming
         )
     }
 

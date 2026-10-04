@@ -34,10 +34,22 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
+    val backStack = mutableStateListOf<Any>()
+
+    @Suppress("DEPRECATION")
+    override fun onBackPressed() {
+        android.util.Log.d("MainActivity", "onBackPressed called, backStack size = ${backStack.size}")
+        if (backStack.size > 1) {
+            backStack.removeLastOrNull()
+        } else {
+            super.onBackPressed()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        
+
         val repository = SettingsRepository(this)
 
         setContent {
@@ -86,7 +98,9 @@ class MainActivity : AppCompatActivity() {
     @Composable
     fun MainShell(initialMode: ViewMode, themeMode: String) {
         val repository = remember { SettingsRepository(this) }
-        val backStack = remember { mutableStateListOf<Any>(NavRoute.Dashboard(initialMode)) }
+        if (backStack.isEmpty()) {
+            backStack.add(NavRoute.Dashboard(initialMode))
+        }
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
         val scope = rememberCoroutineScope()
         
@@ -353,8 +367,15 @@ class MainActivity : AppCompatActivity() {
                     entryProvider = { key ->
                         when (key) {
                             is NavRoute.Dashboard -> NavEntry(key) { 
+                                val targetDateStr = intent?.getStringExtra("target_date")
+                                val targetDate = remember {
+                                    targetDateStr?.let { 
+                                        try { java.time.LocalDate.parse(it) } catch (e: Exception) { null }
+                                    }
+                                }
                                 TimelineDashboard(
                                     viewMode = key.mode,
+                                    initialTargetDate = targetDate,
                                     onMenuClick = { scope.launch { drawerState.open() } }
                                 ) 
                             }
@@ -365,6 +386,9 @@ class MainActivity : AppCompatActivity() {
                                     },
                                     onNavigateToTimelineDisplaySettings = {
                                         backStack.add(NavRoute.CalendarSettings)
+                                    },
+                                    onNavigateToRemindersSettings = {
+                                        backStack.add(NavRoute.RemindersSettings)
                                     }
                                 )
                             }
@@ -400,6 +424,13 @@ class MainActivity : AppCompatActivity() {
                             }
                             NavRoute.ChandrashtamamSettings -> NavEntry(key) {
                                 ChandrashtamamSettingsScreen(
+                                    onBack = {
+                                        backStack.removeLastOrNull()
+                                    }
+                                )
+                            }
+                            NavRoute.RemindersSettings -> NavEntry(key) {
+                                com.suresh.sacredtimeline.ui.settings.RemindersScreen(
                                     onBack = {
                                         backStack.removeLastOrNull()
                                     }

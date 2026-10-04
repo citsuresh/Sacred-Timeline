@@ -949,7 +949,16 @@ fun SunTimesDisplay(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     if (showSunrise) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.clickable {
+                                onDetailClick(
+                                    com.suresh.sacredtimeline.model.DashboardDetail.TimelineTiming(
+                                        com.suresh.sacredtimeline.model.SolarTiming("Sunrise", "சூரிய உதயம்", sunrise, sunrise.plusMinutes(5), Auspiciousness.GREEN, "Local sunrise time.")
+                                    )
+                                )
+                            }.padding(4.dp)
+                        ) {
                             Image(
                                 painter = painterResource(R.drawable.ic_sun),
                                 contentDescription = null,
@@ -988,7 +997,16 @@ fun SunTimesDisplay(
                     }
 
                     if (showSunset) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.clickable {
+                                onDetailClick(
+                                    com.suresh.sacredtimeline.model.DashboardDetail.TimelineTiming(
+                                        com.suresh.sacredtimeline.model.SolarTiming("Sunset", "சூரிய அஸ்தமனம்", sunset, sunset.plusMinutes(5), Auspiciousness.GREEN, "Local sunset time.")
+                                    )
+                                )
+                            }.padding(4.dp)
+                        ) {
                             Text(formatWithAmPm(sunset), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
                             Spacer(modifier = Modifier.width(4.dp))
                             Icon(Icons.Default.WbTwilight, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color(0xFFFF5722))

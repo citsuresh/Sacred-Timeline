@@ -1,16 +1,13 @@
 package com.suresh.sacredtimeline.ui.dashboard.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,9 +19,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.suresh.sacredtimeline.R
+import com.suresh.sacredtimeline.data.RemindersRepository
 import com.suresh.sacredtimeline.model.*
 import com.suresh.sacredtimeline.ui.dashboard.TimelineViewModel
 import com.suresh.sacredtimeline.ui.theme.*
+import com.suresh.sacredtimeline.worker.ReminderWorker
+import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -53,6 +53,70 @@ fun DashboardDetailSheet(
     }
     val contentColor = SacredTimelineColors.getContentColor(containerColor)
 
+    val title = when (detail) {
+        is DashboardDetail.TimelineTiming -> {
+            val t = detail.timing
+            when (t) {
+                is ChandrashtamamTiming -> Metadata.getChandrashtamamLabel(t, context)
+                is YogamTiming -> if (t.categoryResId != 0) stringResource(t.categoryResId) else t.tamilName
+                is TharaBalamTiming -> if (t.categoryResId != 0) stringResource(t.categoryResId) else t.tamilName
+                is SolarTiming -> context.getString(if (t.name == "Sunrise") R.string.label_sunrise else R.string.label_sunset)
+                else -> {
+                    val nameRes = when (t) {
+                        is Hora -> Metadata.getPlanetNameRes(t.name)
+                        is NallaNeram -> Metadata.getSpecialNameRes("Nalla")
+                        is GowriNeram -> Metadata.getGowriNameRes(t.name)
+                        is SpecialPeriod -> Metadata.getSpecialNameRes(t.name)
+                        is Muhurtham -> Metadata.getMuhurthamNameRes(t.name)
+                        is MaitraMuhurtham -> Metadata.getSpecialNameRes("Maitra Muhurtham")
+                        else -> 0
+                    }
+                    if (nameRes != 0 && nameRes != R.string.app_name) stringResource(nameRes) else t.tamilName
+                }
+            }
+        }
+        is DashboardDetail.Lunar -> stringResource(detail.item.resId)
+        is DashboardDetail.SpecialEvent -> stringResource(detail.resId)
+        is DashboardDetail.Muhurtham -> stringResource(detail.title)
+    }
+
+    val subTitle = when (detail) {
+        is DashboardDetail.TimelineTiming -> {
+            when (detail.timing) {
+                is Hora -> stringResource(R.string.nav_hora)
+                is GowriNeram -> stringResource(R.string.nav_gowri_neram)
+                is ChandrashtamamTiming -> stringResource(R.string.label_chandrashtamam)
+                is YogamTiming -> stringResource(R.string.label_yoga)
+                is TharaBalamTiming -> stringResource(R.string.label_thara_balam)
+                else -> ""
+            }
+        }
+        is DashboardDetail.Lunar -> {
+            when (detail.type) {
+                DashboardDetail.LunarType.TITHI -> stringResource(R.string.label_tithi)
+                DashboardDetail.LunarType.NAKSHATRA -> stringResource(R.string.label_nakshatra)
+                DashboardDetail.LunarType.PAKSHA -> stringResource(R.string.label_paksha)
+            }
+        }
+        is DashboardDetail.SpecialEvent -> {
+            val months = listOf(
+                R.string.month_chithirai, R.string.month_vaikasi, R.string.month_aani,
+                R.string.month_aadi, R.string.month_avani, R.string.month_purattasi,
+                R.string.month_aippasi, R.string.month_karthigai, R.string.month_margazhi,
+                R.string.month_thai, R.string.month_maasi, R.string.month_panguni
+            )
+            if (detail.resId in months) stringResource(R.string.label_tamil_month) else ""
+        }
+        else -> ""
+    }
+
+    val eventTitleStr = buildString {
+        append(title)
+        if (subTitle.isNotEmpty() && !title.contains(subTitle, ignoreCase = true)) {
+            append(" $subTitle")
+        }
+    }
+
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
@@ -79,67 +143,12 @@ fun DashboardDetailSheet(
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
-                    val title = when (detail) {
-                        is DashboardDetail.TimelineTiming -> {
-                            val t = detail.timing
-                            when (t) {
-                                is ChandrashtamamTiming -> Metadata.getChandrashtamamLabel(t, context)
-                                is YogamTiming -> t.tamilName
-                                is TharaBalamTiming -> t.tamilName
-                                else -> {
-                                    val nameRes = when (t) {
-                                        is Hora -> Metadata.getPlanetNameRes(t.name)
-                                        is NallaNeram -> Metadata.getSpecialNameRes("Nalla")
-                                        is GowriNeram -> Metadata.getGowriNameRes(t.name)
-                                        is SpecialPeriod -> Metadata.getSpecialNameRes(t.name)
-                                        is Muhurtham -> Metadata.getMuhurthamNameRes(t.name)
-                                        is MaitraMuhurtham -> Metadata.getSpecialNameRes("Maitra Muhurtham")
-                                        else -> 0
-                                    }
-                                    if (nameRes != 0 && nameRes != R.string.app_name) stringResource(nameRes) else t.tamilName
-                                }
-                            }
-                        }
-                        is DashboardDetail.Lunar -> stringResource(detail.item.resId)
-                        is DashboardDetail.SpecialEvent -> stringResource(detail.resId)
-                        is DashboardDetail.Muhurtham -> stringResource(detail.title)
-                    }
-                    
                     Text(
                         text = title,
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold
                     )
                     
-                    val subTitle = when (detail) {
-                        is DashboardDetail.TimelineTiming -> {
-                            when (detail.timing) {
-                                is Hora -> stringResource(R.string.nav_hora)
-                                is GowriNeram -> stringResource(R.string.nav_gowri_neram)
-                                is ChandrashtamamTiming -> stringResource(R.string.label_chandrashtamam)
-                                is YogamTiming -> stringResource(R.string.label_yoga)
-                                is TharaBalamTiming -> stringResource(R.string.label_thara_balam)
-                                else -> ""
-                            }
-                        }
-                        is DashboardDetail.Lunar -> {
-                            when (detail.type) {
-                                DashboardDetail.LunarType.TITHI -> stringResource(R.string.label_tithi)
-                                DashboardDetail.LunarType.NAKSHATRA -> stringResource(R.string.label_nakshatra)
-                                DashboardDetail.LunarType.PAKSHA -> stringResource(R.string.label_paksha)
-                            }
-                        }
-                        is DashboardDetail.SpecialEvent -> {
-                            val months = listOf(
-                                R.string.month_chithirai, R.string.month_vaikasi, R.string.month_aani,
-                                R.string.month_aadi, R.string.month_avani, R.string.month_purattasi,
-                                R.string.month_aippasi, R.string.month_karthigai, R.string.month_margazhi,
-                                R.string.month_thai, R.string.month_maasi, R.string.month_panguni
-                            )
-                            if (detail.resId in months) stringResource(R.string.label_tamil_month) else ""
-                        }
-                        else -> ""
-                    }
                     if (subTitle.isNotEmpty()) {
                         Text(
                             text = subTitle,
@@ -211,6 +220,135 @@ fun DashboardDetailSheet(
                             Text(endTimeStr, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                         }
                     }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+                val selectedDate by viewModel.selectedDate.collectAsState()
+                val zone = ZoneId.systemDefault()
+                val eventCategory = when (detail) {
+                    is DashboardDetail.TimelineTiming -> when (detail.timing) {
+                        is GowriNeram -> "GOWRI"
+                        is Hora -> "HORA"
+                        is ChandrashtamamTiming -> "CHANDRASHTAMAM"
+                        is TharaBalamTiming -> "THARA_BALAM"
+                        is YogamTiming -> "YOGAM"
+                        is MaitraMuhurtham, is Muhurtham -> "MUHURTHAM"
+                        is NallaNeram, is SpecialPeriod -> "NERAM"
+                        is SolarTiming -> "SOLAR"
+                        else -> "UNIVERSAL"
+                    }
+                    is DashboardDetail.Lunar -> when (detail.type) {
+                        DashboardDetail.LunarType.TITHI, DashboardDetail.LunarType.PAKSHA -> "TITHI"
+                        DashboardDetail.LunarType.NAKSHATRA -> "NAKSHATRA"
+                        else -> "UNIVERSAL"
+                    }
+                    is DashboardDetail.Muhurtham -> "MUHURTHAM"
+                    is DashboardDetail.SpecialEvent -> "FESTIVAL"
+                }
+
+                val startTime = when (detail) {
+                    is DashboardDetail.TimelineTiming -> detail.timing.startTime
+                    is DashboardDetail.Muhurtham -> detail.startTime
+                    is DashboardDetail.Lunar -> detail.item.startTime?.atZone(zone)?.toLocalTime()
+                    is DashboardDetail.SpecialEvent -> detail.startTime
+                }
+                val endTime = when (detail) {
+                    is DashboardDetail.TimelineTiming -> detail.timing.endTime
+                    is DashboardDetail.Muhurtham -> detail.endTime
+                    is DashboardDetail.Lunar -> detail.item.endTime?.atZone(zone)?.toLocalTime()
+                    is DashboardDetail.SpecialEvent -> detail.endTime
+                }
+
+                val repository = remember { RemindersRepository(context) }
+                var allReminders by remember { mutableStateOf(repository.getAllReminders()) }
+                val eventReminders = allReminders.filter { it.eventTitle == eventTitleStr && (it.eventDate == selectedDate || it.isRecurring) }
+
+                var showNewReminderDialog by remember { mutableStateOf(false) }
+                var editingReminder by remember { mutableStateOf<Reminder?>(null) }
+
+                if (showNewReminderDialog) {
+                    ReminderDialog(
+                        defaultTitle = eventTitleStr,
+                        defaultCategory = eventCategory,
+                        defaultDate = selectedDate,
+                        defaultStartTime = startTime ?: LocalTime.of(6, 0),
+                        defaultEndTime = endTime ?: LocalTime.of(18, 0),
+                        onDismiss = { showNewReminderDialog = false },
+                        existingReminder = null,
+                        onSaved = { allReminders = repository.getAllReminders() }
+                    )
+                }
+
+                if (editingReminder != null) {
+                    ReminderDialog(
+                        defaultTitle = eventTitleStr,
+                        defaultCategory = eventCategory,
+                        defaultDate = selectedDate,
+                        defaultStartTime = startTime ?: LocalTime.of(6, 0),
+                        defaultEndTime = endTime ?: LocalTime.of(18, 0),
+                        existingReminder = editingReminder,
+                        onDismiss = { editingReminder = null },
+                        onSaved = { allReminders = repository.getAllReminders() }
+                    )
+                }
+
+                if (eventReminders.isNotEmpty()) {
+                    Text(stringResource(R.string.active_reminders), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    eventReminders.forEach { rem ->
+                        Surface(
+                            onClick = { editingReminder = rem },
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+                            shape = RoundedCornerShape(8.dp),
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(10.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    val summary = buildString {
+                                        append(rem.reminderType.name.replace("_", " ").lowercase())
+                                        if (rem.offsetDays > 0) append(" • ${rem.offsetDays}d")
+                                        if (rem.offsetHours > 0) append(" • ${rem.offsetHours}h")
+                                        if (rem.offsetMinutes > 0) append(" • ${rem.offsetMinutes}m before")
+                                        if (rem.isRecurring) append(" • 🔁 All Occurrences")
+                                    }
+                                    Text(summary, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.primary)
+                                }
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    IconButton(
+                                        onClick = { editingReminder = rem },
+                                        modifier = Modifier.size(24.dp)
+                                    ) {
+                                        Icon(Icons.Default.Edit, contentDescription = "Edit", tint = MaterialTheme.colorScheme.primary)
+                                    }
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    IconButton(
+                                        onClick = {
+                                            repository.removeReminder(rem.id)
+                                            ReminderWorker.cancelReminder(context, rem.id)
+                                            allReminders = repository.getAllReminders()
+                                        },
+                                        modifier = Modifier.size(24.dp)
+                                    ) {
+                                        Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+
+                OutlinedButton(
+                    onClick = { showNewReminderDialog = true },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(Icons.Default.NotificationsActive, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(stringResource(R.string.set_reminder))
                 }
             }
 
@@ -285,6 +423,7 @@ fun DashboardDetailSheet(
                         is ChandrashtamamTiming -> context.getString(R.string.desc_timing_chandrashtamam)
                         is TharaBalamTiming -> t.description
                         is YogamTiming -> t.description
+                        is SolarTiming -> context.getString(if (t.name == "Sunrise") R.string.desc_sunrise else R.string.desc_sunset)
                     }
                 }
                 is DashboardDetail.Lunar -> {
@@ -332,6 +471,7 @@ fun DetailIcon(detail: DashboardDetail, tint: Color) {
                 is ChandrashtamamTiming -> Icon(Icons.Default.Warning, contentDescription = null, tint = tint)
                 is TharaBalamTiming -> Icon(Icons.Default.Stars, contentDescription = null, tint = tint)
                 is YogamTiming -> Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = tint)
+                is SolarTiming -> Icon(Icons.Default.WbSunny, contentDescription = null, tint = tint)
                 is SpecialPeriod -> {
                     if (t.name == "Yama") {
                         Icon(
