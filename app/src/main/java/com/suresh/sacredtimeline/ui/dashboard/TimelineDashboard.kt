@@ -52,6 +52,8 @@ fun TimelineDashboard(
     val showBrahmaMuhurtham by viewModel.showBrahmaMuhurtham.collectAsState()
     val showAbhijitMuhurtham by viewModel.showAbhijitMuhurtham.collectAsState()
     val showMaitraMuhurtham by viewModel.showMaitraMuhurtham.collectAsState()
+    val showYogam by viewModel.showYogam.collectAsState()
+    val showTharaBalam by viewModel.showTharaBalam.collectAsState()
     val timelineViewStyleStr by viewModel.timelineViewStyle.collectAsState()
     val timelineViewStyle = remember(timelineViewStyleStr) {
         try { TimelineViewStyle.valueOf(timelineViewStyleStr) } catch (ignore: Exception) { TimelineViewStyle.EQUAL_DISTRIBUTION }
@@ -214,6 +216,8 @@ fun TimelineDashboard(
             showBrahmaMuhurtham = showBrahmaMuhurtham,
             showAbhijitMuhurtham = showAbhijitMuhurtham,
             showMaitraMuhurtham = showMaitraMuhurtham,
+            showYogam = showYogam,
+            showTharaBalam = showTharaBalam,
             viewStyle = timelineViewStyle,
             isHeaderExpanded = isHeaderExpanded,
             onToggleHeaderExpanded = { isHeaderExpanded = it },
@@ -261,6 +265,8 @@ fun TimelineDashboard(
             showBrahmaMuhurtham = showBrahmaMuhurtham,
             showAbhijitMuhurtham = showAbhijitMuhurtham,
             showMaitraMuhurtham = showMaitraMuhurtham,
+            showYogam = showYogam,
+            showTharaBalam = showTharaBalam,
             viewStyle = timelineViewStyle,
             isHeaderExpanded = isHeaderExpanded,
             onToggleHeaderExpanded = { isHeaderExpanded = it },

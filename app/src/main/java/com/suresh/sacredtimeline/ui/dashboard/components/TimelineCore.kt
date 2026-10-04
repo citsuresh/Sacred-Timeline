@@ -297,8 +297,8 @@ fun TimelineContent(
                         
                         if (decided && isVertical) {
                             change.consume()
-                            // Accumulate Y for the threshold
-                            if (totalY > 25) {
+                            val slop = viewConfiguration.touchSlop
+                            if (totalY > slop) {
                                 if (delta.y > 0 && !isHeaderExpanded) {
                                     onToggleHeaderExpanded(true)
                                 } else if (delta.y < 0 && isHeaderExpanded) {
@@ -409,8 +409,8 @@ fun TimelineContent(
                                 if (dayData.chandrashtamam.isNotEmpty()) add("CHANDRASHTAMAM")
                                 add("NERAM_MUHURTHAM")
                                 add("HORA")
-                                add("YOGAM")
-                                add("THARA_BALAM")
+                                if (showYogam) add("YOGAM")
+                                if (showTharaBalam) add("THARA_BALAM")
                             }
                         } else {
                             columnOrder.filter { columnVisibility.contains(it) }
@@ -769,7 +769,7 @@ private fun calculateLanes(
     timings.forEach { result[it] = mutableListOf() }
 
     when (style) {
-        TimelineViewStyle.EQUAL_DISTRIBUTION, TimelineViewStyle.FIXED_3_TRACK -> {
+        TimelineViewStyle.EQUAL_DISTRIBUTION -> {
             val lanes = mutableListOf<MutableList<Timing>>()
             if (forceSingleLane) {
                 lanes.add(timings.toMutableList())
@@ -787,17 +787,108 @@ private fun calculateLanes(
                 }
             }
         }
+        TimelineViewStyle.FIXED_3_TRACK -> {
+            if (pillarConfig != null && !forceSingleLane) {
+                val leftCat = pillarConfig.leftCategory
+                val rightCat = pillarConfig.rightCategory
+
+                val leftItems = timings.filter { it.getCategory() == leftCat }
+                val rightItems = timings.filter { it.getCategory() == rightCat }
+                val centerItems = timings.filter { it.getCategory() != leftCat && it.getCategory() != rightCat }
+
+                val activeTracks = mutableListOf<List<Timing>>()
+                if (leftItems.isNotEmpty()) activeTracks.add(leftItems)
+                if (centerItems.isNotEmpty()) activeTracks.add(centerItems)
+                if (rightItems.isNotEmpty()) activeTracks.add(rightItems)
+
+                if (activeTracks.isEmpty()) {
+                    activeTracks.add(timings)
+                }
+
+                val trackWidth = 1.0f / activeTracks.size
+                activeTracks.forEachIndexed { trackIdx, trackItemList ->
+                    val baseOffset = trackIdx * trackWidth
+                    val trackLanes = mutableListOf<MutableList<Timing>>()
+                    trackItemList.sortedBy { it.startTime }.forEach { t ->
+                        var placed = false
+                        for (lane in trackLanes) if (lane.none { overlaps(it, t) }) { lane.add(t); placed = true; break }
+                        if (!placed) trackLanes.add(mutableListOf(t))
+                    }
+                    val subLaneWidth = trackWidth / trackLanes.size.coerceAtLeast(1)
+                    trackLanes.forEachIndexed { subLaneIdx, items ->
+                        items.forEach { t ->
+                            result[t]?.add(LaneSegment(t.startTime, t.endTime, subLaneWidth, baseOffset + subLaneIdx * subLaneWidth))
+                        }
+                    }
+                }
+            } else {
+                val lanes = mutableListOf<MutableList<Timing>>()
+                if (forceSingleLane) {
+                    lanes.add(timings.toMutableList())
+                } else {
+                    timings.sortedBy { it.startTime }.forEach { t ->
+                        var placed = false
+                        for (lane in lanes) if (lane.none { overlaps(it, t) }) { lane.add(t); placed = true; break }
+                        if (!placed) lanes.add(mutableListOf(t))
+                    }
+                }
+                val width = 1.0f / lanes.size.coerceAtLeast(1)
+                lanes.forEachIndexed { i, items ->
+                    items.forEach { t ->
+                        result[t]?.add(LaneSegment(t.startTime, t.endTime, width, i * width))
+                    }
+                }
+            }
+        }
         TimelineViewStyle.ORTHOGONAL_STEPPED -> {
             val timePoints = (timings.map { it.startTime } + timings.map { it.endTime }).distinct().sorted()
+            val tempSegments = mutableMapOf<Timing, MutableList<LaneSegment>>()
+            timings.forEach { tempSegments[it] = mutableListOf() }
+
             for (i in 0 until timePoints.size - 1) {
                 val s = timePoints[i]
                 val e = timePoints[i+1]
-                val active = timings.filter { !it.startTime.isAfter(s) && it.endTime.isAfter(s) }
-                    .sortedBy { it.startTime }
-                val w = 1.0f / active.size.coerceAtLeast(1)
-                active.forEachIndexed { idx, t ->
-                    result[t]?.add(LaneSegment(s, e, w, idx * w))
+                
+                // Stability Sorting: Categories are prioritized to keep relative horizontal order stable.
+                val active = timings.filter { it.startTime.isBefore(e) && it.endTime.isAfter(s) }
+                    .sortedWith(compareBy({ 
+                        when(it) {
+                            is GowriNeram -> 0
+                            is ChandrashtamamTiming -> 1
+                            is YogamTiming -> 3
+                            is TharaBalamTiming -> 4
+                            is Hora -> 5
+                            else -> 2 // Center: Muhurthams / Neram
+                        }
+                    }, { it.startTime }))
+                
+                if (active.isNotEmpty()) {
+                    val w = 1.0f / active.size
+                    active.forEachIndexed { idx, t ->
+                        tempSegments[t]?.add(LaneSegment(s, e, w, idx * w))
+                    }
                 }
+            }
+
+            // CRITICAL OPTIMIZATION: Merge adjacent segments with identical geometry.
+            // This eliminates horizontal "slicing" lines within a box when unrelated events start/stop.
+            tempSegments.forEach { (timing, segments) ->
+                if (segments.isEmpty()) return@forEach
+                val merged = mutableListOf<LaneSegment>()
+                var current = segments[0]
+                for (j in 1 until segments.size) {
+                    val next = segments[j]
+                    // If geometry is identical and they are contiguous in time, merge into one shape.
+                    if (Math.abs(next.widthFactor - current.widthFactor) < 0.001f && 
+                        Math.abs(next.offsetFactor - current.offsetFactor) < 0.001f) {
+                        current = LaneSegment(current.startTime, next.endTime, current.widthFactor, current.offsetFactor)
+                    } else {
+                        merged.add(current)
+                        current = next
+                    }
+                }
+                merged.add(current)
+                result[timing]?.addAll(merged)
             }
         }
     }
@@ -813,6 +904,8 @@ private fun Timing.getCategory(): String = when (this) {
     is SpecialPeriod -> "NERAM"
     is MaitraMuhurtham -> "MAITRA"
     is ChandrashtamamTiming -> "CHANDRASHTAMAM"
+    is YogamTiming -> "YOGAM"
+    is TharaBalamTiming -> "THARA_BALAM"
     is Muhurtham -> {
         if (this.name.contains("Brahma")) "BRAHMA"
         else if (this.name.contains("Abhijit")) "ABHIJIT"

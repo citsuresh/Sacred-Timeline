@@ -56,6 +56,8 @@ fun PortraitTimelineLayout(
     showBrahmaMuhurtham: Boolean,
     showAbhijitMuhurtham: Boolean,
     showMaitraMuhurtham: Boolean,
+    showYogam: Boolean = true,
+    showTharaBalam: Boolean = true,
     viewStyle: TimelineViewStyle = TimelineViewStyle.EQUAL_DISTRIBUTION,
     isHeaderExpanded: Boolean = false,
     onToggleHeaderExpanded: (Boolean) -> Unit = {},
@@ -162,6 +164,8 @@ fun PortraitTimelineLayout(
                     showBrahmaMuhurtham = showBrahmaMuhurtham,
                     showAbhijitMuhurtham = showAbhijitMuhurtham,
                     showMaitraMuhurtham = showMaitraMuhurtham,
+                    showYogam = showYogam,
+                    showTharaBalam = showTharaBalam,
                     viewStyle = viewStyle,
                     isHeaderExpanded = isHeaderExpanded,
                     onToggleHeaderExpanded = onToggleHeaderExpanded,
@@ -200,6 +204,8 @@ fun LandscapeTimelineLayout(
     showBrahmaMuhurtham: Boolean,
     showAbhijitMuhurtham: Boolean,
     showMaitraMuhurtham: Boolean,
+    showYogam: Boolean = true,
+    showTharaBalam: Boolean = true,
     viewStyle: TimelineViewStyle = TimelineViewStyle.EQUAL_DISTRIBUTION,
     isHeaderExpanded: Boolean = false,
     onToggleHeaderExpanded: (Boolean) -> Unit = {},
@@ -256,7 +262,8 @@ fun LandscapeTimelineLayout(
                                     
                                     if (decided && isVertical) {
                                         change.consume()
-                                        if (totalY > 25) {
+                                        val slop = viewConfiguration.touchSlop
+                                        if (totalY > slop) {
                                             if (delta.y > 0 && !isHeaderExpanded) {
                                                 onToggleHeaderExpanded(true)
                                             } else if (delta.y < 0 && isHeaderExpanded) {
@@ -404,6 +411,8 @@ fun LandscapeTimelineLayout(
                     showBrahmaMuhurtham = showBrahmaMuhurtham,
                     showAbhijitMuhurtham = showAbhijitMuhurtham,
                     showMaitraMuhurtham = showMaitraMuhurtham,
+                    showYogam = showYogam,
+                    showTharaBalam = showTharaBalam,
                     viewStyle = viewStyle,
                     isHeaderExpanded = isHeaderExpanded,
                     onToggleHeaderExpanded = onToggleHeaderExpanded,
