@@ -160,9 +160,9 @@ fun SettingsScreen(
 
             // Reminders & Alerts
             item {
-                SettingsSection(title = "Reminders & Alerts") {
+                SettingsSection(title = stringResource(R.string.settings_reminders_section)) {
                     SettingsClickableItem(
-                        label = "Manage Scheduled Reminders",
+                        label = stringResource(R.string.settings_manage_reminders),
                         onClick = onNavigateToRemindersSettings
                     )
                 }

@@ -23,10 +23,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.suresh.sacredtimeline.R
 import com.suresh.sacredtimeline.data.RemindersRepository
 import com.suresh.sacredtimeline.logic.LunarCalendarUtils
 import com.suresh.sacredtimeline.logic.TamilCalendarUtils
@@ -71,7 +73,7 @@ fun RemindersScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Scheduled Reminders & Alerts") },
+                title = { Text(stringResource(R.string.reminders_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
@@ -81,7 +83,7 @@ fun RemindersScreen(
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { showAddDialog = true }) {
-                Icon(Icons.Default.Add, contentDescription = "Add Reminder")
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_reminder))
             }
         }
     ) { padding ->
@@ -102,7 +104,7 @@ fun RemindersScreen(
                 ) {
                     Icon(Icons.Default.Add, contentDescription = null)
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Add Reminder")
+                    Text(stringResource(R.string.add_reminder))
                 }
 
                 OutlinedButton(
@@ -149,7 +151,7 @@ fun RemindersScreen(
                 ) {
                     Icon(Icons.Default.NotificationsActive, contentDescription = null)
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Test Notification")
+                    Text(stringResource(R.string.test_notification))
                 }
             }
 
@@ -163,7 +165,7 @@ fun RemindersScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(Icons.Default.NotificationsActive, contentDescription = null, modifier = Modifier.size(48.dp), tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
                         Spacer(modifier = Modifier.height(16.dp))
-                        Text("No reminders scheduled", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.no_reminders), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             } else {
@@ -193,7 +195,7 @@ fun RemindersScreen(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(
-                                        text = "${category.replace("_", " ")} (${categoryReminders.size})",
+                                        text = "${getLocalizedCategoryName(category, context)} (${categoryReminders.size})",
                                         style = MaterialTheme.typography.titleSmall,
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -236,6 +238,25 @@ fun RemindersScreen(
             }
         }
     }
+}
+
+fun getLocalizedCategoryName(cat: String, context: Context): String {
+    val resId = when (cat.uppercase()) {
+        "NAKSHATRA" -> R.string.cat_nakshatra
+        "MUHURTHAM" -> R.string.cat_muhurtham
+        "NERAM" -> R.string.cat_neram
+        "HORA" -> R.string.cat_hora
+        "GOWRI" -> R.string.cat_gowri
+        "TITHI" -> R.string.cat_tithi
+        "CHANDRASHTAMAM" -> R.string.cat_chandrashtamam
+        "TAMIL_FESTIVAL" -> R.string.cat_tamil_festival
+        "SOLAR" -> R.string.cat_solar
+        "YOGAM" -> R.string.cat_yogam
+        "THARA_BALAM" -> R.string.cat_tharabalam
+        "CUSTOM" -> R.string.cat_custom
+        else -> R.string.cat_universal
+    }
+    return context.getString(resId)
 }
 
 @Composable
@@ -336,6 +357,7 @@ fun AddGenericReminderDialog(
     }
 
     var timeStr by remember { mutableStateOf("06:00") }
+    var customTimeStr by remember { mutableStateOf("06:00") }
     var offsetDays by remember { mutableStateOf(existingReminder?.offsetDays?.toString() ?: "0") }
     var offsetHours by remember { mutableStateOf(existingReminder?.offsetHours?.toString() ?: "0") }
     var offsetMinutes by remember { mutableStateOf(existingReminder?.offsetMinutes?.toString() ?: "15") }
@@ -349,7 +371,7 @@ fun AddGenericReminderDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(if (existingReminder == null) "Add Reminder" else "Edit Reminder") },
+        title = { Text(if (existingReminder == null) stringResource(R.string.add_reminder) else stringResource(R.string.edit_reminder)) },
         text = {
             Column(
                 modifier = Modifier
@@ -362,7 +384,7 @@ fun AddGenericReminderDialog(
                         onClick = { expandedCategory = true },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Category: $selectedCategory")
+                        Text("${stringResource(R.string.category_label)}: ${getLocalizedCategoryName(selectedCategory, context)}")
                     }
                     DropdownMenu(
                         expanded = expandedCategory,
@@ -370,7 +392,7 @@ fun AddGenericReminderDialog(
                     ) {
                         categories.forEach { cat ->
                             DropdownMenuItem(
-                                text = { Text(cat) },
+                                text = { Text(getLocalizedCategoryName(cat, context)) },
                                 onClick = {
                                     selectedCategory = cat
                                     expandedCategory = false
@@ -398,7 +420,7 @@ fun AddGenericReminderDialog(
                     OutlinedTextField(
                         value = eventTitle,
                         onValueChange = { eventTitle = it },
-                        label = { Text("Event Name / Title") },
+                        label = { Text(stringResource(R.string.event_title_label)) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -427,90 +449,76 @@ fun AddGenericReminderDialog(
                     }
                 }
 
-                Text("Frequency:", style = MaterialTheme.typography.bodyMedium)
+                Text(stringResource(R.string.frequency), style = MaterialTheme.typography.bodyMedium)
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     FilterChip(
                         selected = !isRecurring,
                         onClick = { isRecurring = false },
-                        label = { Text("Single Occurrence") }
+                        label = { Text(stringResource(R.string.single_occurrence)) }
                     )
                     FilterChip(
                         selected = isRecurring,
                         onClick = { isRecurring = true },
-                        label = { Text("All Occurrences") }
+                        label = { Text(stringResource(R.string.all_occurrences)) }
                     )
                 }
 
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("Reminder Strategy:", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.reminder_strategy), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
                 
                 Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         FilterChip(
                             selected = selectedType == ReminderType.START_RELATIVE,
                             onClick = { selectedType = ReminderType.START_RELATIVE },
-                            label = { Text("Relative to Start") }
+                            label = { Text(stringResource(R.string.relative_to_start)) }
                         )
                         FilterChip(
                             selected = selectedType == ReminderType.END_RELATIVE,
                             onClick = { selectedType = ReminderType.END_RELATIVE },
-                            label = { Text("Relative to End") }
+                            label = { Text(stringResource(R.string.relative_to_end)) }
                         )
                     }
                     FilterChip(
                         selected = selectedType == ReminderType.CUSTOM_ABSOLUTE,
                         onClick = { selectedType = ReminderType.CUSTOM_ABSOLUTE },
-                        label = { Text("Custom Time (N Days Before)") }
+                        label = { Text(stringResource(R.string.custom_time_before)) }
                     )
                 }
 
                 Spacer(modifier = Modifier.height(4.dp))
                 if (selectedType == ReminderType.START_RELATIVE || selectedType == ReminderType.END_RELATIVE) {
-                    val defaultTimeForCat = when (selectedCategory.uppercase()) {
-                        "MUHURTHAM" -> if (eventTitle.contains("Brahma")) LocalTime.of(4, 30) else LocalTime.of(6, 0)
-                        "SOLAR" -> if (eventTitle.contains("Sunrise")) LocalTime.of(6, 10) else LocalTime.of(18, 10)
-                        else -> LocalTime.of(6, 0)
-                    }
-                    if (timeStr == "06:00") timeStr = defaultTimeForCat.format(DateTimeFormatter.ofPattern("HH:mm"))
-
-                    OutlinedTextField(
-                        value = timeStr,
-                        onValueChange = { timeStr = it },
-                        label = { Text("Event Start Time (HH:MM)") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text("Offset Before Event:", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.offset_before_event), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedTextField(
                             value = offsetDays,
                             onValueChange = { offsetDays = it },
-                            label = { Text("Days") },
+                            label = { Text(stringResource(R.string.days_before)) },
                             modifier = Modifier.weight(1f),
                             singleLine = true
                         )
                         OutlinedTextField(
                             value = offsetHours,
                             onValueChange = { offsetHours = it },
-                            label = { Text("Hours") },
+                            label = { Text(stringResource(R.string.hours)) },
                             modifier = Modifier.weight(1f),
                             singleLine = true
                         )
                         OutlinedTextField(
                             value = offsetMinutes,
                             onValueChange = { offsetMinutes = it },
-                            label = { Text("Mins") },
+                            label = { Text(stringResource(R.string.mins)) },
                             modifier = Modifier.weight(1f),
                             singleLine = true
                         )
                     }
                 } else {
+                    // CUSTOM_ABSOLUTE
                     OutlinedTextField(
-                        value = timeStr,
-                        onValueChange = { timeStr = it },
-                        label = { Text("Target Notification Time (HH:MM)") },
+                        value = customTimeStr,
+                        onValueChange = { customTimeStr = it },
+                        label = { Text(stringResource(R.string.target_time_label)) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -519,7 +527,7 @@ fun AddGenericReminderDialog(
                     OutlinedTextField(
                         value = offsetDays,
                         onValueChange = { offsetDays = it },
-                        label = { Text("Days Before Event Date (N)") },
+                        label = { Text(stringResource(R.string.days_before)) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -527,20 +535,20 @@ fun AddGenericReminderDialog(
 
                 Spacer(modifier = Modifier.height(8.dp))
                 val targetDateForPreview = calculateNextDate(selectedCategory, eventTitle)
-                val previewTime = try { LocalTime.parse(timeStr) } catch (_: Exception) { LocalTime.of(6, 0) }
                 val pd = offsetDays.toIntOrNull() ?: 0
                 val ph = offsetHours.toIntOrNull() ?: 0
                 val pm = offsetMinutes.toIntOrNull() ?: 15
 
                 val pTriggerDT = when (selectedType) {
                     ReminderType.START_RELATIVE, ReminderType.END_RELATIVE -> {
-                        targetDateForPreview.atTime(previewTime).minusDays(pd.toLong()).minusHours(ph.toLong()).minusMinutes(pm.toLong())
+                        targetDateForPreview.atTime(LocalTime.of(6, 0)).minusDays(pd.toLong()).minusHours(ph.toLong()).minusMinutes(pm.toLong())
                     }
                     ReminderType.CUSTOM_ABSOLUTE -> {
-                        targetDateForPreview.minusDays(pd.toLong()).atTime(previewTime)
+                        val ct = try { LocalTime.parse(customTimeStr) } catch (_: Exception) { LocalTime.of(6, 0) }
+                        targetDateForPreview.minusDays(pd.toLong()).atTime(ct)
                     }
                 }
-                val previewStr = "🔔 Alert fires: ${pTriggerDT.format(DateTimeFormatter.ofPattern("MMM dd, yyyy • hh:mm a"))}"
+                val previewStr = "${stringResource(R.string.alert_fires)}: ${pTriggerDT.format(DateTimeFormatter.ofPattern("MMM dd, yyyy • hh:mm a"))}"
 
                 Surface(
                     color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
@@ -561,17 +569,17 @@ fun AddGenericReminderDialog(
             TextButton(onClick = {
                 if (eventTitle.isBlank()) return@TextButton
                 val date = existingReminder?.eventDate ?: calculateNextDate(selectedCategory, eventTitle)
-                val time = try { LocalTime.parse(timeStr) } catch (_: Exception) { LocalTime.of(6, 0) }
                 val d = offsetDays.toIntOrNull() ?: 0
                 val h = offsetHours.toIntOrNull() ?: 0
                 val m = offsetMinutes.toIntOrNull() ?: 15
 
                 val triggerDateTime = when (selectedType) {
                     ReminderType.START_RELATIVE, ReminderType.END_RELATIVE -> {
-                        date.atTime(time).minusDays(d.toLong()).minusHours(h.toLong()).minusMinutes(m.toLong())
+                        date.atTime(LocalTime.of(6, 0)).minusDays(d.toLong()).minusHours(h.toLong()).minusMinutes(m.toLong())
                     }
                     ReminderType.CUSTOM_ABSOLUTE -> {
-                        date.minusDays(d.toLong()).atTime(time)
+                        val ct = try { LocalTime.parse(customTimeStr) } catch (_: Exception) { LocalTime.of(6, 0) }
+                        date.minusDays(d.toLong()).atTime(ct)
                     }
                 }
                 val triggerInstant = triggerDateTime.atZone(ZoneId.systemDefault()).toInstant()
@@ -589,7 +597,10 @@ fun AddGenericReminderDialog(
                     offsetMinutes = m,
                     isEnabled = true,
                     isRecurring = isRecurring,
-                    timeDisplay = time.format(DateTimeFormatter.ofPattern("hh:mm a"))
+                    timeDisplay = when (selectedType) {
+                        ReminderType.CUSTOM_ABSOLUTE -> customTimeStr
+                        else -> "06:00 AM"
+                    }
                 )
 
                 val repo = RemindersRepository(context)
@@ -599,12 +610,12 @@ fun AddGenericReminderDialog(
                 onReminderAdded()
                 onDismiss()
             }) {
-                Text("Save")
+                Text(stringResource(R.string.save))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
         }
     )
@@ -642,7 +653,7 @@ fun ReminderCard(
                     if (reminder.offsetDays > 0) append(" • ${reminder.offsetDays}d")
                     if (reminder.offsetHours > 0) append(" • ${reminder.offsetHours}h")
                     if (reminder.offsetMinutes > 0) append(" • ${reminder.offsetMinutes}m before")
-                    if (reminder.isRecurring) append(" • 🔁 All Occurrences")
+                    if (reminder.isRecurring) append(" • 🔁 ${stringResource(R.string.all_occurrences)}")
                 }
                 Text(
                     text = offsetText,
@@ -659,8 +670,9 @@ fun ReminderCard(
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onEdit) {
-                    Icon(Icons.Default.Edit, contentDescription = "Edit Reminder", tint = MaterialTheme.colorScheme.primary)
+                    Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit_reminder), tint = MaterialTheme.colorScheme.primary)
                 }
+                Spacer(modifier = Modifier.width(4.dp))
                 Switch(
                     checked = reminder.isEnabled,
                     onCheckedChange = onToggle
