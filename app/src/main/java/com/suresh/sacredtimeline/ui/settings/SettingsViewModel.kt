@@ -90,7 +90,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     )
 
     val widgetRefreshMinutes: StateFlow<Int> = repository.widgetRefreshMinutes.stateIn(
-        viewModelScope, SharingStarted.WhileSubscribed(5000), 30
+        viewModelScope, SharingStarted.WhileSubscribed(5000), 15
     )
 
     val preloadDays: StateFlow<Int> = repository.preloadDays.stateIn(

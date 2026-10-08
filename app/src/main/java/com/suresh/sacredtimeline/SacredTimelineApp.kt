@@ -10,8 +10,8 @@ import com.suresh.sacredtimeline.worker.WidgetUpdateWorker
 class SacredTimelineApp : Application() {
     override fun onCreate() {
         super.onCreate()
-        // Initial schedule with default 30 mins (SettingsViewModel will update if changed)
-        WidgetUpdateWorker.enqueuePeriodicWork(this, 30L)
+        // Initial schedule with default 15 mins (SettingsViewModel will update if changed)
+        WidgetUpdateWorker.enqueuePeriodicWork(this, 15L)
 
         // Pre-create exact 1-to-1 notification channels on app startup
         createAllNotificationChannels(this)

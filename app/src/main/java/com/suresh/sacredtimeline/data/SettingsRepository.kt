@@ -140,7 +140,7 @@ class SettingsRepository(private val context: Context) {
     val lastKnownLatitude: Flow<Double> = context.dataStore.data.map { it[Keys.LAST_KNOWN_LATITUDE] ?: 11.0168 }
     val lastKnownLongitude: Flow<Double> = context.dataStore.data.map { it[Keys.LAST_KNOWN_LONGITUDE] ?: 76.9558 }
 
-    val widgetRefreshMinutes: Flow<Int> = context.dataStore.data.map { it[Keys.WIDGET_REFRESH_MINUTES] ?: 30 }
+    val widgetRefreshMinutes: Flow<Int> = context.dataStore.data.map { it[Keys.WIDGET_REFRESH_MINUTES] ?: 15 }
     
     val preloadDays: Flow<Int> = context.dataStore.data.map { it[Keys.PRELOAD_DAYS] ?: 30 }
     val language: Flow<String> = context.dataStore.data.map { it[Keys.LANGUAGE] ?: "en" }
