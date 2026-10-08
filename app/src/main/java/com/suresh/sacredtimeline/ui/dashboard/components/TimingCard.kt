@@ -281,26 +281,32 @@ fun TimingCard(
         }
         
         // Compatibility Icon for Hora
-        if (timing is Hora && totalHeight > 30.dp) {
-             val iconX = maxWidth * (widestSegment.offsetFactor + widestSegment.widthFactor) - (if (totalHeight > 60.dp) 18.dp else 12.dp) - 2.dp
-             Box(modifier = Modifier
-                .offset(x = iconX, y = sOffset + 2.dp)
-                .size(if (totalHeight > 60.dp) 18.dp else 12.dp)
-                .background(Color.White, RoundedCornerShape(9.dp))
-                .zIndex(2f),
-                contentAlignment = Alignment.Center
-             ) {
-                val (icon, tint) = when (timing.compatibility) {
-                    HoraCompatibility.FAVORABLE -> Icons.Default.CheckCircle to CompatibilityFavorable
-                    HoraCompatibility.CONFLICTING -> Icons.Default.Cancel to CompatibilityConflicting
-                    HoraCompatibility.NEUTRAL -> Icons.Default.RadioButtonUnchecked to CompatibilityNeutral
+        if (timing is Hora && totalHeight > 25.dp) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 2.dp, end = 2.dp),
+                contentAlignment = Alignment.TopEnd
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(if (totalHeight > 60.dp) 16.dp else 12.dp)
+                        .background(Color.White, RoundedCornerShape(8.dp))
+                        .zIndex(2f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    val (icon, tint) = when (timing.compatibility) {
+                        HoraCompatibility.FAVORABLE -> Icons.Default.CheckCircle to CompatibilityFavorable
+                        HoraCompatibility.CONFLICTING -> Icons.Default.Cancel to CompatibilityConflicting
+                        HoraCompatibility.NEUTRAL -> Icons.Default.RadioButtonUnchecked to CompatibilityNeutral
+                    }
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        modifier = Modifier.size(if (totalHeight > 60.dp) 14.dp else 10.dp),
+                        tint = tint
+                    )
                 }
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    tint = tint
-                )
             }
         }
     }

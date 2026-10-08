@@ -323,10 +323,10 @@ class PanchangamWidget : GlanceAppWidget() {
                         val currentThara = dayData.tharaBalam.find { it.isCurrent(now) }
 
                         val activeLanes = buildList {
-                            if (currentGowri != null) add("GOWRI")
-                            if (currentChandrashtamam != null) add("CHANDRASHTAMAM")
-                            if (middleTiming != null || currentMaitra != null) add("NERAM")
                             if (currentHora != null) add("HORAI")
+                            if (currentChandrashtamam != null) add("CHANDRASHTAMAM")
+                            if (currentGowri != null) add("GOWRI")
+                            if (middleTiming != null || currentMaitra != null) add("NERAM")
                             if (currentYogam != null) add("YOGAM")
                             if (currentThara != null) add("THARA_BALAM")
                         }

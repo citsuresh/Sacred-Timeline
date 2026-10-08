@@ -405,10 +405,10 @@ fun TimelineContent(
                         
                         val visibleCols = if (viewMode == ViewMode.UNIVERSAL) {
                             buildList {
-                                add("GOWRI")
-                                if (dayData.chandrashtamam.isNotEmpty()) add("CHANDRASHTAMAM")
-                                add("NERAM_MUHURTHAM")
                                 add("HORA")
+                                if (dayData.chandrashtamam.isNotEmpty()) add("CHANDRASHTAMAM")
+                                add("GOWRI")
+                                add("NERAM_MUHURTHAM")
                                 if (showYogam) add("YOGAM")
                                 if (showTharaBalam) add("THARA_BALAM")
                             }
