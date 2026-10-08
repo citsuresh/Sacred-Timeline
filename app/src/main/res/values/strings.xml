@@ -730,4 +730,7 @@
     <string name="event_prefix">Event: %1$s</string>
     <string name="event_date_prompt">Event Date (YYYY-MM-DD)</string>
     <string name="days_label">Days</string>
+    <string name="calculation_standard">Calculation Standard</string>
+    <string name="calculation_standard_desc">All Panchangam timings, Nalla Neram, and Horas are calculated using precise Thirukanitha (Drik Siddhanta) ephemeris astronomy.</string>
+    <string name="calculation_standard_value">Thirukanitha (Drik Siddhanta)</string>
 </resources>

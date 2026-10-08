@@ -681,4 +681,7 @@
     <string name="event_prefix">நிகழ்வு: %1$s</string>
     <string name="event_date_prompt">நிகழ்வு தேதி (ஆண்டு-மாதம்-நாள்)</string>
     <string name="days_label">நாட்கள்</string>
+    <string name="calculation_standard">கணிப்பு முறை</string>
+    <string name="calculation_standard_desc">அனைத்து பஞ்சாங்க நேரங்களும், நல்ல நேரமும் மற்றும் ஓரைகளும் திருகணித (த்ரிக்) ephemeris வானியல் முறையைப் பயன்படுத்தி துல்லியமாக கணக்கிடப்படுகின்றன.</string>
+    <string name="calculation_standard_value">திருகணிதம் (த்ரிக் சித்தாந்தம்)</string>
 </resources>

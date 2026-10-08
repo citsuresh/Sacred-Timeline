@@ -32,6 +32,29 @@ class PanchangamCalculatorTest {
     }
 
     @Test
+    fun testNallaNeramUpdatedSlots() {
+        val sunrise = LocalTime.of(6, 0)
+        val sunset = LocalTime.of(18, 0)
+        
+        // Sunday (Slot 1 -> 07:55; Slot 4 overlaps Yamagandam)
+        val sunday = PanchangamCalculator.calculateNallaNeram(DayOfWeek.SUNDAY, sunrise, sunset)
+        assertTrue(sunday.isNotEmpty())
+        assertEquals(LocalTime.of(7, 45), sunday[0].startTime)
+
+        // Monday (Slots 0 & 7 -> 06:15 & 16:45)
+        val monday = PanchangamCalculator.calculateNallaNeram(DayOfWeek.MONDAY, sunrise, sunset)
+        assertEquals(2, monday.size)
+        assertEquals(LocalTime.of(6, 15), monday[0].startTime)
+        assertEquals(LocalTime.of(16, 45), monday[1].startTime)
+
+        // Thursday (Slots 3 & 7 -> 10:45 & 16:45)
+        val thursday = PanchangamCalculator.calculateNallaNeram(DayOfWeek.THURSDAY, sunrise, sunset)
+        assertEquals(2, thursday.size)
+        assertEquals(LocalTime.of(10, 45), thursday[0].startTime)
+        assertEquals(LocalTime.of(16, 45), thursday[1].startTime)
+    }
+
+    @Test
     fun testSpecialPeriodsForFriday() {
         val sunrise = LocalTime.of(6, 0)
         val sunset = LocalTime.of(18, 0)

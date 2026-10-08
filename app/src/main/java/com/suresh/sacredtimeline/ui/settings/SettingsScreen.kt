@@ -91,6 +91,23 @@ fun SettingsScreen(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
+            // Calculation Standard Attribution
+            item {
+                SettingsSection(title = stringResource(R.string.calculation_standard)) {
+                    Text(
+                        text = stringResource(R.string.calculation_standard_value),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        text = stringResource(R.string.calculation_standard_desc),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+            }
+
             // 1. General Settings
             item {
                 SettingsSection(title = stringResource(R.string.settings_general)) {

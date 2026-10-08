@@ -119,13 +119,13 @@ object PanchangamCalculator {
     }
 
     private val NALLA_NERAM_DAY_SLOTS = mapOf(
-        DayOfWeek.SUNDAY to listOf(1, 3),    // 2nd and 4th slots
-        DayOfWeek.MONDAY to listOf(0, 6),    // 1st and 7th slots
+        DayOfWeek.SUNDAY to listOf(1, 4),    // 2nd and 5th slots
+        DayOfWeek.MONDAY to listOf(0, 7),    // 1st and 8th slots
         DayOfWeek.TUESDAY to listOf(1, 7),   // 2nd and 8th slots
-        DayOfWeek.WEDNESDAY to listOf(2, 6), // 3rd and 7th slots
-        DayOfWeek.THURSDAY to listOf(3, 4),  // 4th and 5th slots
+        DayOfWeek.WEDNESDAY to listOf(2, 7), // 3rd and 8th slots
+        DayOfWeek.THURSDAY to listOf(3, 7),  // 4th and 8th slots
         DayOfWeek.FRIDAY to listOf(2, 7),    // 3rd and 8th slots
-        DayOfWeek.SATURDAY to listOf(1, 7)   // 2nd and 8th slots
+        DayOfWeek.SATURDAY to listOf(3, 7)   // 4th and 8th slots
     )
 
     fun calculateNallaNeram(
@@ -175,7 +175,7 @@ object PanchangamCalculator {
                         }
                     }
 
-                    if (Duration.between(start, end).toMinutes() >= 30) {
+                    if (Duration.between(start, end).toMinutes() >= 25) {
                         val name = if (start.isBefore(LocalTime.NOON)) "Morning" else "Evening"
                         result.add(NallaNeram(
                             name = name,
