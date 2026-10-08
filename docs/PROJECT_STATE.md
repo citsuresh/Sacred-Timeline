@@ -3,6 +3,8 @@
 **Phase**: Alpha/Stable (Phase 10 Complete - Advanced Reminders & Notifications)
 
 ## 1. Recently Implemented
+- **Pure Thirukanitha (Drik) Sunrise-Anchored Nalla Neram**: Updated Nalla Neram calculations (`PanchangamCalculator.kt`) to use ephemeris-derived proportional sunrise-anchored slots across all 7 weekdays, complete with automatic Rahu Kalam / Yamagandam / Kuligai conflict trimming.
+- **Settings Calculation Standard Attribution**: Added an informational card in `SettingsScreen.kt` (with English and Tamil localization) indicating that Thirukanitha (Drik Siddhanta) ephemeris standards are used for app timings.
 - **Advanced Timeline Event Reminders**: Full-stack reminder system supporting relative offsets (start/end) and custom absolute times ($N$ days before at specific time). Features multiple reminders per event, recurring reminders ("All Occurrences" with automatic next-occurrence calculation for Nakshatras and Tamil dates), and direct creation/management from Settings.
 - **WorkManager Background Reliability (`ReminderWorker`)**: Migrated alarm scheduling to WorkManager with built-in WakeLocks to ensure reliable background notification delivery across all OEM devices (including Tecno HiOS).
 - **Dedicated 1-to-1 Notification Channels**: Established 12 dedicated notification channels pre-created on app startup, allowing independent user customization of sound, vibration, and banner settings per category.
