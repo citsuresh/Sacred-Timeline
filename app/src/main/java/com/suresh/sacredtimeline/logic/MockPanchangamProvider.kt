@@ -84,6 +84,7 @@ class MockPanchangamProvider {
             is NallaNeram -> original.copy(startTime = start, endTime = end)
             is GowriNeram -> original.copy(startTime = start, endTime = end)
             is Hora -> original.copy(startTime = start, endTime = end)
+            is SubHora -> original.copy(startTime = start, endTime = end)
             is SpecialPeriod -> original.copy(startTime = start, endTime = end)
             is Muhurtham -> original.copy(startTime = start, endTime = end)
             is MaitraMuhurtham -> original.copy(startTime = start, endTime = end)

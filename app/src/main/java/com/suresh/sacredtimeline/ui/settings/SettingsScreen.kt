@@ -272,9 +272,11 @@ fun SettingsScreen(
                                 "BRAHMA" -> stringResource(R.string.muhurtham_brahma)
                                 "ABHIJIT" -> stringResource(R.string.muhurtham_abhijit)
                                 "MAITRA" -> stringResource(R.string.timing_maitra)
-                                "GOWRI" -> stringResource(R.string.view_mode_gowri)
+                                "GOWRI" -> stringResource(R.string.nav_gowri_neram)
                                 "HORA" -> stringResource(R.string.nav_hora)
                                 "CHANDRASHTAMAM" -> stringResource(R.string.label_chandrashtamam)
+                                "YOGAM" -> stringResource(R.string.nav_yoga)
+                                "THARA_BALAM" -> stringResource(R.string.label_thara_balam)
                                 else -> colId
                             },
                             isVisible = isVisible,
@@ -415,9 +417,11 @@ fun SettingsScreen(
                                 "BRAHMA" -> stringResource(R.string.muhurtham_brahma)
                                 "ABHIJIT" -> stringResource(R.string.muhurtham_abhijit)
                                 "MAITRA" -> stringResource(R.string.timing_maitra)
-                                "GOWRI" -> stringResource(R.string.view_mode_gowri)
+                                "GOWRI" -> stringResource(R.string.nav_gowri_neram)
                                 "HORA" -> stringResource(R.string.nav_hora)
                                 "CHANDRASHTAMAM" -> stringResource(R.string.label_chandrashtamam)
+                                "YOGAM" -> stringResource(R.string.nav_yoga)
+                                "THARA_BALAM" -> stringResource(R.string.label_thara_balam)
                                 else -> colId
                             },
                             isVisible = isVisible, onToggleVisibility = { viewModel.updateWidgetColumnVisibility(colId, it) },

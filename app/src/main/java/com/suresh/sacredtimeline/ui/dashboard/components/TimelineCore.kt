@@ -98,7 +98,8 @@ fun TimelinePager(
     onZoomOut: () -> Unit,
     onDetailClick: (com.suresh.sacredtimeline.model.DashboardDetail) -> Unit = {},
     isLandscape: Boolean,
-    viewStyle: TimelineViewStyle = TimelineViewStyle.EQUAL_DISTRIBUTION
+    viewStyle: TimelineViewStyle = TimelineViewStyle.EQUAL_DISTRIBUTION,
+    showSubHoras: Boolean = false
 ) {
     val hourHeight = BASE_HOUR_HEIGHT * timelineScale
     
@@ -178,7 +179,8 @@ fun TimelinePager(
                             showTharaBalam = showTharaBalam,
                             isHeaderExpanded = isHeaderExpanded,
                             onToggleHeaderExpanded = onToggleHeaderExpanded,
-                            viewStyle = viewStyle
+                            viewStyle = viewStyle,
+                            showSubHoras = showSubHoras
                         )
                     } else {
                         Box(modifier = Modifier.fillMaxSize()) {
@@ -241,7 +243,8 @@ fun TimelineContent(
     showTharaBalam: Boolean = true,
     isHeaderExpanded: Boolean = false,
     onToggleHeaderExpanded: (Boolean) -> Unit = {},
-    viewStyle: TimelineViewStyle = TimelineViewStyle.EQUAL_DISTRIBUTION
+    viewStyle: TimelineViewStyle = TimelineViewStyle.EQUAL_DISTRIBUTION,
+    showSubHoras: Boolean = false
 ) {
     val scrollState = rememberScrollState()
     val density = LocalDensity.current
@@ -443,7 +446,9 @@ fun TimelineContent(
                                     is24Hour = is24Hour,
                                     modifier = Modifier.weight(1f),
                                     viewStyle = viewStyle,
-                                    forceSingleLane = colId == "YOGAM" || colId == "THARA_BALAM" || colId == "HORA" || colId == "GOWRI" || colId == "CHANDRASHTAMAM"
+                                    forceSingleLane = colId == "YOGAM" || colId == "THARA_BALAM" || colId == "HORA" || colId == "GOWRI" || colId == "CHANDRASHTAMAM",
+                                    showSubHoras = showSubHoras,
+                                    currentTime = currentTime
                                 )
                                 if (index < visibleCols.size - 1) {
                                     VerticalDivider(thickness = 1.dp, color = Color.LightGray.copy(alpha = 0.3f))
@@ -496,7 +501,9 @@ fun TimelineContent(
                                         val leftCat = visibleCols.firstOrNull() ?: ""
                                         val rightCat = visibleCols.lastOrNull().takeIf { it != leftCat } ?: ""
                                         PillarConfig(leftCat, rightCat)
-                                    } else null
+                                    } else null,
+                                    showSubHoras = showSubHoras,
+                                    currentTime = currentTime
                                 )
                             }
                         }
@@ -729,7 +736,9 @@ fun TimelineColumn(
     modifier: Modifier = Modifier,
     viewStyle: TimelineViewStyle = TimelineViewStyle.EQUAL_DISTRIBUTION,
     pillarConfig: PillarConfig? = null,
-    forceSingleLane: Boolean = false
+    forceSingleLane: Boolean = false,
+    showSubHoras: Boolean = false,
+    currentTime: LocalTime = LocalTime.now()
 ) {
     Box(modifier = modifier.fillMaxHeight()) {
         val segmentsMap = remember(timings, viewStyle, pillarConfig, forceSingleLane) {
@@ -742,6 +751,8 @@ fun TimelineColumn(
                 hourHeight = hourHeight, 
                 is24Hour = is24Hour,
                 segments = segments,
+                showSubHoras = showSubHoras,
+                currentTime = currentTime,
                 onClick = { onTimingClick(timing) }
             )
         }

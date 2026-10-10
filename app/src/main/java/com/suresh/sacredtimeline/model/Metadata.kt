@@ -82,7 +82,7 @@ object Metadata {
         return when (timing) {
             is NallaNeram, is SpecialPeriod -> R.string.label_neram_short
             is GowriNeram -> R.string.nav_gowri_neram
-            is Hora -> R.string.nav_hora
+            is Hora, is SubHora -> R.string.nav_hora
             is Muhurtham, is MaitraMuhurtham -> R.string.label_muhurtham_short
             is ChandrashtamamTiming -> R.string.label_special_short
             is TharaBalamTiming -> R.string.label_thara_balam

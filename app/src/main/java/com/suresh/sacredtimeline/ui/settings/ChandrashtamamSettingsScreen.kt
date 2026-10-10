@@ -95,7 +95,7 @@ fun ChandrashtamamSettingsScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Select All / Deselect All", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.select_all_deselect_all), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
                     Switch(
                         checked = allSelected,
                         onCheckedChange = { viewModel.setAllEnabledChandrashtamamStars(it) }

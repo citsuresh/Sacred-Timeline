@@ -1,5 +1,6 @@
 package com.suresh.sacredtimeline.ui.dashboard.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -18,6 +19,8 @@ import androidx.compose.runtime.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.border
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -44,6 +47,8 @@ fun TimingCard(
     hourHeight: Dp,
     is24Hour: Boolean,
     segments: List<LaneSegment>,
+    showSubHoras: Boolean = false,
+    currentTime: LocalTime = LocalTime.now(),
     onClick: () -> Unit
 ) {
     if (segments.isEmpty()) return
@@ -157,11 +162,46 @@ fun TimingCard(
                 .size(width = maxWidth * widestSegment.widthFactor, height = sHeight)
                 .zIndex(1f)
         ) {
-            Column(
+            val isHoraWithSub = timing is Hora && showSubHoras && sHeight > 50.dp && timing.subHoras.isNotEmpty() && timing.isCurrent(currentTime)
+            Row(
                 modifier = Modifier.fillMaxSize().padding(horizontal = 2.dp, vertical = 2.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                Column(
+                    modifier = Modifier.fillMaxHeight().weight(if (isHoraWithSub) 0.58f else 1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                // 0. Compatibility Badge for Hora
+                if (timing is Hora && sHeight > 40.dp) {
+                    val icon = when (timing.compatibility) {
+                        HoraCompatibility.FAVORABLE -> Icons.Default.CheckCircle
+                        HoraCompatibility.CONFLICTING -> Icons.Default.Cancel
+                        HoraCompatibility.NEUTRAL -> Icons.Default.RadioButtonUnchecked
+                    }
+                    val badgeColor = when (timing.compatibility) {
+                        HoraCompatibility.FAVORABLE -> CompatibilityFavorable
+                        HoraCompatibility.CONFLICTING -> CompatibilityConflicting
+                        HoraCompatibility.NEUTRAL -> CompatibilityNeutral
+                    }
+                    Surface(
+                        color = badgeColor,
+                        shape = RoundedCornerShape(8.dp),
+                        shadowElevation = 2.dp,
+                        border = BorderStroke(0.5.dp, Color.White),
+                        modifier = Modifier.size(if (sHeight > 60.dp) 18.dp else 14.dp).padding(bottom = 2.dp)
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(
+                                imageVector = icon,
+                                contentDescription = null,
+                                modifier = Modifier.size(if (sHeight > 60.dp) 12.dp else 9.dp),
+                                tint = Color.White
+                            )
+                        }
+                    }
+                }
+
                 // 1. Heading - Top Center (Only if enough height and NOT redundant)
                 val isMuhurthamType = timing is Muhurtham || timing is MaitraMuhurtham
                 if (widestSegment.widthFactor >= 0.28f && sHeight > 45.dp && !isMuhurthamType) {
@@ -278,36 +318,67 @@ fun TimingCard(
                     }
                 }
             }
-        }
-        
-        // Compatibility Icon for Hora
-        if (timing is Hora && totalHeight > 25.dp) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 2.dp, end = 2.dp),
-                contentAlignment = Alignment.TopEnd
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(if (totalHeight > 60.dp) 16.dp else 12.dp)
-                        .background(Color.White, RoundedCornerShape(8.dp))
-                        .zIndex(2f),
-                    contentAlignment = Alignment.Center
+
+            if (isHoraWithSub) {
+                Column(
+                    modifier = Modifier.fillMaxHeight().weight(0.42f).padding(start = 2.dp, end = 2.dp),
+                    verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    val (icon, tint) = when (timing.compatibility) {
-                        HoraCompatibility.FAVORABLE -> Icons.Default.CheckCircle to CompatibilityFavorable
-                        HoraCompatibility.CONFLICTING -> Icons.Default.Cancel to CompatibilityConflicting
-                        HoraCompatibility.NEUTRAL -> Icons.Default.RadioButtonUnchecked to CompatibilityNeutral
+                    (timing as Hora).subHoras.forEach { sub ->
+                        val subColor = SacredTimelineColors.getTimingColor(sub)
+                        val parts = when (sub.planet) {
+                            "Venus" -> 20f
+                            "Saturn" -> 19f
+                            "Mercury" -> 17f
+                            "Jupiter" -> 16f
+                            "Moon" -> 10f
+                            "Mars" -> 7f
+                            "Sun" -> 6f
+                            else -> 10f
+                        }
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(parts)
+                                .clip(RoundedCornerShape(3.dp))
+                                .background(subColor)
+                                .border(0.5.dp, Color.White.copy(alpha = 0.9f))
+                                .padding(horizontal = 4.dp),
+                            contentAlignment = Alignment.CenterStart
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = Metadata.getPlanetName(sub.planet, LocalContext.current),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontSize = 8.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = SacredTimelineColors.getContentColor(subColor),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Visible
+                                )
+                                val (subIcon, subTint) = when (sub.compatibility) {
+                                    HoraCompatibility.FAVORABLE -> Icons.Default.CheckCircle to CompatibilityFavorable
+                                    HoraCompatibility.CONFLICTING -> Icons.Default.Cancel to CompatibilityConflicting
+                                    HoraCompatibility.NEUTRAL -> Icons.Default.RadioButtonUnchecked to CompatibilityNeutral
+                                }
+                                Icon(
+                                    imageVector = subIcon,
+                                    contentDescription = null,
+                                    tint = subTint,
+                                    modifier = Modifier.size(10.dp)
+                                )
+                            }
+                        }
                     }
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = null,
-                        modifier = Modifier.size(if (totalHeight > 60.dp) 14.dp else 10.dp),
-                        tint = tint
-                    )
                 }
             }
+          }
         }
+
+
     }
 }

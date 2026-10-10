@@ -2,6 +2,8 @@ package com.suresh.sacredtimeline.ui.dashboard.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -24,9 +26,15 @@ import com.suresh.sacredtimeline.model.*
 import com.suresh.sacredtimeline.ui.dashboard.TimelineViewModel
 import com.suresh.sacredtimeline.ui.theme.*
 import com.suresh.sacredtimeline.worker.ReminderWorker
+import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import androidx.compose.ui.draw.clip
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,7 +42,8 @@ fun DashboardDetailSheet(
     detail: DashboardDetail,
     sheetState: SheetState,
     onDismiss: () -> Unit,
-    viewModel: TimelineViewModel = viewModel()
+    viewModel: TimelineViewModel = viewModel(),
+    showSubHoras: Boolean = false
 ) {
     val timeFormat24h by viewModel.timeFormat24h.collectAsState(initial = false)
     val pattern = if (timeFormat24h) "HH:mm" else "hh:mm a"
@@ -122,9 +131,12 @@ fun DashboardDetailSheet(
         sheetState = sheetState,
         dragHandle = { BottomSheetDefaults.DragHandle() }
     ) {
+        val scrollState = rememberScrollState()
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .fillMaxHeight(0.90f)
+                .verticalScroll(scrollState)
                 .padding(bottom = 32.dp, start = 24.dp, end = 24.dp)
         ) {
             Row(
@@ -228,7 +240,7 @@ fun DashboardDetailSheet(
                 val eventCategory = when (detail) {
                     is DashboardDetail.TimelineTiming -> when (detail.timing) {
                         is GowriNeram -> "GOWRI"
-                        is Hora -> "HORA"
+                        is Hora, is SubHora -> "HORA"
                         is ChandrashtamamTiming -> "CHANDRASHTAMAM"
                         is TharaBalamTiming -> "THARA_BALAM"
                         is YogamTiming -> "YOGAM"
@@ -260,7 +272,16 @@ fun DashboardDetailSheet(
                 }
 
                 val repository = remember { RemindersRepository(context) }
-                var allReminders by remember { mutableStateOf(repository.getAllReminders()) }
+                var allReminders by remember { mutableStateOf<List<Reminder>>(emptyList()) }
+                val coroutineScope = rememberCoroutineScope()
+                LaunchedEffect(Unit) {
+                    withContext(Dispatchers.IO) {
+                        val initial = repository.getAllReminders()
+                        withContext(Dispatchers.Main) {
+                            allReminders = initial
+                        }
+                    }
+                }
                 val eventReminders = allReminders.filter { it.eventTitle == eventTitleStr && (it.eventDate == selectedDate || it.isRecurring) }
 
                 var showNewReminderDialog by remember { mutableStateOf(false) }
@@ -275,7 +296,14 @@ fun DashboardDetailSheet(
                         defaultEndTime = endTime ?: LocalTime.of(18, 0),
                         onDismiss = { showNewReminderDialog = false },
                         existingReminder = null,
-                        onSaved = { allReminders = repository.getAllReminders() }
+                        onSaved = {
+                            coroutineScope.launch(Dispatchers.IO) {
+                                val updated = repository.getAllReminders()
+                                withContext(Dispatchers.Main) {
+                                    allReminders = updated
+                                }
+                            }
+                        }
                     )
                 }
 
@@ -288,7 +316,14 @@ fun DashboardDetailSheet(
                         defaultEndTime = endTime ?: LocalTime.of(18, 0),
                         existingReminder = editingReminder,
                         onDismiss = { editingReminder = null },
-                        onSaved = { allReminders = repository.getAllReminders() }
+                        onSaved = {
+                            coroutineScope.launch(Dispatchers.IO) {
+                                val updated = repository.getAllReminders()
+                                withContext(Dispatchers.Main) {
+                                    allReminders = updated
+                                }
+                            }
+                        }
                     )
                 }
 
@@ -327,9 +362,14 @@ fun DashboardDetailSheet(
                                     Spacer(modifier = Modifier.width(4.dp))
                                     IconButton(
                                         onClick = {
-                                            repository.removeReminder(rem.id)
-                                            ReminderWorker.cancelReminder(context, rem.id)
-                                            allReminders = repository.getAllReminders()
+                                            coroutineScope.launch(Dispatchers.IO) {
+                                                repository.removeReminder(rem.id)
+                                                ReminderWorker.cancelReminder(context, rem.id)
+                                                val updated = repository.getAllReminders()
+                                                withContext(Dispatchers.Main) {
+                                                    allReminders = updated
+                                                }
+                                            }
                                         },
                                         modifier = Modifier.size(24.dp)
                                     ) {
@@ -341,6 +381,173 @@ fun DashboardDetailSheet(
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                 }
+
+            // Sub-Horai Breakdown Card for Hora
+            if (showSubHoras && detail is DashboardDetail.TimelineTiming && detail.timing is Hora && detail.timing.subHoras.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                // Main Hora Compatibility Header (Above Sub-Horai breakdown heading)
+                Surface(
+                    color = containerColor,
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        val icon = when (detail.timing.compatibility) {
+                            HoraCompatibility.FAVORABLE -> Icons.Default.CheckCircle
+                            HoraCompatibility.CONFLICTING -> Icons.Default.Cancel
+                            HoraCompatibility.NEUTRAL -> Icons.Default.RadioButtonUnchecked
+                        }
+                        val tint = when (detail.timing.compatibility) {
+                            HoraCompatibility.FAVORABLE -> CompatibilityFavorable
+                            HoraCompatibility.CONFLICTING -> CompatibilityConflicting
+                            HoraCompatibility.NEUTRAL -> CompatibilityNeutral
+                        }
+                        Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(24.dp))
+                        Column {
+                            Text(
+                                text = stringResource(R.string.main_hora_format, Metadata.getPlanetName(detail.timing.name, context)),
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = contentColor
+                            )
+                            val compText = when (detail.timing.compatibility) {
+                                HoraCompatibility.FAVORABLE -> stringResource(R.string.birth_star_favorable)
+                                HoraCompatibility.CONFLICTING -> stringResource(R.string.birth_star_conflicting)
+                                HoraCompatibility.NEUTRAL -> stringResource(R.string.birth_star_neutral)
+                            }
+                            Text(
+                                text = compText,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = contentColor.copy(alpha = 0.8f)
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = stringResource(R.string.label_sub_horas),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Surface(
+                    color = MaterialTheme.colorScheme.surface,
+                    shape = RoundedCornerShape(8.dp),
+                    border = null,
+                    modifier = Modifier.fillMaxWidth().height(350.dp)
+                ) {
+                    var liveNow by remember { mutableStateOf(LocalTime.now()) }
+                    LaunchedEffect(Unit) {
+                        while (true) {
+                            liveNow = LocalTime.now()
+                            delay(60000L)
+                        }
+                    }
+
+                    val totalMinutes = java.time.Duration.between(detail.timing.startTime, detail.timing.endTime).toMinutes().coerceAtLeast(1)
+                    val elapsedMinutes = java.time.Duration.between(detail.timing.startTime, liveNow).toMinutes().coerceIn(0, totalMinutes)
+                    val nowProgressFraction = (elapsedMinutes.toFloat() / totalMinutes.toFloat()).coerceIn(0f, 1f)
+                    val isToday = selectedDate == LocalDate.now()
+
+                    val nowLineColorInt by viewModel.nowLineColor.collectAsState()
+                    val nowLineThicknessFloat by viewModel.nowLineThickness.collectAsState()
+                    val nowLineColor = Color(nowLineColorInt.toLong() and 0xFFFFFFFFL)
+                    val nowLineThickness = nowLineThicknessFloat.dp
+
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.spacedBy(0.dp)
+                        ) {
+                            val pattern = if (timeFormat24h) "HH:mm" else "h:mm a"
+                            val formatter = DateTimeFormatter.ofPattern(pattern)
+
+                            detail.timing.subHoras.forEach { sub ->
+                                val subColor = SacredTimelineColors.getTimingColor(sub)
+                                val parts = when (sub.planet) {
+                                    "Venus" -> 20f
+                                    "Saturn" -> 19f
+                                    "Mercury" -> 17f
+                                    "Jupiter" -> 16f
+                                    "Moon" -> 10f
+                                    "Mars" -> 7f
+                                    "Sun" -> 6f
+                                    else -> 10f
+                                }
+                                val textColor = SacredTimelineColors.getContentColor(subColor)
+
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .weight(parts, fill = true)
+                                        .background(subColor)
+                                        .padding(horizontal = 10.dp, vertical = 2.dp),
+                                    contentAlignment = Alignment.CenterStart
+                                ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "${sub.startTime.format(formatter)} - ${sub.endTime.format(formatter)}  •  ${Metadata.getPlanetName(sub.planet, context)}",
+                                            style = MaterialTheme.typography.labelMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = textColor
+                                        )
+                                        val (subIcon, subTint) = when (sub.compatibility) {
+                                            HoraCompatibility.FAVORABLE -> Icons.Default.CheckCircle to CompatibilityFavorable
+                                            HoraCompatibility.CONFLICTING -> Icons.Default.Cancel to CompatibilityConflicting
+                                            HoraCompatibility.NEUTRAL -> Icons.Default.RadioButtonUnchecked to CompatibilityNeutral
+                                        }
+                                        Icon(subIcon, contentDescription = null, tint = subTint, modifier = Modifier.size(14.dp))
+                                    }
+                                }
+                            }
+                        }
+
+                        // Visual NOW Line indicator at exact vertical fraction
+                        if (isToday) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = ((350.dp * nowProgressFraction) - (nowLineThickness / 2)).coerceAtLeast(0.dp))
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .height(nowLineThickness)
+                                            .background(nowLineColor)
+                                    )
+                                    Surface(
+                                        color = nowLineColor,
+                                        shape = RoundedCornerShape(4.dp)
+                                    ) {
+                                        Text(
+                                            text = "NOW",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = Color.White,
+                                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp),
+                                            fontSize = 8.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
                 OutlinedButton(
                     onClick = { showNewReminderDialog = true },
@@ -415,6 +622,7 @@ fun DashboardDetailSheet(
                 is DashboardDetail.TimelineTiming -> {
                     when (val t = detail.timing) {
                         is Hora -> Metadata.getPlanetQuality(t.name, context)
+                        is SubHora -> Metadata.getPlanetQuality(t.planet, context)
                         is GowriNeram -> Metadata.getGowriDescription(t.name, context)
                         is SpecialPeriod -> Metadata.getSpecialDescription(t.name, context)
                         is NallaNeram -> Metadata.getSpecialDescription("Nalla", context)
@@ -464,7 +672,7 @@ fun DetailIcon(detail: DashboardDetail, tint: Color) {
         is DashboardDetail.TimelineTiming -> {
             when (val t = detail.timing) {
                 is NallaNeram -> Icon(Icons.Default.Star, contentDescription = null, tint = tint)
-                is Hora -> Icon(Icons.Default.Today, contentDescription = null, tint = tint)
+                is Hora, is SubHora -> Icon(Icons.Default.Today, contentDescription = null, tint = tint)
                 is GowriNeram -> Icon(Icons.Default.Brightness4, contentDescription = null, tint = tint)
                 is Muhurtham -> Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = tint)
                 is MaitraMuhurtham -> Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = tint)

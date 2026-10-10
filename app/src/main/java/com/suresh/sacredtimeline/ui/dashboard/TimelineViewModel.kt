@@ -126,6 +126,10 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
         viewModelScope, SharingStarted.WhileSubscribed(5000), true
     )
 
+    val showSubHoras: StateFlow<Boolean> = repository.showSubHoras.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), true
+    )
+
     val sunriseDefinition: StateFlow<String> = repository.sunriseDefinition.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), "SCIENTIFIC"
     )

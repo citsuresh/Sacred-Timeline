@@ -733,4 +733,11 @@
     <string name="calculation_standard">Calculation Standard</string>
     <string name="calculation_standard_desc">All Panchangam timings, Nalla Neram, and Horas are calculated using precise Thirukanitha (Drik Siddhanta) ephemeris astronomy.</string>
     <string name="calculation_standard_value">Thirukanitha (Drik Siddhanta)</string>
+    <string name="settings_show_sub_horas">Show Sub-Horai (Micro-Planetary Hours)</string>
+    <string name="label_sub_horas">Sub-Horai Breakdown</string>
+    <string name="main_hora_format">Main Hora: %s</string>
+    <string name="birth_star_favorable">Favorable for your birth star</string>
+    <string name="birth_star_conflicting">Challenging for your birth star</string>
+    <string name="birth_star_neutral">Neutral for your birth star</string>
+    <string name="select_all_deselect_all">Select All / Deselect All</string>
 </resources>

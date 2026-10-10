@@ -47,6 +47,7 @@ class SettingsRepository(private val context: Context) {
         val SHOW_MAITRA_MUHURTHAM = booleanPreferencesKey("show_maitra_muhurtham")
         val SHOW_YOGAM = booleanPreferencesKey("show_yogam")
         val SHOW_THARA_BALAM = booleanPreferencesKey("show_thara_balam")
+        val SHOW_SUB_HORAS = booleanPreferencesKey("show_sub_horas")
         val SUNRISE_DEFINITION = stringPreferencesKey("sunrise_definition")
         val SPECIAL_PERIOD_STYLE = stringPreferencesKey("special_period_style")
         val LUNAR_MONTH_SYSTEM = stringPreferencesKey("lunar_month_system")
@@ -164,6 +165,7 @@ class SettingsRepository(private val context: Context) {
     val showMaitraMuhurtham: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_MAITRA_MUHURTHAM] ?: true }
     val showYogam: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_YOGAM] ?: true }
     val showTharaBalam: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_THARA_BALAM] ?: true }
+    val showSubHoras: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_SUB_HORAS] ?: true }
 
     val sunriseDefinition: Flow<String> = context.dataStore.data.map { it[Keys.SUNRISE_DEFINITION] ?: "SCIENTIFIC" }
     val specialPeriodStyle: Flow<String> = context.dataStore.data.map { it[Keys.SPECIAL_PERIOD_STYLE] ?: "PROPORTIONAL" }
@@ -357,6 +359,10 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun setShowTharaBalam(show: Boolean) {
         context.dataStore.edit { it[Keys.SHOW_THARA_BALAM] = show }
+    }
+
+    suspend fun setShowSubHoras(show: Boolean) {
+        context.dataStore.edit { it[Keys.SHOW_SUB_HORAS] = show }
     }
 
     suspend fun setSunriseDefinition(definition: String) {

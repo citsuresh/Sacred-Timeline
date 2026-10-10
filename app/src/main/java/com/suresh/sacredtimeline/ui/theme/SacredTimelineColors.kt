@@ -31,6 +31,18 @@ object SacredTimelineColors {
                     else -> HoraSun
                 }
             }
+            is SubHora -> {
+                when (timing.planet) {
+                    "Jupiter" -> HoraJupiter
+                    "Venus" -> HoraVenus
+                    "Mercury" -> HoraMercury
+                    "Moon" -> HoraMoon
+                    "Mars" -> HoraMars
+                    "Saturn" -> HoraSaturn
+                    "Sun" -> HoraSun
+                    else -> HoraSun
+                }
+            }
             is SpecialPeriod -> {
                 when {
                     timing.name == "Rahu" -> RahuBrightRed

@@ -59,6 +59,7 @@ fun TimelineDashboard(
     val showMaitraMuhurtham by viewModel.showMaitraMuhurtham.collectAsState()
     val showYogam by viewModel.showYogam.collectAsState()
     val showTharaBalam by viewModel.showTharaBalam.collectAsState()
+    val showSubHoras by viewModel.showSubHoras.collectAsState(initial = false)
     val timelineViewStyleStr by viewModel.timelineViewStyle.collectAsState()
     val timelineViewStyle = remember(timelineViewStyleStr) {
         try { TimelineViewStyle.valueOf(timelineViewStyleStr) } catch (ignore: Exception) { TimelineViewStyle.EQUAL_DISTRIBUTION }
@@ -96,7 +97,7 @@ fun TimelineDashboard(
     var isHeaderExpanded by remember { mutableStateOf(false) }
     
     var selectedDetail by remember { mutableStateOf<com.suresh.sacredtimeline.model.DashboardDetail?>(null) }
-    val sheetState = rememberModalBottomSheetState()
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSheet by remember { mutableStateOf(false) }
 
     if (showSheet && selectedDetail != null) {
@@ -104,7 +105,8 @@ fun TimelineDashboard(
             detail = selectedDetail!!,
             sheetState = sheetState,
             onDismiss = { showSheet = false },
-            viewModel = viewModel
+            viewModel = viewModel,
+            showSubHoras = showSubHoras
         )
     }
 
@@ -233,6 +235,7 @@ fun TimelineDashboard(
             showMaitraMuhurtham = showMaitraMuhurtham,
             showYogam = showYogam,
             showTharaBalam = showTharaBalam,
+            showSubHoras = showSubHoras,
             viewStyle = timelineViewStyle,
             isHeaderExpanded = isHeaderExpanded,
             onToggleHeaderExpanded = { isHeaderExpanded = it },
@@ -282,6 +285,7 @@ fun TimelineDashboard(
             showMaitraMuhurtham = showMaitraMuhurtham,
             showYogam = showYogam,
             showTharaBalam = showTharaBalam,
+            showSubHoras = showSubHoras,
             viewStyle = timelineViewStyle,
             isHeaderExpanded = isHeaderExpanded,
             onToggleHeaderExpanded = { isHeaderExpanded = it },

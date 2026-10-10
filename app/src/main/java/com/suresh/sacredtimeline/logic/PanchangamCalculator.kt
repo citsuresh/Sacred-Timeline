@@ -283,7 +283,7 @@ object PanchangamCalculator {
                 "Saturn", "Mars" -> Auspiciousness.RED
                 else -> Auspiciousness.AMBER
             }
-            Hora(
+            val tempHora = Hora(
                 name = planet,
                 tamilName = "",
                 startTime = start,
@@ -292,6 +292,7 @@ object PanchangamCalculator {
                 description = "",
                 compatibility = getHoraCompatibility(planet, dayOfWeek)
             )
+            tempHora.copy(subHoras = calculateSubHoras(tempHora, dayOfWeek))
         }
 
         val nightHoras = (0 until 12).map { i ->
@@ -305,7 +306,7 @@ object PanchangamCalculator {
                 "Saturn", "Mars" -> Auspiciousness.RED
                 else -> Auspiciousness.AMBER
             }
-            Hora(
+            val tempHora = Hora(
                 name = planet,
                 tamilName = "",
                 startTime = start,
@@ -314,9 +315,66 @@ object PanchangamCalculator {
                 description = "",
                 compatibility = getHoraCompatibility(planet, dayOfWeek)
             )
+            tempHora.copy(subHoras = calculateSubHoras(tempHora, dayOfWeek))
         }
 
         return dayHoras + nightHoras
+    }
+
+    private val SUB_HORA_PARTS = mapOf(
+        "Sun" to 6,
+        "Venus" to 20,
+        "Mercury" to 17,
+        "Moon" to 10,
+        "Saturn" to 19,
+        "Jupiter" to 16,
+        "Mars" to 7
+    )
+
+    fun calculateSubHoras(hora: Hora, dayOfWeek: DayOfWeek): List<SubHora> {
+        val planets = listOf("Sun", "Venus", "Mercury", "Moon", "Saturn", "Jupiter", "Mars")
+        val mainPlanetIndex = planets.indexOf(hora.name).takeIf { it != -1 } ?: 0
+        
+        val totalDurationMillis = Duration.between(hora.startTime, hora.endTime).toMillis()
+        if (totalDurationMillis <= 0) return emptyList()
+
+        var currentStart = hora.startTime
+        val result = mutableListOf<SubHora>()
+
+        for (i in 0 until 7) {
+            val subPlanet = planets[(mainPlanetIndex + i) % 7]
+            val parts = SUB_HORA_PARTS[subPlanet] ?: 10
+            val subDurationMillis = (totalDurationMillis * parts) / 95
+            
+            val currentEnd = if (i == 6) {
+                hora.endTime
+            } else {
+                currentStart.plusNanos(subDurationMillis * 1_000_000)
+            }
+
+            val auspiciousness = when (subPlanet) {
+                "Jupiter", "Venus", "Mercury", "Moon" -> Auspiciousness.GREEN
+                "Sun" -> Auspiciousness.BLUE
+                "Saturn", "Mars" -> Auspiciousness.RED
+                else -> Auspiciousness.AMBER
+            }
+
+            result.add(
+                SubHora(
+                    name = "$subPlanet Sub-Hora",
+                    tamilName = "",
+                    startTime = currentStart,
+                    endTime = currentEnd,
+                    auspiciousness = auspiciousness,
+                    description = "",
+                    planet = subPlanet,
+                    compatibility = getHoraCompatibility(subPlanet, dayOfWeek)
+                )
+            )
+            currentStart = currentEnd
+        }
+
+        return result
     }
 
     fun getHoraCompatibility(planet: String, dayOfWeek: DayOfWeek): HoraCompatibility {
