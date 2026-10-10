@@ -69,3 +69,7 @@ Historical record of architectural and UI/UX choices.
     - Established exact 1-to-1 mapping between all 12 reminder categories and pre-created notification channels in `SacredTimelineApp` so users can customize sound, vibration, and banner settings per category.
 - **Activity-Level Backstack Hoisting**: 
     - Hoisted navigation `backStack` state to `MainActivity` and overridden `onBackPressed()` to ensure reliable hardware back button navigation across settings sub-screens without closing the app.
+- **Sub-Horai Micro-Planetary Hours**:
+    - Calculated ephemeris-derived proportional sub-divisions of Horas across all 7 weekdays with planetary compatibility mapping.
+    - Implemented `DashboardDetailSheet` polish featuring a scrollable 90% full-height sheet, 350.dp zero-border proportional Sub-Horai box, synchronized live NOW line styling, and Main Hora compatibility cards matching the main Hora color theme (`containerColor`).
+    - Added asynchronous disk loading for `RemindersRepository` in `DashboardDetailSheet` to prevent main-thread ANR / UI freezes.
