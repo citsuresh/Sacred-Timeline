@@ -3,9 +3,12 @@
 This document defines mandatory protocols for AI agents working on the Sacred Timeline project.
 
 ## 1. Regression Audit Protocol
-Before considering any code change complete: after each meaningful part of a multi-part change, spawn a sub-agent via the task tool with this brief: 
+Before considering any code change complete, the project uses a two-tiered audit workflow:
 
-> "Act as a Regression Auditor. Review this change specifically for: 
+### A. Intermediate Audit (After each part of a multi-part change)
+After completing each individual part of an implementation plan, spawn a sub-agent via the task tool with this brief: 
+
+> "Act as a Regression Auditor (Intermediate Check). Review this change specifically for: 
 > (1) any existing behavior, caller, or shared state this diff could have altered without being asked to — check imports, method signatures, callers of anything touched, and any config/state other code relies on; 
 > (2) whether the change contradicts or duplicates anything already established elsewhere in the codebase; 
 > (3) if a build/test can be run, run it and report actual results, not just a read-through;
@@ -17,17 +20,23 @@ Before considering any code change complete: after each meaningful part of a mul
 >     - **SettingsRepository.kt** (User toggle/visibility persistence)
 > (6) **Notification & Background Reliability**: Verify background tasks use WorkManager (`ReminderWorker`) with WakeLocks, and that all reminder categories have exact 1-to-1 pre-created notification channels in `SacredTimelineApp.kt`.
 > (7) **Navigation & Back Button**: Verify hardware back button handling (`MainActivity.onBackPressed()`) correctly pops the navigation stack rather than finishing the activity.
-> (8) **Strict Localization Parity**: Verify that *every* user-facing string, card description, metadata, title, button, guidance, and activity list uses `stringResource` and has complete, non-fallback translations in both English (`values/strings.xml`) and Tamil (`values-ta/strings.xml`).
-> (9) **Finding Classification**: For every finding, explicitly classify it as one of: (a) unrelated to the agreed breakdown — treat as out-of-scope per the existing rule, or (b) within the scope of an already-planned future part of the breakdown — name which part, and flag it as "expected to be addressed in Part N".
+> (8) **Finding Classification**: For every finding, explicitly classify it as one of: (a) unrelated to the agreed breakdown — treat as out-of-scope per the existing rule, or (b) within the scope of an already-planned future part of the breakdown — name which part, and flag it as "expected to be addressed in Part N".
 >
 > **Reporting Rules**:
 > - For every finding (including out-of-scope items), **investigate fully** to understand the root cause.
 > - **Propose a specific fix** (as a code snippet or diff).
 > - **Provide an effort estimate** (e.g., "5 mins, Low Risk").
-> - **NO ACTION POLICY**: Do not touch the files or apply any fix yourself. Report the findings to the user and wait for explicit permission to apply any specific fix.
-> - If an issue is out-of-scope, note it as a candidate for a 'known-issues' list." 
+> - **NO ACTION POLICY**: Do not touch the files or apply any fix yourself. Report the findings to the user and wait for explicit permission to apply any specific fix."
 
-After the full change is complete, spawn one more sub-agent with the same brief against the complete diff. 
+### B. Final Comprehensive Audit (After the entire multi-part change is complete)
+After the full change and all parts are complete, spawn one final sub-agent against the complete diff with this brief:
+
+> "Act as a Regression Auditor (Final Comprehensive Check). Review the complete diff against all criteria from the intermediate audit, plus:
+> (1) **Strict Localization Parity**: Verify that *every* user-facing string, card description, metadata, title, button, guidance, and activity list uses `stringResource` and has complete, non-fallback translations in both English (`values/strings.xml`) and Tamil (`values-ta/strings.xml`).
+> (2) **README Documentation Parity**: Verify that `README.md` has been fully updated with clear documentation explaining all newly implemented features, ephemeris calculations, and workflows.
+>
+> **Reporting Rules**:
+> - Report all findings, propose specific fixes, and follow the **NO ACTION POLICY**." 
 
 ## 2. Pre-Build Decomposition Protocol
 Before implementing any non-trivial multi-part change, propose a breakdown of the work into the smallest independently-reviewable pieces and present this plan to the user for confirmation before writing any code. Do not decide on pieces ad hoc as implementation proceeds — the breakdown must be agreed upfront. If a piece turns out to be too tightly coupled to review separately from another, say so and propose combining them, rather than silently reviewing them together without flagging it.
