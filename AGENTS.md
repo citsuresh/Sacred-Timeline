@@ -34,6 +34,10 @@ After the full change and all parts are complete, spawn one final sub-agent agai
 > "Act as a Regression Auditor (Final Comprehensive Check). Review the complete diff against all criteria from the intermediate audit, plus:
 > (1) **Strict Localization Parity**: Verify that *every* user-facing string, card description, metadata, title, button, guidance, and activity list uses `stringResource` and has complete, non-fallback translations in both English (`values/strings.xml`) and Tamil (`values-ta/strings.xml`).
 > (2) **README Documentation Parity**: Verify that `README.md` has been fully updated with clear documentation explaining all newly implemented features, ephemeris calculations, and workflows.
+> (3) **Test Suite & Build Verification**: Run unit tests (`app:testDebugUnitTest`) and verify 100% green pass rate.
+> (4) **Main-Thread I/O & Performance Check**: Verify that no blocking disk or network I/O occurs on the main thread during UI composition (preventing ANRs and jank).
+> (5) **Background Worker & Widget Sync**: Verify that WorkManager (`ReminderWorker`, `WidgetUpdateWorker`) and Glance widgets correctly synchronize transitions and notification channels.
+> (6) **Documentation Sync**: Verify that all `.md` files in `docs/` (`PROJECT_STATE.md`, `CODE_SUMMARY.md`, `DESIGN_DECISIONS.md`, `ROADMAP.md`) are fully up-to-date with session achievements.
 >
 > **Reporting Rules**:
 > - Report all findings, propose specific fixes, and follow the **NO ACTION POLICY**." 
