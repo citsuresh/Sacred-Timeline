@@ -54,3 +54,14 @@ Future development phases for the Sacred Timeline project.
 - **Custom Timeline Persistence [COMPLETE]**: Sandbox slot in DataStore to remember user's manual column visibility and order.
 - **Side Menu Integration [COMPLETE]**: One-click restoration of custom setups with "Hidden until Born" shortcut logic.
 - **Advanced Column Picker**: Future dedicated sub-screen for even more granular control.
+
+## Phase 10: Multi-Profile & Personalized Astrology Ecosystem (Roadmap)
+- **Top-Bar Profile Switcher**: 
+    - Quick profile avatar picker in the top app bar.
+    - Support for selecting preset avatars or uploading custom profile pictures (Image Uri / local storage).
+    - Instant timeline re-calculation, refresh, and rendering tailored to the active profile's computed Lagna, Rasi, and Birth Star.
+    - **Architectural Complexity & Design Notes**: While data computation is lightweight on-device, multi-profile state propagation requires careful Flow scoping (`StateFlow` keyed by `activeProfileId`), DataStore migration to a multi-profile schema (`profiles_v1.json`), and thread-safe caching.
+- **Profile-Tied & Shared Reminders**:
+    - Dual reminder scoping: **Common/Shared Reminders** (applicable across all profiles, e.g. major public festivals or Ekadashi vrats) vs. **Profile-Specific Reminders** (personalized Nakshatra/Thara Balam/Hora alerts tied strictly to a specific user profile).
+- **Search for Next Auspicious Slot**:
+    - Activity-based search engine allowing users to select an activity, query forthcoming favorable slots, and create reminders directly from search results.
