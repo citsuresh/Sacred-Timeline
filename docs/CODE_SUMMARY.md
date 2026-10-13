@@ -19,26 +19,31 @@ graph TD
 ### `logic/` (Domain)
 - `PanchangamCalculator`: Core engine (Nalla Neram, Gowri, Horai). Proportional/Fixed styles.
 - `LagnaCalculator`: Sidereal ascendants & Maitra Muhurtham (IAU 1982/Meeus).
+- `BirthChartCalculator`: Exact astrological ephemeris calculations for Lagna (D1), Moon Rasi, and planetary positions from birth profile coordinates.
+- `DasaCalculator`: Vimsottari Dasa & Bhukti calculation engine with exact birth balance slicing and 120-year boundary enforcement.
 - `LunarCalendarUtils`: Ephemeris (ELP-2000), Lahiri Ayanamsha, ritual windows.
 - `TamilCalendarUtils`: 60-year cycles, anchored festival detection (`RitualContext`).
 - `SunriseSunsetProvider` & `MockPanchangamProvider`: Solar calculations & slot clipping/transitions.
 
 ### `ui/` & `widget/` (Presentation)
 - `dashboard/`: 24h timeline. `TimelineCore` handles lane-scaling & harmony refinement.
+- `profile/`: User Profile Page (`ProfileScreen`), Add/Edit Dialog (`ProfileAddDialog`), Astrological Charts (`AstroChartCanvas`), and Vimsottari Dasa Timeline Dialog (`DasaBhuktiDialog`).
 - `navigation/`: State-driven Nav3 routing and custom `ViewMode` logic.
 - `settings/`: DataStore-backed config (7 blocks), Custom Timeline and Chandrashtamam management.
 - `PanchangamWidget`: Glance-based M3 widget for at-a-glance timings.
-- `theme/`: `SacredTimelineColors` (Dual-tone gold/sticker-look).
+- `theme/`: Universal planetary colors (`SunColor`, `MoonColor`, `RahuColor`, `KetuColor`) with high-contrast text foreground colors (`SunFgColor`, `VenusFgColor`, etc.).
 
 ### `data/` & `worker/` (Infrastructure)
-- `SettingsRepository`: SSOT for config & Custom Timeline presets.
+- `SettingsRepository`: SSOT for config, Custom Timeline presets, Date Format, and Time Format.
+- `BirthProfilesRepository`: Atomic disk JSON storage for user birth profiles (`birth_profiles_v1.json`).
 - `CacheManager`: Atomic JSON storage for `DayData` (keyed by lat/lng/date).
 - `WidgetUpdateWorker`: Background cache maintenance & transition-aware updates.
 - `VerifiedHolidays`: Static TN Public Holidays & Muhurthams.
 
 ### `model/` (State & Resources)
+- `BirthProfile`: Data model for user birth details, chart style preference, and lunar month system.
 - `Metadata`: Logic-to-Resource bridge (localized strings, traditional guidance).
-- `DayData`: Primary 24h snapshot ( Muhurthams, Tithis, Festivals).
+- `DayData`: Primary 24h snapshot (Muhurthams, Tithis, Festivals).
 - `Serializers`: K-Serialization for Java Time types.
 
 ## 3. Core Algorithms
@@ -56,10 +61,11 @@ graph TD
 | Symbol | Responsibility |
 | :--- | :--- |
 | `DayDataProvider` | SSOT for unified Panchangam calculation (App, Widget, Worker). |
+| `BirthChartCalculator` | Ephemeris math core for generating Rasi (D1) and Navamsa (D9) positions. |
+| `DasaCalculator` | Vimsottari Dasa timeline generator with birth nakshatra balance and Bhukti breakdown. |
 | `TimelineCore` | 24h grid with dynamic lane scaling and harmony gap-filling. |
-| `RitualContext` | Anchor data (Sunrise, Pradosha, Nishita) for event detection. |
 | `CacheManager` | Versioned atomic storage for timeline performance. |
 | `Metadata` | Mapping between calculation results and localized traditional text. |
-| `LagnaCalculator` | Math core for zodiac rise times and Maitra potency. |
+| `LagnaCalculator` | High-precision Meeus math core for zodiac ascendants (Lagna). |
 | `WidgetUpdateWorker` | Transition-triggered background updates and cache refills. |
 | `Custom Timeline` | Persistent user-defined column arrangements in `SettingsRepository`. |

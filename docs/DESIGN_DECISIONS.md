@@ -73,3 +73,9 @@ Historical record of architectural and UI/UX choices.
     - Calculated ephemeris-derived proportional sub-divisions of Horas across all 7 weekdays with planetary compatibility mapping.
     - Implemented `DashboardDetailSheet` polish featuring a scrollable 90% full-height sheet, 350.dp zero-border proportional Sub-Horai box, synchronized live NOW line styling, and Main Hora compatibility cards matching the main Hora color theme (`containerColor`).
     - Added asynchronous disk loading for `RemindersRepository` in `DashboardDetailSheet` to prevent main-thread ANR / UI freezes.
+- **Personalized Astrological Profiles & Charts**:
+    - Implemented atomic disk storage for user birth profiles (`BirthProfilesRepository`), dual name fields (English + Regional script), and live system `Geocoder` autocomplete for worldwide town/village geocoding with zero API keys.
+    - Built native Compose grid and diamond chart renderers (`AstroChartCanvas`) supporting **South Indian Grid** and **North Indian Diamond** styles with traditional Lagna (`Lag`) and Janma Rasi (`Rasi`) markers.
+    - Implemented high-precision ephemeris Sidereal Ascendant (`LagnaCalculator.getLagnaRashi`) using rigorous Meeus GMST/LST formulas and fractional timezone offset handling (`+05:30`).
+    - Implemented Vimsottari Dasa & Bhukti calculation engine (`DasaCalculator`) with exact birth balance slicing, 120-year boundary enforcement, and zero-gap continuity verified by automated unit tests.
+    - Standardized universal planetary colors (`SunColor`, `MoonColor`, `RahuColor`, `KetuColor`, etc.) with high-contrast text foreground colors (`SunFgColor`, `VenusFgColor`, etc.).

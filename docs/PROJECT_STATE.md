@@ -1,22 +1,20 @@
 # Project State
 
-**Phase**: Alpha/Stable (Phase 10 Complete - Advanced Reminders & Notifications)
+**Phase**: Alpha/Stable (Phase 11 Complete - Personalized Astrological Profiles & Vimsottari Dasa Engine)
 
 ## 1. Recently Implemented
-- **Pure Thirukanitha (Drik) Sunrise-Anchored Nalla Neram**: Updated Nalla Neram calculations (`PanchangamCalculator.kt`) to use ephemeris-derived proportional sunrise-anchored slots across all 7 weekdays, complete with automatic Rahu Kalam / Yamagandam / Kuligai conflict trimming.
-- **Settings Calculation Standard Attribution**: Added an informational card in `SettingsScreen.kt` (with English and Tamil localization) indicating that Thirukanitha (Drik Siddhanta) ephemeris standards are used for app timings.
-- **Advanced Timeline Event Reminders**: Full-stack reminder system supporting relative offsets (start/end) and custom absolute times ($N$ days before at specific time). Features multiple reminders per event, recurring reminders ("All Occurrences" with automatic next-occurrence calculation for Nakshatras and Tamil dates), and direct creation/management from Settings.
-- **WorkManager Background Reliability (`ReminderWorker`)**: Migrated alarm scheduling to WorkManager with built-in WakeLocks to ensure reliable background notification delivery across all OEM devices (including Tecno HiOS).
-- **Dedicated 1-to-1 Notification Channels**: Established 12 dedicated notification channels pre-created on app startup, allowing independent user customization of sound, vibration, and banner settings per category.
-- **Interactive Solar Cards & Reminders**: Added first-class `SolarTiming` cards for Sunrise and Sunset on the timeline header, allowing users to view details and set solar event reminders.
-- **Strict Bilingual Localization Parity**: Completed a comprehensive localization audit across English and Tamil (`values-ta/strings.xml`), ensuring all Nakshatra descriptions (`desc_star_1` to `desc_star_27`), Tithi descriptions (`tithi_desc_...`), Gowri descriptions, Hora planet qualities, guidance, and strategic activities are fully translated.
-- **Navigation & Back Button Fix**: Hoisted navigation backstack state to `MainActivity` and overridden `onBackPressed()` to properly support hardware back button navigation across all settings sub-screens.
-- **Hora Detail Sheet & Sub-Horai Polish**: Enhanced `DashboardDetailSheet` with a scrollable 90% full-height layout, a spacious 350.dp zero-border proportional Sub-Horai box, custom settings-synchronized NOW line styling, and prominent Main Hora compatibility badges. Optimized `TimingCard` with adaptive sub-horai text display (full names vs. 3-letter abbreviations based on column width).
+- **Personalized Astrological Profiles & Storage**: Implemented `BirthProfile` data model and `BirthProfilesRepository` with atomic JSON persistence, primary profile management, dual name fields (English and Regional script), and offline coordinate auto-resolution.
+- **Live Global Geocoder Autocomplete (`GeoHelper`)**: Integrated Android's system `Geocoder` (forced to `Locale.ENGLISH` for cross-language consistency) with zero API keys required, enabling live autocomplete for any town, village, or city worldwide.
+- **High-Precision Ephemeris & Lagna Engine (`BirthChartCalculator` & `LagnaCalculator`)**: Upgraded Sidereal Ascendant (Lagna) calculations using rigorous Meeus Chapter 12/13 GMST/LST formulas and fractional timezone offset handling (`+05:30`).
+- **Visual Astrological Charts (`AstroChartCanvas`)**: Built native Compose grid and diamond chart renderers supporting **South Indian Grid** and **North Indian Diamond** chart styles with traditional Lagna (`Lag`) and Moon Rasi (`Rasi`) markers and localized 3-letter abbreviations.
+- **Global Date & Time Settings Parity**: Added Date Format settings (`DD-MM-YYYY`, `MM-DD-YYYY`, `YYYY-MM-DD`) in Settings, synchronized with 12h/24h time formatting across the entire app.
+- **Vimsottari Dasa & Bhukti Calculator (`DasaCalculator` & `DasaBhuktiDialog`)**: Implemented complete 120-year Mahadasa and Bhukti calculation engine with exact birth balance slicing, 120-year boundary enforcement, List View with active Dasa auto-focus, and Visual Track with dual-lane Gantt chart, zoom controls, pinch-to-zoom, and "Jump to Now" button.
+- **Strict Bilingual Localization Parity**: Completed comprehensive localization audits across English and Tamil (`values-ta/strings.xml`), ensuring all profile screens, dialogs, chart box abbreviations, and 12-house Macro Planetary Insights transit interpretations are fully translated.
 
 ## 2. Technical Stack
 - **UI**: Kotlin, Compose (M3), Jetpack Glance (Widgets), Navigation 3.
-- **Logic**: ELP-2000 / Meeus / IAU 1982 (Sidereal), Lahiri Ayanamsha.
-- **Storage**: DataStore (Settings), Disk JSON (Atomic Cache & Reminders JSON).
+- **Logic**: ELP-2000 / Meeus / IAU 1982 (Sidereal), Lahiri Ayanamsha, Vimsottari Dasa Engine.
+- **Storage**: DataStore (Settings), Disk JSON (Atomic Cache, Reminders, Birth Profiles JSON).
 - **Background**: Jetpack WorkManager (`ReminderWorker`, `WidgetUpdateWorker`).
 
 ## 3. Next Focus
