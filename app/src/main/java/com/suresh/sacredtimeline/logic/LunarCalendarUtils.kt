@@ -212,7 +212,7 @@ object LunarCalendarUtils {
         return sunLong
     }
 
-    private fun calculateMoonLongitudeHighPrecision(t: Double): Double {
+    internal fun calculateMoonLongitudeHighPrecision(t: Double): Double {
         // ELP-2000 Main Perturbations
         val lPrime = 218.3164477 + 481267.8812307 * t - 0.0015786 * t * t + t * t * t / 538841.0
         val d = 297.8501921 + 445267.1114034 * t - 0.0018819 * t * t + t * t * t / 545868.0

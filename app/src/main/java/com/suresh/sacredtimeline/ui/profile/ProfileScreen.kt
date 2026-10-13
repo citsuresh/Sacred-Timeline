@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -198,6 +199,7 @@ fun ProfileDetailsContent(
     val is24Hour by settingsRepo.timeFormat24h.collectAsState(initial = false)
     val dateFormat by settingsRepo.dateFormat.collectAsState(initial = "DD-MM-YYYY")
     val scope = rememberCoroutineScope()
+    var showDasaDialog by remember { mutableStateOf(false) }
 
     profile?.let { p ->
         // Calculate actual real astrological chart based on user's birth profile
@@ -301,14 +303,28 @@ fun ProfileDetailsContent(
             }
         }
 
-        // Macro Insights Card with Dynamic House-Specific Transit Interpretations & Quality Verdicts
+        // Macro Insights Card with Clickable Dasa & Bhukti row & Info icon
         Card(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text(text = stringResource(R.string.macro_insights), style = MaterialTheme.typography.titleMedium)
                 
-                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    Text(text = stringResource(R.string.active_dasa_bhukti), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-                    Text(text = stringResource(R.string.default_dasa_bhukti), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                // Clickable Active Dasa & Bhukti row with Info icon
+                Card(
+                    onClick = { showDasaDialog = true },
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.padding(12.dp).fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            Text(text = stringResource(R.string.active_dasa_bhukti), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+                            Text(text = stringResource(R.string.default_dasa_bhukti), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                        }
+                        Icon(Icons.Default.Info, contentDescription = "View Vimsottari Dasa Timeline", tint = MaterialTheme.colorScheme.primary)
+                    }
                 }
 
                 // Dynamic Jupiter Transit House from Moon Rasi (Janma Rasi)
@@ -352,6 +368,13 @@ fun ProfileDetailsContent(
         Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
             Text(stringResource(R.string.no_profile_selected))
         }
+    }
+
+    if (showDasaDialog && profile != null) {
+        DasaBhuktiDialog(
+            profile = profile,
+            onDismiss = { showDasaDialog = false }
+        )
     }
 }
 

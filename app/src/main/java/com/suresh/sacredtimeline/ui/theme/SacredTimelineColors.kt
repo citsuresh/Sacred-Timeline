@@ -21,26 +21,26 @@ object SacredTimelineColors {
             }
             is Hora -> {
                 when (timing.name) {
-                    "Jupiter" -> HoraJupiter
-                    "Venus" -> HoraVenus
-                    "Mercury" -> HoraMercury
-                    "Moon" -> HoraMoon
-                    "Mars" -> HoraMars
-                    "Saturn" -> HoraSaturn
-                    "Sun" -> HoraSun
-                    else -> HoraSun
+                    "Jupiter" -> JupiterColor
+                    "Venus" -> VenusColor
+                    "Mercury" -> MercuryColor
+                    "Moon" -> MoonColor
+                    "Mars" -> MarsColor
+                    "Saturn" -> SaturnColor
+                    "Sun" -> SunColor
+                    else -> SunColor
                 }
             }
             is SubHora -> {
                 when (timing.planet) {
-                    "Jupiter" -> HoraJupiter
-                    "Venus" -> HoraVenus
-                    "Mercury" -> HoraMercury
-                    "Moon" -> HoraMoon
-                    "Mars" -> HoraMars
-                    "Saturn" -> HoraSaturn
-                    "Sun" -> HoraSun
-                    else -> HoraSun
+                    "Jupiter" -> JupiterColor
+                    "Venus" -> VenusColor
+                    "Mercury" -> MercuryColor
+                    "Moon" -> MoonColor
+                    "Mars" -> MarsColor
+                    "Saturn" -> SaturnColor
+                    "Sun" -> SunColor
+                    else -> SunColor
                 }
             }
             is SpecialPeriod -> {

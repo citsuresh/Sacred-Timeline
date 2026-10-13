@@ -19,13 +19,26 @@ val GowriAmridhaBest = Color(0xFF388E3C)
 val GowriStandardRed = Color(0xFFD32F2F)
 val GowriUthiBlue = Color(0xFF7CB342) 
 
-val HoraSaturn = Color(0xFF616161) // Dark Grey
-val HoraJupiter = Color(0xFFFBC02D) // Yellow
-val HoraMars = Color(0xFFB71C1C)
-val HoraSun = Color(0xFFD32F2F)
-val HoraVenus = Color(0xFFFFFFFF)
-val HoraMercury = Color(0xFF7CB342)
-val HoraMoon = Color(0xFFFFFFFF)
+// Universal Planetary Colors & Contrasting Text Colors
+val SunColor = Color(0xFFD32F2F)
+val MoonColor = Color(0xFFFAFAFA)
+val MarsColor = Color(0xFFB71C1C)
+val MercuryColor = Color(0xFF7CB342)
+val JupiterColor = Color(0xFFFBC02D)
+val VenusColor = Color(0xFFFFFFFF)
+val SaturnColor = Color(0xFF616161)
+val RahuColor = Color(0xFF455A64)
+val KetuColor = Color(0xFF4E342E)
+
+val SunFgColor = Color.White
+val MoonFgColor = Color.Black
+val MarsFgColor = Color.White
+val MercuryFgColor = Color.White
+val JupiterFgColor = Color.Black
+val VenusFgColor = Color.Black
+val SaturnFgColor = Color.White
+val RahuFgColor = Color.White
+val KetuFgColor = Color.White
 
 val RahuBrightRed = Color(0xFFFF0000)
 val YamaMaroon = Color(0xFF800000)
