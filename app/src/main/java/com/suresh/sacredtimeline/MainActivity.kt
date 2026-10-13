@@ -342,6 +342,18 @@ class MainActivity : AppCompatActivity() {
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
                         NavigationDrawerItem(
+                            label = { Text(stringResource(R.string.nav_profile)) },
+                            selected = currentRoute is NavRoute.Profile,
+                            onClick = {
+                                if (currentRoute !is NavRoute.Profile) {
+                                    backStack.add(NavRoute.Profile)
+                                }
+                                scope.launch { drawerState.close() }
+                            },
+                            icon = { Icon(Icons.Default.Person, contentDescription = null) }
+                        )
+
+                        NavigationDrawerItem(
                             label = { Text(stringResource(R.string.nav_settings)) },
                             selected = currentRoute is NavRoute.Settings,
                             onClick = {
@@ -376,8 +388,15 @@ class MainActivity : AppCompatActivity() {
                                 TimelineDashboard(
                                     viewMode = key.mode,
                                     initialTargetDate = targetDate,
-                                    onMenuClick = { scope.launch { drawerState.open() } }
+                                    onMenuClick = { scope.launch { drawerState.open() } },
+                                    onProfileClick = { backStack.add(NavRoute.Profile) }
                                 ) 
+                            }
+                            NavRoute.Profile -> NavEntry(key) {
+                                com.suresh.sacredtimeline.ui.profile.ProfileScreen(
+                                    repository = com.suresh.sacredtimeline.data.BirthProfilesRepository(this),
+                                    onBack = { backStack.removeLastOrNull() }
+                                )
                             }
                             NavRoute.Settings -> NavEntry(key) { 
                                 SettingsScreen(

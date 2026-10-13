@@ -41,4 +41,7 @@ sealed interface NavRoute : NavKey {
 
     @Serializable
     data object RemindersSettings : NavRoute
+
+    @Serializable
+    data object Profile : NavRoute
 }

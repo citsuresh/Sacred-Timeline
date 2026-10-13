@@ -92,15 +92,25 @@ object LagnaCalculator {
         }
     }
 
-    private fun getLagnaRashi(instant: Instant, lat: Double, lng: Double): Rashi {
+    internal fun getLagnaRashi(instant: Instant, lat: Double, lng: Double): Rashi {
         val jd = (instant.toEpochMilli() / 86400000.0) + 2440587.5
-        val t = (jd - 2451545.0) / 36525.0
+        val z = floor(jd + 0.5)
+        val f = (jd + 0.5) - z
+        val jd0 = z - 0.5
+        val t = (jd0 - 2451545.0) / 36525.0
         
-        val epsilon = 23.4392911 - (46.8150 * t) / 3600.0
+        var gmst0 = 100.46061837 + 36000.7700536 * t + 0.000387933 * t * t - (t * t * t) / 38710000.0
+        gmst0 %= 360.0
+        if (gmst0 < 0) gmst0 += 360.0
         
-        var gmst = 280.46061837 + 360.98564736629 * (jd - 2451545.0)
-        var lst = (gmst + lng) % 360.0
-        while (lst < 0) lst += 360.0
+        val utHours = f * 24.0
+        val gmst = gmst0 + utHours * 15.0410686475
+        var lst = gmst + lng
+        lst %= 360.0
+        if (lst < 0) lst += 360.0
+        
+        val tCenturies = (jd - 2451545.0) / 36525.0
+        val epsilon = 23.4392911 - (46.8150 * tCenturies) / 3600.0
         
         val lstRad = Math.toRadians(lst)
         val latRad = Math.toRadians(lat)

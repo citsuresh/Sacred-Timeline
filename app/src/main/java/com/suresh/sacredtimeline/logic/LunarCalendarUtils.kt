@@ -200,7 +200,7 @@ object LunarCalendarUtils {
         return tithi to nakshatra
     }
 
-    private fun calculateSunLongitudeHighPrecision(t: Double): Double {
+    internal fun calculateSunLongitudeHighPrecision(t: Double): Double {
         val l0 = 280.46646 + 36000.76983 * t + 0.0003032 * t * t
         val m = 357.52911 + 35999.05029 * t - 0.0001537 * t * t
         val c = (1.914602 - 0.004817 * t - 0.000014 * t * t) * sin(Math.toRadians(m)) +

@@ -30,7 +30,8 @@ fun TimelineDashboard(
     viewModel: TimelineViewModel = viewModel(),
     viewMode: ViewMode = ViewMode.COMPOSITE,
     initialTargetDate: LocalDate? = null,
-    onMenuClick: () -> Unit = {}
+    onMenuClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val selectedDate by viewModel.selectedDate.collectAsState()
@@ -258,7 +259,8 @@ fun TimelineDashboard(
                 showSheet = true
             },
             onTodayClick = { viewModel.updateDate(LocalDate.now()) },
-            onCalendarClick = { showDatePicker = true }
+            onCalendarClick = { showDatePicker = true },
+            onProfileClick = onProfileClick
         )
     } else {
         PortraitTimelineLayout(
@@ -308,7 +310,8 @@ fun TimelineDashboard(
                 showSheet = true
             },
             onTodayClick = { viewModel.updateDate(LocalDate.now()) },
-            onCalendarClick = { showDatePicker = true }
+            onCalendarClick = { showDatePicker = true },
+            onProfileClick = onProfileClick
         )
     }
 }

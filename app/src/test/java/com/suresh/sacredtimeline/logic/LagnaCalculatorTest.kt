@@ -1,5 +1,7 @@
 package com.suresh.sacredtimeline.logic
 
+import com.suresh.sacredtimeline.model.BirthProfile
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.time.LocalDate
@@ -13,12 +15,37 @@ class LagnaCalculatorTest {
     private val istZone = ZoneId.of("Asia/Kolkata")
 
     @Test
+    fun testSpecificBirthCharts() {
+        val profile1 = BirthProfile(
+            nameEnglish = "Test 1",
+            birthDate = "1983-01-29",
+            birthTime = "02:55",
+            birthPlace = "Coimbatore",
+            latitude = 11.0168,
+            longitude = 76.9558,
+            timezoneOffsetHours = 5.5
+        )
+        val result1 = BirthChartCalculator.calculateChart(profile1)
+        assertEquals(8, result1.lagnaHouse) // Vrischika (Scorpio)
+
+        val profile2 = BirthProfile(
+            nameEnglish = "Test 2",
+            birthDate = "1958-03-28",
+            birthTime = "09:15",
+            birthPlace = "Coimbatore",
+            latitude = 11.0168,
+            longitude = 76.9558,
+            timezoneOffsetHours = 5.5
+        )
+        val result2 = BirthChartCalculator.calculateChart(profile2)
+        assertEquals(2, result2.lagnaHouse) // Rishabha (Taurus)
+    }
+
+    @Test
     fun testFeb11_2026_VrishchikaLagna() {
         val date = LocalDate.of(2026, 2, 11)
         val windows = LagnaCalculator.calculateLagnaWindows(date, coimbatoreLat, coimbatoreLng, istZone)
         
-        // Calculated: Feb 11, 2026 Vrishchika Lagna window is approx 00:37 AM – 02:54 AM
-        // We look for the one starting early in the day
         val scorpio = windows.filter { it.rashi == LagnaCalculator.Rashi.VRISHCHIKA }
             .find { it.startTime.isBefore(LocalTime.of(1, 0)) }
         
@@ -34,7 +61,6 @@ class LagnaCalculatorTest {
         val date = LocalDate.of(2026, 7, 24)
         val windows = LagnaCalculator.calculateLagnaWindows(date, coimbatoreLat, coimbatoreLng, istZone)
         
-        // Vrishchika Lagna window
         val scorpio = windows.find { it.rashi == LagnaCalculator.Rashi.VRISHCHIKA && it.startTime.isAfter(LocalTime.NOON) }
         
         assertTrue("Vrishchika Lagna should be present", scorpio != null)
@@ -49,7 +75,6 @@ class LagnaCalculatorTest {
         val date = LocalDate.of(2026, 8, 4)
         val windows = LagnaCalculator.calculateLagnaWindows(date, coimbatoreLat, coimbatoreLng, istZone)
         
-        // Mesha Lagna window (starts at midnight on Aug 4 as it crosses over from Aug 3)
         val mesha = windows.find { it.rashi == LagnaCalculator.Rashi.MESHA }
         
         assertTrue("Mesha Lagna should be present", mesha != null)

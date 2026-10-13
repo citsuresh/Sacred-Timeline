@@ -48,6 +48,7 @@ class SettingsRepository(private val context: Context) {
         val SHOW_YOGAM = booleanPreferencesKey("show_yogam")
         val SHOW_THARA_BALAM = booleanPreferencesKey("show_thara_balam")
         val SHOW_SUB_HORAS = booleanPreferencesKey("show_sub_horas")
+        val DATE_FORMAT = stringPreferencesKey("date_format")
         val SUNRISE_DEFINITION = stringPreferencesKey("sunrise_definition")
         val SPECIAL_PERIOD_STYLE = stringPreferencesKey("special_period_style")
         val LUNAR_MONTH_SYSTEM = stringPreferencesKey("lunar_month_system")
@@ -128,6 +129,7 @@ class SettingsRepository(private val context: Context) {
     }
 
     val timeFormat24h: Flow<Boolean> = context.dataStore.data.map { it[Keys.TIME_FORMAT_24H] ?: false }
+    val dateFormat: Flow<String> = context.dataStore.data.map { it[Keys.DATE_FORMAT] ?: "DD-MM-YYYY" }
     val showNowLine: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_NOW_LINE] ?: true }
     val nowLineColor: Flow<Int> = context.dataStore.data.map { it[Keys.NOW_LINE_COLOR] ?: 0xFF4CAF50.toInt() } // Default Green
     val nowLineThickness: Flow<Float> = context.dataStore.data.map { it[Keys.NOW_LINE_THICKNESS] ?: 2.0f }
@@ -247,6 +249,10 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun setTimeFormat24h(is24h: Boolean) {
         context.dataStore.edit { it[Keys.TIME_FORMAT_24H] = is24h }
+    }
+
+    suspend fun setDateFormat(format: String) {
+        context.dataStore.edit { it[Keys.DATE_FORMAT] = format }
     }
 
     suspend fun setShowNowLine(show: Boolean) {

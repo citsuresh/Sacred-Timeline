@@ -36,6 +36,7 @@ fun SettingsScreen(
     val singleViewScale by viewModel.singleViewScale.collectAsState()
     val defaultLaunchView by viewModel.defaultLaunchView.collectAsState()
     val timeFormat24h by viewModel.timeFormat24h.collectAsState()
+    val dateFormat by viewModel.dateFormat.collectAsState()
     val showNowLine by viewModel.showNowLine.collectAsState()
     val pinchToZoomEnabled by viewModel.pinchToZoomEnabled.collectAsState()
     val columnVisibility by viewModel.columnVisibility.collectAsState()
@@ -159,18 +160,12 @@ fun SettingsScreen(
                         onCheckedChange = { viewModel.setTimeFormat24h(it) }
                     )
 
-                    val birthStar by viewModel.birthStar.collectAsState()
-                    val starOptions = (1..27).map { "STAR_$it" }
-                    val starLabels = starOptions.map { stringResource(com.suresh.sacredtimeline.model.Metadata.getStarResIdFromConfigId(it)) }
+                    val dateFormats = listOf("DD-MM-YYYY", "MM-DD-YYYY", "YYYY-MM-DD")
                     SettingsDropdownItem(
-                        label = stringResource(R.string.settings_birth_star),
-                        selected = stringResource(com.suresh.sacredtimeline.model.Metadata.getStarResIdFromConfigId(birthStar)),
-                        options = starLabels,
-                        onOptionSelected = { label ->
-                            val index = starLabels.indexOf(label)
-                            if (index != -1) viewModel.setBirthStar(starOptions[index])
-                        },
-                        description = "(${stringResource(R.string.label_used_for_tharabalam)})"
+                        label = stringResource(R.string.settings_date_format),
+                        selected = dateFormat,
+                        options = dateFormats,
+                        onOptionSelected = { viewModel.setDateFormat(it) }
                     )
                 }
             }

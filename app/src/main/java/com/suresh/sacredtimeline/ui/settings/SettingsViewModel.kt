@@ -65,6 +65,10 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         viewModelScope, SharingStarted.WhileSubscribed(5000), false
     )
 
+    val dateFormat: StateFlow<String> = repository.dateFormat.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), "DD-MM-YYYY"
+    )
+
     val showNowLine: StateFlow<Boolean> = repository.showNowLine.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), true
     )
@@ -239,6 +243,10 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
     fun setTimeFormat24h(is24h: Boolean) {
         viewModelScope.launch { repository.setTimeFormat24h(is24h) }
+    }
+
+    fun setDateFormat(format: String) {
+        viewModelScope.launch { repository.setDateFormat(format) }
     }
 
     fun setShowNowLine(show: Boolean) {
