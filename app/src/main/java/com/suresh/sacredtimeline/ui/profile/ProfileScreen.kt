@@ -30,6 +30,7 @@ import com.suresh.sacredtimeline.data.SettingsRepository
 import com.suresh.sacredtimeline.logic.BirthChartCalculator
 import com.suresh.sacredtimeline.model.BirthProfile
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
@@ -49,12 +50,18 @@ fun ProfileScreen(
     var dropdownExpanded by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
+    val context = LocalContext.current
+    val settingsRepo = remember { SettingsRepository(context) }
+
     LaunchedEffect(Unit) {
         withContext(Dispatchers.IO) {
             val loaded = repository.getAllProfiles()
+            val activeId = settingsRepo.activeProfileId.first()
+            val primary = loaded.find { it.isPrimary } ?: loaded.firstOrNull()
+            val initial = loaded.find { it.id == activeId } ?: primary
             withContext(Dispatchers.Main) {
                 profiles = loaded
-                selectedProfile = loaded.find { it.isPrimary } ?: loaded.firstOrNull()
+                selectedProfile = initial
             }
         }
     }
@@ -137,6 +144,13 @@ fun ProfileScreen(
                             onClick = {
                                 selectedProfile = profile
                                 dropdownExpanded = false
+                                scope.launch(Dispatchers.IO) {
+                                    repository.setPrimary(profile.id)
+                                    val updated = repository.getAllProfiles()
+                                    withContext(Dispatchers.Main) {
+                                        profiles = updated
+                                    }
+                                }
                             }
                         )
                     }
@@ -298,6 +312,8 @@ fun ProfileDetailsContent(
                         onClick = {
                             scope.launch(Dispatchers.IO) {
                                 repository.setPrimary(p.id)
+                                com.suresh.sacredtimeline.data.CacheManager(context).clearCache()
+                                com.suresh.sacredtimeline.worker.WidgetUpdateWorker.triggerImmediateUpdate(context)
                                 val updated = repository.getAllProfiles()
                                 withContext(Dispatchers.Main) {
                                     onProfilesUpdated(updated)

@@ -64,7 +64,7 @@ class WidgetUpdateWorker(
     }
 
     private suspend fun fetchDayData(lat: Double, lng: Double, date: LocalDate, repository: SettingsRepository): DayData {
-        return DayDataProvider(applicationContext).fetchDayData(date, lat, lng)
+        return DayDataProvider(applicationContext).fetchDayData(date, lat, lng, usePrimaryProfile = true)
     }
 
     private suspend fun refillCache(lat: Double, lng: Double, centerDate: LocalDate, repository: SettingsRepository, cacheManager: CacheManager) {

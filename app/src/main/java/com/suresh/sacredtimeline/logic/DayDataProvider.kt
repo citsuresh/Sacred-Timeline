@@ -17,7 +17,7 @@ class DayDataProvider(private val context: Context) {
     private val provider = MockPanchangamProvider()
     private val sunProvider = SunriseSunsetProvider()
 
-    suspend fun fetchDayData(date: LocalDate, lat: Double, lng: Double): DayData {
+    suspend fun fetchDayData(date: LocalDate, lat: Double, lng: Double, usePrimaryProfile: Boolean = false): DayData {
         val sunDef = repository.sunriseDefinition.first()
         val style = repository.specialPeriodStyle.first()
         val enabledTithisVal = repository.enabledTithis.first()
@@ -28,8 +28,15 @@ class DayDataProvider(private val context: Context) {
         val birthStarConfigId = repository.birthStar.first()
         val birthStarIndex = try { birthStarConfigId.split("_")[1].toInt() } catch(e: Exception) { 1 }
 
-        val primaryProfile = BirthProfilesRepository(context).getPrimaryProfile()
-        val lagnaRasi = primaryProfile?.let { profile ->
+        val profilesRepo = BirthProfilesRepository(context)
+        val activeProfile = if (usePrimaryProfile) {
+            profilesRepo.getPrimaryProfile()
+        } else {
+            val activeProfileId = repository.activeProfileId.first()
+            val allProfiles = profilesRepo.getAllProfiles()
+            allProfiles.find { it.id == activeProfileId } ?: profilesRepo.getPrimaryProfile()
+        }
+        val lagnaRasi = activeProfile?.let { profile ->
             try {
                 BirthChartCalculator.calculateChart(profile).lagnaHouse
             } catch (_: Exception) { null }

@@ -76,7 +76,7 @@ class PanchangamWidget : GlanceAppWidget() {
         val dayData: DayData = if (cache?.containsKey(date) == true) {
             cache[date]!!
         } else {
-            val data = DayDataProvider(context).fetchDayData(date, lat, lng)
+            val data = DayDataProvider(context).fetchDayData(date, lat, lng, usePrimaryProfile = true)
             
             // Fix: Cache Write-Back
             val newCache = cache?.toMutableMap() ?: mutableMapOf()
@@ -251,7 +251,7 @@ class PanchangamWidget : GlanceAppWidget() {
                         provider = ImageProvider(R.drawable.ic_refresh_glance),
                         contentDescription = "Refresh",
                         modifier = GlanceModifier.size(18.dp),
-                        colorFilter = ColorFilter.tint(ColorProvider(android.R.color.black))
+                        colorFilter = ColorFilter.tint(ColorProvider(Color.Black))
                     )
                 }
             }

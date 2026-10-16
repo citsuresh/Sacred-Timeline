@@ -58,6 +58,7 @@ class SettingsRepository(private val context: Context) {
         val HAS_CUSTOM_LAYOUT = booleanPreferencesKey("has_custom_layout")
         val ENABLED_CHANDRASHTAMAM_STARS = stringSetPreferencesKey("enabled_chandrashtamam_stars")
         val BIRTH_STAR = stringPreferencesKey("birth_star")
+        val ACTIVE_PROFILE_ID = stringPreferencesKey("active_profile_id")
     }
 
     val compositeScale: Flow<Float> = context.dataStore.data.map { it[Keys.COMPOSITE_SCALE] ?: 1.0f }
@@ -101,6 +102,18 @@ class SettingsRepository(private val context: Context) {
 
     val birthStar: Flow<String> = context.dataStore.data.map { 
         it[Keys.BIRTH_STAR] ?: "STAR_1" 
+    }
+
+    val activeProfileId: Flow<String?> = context.dataStore.data.map { it[Keys.ACTIVE_PROFILE_ID] }
+
+    suspend fun setActiveProfileId(id: String?) {
+        context.dataStore.edit { prefs ->
+            if (id != null) {
+                prefs[Keys.ACTIVE_PROFILE_ID] = id
+            } else {
+                prefs.remove(Keys.ACTIVE_PROFILE_ID)
+            }
+        }
     }
 
     val widgetColumnVisibility: Flow<Set<String>> = context.dataStore.data.map { 
