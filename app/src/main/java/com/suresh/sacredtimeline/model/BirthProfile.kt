@@ -28,5 +28,8 @@ data class BirthProfile(
     val timezoneOffsetHours: Double = 5.5,
     val chartStyle: ChartStyle = ChartStyle.SOUTH_INDIAN,
     val lunarSystem: LunarMonthSystem = LunarMonthSystem.AMANTA,
-    val isPrimary: Boolean = false
+    val isPrimary: Boolean = false,
+    val photoUri: String? = null,
+    val avatarColor: Int = 0xFF6750A4.toInt(),
+    val initials: String = ""
 )

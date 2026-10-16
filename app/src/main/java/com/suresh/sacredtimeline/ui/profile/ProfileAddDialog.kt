@@ -2,12 +2,20 @@ package com.suresh.sacredtimeline.ui.profile
 
 import android.content.Context
 import android.location.Geocoder
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -120,6 +128,29 @@ fun ProfileAddDialog(
     var chartStyle by remember { mutableStateOf(initialProfile?.chartStyle ?: ChartStyle.SOUTH_INDIAN) }
     var lunarSystem by remember { mutableStateOf(initialProfile?.lunarSystem ?: LunarMonthSystem.AMANTA) }
 
+    var photoUri by remember { mutableStateOf(initialProfile?.photoUri ?: "") }
+    var avatarColor by remember { mutableStateOf(initialProfile?.avatarColor ?: 0xFF6750A4.toInt()) }
+    var initialsField by remember { mutableStateOf(initialProfile?.initials ?: "") }
+    var userModifiedInitials by remember { mutableStateOf(initialProfile != null) }
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let { photoUri = it.toString() }
+    }
+
+    fun computeInitials(name: String): String {
+        return name.split(" ")
+            .mapNotNull { it.firstOrNull()?.uppercase() }
+            .take(2)
+            .joinToString("")
+    }
+
+    LaunchedEffect(nameEnglish) {
+        if (!userModifiedInitials && photoUri.isBlank()) {
+            initialsField = computeInitials(nameEnglish)
+        }
+    }
+
     var placeExpanded by remember { mutableStateOf(false) }
     var showError by remember { mutableStateOf(false) }
     var isSearching by remember { mutableStateOf(false) }
@@ -168,6 +199,87 @@ fun ProfileAddDialog(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+
+                // Profile Avatar & Color Selector
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    ProfileAvatarBadge(
+                        profile = BirthProfile(
+                            nameEnglish = nameEnglish.ifBlank { "User" },
+                            birthDate = "2000-01-01",
+                            birthTime = "06:00",
+                            birthPlace = "",
+                            latitude = 0.0,
+                            longitude = 0.0,
+                            photoUri = photoUri.ifBlank { null },
+                            avatarColor = avatarColor,
+                            initials = initialsField
+                        ),
+                        size = 56.dp
+                    )
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        OutlinedButton(
+                            onClick = { photoPickerLauncher.launch("image/*") }
+                        ) {
+                            Text(if (photoUri.isBlank()) "Select Photo" else "Change Photo")
+                        }
+                        if (photoUri.isNotBlank()) {
+                            TextButton(onClick = { photoUri = "" }) {
+                                Text("Remove Photo", color = MaterialTheme.colorScheme.error)
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = "Avatar Background Color", style = MaterialTheme.typography.labelMedium)
+                val palette = listOf(
+                    0xFF6750A4.toInt(), 0xFF1976D2.toInt(), 0xFF009688.toInt(),
+                    0xFF4CAF50.toInt(), 0xFFFF9800.toInt(), 0xFFE53935.toInt(),
+                    0xFF3F51B5.toInt(), 0xFFE91E63.toInt(), 0xFF00BCD4.toInt(), 0xFFFF5722.toInt()
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    palette.forEach { colorInt ->
+                        Box(
+                            modifier = Modifier
+                                .size(28.dp)
+                                .clip(CircleShape)
+                                .background(Color(colorInt))
+                                .clickable { avatarColor = colorInt },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (avatarColor == colorInt) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(10.dp)
+                                        .clip(CircleShape)
+                                        .background(Color.White)
+                                )
+                            }
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                if (photoUri.isBlank()) {
+                    OutlinedTextField(
+                        value = initialsField,
+                        onValueChange = { 
+                            initialsField = it
+                            userModifiedInitials = true
+                        },
+                        label = { Text("Initials") },
+                        placeholder = { Text("Leave blank for color only") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
+                    )
+                }
+                Spacer(modifier = Modifier.height(4.dp))
 
                 // Mandatory Field: English Name
                 OutlinedTextField(
@@ -355,7 +467,10 @@ fun ProfileAddDialog(
                                 timezoneOffsetHours = 5.5,
                                 chartStyle = chartStyle,
                                 lunarSystem = lunarSystem,
-                                isPrimary = initialProfile?.isPrimary ?: false
+                                isPrimary = initialProfile?.isPrimary ?: false,
+                                photoUri = photoUri.ifBlank { null },
+                                avatarColor = avatarColor,
+                                initials = initialsField
                             )
                             withContext(Dispatchers.Main) {
                                 onSave(profile)

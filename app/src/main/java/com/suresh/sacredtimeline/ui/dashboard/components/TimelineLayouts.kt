@@ -15,8 +15,10 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Today
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
@@ -129,7 +131,9 @@ fun PortraitTimelineLayout(
                         Icon(Icons.Default.CalendarMonth, contentDescription = stringResource(R.string.label_select_date))
                     }
                     IconButton(onClick = onProfileClick) {
-                        Icon(Icons.Default.Person, contentDescription = stringResource(R.string.profile_title))
+                        val context = LocalContext.current
+                        val primaryProfile = remember { com.suresh.sacredtimeline.data.BirthProfilesRepository(context).getPrimaryProfile() }
+                        com.suresh.sacredtimeline.ui.profile.ProfileAvatarBadge(profile = primaryProfile, size = 28.dp)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

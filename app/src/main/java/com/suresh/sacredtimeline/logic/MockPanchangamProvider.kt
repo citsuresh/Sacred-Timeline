@@ -15,7 +15,8 @@ class MockPanchangamProvider {
         lat: Double = 11.0168, 
         lng: Double = 76.9558,
         offsetMinutes: Long = 15,
-        durationMinutes: Long = 60
+        durationMinutes: Long = 60,
+        lagnaRasi: Int? = null
     ): List<Timing> {
         val sunProvider = SunriseSunsetProvider()
         
@@ -27,7 +28,8 @@ class MockPanchangamProvider {
             yesterdaySun.sunset, 
             style,
             offsetMinutes,
-            durationMinutes
+            durationMinutes,
+            lagnaRasi
         )
         
         // 2. Today's cycle
@@ -37,7 +39,8 @@ class MockPanchangamProvider {
             sunset, 
             style,
             offsetMinutes,
-            durationMinutes
+            durationMinutes,
+            lagnaRasi
         )
 
         // 3. Maitra Muhurthams

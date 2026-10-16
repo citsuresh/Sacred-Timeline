@@ -17,11 +17,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.suresh.sacredtimeline.R
 import com.suresh.sacredtimeline.data.BirthProfilesRepository
 import com.suresh.sacredtimeline.data.SettingsRepository
@@ -212,16 +214,23 @@ fun ProfileDetailsContent(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
         ) {
             Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                // Header Row: Profile Name + Edit & Delete Icon Buttons
+                // Header Row: Profile Avatar + Name + Edit & Delete Icon Buttons
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(text = p.nameEnglish, style = MaterialTheme.typography.titleLarge)
-                        if (p.nameRegional.isNotBlank()) {
-                            Text(text = p.nameRegional, style = MaterialTheme.typography.bodyMedium)
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        ProfileAvatarBadge(profile = p, size = 44.dp)
+                        Column {
+                            Text(text = p.nameEnglish, style = MaterialTheme.typography.titleLarge)
+                            if (p.nameRegional.isNotBlank()) {
+                                Text(text = p.nameRegional, style = MaterialTheme.typography.bodyMedium)
+                            }
                         }
                     }
                     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -489,5 +498,69 @@ private fun formatDisplayTime(timeStr: String, is24Hour: Boolean): String {
         }
     } catch (e: Exception) {
         timeStr
+    }
+}
+
+val avatarPalette = listOf(
+    androidx.compose.ui.graphics.Color(0xFF6750A4), // Purple
+    androidx.compose.ui.graphics.Color(0xFF1976D2), // Blue
+    androidx.compose.ui.graphics.Color(0xFF009688), // Teal
+    androidx.compose.ui.graphics.Color(0xFF4CAF50), // Green
+    androidx.compose.ui.graphics.Color(0xFFFF9800), // Amber
+    androidx.compose.ui.graphics.Color(0xFFE53935), // Red
+    androidx.compose.ui.graphics.Color(0xFF3F51B5), // Indigo
+    androidx.compose.ui.graphics.Color(0xFFE91E63), // Pink
+    androidx.compose.ui.graphics.Color(0xFF00BCD4), // Cyan
+    androidx.compose.ui.graphics.Color(0xFFFF5722)  // Deep Orange
+)
+
+@Composable
+fun ProfileAvatarBadge(
+    profile: BirthProfile?,
+    size: androidx.compose.ui.unit.Dp = 24.dp,
+    modifier: Modifier = Modifier
+) {
+    val name = profile?.nameEnglish ?: "User"
+    val initials = when {
+        profile?.initials != null -> profile.initials
+        else -> {
+            name.split(" ")
+                .mapNotNull { it.firstOrNull()?.uppercase() }
+                .take(2)
+                .joinToString("")
+                .ifEmpty { "U" }
+        }
+    }
+    
+    val bgColor = if (profile != null && profile.avatarColor != 0) {
+        androidx.compose.ui.graphics.Color(profile.avatarColor)
+    } else {
+        val hash = kotlin.math.abs((profile?.id ?: "default").hashCode() + name.hashCode())
+        avatarPalette[hash % avatarPalette.size]
+    }
+
+    Box(
+        modifier = modifier
+            .size(size)
+            .clip(androidx.compose.foundation.shape.CircleShape)
+            .background(bgColor),
+        contentAlignment = Alignment.Center
+    ) {
+        if (!profile?.photoUri.isNullOrBlank()) {
+            coil.compose.AsyncImage(
+                model = profile?.photoUri,
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize().clip(androidx.compose.foundation.shape.CircleShape),
+                contentScale = androidx.compose.ui.layout.ContentScale.Crop
+            )
+        } else if (initials.isNotEmpty()) {
+            Text(
+                text = initials,
+                style = MaterialTheme.typography.labelSmall,
+                color = androidx.compose.ui.graphics.Color.White,
+                fontWeight = FontWeight.Bold,
+                fontSize = (size.value * 0.38f).sp
+            )
+        }
     }
 }

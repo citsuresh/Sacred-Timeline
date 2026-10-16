@@ -491,22 +491,22 @@ fun DashboardDetailSheet(
                                     contentAlignment = Alignment.CenterStart
                                 ) {
                                     Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        modifier = Modifier.fillMaxWidth().padding(end = 40.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
+                                        val (subIcon, subTint) = when (sub.compatibility) {
+                                            HoraCompatibility.FAVORABLE -> Icons.Default.CheckCircle to CompatibilityFavorable
+                                            HoraCompatibility.CONFLICTING -> Icons.Default.Cancel to CompatibilityConflicting
+                                            HoraCompatibility.NEUTRAL -> Icons.Default.RadioButtonUnchecked to CompatibilityNeutral
+                                        }
+                                        Icon(subIcon, contentDescription = null, tint = subTint, modifier = Modifier.size(20.dp))
                                         Text(
                                             text = "${sub.startTime.format(formatter)} - ${sub.endTime.format(formatter)}  •  ${Metadata.getPlanetName(sub.planet, context)}",
                                             style = MaterialTheme.typography.labelMedium,
                                             fontWeight = FontWeight.Bold,
                                             color = textColor
                                         )
-                                        val (subIcon, subTint) = when (sub.compatibility) {
-                                            HoraCompatibility.FAVORABLE -> Icons.Default.CheckCircle to CompatibilityFavorable
-                                            HoraCompatibility.CONFLICTING -> Icons.Default.Cancel to CompatibilityConflicting
-                                            HoraCompatibility.NEUTRAL -> Icons.Default.RadioButtonUnchecked to CompatibilityNeutral
-                                        }
-                                        Icon(subIcon, contentDescription = null, tint = subTint, modifier = Modifier.size(14.dp))
                                     }
                                 }
                             }

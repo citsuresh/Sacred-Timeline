@@ -340,9 +340,7 @@ fun TimingCard(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(parts)
-                                .clip(RoundedCornerShape(3.dp))
                                 .background(subColor)
-                                .border(0.5.dp, Color.White.copy(alpha = 0.9f))
                                 .padding(horizontal = 4.dp),
                             contentAlignment = Alignment.CenterStart
                         ) {

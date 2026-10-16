@@ -245,7 +245,7 @@ object PanchangamCalculator {
 
     private data class Quadruple<A, B, C, D>(val first: A, val second: B, val third: C, val fourth: D)
 
-    fun calculateHora(dayOfWeek: DayOfWeek, sunrise: LocalTime, sunset: LocalTime, style: String = "PROPORTIONAL"): List<Hora> {
+    fun calculateHora(dayOfWeek: DayOfWeek, sunrise: LocalTime, sunset: LocalTime, style: String = "PROPORTIONAL", lagnaRasi: Int? = null): List<Hora> {
         val (daySlotDuration, nightSlotDuration, startDay, startNight) = if (style == "FIXED") {
             // Standard Fixed Hora is exactly 1 hour, anchored to 6 AM
             val d = Duration.ofHours(1)
@@ -290,9 +290,9 @@ object PanchangamCalculator {
                 endTime = end,
                 auspiciousness = auspiciousness,
                 description = "",
-                compatibility = getHoraCompatibility(planet, dayOfWeek)
+                compatibility = getHoraCompatibility(planet, dayOfWeek, lagnaRasi)
             )
-            tempHora.copy(subHoras = calculateSubHoras(tempHora, dayOfWeek))
+            tempHora.copy(subHoras = calculateSubHoras(tempHora, dayOfWeek, lagnaRasi))
         }
 
         val nightHoras = (0 until 12).map { i ->
@@ -313,9 +313,9 @@ object PanchangamCalculator {
                 endTime = end,
                 auspiciousness = auspiciousness,
                 description = "",
-                compatibility = getHoraCompatibility(planet, dayOfWeek)
+                compatibility = getHoraCompatibility(planet, dayOfWeek, lagnaRasi)
             )
-            tempHora.copy(subHoras = calculateSubHoras(tempHora, dayOfWeek))
+            tempHora.copy(subHoras = calculateSubHoras(tempHora, dayOfWeek, lagnaRasi))
         }
 
         return dayHoras + nightHoras
@@ -331,7 +331,7 @@ object PanchangamCalculator {
         "Mars" to 7
     )
 
-    fun calculateSubHoras(hora: Hora, dayOfWeek: DayOfWeek): List<SubHora> {
+    fun calculateSubHoras(hora: Hora, dayOfWeek: DayOfWeek, lagnaRasi: Int? = null): List<SubHora> {
         val planets = listOf("Sun", "Venus", "Mercury", "Moon", "Saturn", "Jupiter", "Mars")
         val mainPlanetIndex = planets.indexOf(hora.name).takeIf { it != -1 } ?: 0
         
@@ -368,7 +368,7 @@ object PanchangamCalculator {
                     auspiciousness = auspiciousness,
                     description = "",
                     planet = subPlanet,
-                    compatibility = getHoraCompatibility(subPlanet, dayOfWeek)
+                    compatibility = getHoraCompatibility(subPlanet, dayOfWeek, lagnaRasi)
                 )
             )
             currentStart = currentEnd
@@ -377,7 +377,10 @@ object PanchangamCalculator {
         return result
     }
 
-    fun getHoraCompatibility(planet: String, dayOfWeek: DayOfWeek): HoraCompatibility {
+    fun getHoraCompatibility(planet: String, dayOfWeek: DayOfWeek, lagnaRasi: Int? = null): HoraCompatibility {
+        if (lagnaRasi != null && lagnaRasi in 1..12) {
+            return getNatalHoraCompatibility(planet, lagnaRasi)
+        }
         return when (planet) {
             "Sun" -> when (dayOfWeek) {
                 DayOfWeek.SUNDAY, DayOfWeek.THURSDAY, DayOfWeek.TUESDAY -> HoraCompatibility.FAVORABLE
@@ -418,16 +421,41 @@ object PanchangamCalculator {
         }
     }
 
+    private fun getPlanetRuledSigns(planet: String): List<Int> {
+        return when (planet) {
+            "Sun" -> listOf(5)
+            "Moon" -> listOf(4)
+            "Mars" -> listOf(1, 8)
+            "Mercury" -> listOf(3, 6)
+            "Jupiter" -> listOf(9, 12)
+            "Venus" -> listOf(2, 7)
+            "Saturn" -> listOf(10, 11)
+            else -> emptyList()
+        }
+    }
+
+    private fun getNatalHoraCompatibility(planet: String, lagnaRasi: Int): HoraCompatibility {
+        val signs = getPlanetRuledSigns(planet)
+        val houses = signs.map { sign -> ((sign - lagnaRasi + 12) % 12) + 1 }
+        return when {
+            houses.any { it in listOf(1, 5, 9) } -> HoraCompatibility.FAVORABLE
+            houses.any { it in listOf(6, 8, 12) } -> HoraCompatibility.CONFLICTING
+            else -> HoraCompatibility.NEUTRAL
+        }
+    }
+
     fun calculateAllTimings(
         dayOfWeek: DayOfWeek, 
         sunrise: LocalTime, 
         sunset: LocalTime, 
         style: String = "PROPORTIONAL",
         offsetMinutes: Long = 15,
-        durationMinutes: Long = 60
+        durationMinutes: Long = 60,
+        lagnaRasi: Int? = null
     ): List<Timing> {
         return calculateNallaNeram(dayOfWeek, sunrise, sunset, style, offsetMinutes, durationMinutes) +
                 calculateGowriNeram(dayOfWeek, sunrise, sunset, style) +
+                calculateHora(dayOfWeek, sunrise, sunset, style, lagnaRasi) +
                 calculateHora(dayOfWeek, sunrise, sunset, style) +
                 listOf(
                     calculateRahuKalam(dayOfWeek, sunrise, sunset, style),

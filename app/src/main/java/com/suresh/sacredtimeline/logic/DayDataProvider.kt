@@ -3,6 +3,7 @@ package com.suresh.sacredtimeline.logic
 import android.content.Context
 import com.suresh.sacredtimeline.R
 import com.suresh.sacredtimeline.data.SettingsRepository
+import com.suresh.sacredtimeline.data.BirthProfilesRepository
 import com.suresh.sacredtimeline.data.VerifiedHolidays
 import com.suresh.sacredtimeline.model.*
 import kotlinx.coroutines.flow.first
@@ -27,8 +28,15 @@ class DayDataProvider(private val context: Context) {
         val birthStarConfigId = repository.birthStar.first()
         val birthStarIndex = try { birthStarConfigId.split("_")[1].toInt() } catch(e: Exception) { 1 }
 
+        val primaryProfile = BirthProfilesRepository(context).getPrimaryProfile()
+        val lagnaRasi = primaryProfile?.let { profile ->
+            try {
+                BirthChartCalculator.calculateChart(profile).lagnaHouse
+            } catch (_: Exception) { null }
+        }
+
         val sunResult = sunProvider.getSunTimes(lat, lng, date, sunDef)
-        val timings = provider.getTimings(date, sunResult.sunrise, sunResult.sunset, style, sunDef, lat, lng)
+        val timings = provider.getTimings(date, sunResult.sunrise, sunResult.sunset, style, sunDef, lat, lng, 15, 60, lagnaRasi)
         
         val tamilCalendar = TamilCalendarUtils.getTamilDate(date)
         val lunarDayInfo = LunarCalendarUtils.getLunarDayInfo(date, system)

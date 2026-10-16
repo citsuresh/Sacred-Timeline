@@ -54,12 +54,15 @@ class ReminderWorker(
                 ExistingWorkPolicy.REPLACE,
                 workRequest
             )
-            Log.d("ReminderWorker", "Scheduled WorkManager reminder '${reminder.eventTitle}' with delay ${delayMillis}ms")
+            // Also schedule exact AlarmManager via ReminderReceiver for 100% reliability when app is closed
+            ReminderReceiver.scheduleReminder(context, reminder)
+            Log.d("ReminderWorker", "Scheduled WorkManager & AlarmManager reminder '${reminder.eventTitle}' with delay ${delayMillis}ms")
         }
 
         fun cancelReminder(context: Context, reminderId: String) {
             WorkManager.getInstance(context).cancelUniqueWork("reminder_$reminderId")
-            Log.d("ReminderWorker", "Cancelled WorkManager reminder $reminderId")
+            ReminderReceiver.cancelReminder(context, reminderId)
+            Log.d("ReminderWorker", "Cancelled WorkManager & AlarmManager reminder $reminderId")
         }
     }
 
