@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -146,7 +147,28 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
         viewModelScope, SharingStarted.WhileSubscribed(5000), "STAR_1"
     )
 
+    val activeProfile: StateFlow<BirthProfile?> = repository.activeProfileId.map { activeId ->
+        val profilesRepo = com.suresh.sacredtimeline.data.BirthProfilesRepository(application)
+        val all = profilesRepo.getAllProfiles()
+        all.find { it.id == activeId } ?: profilesRepo.getPrimaryProfile()
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        com.suresh.sacredtimeline.data.BirthProfilesRepository(application).getPrimaryProfile()
+    )
+
     init {
+        // Observe active profile changes and re-calculate dashboard
+        viewModelScope.launch {
+            repository.activeProfileId.drop(1).collect { _ ->
+                refreshJob?.cancel()
+                refreshJob = viewModelScope.launch {
+                    cacheMutex.withLock { cachedDays.clear() }
+                    cacheManager.clearCache()
+                    preloadData(selectedDate.value, repository.preloadDays.first())
+                }
+            }
+        }
         // Observe scale settings based on view mode
         viewModelScope.launch {
             combine(repository.compositeScale, repository.singleViewScale, _viewMode) { composite, single, mode ->

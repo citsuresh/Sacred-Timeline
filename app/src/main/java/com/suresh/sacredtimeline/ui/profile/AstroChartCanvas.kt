@@ -249,12 +249,18 @@ fun RasiCell(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.Top
             ) {
-                Text(
-                    text = rasiName,
-                    style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold, color = onSurfaceColor)
-                )
+                Column {
+                    Text(
+                        text = rasiName,
+                        style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.Bold, color = onSurfaceColor)
+                    )
+                    Text(
+                        text = getSignLordAbbr(context, rasiIndex),
+                        style = TextStyle(fontSize = 9.sp, color = onSurfaceColor.copy(alpha = 0.6f))
+                    )
+                }
                 Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
                     if (rasiIndex == lagnaHouse) {
                         Surface(
@@ -330,4 +336,19 @@ private fun getLocalizedPlanetAbbr(context: Context, planet: String): String {
         else -> 0
     }
     return if (resId != 0) context.getString(resId) else planet.take(3)
+}
+
+private fun getSignLordAbbr(context: Context, rasiIndex: Int): String {
+    val planet = when (rasiIndex) {
+        1, 8 -> "Mars"
+        2, 7 -> "Venus"
+        3, 6 -> "Mercury"
+        4 -> "Moon"
+        5 -> "Sun"
+        9, 12 -> "Jupiter"
+        10, 11 -> "Saturn"
+        else -> "Sun"
+    }
+    val abbr = getLocalizedPlanetAbbr(context, planet)
+    return "($abbr)"
 }

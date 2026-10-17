@@ -290,7 +290,8 @@ object PanchangamCalculator {
                 endTime = end,
                 auspiciousness = auspiciousness,
                 description = "",
-                compatibility = getHoraCompatibility(planet, dayOfWeek, lagnaRasi)
+                compatibility = getHoraCompatibility(planet, dayOfWeek),
+                natalCompatibility = if (lagnaRasi != null && lagnaRasi in 1..12) getNatalHoraCompatibility(planet, lagnaRasi) else getHoraCompatibility(planet, dayOfWeek)
             )
             tempHora.copy(subHoras = calculateSubHoras(tempHora, dayOfWeek, lagnaRasi))
         }
@@ -313,7 +314,8 @@ object PanchangamCalculator {
                 endTime = end,
                 auspiciousness = auspiciousness,
                 description = "",
-                compatibility = getHoraCompatibility(planet, dayOfWeek, lagnaRasi)
+                compatibility = getHoraCompatibility(planet, dayOfWeek),
+                natalCompatibility = if (lagnaRasi != null && lagnaRasi in 1..12) getNatalHoraCompatibility(planet, lagnaRasi) else getHoraCompatibility(planet, dayOfWeek)
             )
             tempHora.copy(subHoras = calculateSubHoras(tempHora, dayOfWeek, lagnaRasi))
         }
@@ -368,7 +370,8 @@ object PanchangamCalculator {
                     auspiciousness = auspiciousness,
                     description = "",
                     planet = subPlanet,
-                    compatibility = getHoraCompatibility(subPlanet, dayOfWeek, lagnaRasi)
+                    compatibility = getHoraCompatibility(subPlanet, dayOfWeek),
+                    natalCompatibility = if (lagnaRasi != null && lagnaRasi in 1..12) getNatalHoraCompatibility(subPlanet, lagnaRasi) else getHoraCompatibility(subPlanet, dayOfWeek)
                 )
             )
             currentStart = currentEnd

@@ -29,6 +29,7 @@ import com.suresh.sacredtimeline.data.BirthProfilesRepository
 import com.suresh.sacredtimeline.data.SettingsRepository
 import com.suresh.sacredtimeline.logic.BirthChartCalculator
 import com.suresh.sacredtimeline.model.BirthProfile
+import com.suresh.sacredtimeline.ui.theme.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -145,11 +146,7 @@ fun ProfileScreen(
                                 selectedProfile = profile
                                 dropdownExpanded = false
                                 scope.launch(Dispatchers.IO) {
-                                    repository.setPrimary(profile.id)
-                                    val updated = repository.getAllProfiles()
-                                    withContext(Dispatchers.Main) {
-                                        profiles = updated
-                                    }
+                                    settingsRepo.setActiveProfileId(profile.id)
                                 }
                             }
                         )
@@ -303,6 +300,108 @@ fun ProfileDetailsContent(
                     Column(modifier = Modifier.weight(1f)) {
                         Text(text = stringResource(R.string.label_moon_rasi), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
                         Text(text = getLocalizedRasiFullName(context, chartResult.rasiHouse), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+                HorizontalDivider()
+                Spacer(modifier = Modifier.height(4.dp))
+
+                val analysis = remember(chartResult.lagnaHouse) { analyzeLagna(chartResult.lagnaHouse) }
+                var showLordshipInfoDialog by remember { mutableStateOf(false) }
+
+                if (showLordshipInfoDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showLordshipInfoDialog = false },
+                        title = { Text(stringResource(R.string.about_lagna_lordships)) },
+                        text = {
+                            Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.verticalScroll(rememberScrollState())) {
+                                Text(stringResource(R.string.lagna_lord_desc), style = MaterialTheme.typography.bodyMedium)
+                                Text(stringResource(R.string.yogakaraka_desc), style = MaterialTheme.typography.bodyMedium)
+                                Text(stringResource(R.string.trikona_desc), style = MaterialTheme.typography.bodyMedium)
+                                Text(stringResource(R.string.dusthana_desc), style = MaterialTheme.typography.bodyMedium)
+                                Text(stringResource(R.string.kendra_desc), style = MaterialTheme.typography.bodyMedium)
+                                Text(stringResource(R.string.upachaya_desc), style = MaterialTheme.typography.bodyMedium)
+                                Text(stringResource(R.string.maraka_desc), style = MaterialTheme.typography.bodyMedium)
+                                Text(stringResource(R.string.badhaka_desc), style = MaterialTheme.typography.bodyMedium)
+                            }
+                        },
+                        confirmButton = {
+                            TextButton(onClick = { showLordshipInfoDialog = false }) {
+                                Text(stringResource(R.string.btn_ok))
+                            }
+                        }
+                    )
+                }
+
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(text = stringResource(R.string.lagna_lordships_aspects), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                        IconButton(onClick = { showLordshipInfoDialog = true }, modifier = Modifier.size(24.dp)) {
+                            Icon(Icons.Default.Info, contentDescription = "Info", tint = MaterialTheme.colorScheme.primary)
+                        }
+                    }
+                    
+                    // Lagna Lord
+                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Text(text = "${stringResource(R.string.lagna_lord)}:", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                        Text(text = "${analysis.lagnaLord.planet} (${formatHouses(analysis.lagnaLord.houses)})", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+                    }
+
+                    // Yogakaraka
+                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Text(text = "${stringResource(R.string.yogakaraka)}:", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                        Text(text = analysis.yogakaraka?.let { "${it.planet} (${formatHouses(it.houses)})" } ?: "None", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+                    }
+
+                    // Trikonadhipathis
+                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Text(text = "${stringResource(R.string.trikonadhipathis)}:", style = MaterialTheme.typography.bodyMedium, color = CompatibilityFavorable, fontWeight = FontWeight.Bold)
+                        analysis.trikonaLords.forEach { item ->
+                            Text(text = "• ${item.planet} (${formatHouses(item.houses)})", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+                        }
+                    }
+
+                    // Dusthanadhipathis
+                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Text(text = "${stringResource(R.string.dusthanadhipathis)}:", style = MaterialTheme.typography.bodyMedium, color = CompatibilityConflicting, fontWeight = FontWeight.Bold)
+                        analysis.dustanaLords.forEach { item ->
+                            Text(text = "• ${item.planet} (${formatHouses(item.houses)})", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+                        }
+                    }
+
+                    // Kendradhipathis
+                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Text(text = "${stringResource(R.string.kendradhipathis)}:", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                        analysis.kendraLords.forEach { item ->
+                            Text(text = "• ${item.planet} (${formatHouses(item.houses)})", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+                        }
+                    }
+
+                    // Upachayathipathis
+                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Text(text = "Upachayathipathis (3rd, 6th, 10th, 11th Lords):", style = MaterialTheme.typography.bodyMedium, color = CompatibilityFavorable, fontWeight = FontWeight.Bold)
+                        analysis.upachayaLords.forEach { item ->
+                            Text(text = "• ${item.planet} (${formatHouses(item.houses)})", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+                        }
+                    }
+
+                    // Marakadhipathis
+                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Text(text = "Marakadhipathis (2nd, 7th Lords):", style = MaterialTheme.typography.bodyMedium, color = CompatibilityConflicting, fontWeight = FontWeight.Bold)
+                        analysis.marakaLords.forEach { item ->
+                            Text(text = "• ${item.planet} (${formatHouses(item.houses)})", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+                        }
+                    }
+
+                    // Badhaka Lord
+                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Text(text = "Badhaka Lord (Obstruction Lord):", style = MaterialTheme.typography.bodyMedium, color = CompatibilityConflicting, fontWeight = FontWeight.Bold)
+                        Text(text = "• ${analysis.badhakaLord.planet} (${formatHouses(analysis.badhakaLord.houses)})", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
                     }
                 }
 
@@ -579,4 +678,116 @@ fun ProfileAvatarBadge(
             )
         }
     }
+}
+
+data class LordshipDetail(
+    val planet: String,
+    val houses: List<Int>
+)
+
+data class LagnaAnalysis(
+    val lagnaLord: LordshipDetail,
+    val trikonaLords: List<LordshipDetail>,
+    val dustanaLords: List<LordshipDetail>,
+    val kendraLords: List<LordshipDetail>,
+    val upachayaLords: List<LordshipDetail>,
+    val marakaLords: List<LordshipDetail>,
+    val badhakaLord: LordshipDetail,
+    val yogakaraka: LordshipDetail?
+)
+
+private fun getRulerForSign(sign: Int): String {
+    return when (sign) {
+        1, 8 -> "Mars"
+        2, 7 -> "Venus"
+        3, 6 -> "Mercury"
+        4 -> "Moon"
+        5 -> "Sun"
+        9, 12 -> "Jupiter"
+        10, 11 -> "Saturn"
+        else -> "Sun"
+    }
+}
+
+private fun getBadhakaHouse(lagnaHouse: Int): Int {
+    return when (lagnaHouse) {
+        1, 4, 7, 10 -> 11
+        2, 5, 8, 11 -> 9
+        else -> 7
+    }
+}
+
+private fun formatHouses(houses: List<Int>): String {
+    return houses.joinToString(", ") { h ->
+        val suffix = when (h) {
+            1 -> "st"
+            2 -> "nd"
+            3 -> "rd"
+            else -> "th"
+        }
+        "$h$suffix House"
+    }
+}
+
+private fun analyzeLagna(lagnaHouse: Int): LagnaAnalysis {
+    fun houseSign(n: Int): Int = ((lagnaHouse + n - 2) % 12) + 1
+    val houseRulers = (1..12).associateWith { h -> getRulerForSign(houseSign(h)) }
+    
+    val planetHouses = mutableMapOf<String, MutableList<Int>>()
+    houseRulers.forEach { (house, planet) ->
+        planetHouses.getOrPut(planet) { mutableListOf() }.add(house)
+    }
+
+    val lagnaLordPlanet = houseRulers[1] ?: "Sun"
+    val lord1 = LordshipDetail(lagnaLordPlanet, planetHouses[lagnaLordPlanet]?.sorted() ?: listOf(1))
+
+    val trikonaHouses = listOf(1, 5, 9)
+    val trikona = trikonaHouses.map { h -> 
+        val p = houseRulers[h]!!
+        LordshipDetail(p, planetHouses[p]?.sorted() ?: listOf(h))
+    }.distinctBy { it.planet }
+
+    val dustanaHouses = listOf(6, 8, 12)
+    val dustana = dustanaHouses.map { h -> 
+        val p = houseRulers[h]!!
+        LordshipDetail(p, planetHouses[p]?.sorted() ?: listOf(h))
+    }.distinctBy { it.planet }
+
+    val kendraHouses = listOf(1, 4, 7, 10)
+    val kendra = kendraHouses.map { h -> 
+        val p = houseRulers[h]!!
+        LordshipDetail(p, planetHouses[p]?.sorted() ?: listOf(h))
+    }.distinctBy { it.planet }
+
+    val upachayaHouses = listOf(3, 6, 10, 11)
+    val upachaya = upachayaHouses.map { h -> 
+        val p = houseRulers[h]!!
+        LordshipDetail(p, planetHouses[p]?.sorted() ?: listOf(h))
+    }.distinctBy { it.planet }
+
+    val marakaHouses = listOf(2, 7)
+    val maraka = marakaHouses.map { h -> 
+        val p = houseRulers[h]!!
+        LordshipDetail(p, planetHouses[p]?.sorted() ?: listOf(h))
+    }.distinctBy { it.planet }
+
+    val badhakaHouseNum = getBadhakaHouse(lagnaHouse)
+    val badhakaPlanet = houseRulers[badhakaHouseNum] ?: "Sun"
+    val badhaka = LordshipDetail(badhakaPlanet, planetHouses[badhakaPlanet]?.sorted() ?: listOf(badhakaHouseNum))
+
+    val kendraRulingPlanets = listOf(4, 7, 10).map { houseRulers[it]!! }
+    val trikonaRulingPlanets = listOf(5, 9).map { houseRulers[it]!! }
+    val yogakarakaPlanet = kendraRulingPlanets.intersect(trikonaRulingPlanets.toSet()).firstOrNull()
+    val yogakaraka = yogakarakaPlanet?.let { p -> LordshipDetail(p, planetHouses[p]?.sorted() ?: emptyList()) }
+
+    return LagnaAnalysis(
+        lagnaLord = lord1,
+        trikonaLords = trikona,
+        dustanaLords = dustana,
+        kendraLords = kendra,
+        upachayaLords = upachaya,
+        marakaLords = maraka,
+        badhakaLord = badhaka,
+        yogakaraka = yogakaraka
+    )
 }

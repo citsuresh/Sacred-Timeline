@@ -850,4 +850,27 @@
     <string name="transit_verdict_challenging">Challenging - Exercise Caution</string>
     <string name="transit_verdict_excellent">Excellent - Great Success</string>
     <string name="transit_verdict_neutral">Neutral</string>
+    <string name="lagna_lordships_aspects">Lagna Lordships &amp; Aspects</string>
+    <string name="lagna_lord">Lagna Lord</string>
+    <string name="yogakaraka">Yogakaraka</string>
+    <string name="trikonadhipathis">Trikonadhipathis (1st, 5th, 9th Lords)</string>
+    <string name="dusthanadhipathis">Dusthanadhipathis (6th, 8th, 12th Lords)</string>
+    <string name="kendradhipathis">Kendradhipathis (1st, 4th, 7th, 10th Lords)</string>
+    <string name="about_lagna_lordships">About Lagna Lordships &amp; Aspects</string>
+    <string name="lagna_lord_desc">• Lagna Lord (Lagnadipathi): The ruling planet of your Ascendant (1st house). Represents self, physical body, vitality, and life path.</string>
+    <string name="yogakaraka_desc">• Yogakaraka: A planet that rules both a Kendra (1, 4, 7, 10) and a Trikona (1, 5, 9), bringing immense fortune and success.</string>
+    <string name="trikona_desc">• Trikonadhipathis (Trine Lords - 1, 5, 9): Lords of houses of fortune, intellect, and divine grace. Generally highly auspicious.</string>
+    <string name="dusthana_desc">• Dusthanadhipathis (Evil Lords - 6, 8, 12): Lords of houses of disease, debt, obstacles, and losses. Require care during their periods.</string>
+    <string name="kendra_desc">• Kendradhipathis (Angular Lords - 1, 4, 7, 10): Lords of foundational life pillars (self, home, partnership, career).</string>
+    <string name="select_photo">Select Photo</string>
+    <string name="change_photo">Change Photo</string>
+    <string name="remove_photo">Remove Photo</string>
+    <string name="avatar_bg_color">Avatar Background Color</string>
+    <string name="initials_label">Initials</string>
+    <string name="initials_placeholder">Leave blank for color only</string>
+    <string name="general_rule">General Rule</string>
+    <string name="personal_natal_rule">Personal Natal Rule</string>
+    <string name="upachaya_desc">• Upachayathipathis (Growth Lords - 3, 6, 10, 11): Lords of houses of steady growth, enterprise, and material improvement over time.</string>
+    <string name="maraka_desc">• Marakadhipathis (Death-Inflicting Lords - 2, 7): Lords of houses associated with vital energy transition and wealth accumulation.</string>
+    <string name="badhaka_desc">• Badhaka Lord (Obstruction Lord): The lord of the specific obstruction house depending on whether the Lagna is Movable (11th), Fixed (9th), or Dual (7th).</string>
 </resources>

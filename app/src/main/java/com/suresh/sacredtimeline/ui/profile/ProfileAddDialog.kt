@@ -224,18 +224,18 @@ fun ProfileAddDialog(
                         OutlinedButton(
                             onClick = { photoPickerLauncher.launch("image/*") }
                         ) {
-                            Text(if (photoUri.isBlank()) "Select Photo" else "Change Photo")
+                            Text(if (photoUri.isBlank()) stringResource(R.string.select_photo) else stringResource(R.string.change_photo))
                         }
                         if (photoUri.isNotBlank()) {
                             TextButton(onClick = { photoUri = "" }) {
-                                Text("Remove Photo", color = MaterialTheme.colorScheme.error)
+                                Text(stringResource(R.string.remove_photo), color = MaterialTheme.colorScheme.error)
                             }
                         }
                     }
                 }
 
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = "Avatar Background Color", style = MaterialTheme.typography.labelMedium)
+                Text(text = stringResource(R.string.avatar_bg_color), style = MaterialTheme.typography.labelMedium)
                 val palette = listOf(
                     0xFF6750A4.toInt(), 0xFF1976D2.toInt(), 0xFF009688.toInt(),
                     0xFF4CAF50.toInt(), 0xFFFF9800.toInt(), 0xFFE53935.toInt(),
@@ -273,8 +273,8 @@ fun ProfileAddDialog(
                             initialsField = it
                             userModifiedInitials = true
                         },
-                        label = { Text("Initials") },
-                        placeholder = { Text("Leave blank for color only") },
+                        label = { Text(stringResource(R.string.initials_label)) },
+                        placeholder = { Text(stringResource(R.string.initials_placeholder)) },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
                     )

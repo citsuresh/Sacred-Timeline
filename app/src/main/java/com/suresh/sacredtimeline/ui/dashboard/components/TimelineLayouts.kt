@@ -28,8 +28,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.suresh.sacredtimeline.R
+import com.suresh.sacredtimeline.model.BirthProfile
 import com.suresh.sacredtimeline.model.Timing
 import com.suresh.sacredtimeline.ui.dashboard.TimelineUiState
+import com.suresh.sacredtimeline.ui.profile.ProfileAvatarBadge
 import com.suresh.sacredtimeline.ui.navigation.ViewMode
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -76,7 +78,8 @@ fun PortraitTimelineLayout(
     onDetailClick: (com.suresh.sacredtimeline.model.DashboardDetail) -> Unit = {},
     onTodayClick: () -> Unit,
     onCalendarClick: () -> Unit,
-    onProfileClick: () -> Unit = {}
+    onProfileClick: () -> Unit = {},
+    activeProfile: BirthProfile? = null
 ) {
     Scaffold(
         topBar = {
@@ -131,9 +134,7 @@ fun PortraitTimelineLayout(
                         Icon(Icons.Default.CalendarMonth, contentDescription = stringResource(R.string.label_select_date))
                     }
                     IconButton(onClick = onProfileClick) {
-                        val context = LocalContext.current
-                        val primaryProfile = remember { com.suresh.sacredtimeline.data.BirthProfilesRepository(context).getPrimaryProfile() }
-                        com.suresh.sacredtimeline.ui.profile.ProfileAvatarBadge(profile = primaryProfile, size = 28.dp)
+                        ProfileAvatarBadge(profile = activeProfile, size = 28.dp)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -232,7 +233,8 @@ fun LandscapeTimelineLayout(
     onDetailClick: (com.suresh.sacredtimeline.model.DashboardDetail) -> Unit = {},
     onTodayClick: () -> Unit,
     onCalendarClick: () -> Unit,
-    onProfileClick: () -> Unit = {}
+    onProfileClick: () -> Unit = {},
+    activeProfile: BirthProfile? = null
 ) {
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Row(modifier = Modifier.fillMaxSize()) {
@@ -326,7 +328,7 @@ fun LandscapeTimelineLayout(
                                 Icon(Icons.Default.CalendarMonth, contentDescription = stringResource(R.string.label_select_date), modifier = Modifier.size(18.dp))
                             }
                             IconButton(onClick = onProfileClick, modifier = Modifier.size(32.dp)) {
-                                Icon(Icons.Default.Person, contentDescription = stringResource(R.string.profile_title), modifier = Modifier.size(18.dp))
+                                ProfileAvatarBadge(profile = activeProfile, size = 20.dp)
                             }
                         }
                     }

@@ -59,6 +59,7 @@ data class Hora(
     override val auspiciousness: Auspiciousness,
     override val description: String = "",
     val compatibility: HoraCompatibility = HoraCompatibility.NEUTRAL,
+    val natalCompatibility: HoraCompatibility = HoraCompatibility.NEUTRAL,
     val subHoras: List<SubHora> = emptyList()
 ) : Timing
 

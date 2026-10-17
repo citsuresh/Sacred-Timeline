@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -386,45 +387,84 @@ fun DashboardDetailSheet(
             if (showSubHoras && detail is DashboardDetail.TimelineTiming && detail.timing is Hora && detail.timing.subHoras.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(16.dp))
                 
-                // Main Hora Compatibility Header (Above Sub-Horai breakdown heading)
-                Surface(
-                    color = containerColor,
-                    shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier.fillMaxWidth()
+                // Main Hora Compatibility Header (Dual Summary Blocks for General & Natal)
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Row(
-                        modifier = Modifier.padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    // 1. General Calendar Compatibility Block
+                    Surface(
+                        color = containerColor,
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        val icon = when (detail.timing.compatibility) {
-                            HoraCompatibility.FAVORABLE -> Icons.Default.CheckCircle
-                            HoraCompatibility.CONFLICTING -> Icons.Default.Cancel
-                            HoraCompatibility.NEUTRAL -> Icons.Default.RadioButtonUnchecked
-                        }
-                        val tint = when (detail.timing.compatibility) {
-                            HoraCompatibility.FAVORABLE -> CompatibilityFavorable
-                            HoraCompatibility.CONFLICTING -> CompatibilityConflicting
-                            HoraCompatibility.NEUTRAL -> CompatibilityNeutral
-                        }
-                        Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(24.dp))
-                        Column {
-                            Text(
-                                text = stringResource(R.string.main_hora_format, Metadata.getPlanetName(detail.timing.name, context)),
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = contentColor
-                            )
-                            val compText = when (detail.timing.compatibility) {
-                                HoraCompatibility.FAVORABLE -> stringResource(R.string.birth_star_favorable)
-                                HoraCompatibility.CONFLICTING -> stringResource(R.string.birth_star_conflicting)
-                                HoraCompatibility.NEUTRAL -> stringResource(R.string.birth_star_neutral)
+                        Row(
+                            modifier = Modifier.padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            val icon = when (detail.timing.compatibility) {
+                                HoraCompatibility.FAVORABLE -> Icons.Default.CheckCircle
+                                HoraCompatibility.CONFLICTING -> Icons.Default.Cancel
+                                HoraCompatibility.NEUTRAL -> Icons.Default.RadioButtonUnchecked
                             }
-                            Text(
-                                text = compText,
-                                style = MaterialTheme.typography.labelSmall,
-                                color = contentColor.copy(alpha = 0.8f)
-                            )
+                            val tint = when (detail.timing.compatibility) {
+                                HoraCompatibility.FAVORABLE -> CompatibilityFavorable
+                                HoraCompatibility.CONFLICTING -> CompatibilityConflicting
+                                HoraCompatibility.NEUTRAL -> CompatibilityNeutral
+                            }
+                            Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(22.dp))
+                            Column {
+                                Text(
+                                    text = "${stringResource(R.string.general_rule)}: ${Metadata.getPlanetName(detail.timing.name, context)} Horai",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = contentColor
+                                )
+                                Text(
+                                    text = stringResource(R.string.birth_star_favorable),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = contentColor.copy(alpha = 0.8f)
+                                )
+                            }
+                        }
+                    }
+
+                    // 2. Personal Natal Compatibility Block
+                    val natalTint = when (detail.timing.natalCompatibility) {
+                        HoraCompatibility.FAVORABLE -> CompatibilityFavorable
+                        HoraCompatibility.CONFLICTING -> CompatibilityConflicting
+                        HoraCompatibility.NEUTRAL -> CompatibilityNeutral
+                    }
+                    Surface(
+                        color = containerColor,
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            Icon(Icons.Default.Person, contentDescription = null, tint = natalTint, modifier = Modifier.size(22.dp))
+                            Column {
+                                Text(
+                                    text = "${stringResource(R.string.personal_natal_rule)}: ${Metadata.getPlanetName(detail.timing.name, context)} Horai",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = contentColor
+                                )
+                                val natalCompText = when (detail.timing.natalCompatibility) {
+                                    HoraCompatibility.FAVORABLE -> "Favorable for your Lagna (rules Trikona 1, 5, 9)"
+                                    HoraCompatibility.CONFLICTING -> "Challenging for your Lagna (rules Dustana 6, 8, 12)"
+                                    HoraCompatibility.NEUTRAL -> "Neutral for your Lagna chart"
+                                }
+                                Text(
+                                    text = natalCompText,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = contentColor.copy(alpha = 0.8f)
+                                )
+                            }
                         }
                     }
                 }
@@ -491,7 +531,7 @@ fun DashboardDetailSheet(
                                     contentAlignment = Alignment.CenterStart
                                 ) {
                                     Row(
-                                        modifier = Modifier.fillMaxWidth().padding(end = 40.dp),
+                                        modifier = Modifier.fillMaxWidth().padding(end = 45.dp),
                                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
@@ -500,7 +540,33 @@ fun DashboardDetailSheet(
                                             HoraCompatibility.CONFLICTING -> Icons.Default.Cancel to CompatibilityConflicting
                                             HoraCompatibility.NEUTRAL -> Icons.Default.RadioButtonUnchecked to CompatibilityNeutral
                                         }
-                                        Icon(subIcon, contentDescription = null, tint = subTint, modifier = Modifier.size(20.dp))
+                                        Surface(
+                                            color = Color.White,
+                                            shape = CircleShape,
+                                            shadowElevation = 1.dp,
+                                            modifier = Modifier.size(20.dp)
+                                        ) {
+                                            Box(contentAlignment = Alignment.Center) {
+                                                Icon(subIcon, contentDescription = null, tint = subTint, modifier = Modifier.size(14.dp))
+                                            }
+                                        }
+
+                                        val subNatalTint = when (sub.natalCompatibility) {
+                                            HoraCompatibility.FAVORABLE -> CompatibilityFavorable
+                                            HoraCompatibility.CONFLICTING -> CompatibilityConflicting
+                                            HoraCompatibility.NEUTRAL -> CompatibilityNeutral
+                                        }
+                                        Surface(
+                                            color = Color.White,
+                                            shape = CircleShape,
+                                            shadowElevation = 1.dp,
+                                            modifier = Modifier.size(20.dp)
+                                        ) {
+                                            Box(contentAlignment = Alignment.Center) {
+                                                Icon(Icons.Default.Person, contentDescription = null, tint = subNatalTint, modifier = Modifier.size(14.dp))
+                                            }
+                                        }
+
                                         Text(
                                             text = "${sub.startTime.format(formatter)} - ${sub.endTime.format(formatter)}  •  ${Metadata.getPlanetName(sub.planet, context)}",
                                             style = MaterialTheme.typography.labelMedium,
@@ -561,11 +627,11 @@ fun DashboardDetailSheet(
 
             // Guidance / Significance
             if (detail is DashboardDetail.TimelineTiming && detail.timing is Hora) {
-                val guidance = Metadata.getHoraGuidance(detail.timing.name, detail.timing.compatibility, context)
+                val guidance = Metadata.getHoraGuidance(detail.timing.name, detail.timing.natalCompatibility, context)
                 if (guidance.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(16.dp))
                     Surface(
-                        color = when (detail.timing.compatibility) {
+                        color = when (detail.timing.natalCompatibility) {
                             HoraCompatibility.FAVORABLE -> CompatibilityFavorable.copy(alpha = 0.1f)
                             HoraCompatibility.CONFLICTING -> CompatibilityConflicting.copy(alpha = 0.1f)
                             HoraCompatibility.NEUTRAL -> CompatibilityNeutral.copy(alpha = 0.1f)
@@ -577,10 +643,10 @@ fun DashboardDetailSheet(
                             modifier = Modifier.padding(12.dp),
                             verticalAlignment = Alignment.Top
                         ) {
-                            val (icon, tint) = when (detail.timing.compatibility) {
-                                HoraCompatibility.FAVORABLE -> Icons.Default.CheckCircle to CompatibilityFavorable
-                                HoraCompatibility.CONFLICTING -> Icons.Default.Cancel to CompatibilityConflicting
-                                HoraCompatibility.NEUTRAL -> Icons.Default.RadioButtonUnchecked to CompatibilityNeutral
+                            val (icon, tint) = when (detail.timing.natalCompatibility) {
+                                HoraCompatibility.FAVORABLE -> Icons.Default.Person to CompatibilityFavorable
+                                HoraCompatibility.CONFLICTING -> Icons.Default.Person to CompatibilityConflicting
+                                HoraCompatibility.NEUTRAL -> Icons.Default.Person to CompatibilityNeutral
                             }
                             Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(20.dp).padding(top = 2.dp))
                             Spacer(modifier = Modifier.width(12.dp))
@@ -599,17 +665,17 @@ fun DashboardDetailSheet(
                 Spacer(modifier = Modifier.height(24.dp))
                 Text(stringResource(R.string.label_strategic_activities), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
                 Spacer(modifier = Modifier.height(8.dp))
-                val activities = Metadata.getHoraStrategicActivities(detail.timing.name, detail.timing.compatibility, context)
+                val activities = Metadata.getHoraStrategicActivities(detail.timing.name, detail.timing.natalCompatibility, context)
                 activities.forEach { activity ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(vertical = 4.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.CheckCircle,
+                            imageVector = Icons.Default.Person,
                             contentDescription = null,
                             modifier = Modifier.size(16.dp),
-                            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
+                            tint = CompatibilityFavorable
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(text = activity, style = MaterialTheme.typography.bodyLarge)

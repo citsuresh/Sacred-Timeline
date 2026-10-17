@@ -14,5 +14,6 @@ data class SubHora(
     override val auspiciousness: Auspiciousness,
     override val description: String = "",
     val planet: String,
-    val compatibility: HoraCompatibility = HoraCompatibility.NEUTRAL
+    val compatibility: HoraCompatibility = HoraCompatibility.NEUTRAL,
+    val natalCompatibility: HoraCompatibility = HoraCompatibility.NEUTRAL
 ) : Timing

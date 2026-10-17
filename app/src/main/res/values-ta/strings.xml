@@ -801,4 +801,27 @@
     <string name="planet_sat_abbr">சனி</string>
     <string name="planet_rah_abbr">ராகு</string>
     <string name="planet_ket_abbr">கேது</string>
+    <string name="lagna_lordships_aspects">லக்ன அதிபதிகள் &amp; பார்வைகள்</string>
+    <string name="lagna_lord">லக்னாதிபதி</string>
+    <string name="yogakaraka">யோககாரகர்</string>
+    <string name="trikonadhipathis">கோண அதிபதிகள் (1, 5, 9 ஆம் அதிபதிகள்)</string>
+    <string name="dusthanadhipathis">மறைவு ஸ்தான அதிபதிகள் (6, 8, 12 ஆம் அதிபதிகள்)</string>
+    <string name="kendradhipathis">கேந்திர அதிபதிகள் (1, 4, 7, 10 ஆம் அதிபதிகள்)</string>
+    <string name="about_lagna_lordships">லக்ன அதிபதிகள் &amp; பார்வைகள் பற்றிய விவரம்</string>
+    <string name="lagna_lord_desc">• லக்னாதிபதி: உங்கள் லக்னத்தின் (1-ம் வீடு) அதிபதி. இது உடல், ஆன்மா மற்றும் வாழ்க்கை பாதையைக் குறிக்கிறது.</string>
+    <string name="yogakaraka_desc">• யோககாரகர்: ஒரு கேந்திரத்திற்கும் (1, 4, 7, 10) கோணத்திற்கும் (1, 5, 9) ஒரே அதிபதியாக விளங்கி பெரும் செல்வத்தையும் வெற்றியையும் தரும் கிரகம்.</string>
+    <string name="trikona_desc">• கோண அதிபதிகள் (1, 5, 9): பாக்கியம், புத்தி மற்றும் தெய்வீக அருள் தரும் வீடுகளின் அதிபதிகள். பொதுவாக மிகச் சுபமானவர்கள்.</string>
+    <string name="dusthana_desc">• மறைவு ஸ்தான அதிபதிகள் (6, 8, 12): நோய், கடன், தடைகள் மற்றும் விரயங்களைக் குறிக்கும் வீடுகளின் அதிபதிகள்.</string>
+    <string name="kendra_desc">• கேந்திர அதிபதிகள் (1, 4, 7, 10): வாழ்வாதார தூண்களான சுயமரியாதை, வீடு, கூட்டுறவு மற்றும் தொழிலைக் குறிக்கும் வீடுகளின் அதிபதிகள்.</string>
+    <string name="select_photo">புகைப்படத்தைத் தேர்ந்தெடு</string>
+    <string name="change_photo">புகைப்படத்தை மாற்று</string>
+    <string name="remove_photo">புகைப்படத்தை நீக்கு</string>
+    <string name="avatar_bg_color">சுயவிவர பின்னணி நிறம்</string>
+    <string name="initials_label">சுருக்க எழுத்துகள்</string>
+    <string name="initials_placeholder">நிறம் மட்டும் காட்ட காலியாக விடவும்</string>
+    <string name="general_rule">பொதுவான விதி</string>
+    <string name="personal_natal_rule">தனிப்பட்ட ஜாதக விதி</string>
+    <string name="upachaya_desc">• உபசய அதிபதிகள் (3, 6, 10, 11): காலப்போக்கில் வளர்ச்சி மற்றும் முன்னேற்றத்தைக் குறிக்கும் வீடுகளின் அதிபதிகள்.</string>
+    <string name="maraka_desc">• மாரகாதிபதிகள் (2, 7): தன வரவு மற்றும் ஆயுள் மாற்றங்களைக் குறிக்கும் வீடுகளின் அதிபதிகள்.</string>
+    <string name="badhaka_desc">• பாதகாதிபதி: லக்னத்தின் சுபாவத்தைப் பொறுத்து (சர லக்னம் எனில் 11-ம் வீடு, ஸ்திர லக்னம் எனில் 9-ம் வீடு, உபய லக்னம் எனில் 7-ம் வீடு) தடைகளைத் தரும் வீட்டின் அதிபதி.</string>
 </resources>

@@ -62,6 +62,7 @@ fun TimelineDashboard(
     val showTharaBalam by viewModel.showTharaBalam.collectAsState()
     val showSubHoras by viewModel.showSubHoras.collectAsState(initial = false)
     val timelineViewStyleStr by viewModel.timelineViewStyle.collectAsState()
+    val activeProfile by viewModel.activeProfile.collectAsState(initial = null)
     val timelineViewStyle = remember(timelineViewStyleStr) {
         try { TimelineViewStyle.valueOf(timelineViewStyleStr) } catch (ignore: Exception) { TimelineViewStyle.EQUAL_DISTRIBUTION }
     }
@@ -260,7 +261,8 @@ fun TimelineDashboard(
             },
             onTodayClick = { viewModel.updateDate(LocalDate.now()) },
             onCalendarClick = { showDatePicker = true },
-            onProfileClick = onProfileClick
+            onProfileClick = onProfileClick,
+            activeProfile = activeProfile
         )
     } else {
         PortraitTimelineLayout(
@@ -311,7 +313,8 @@ fun TimelineDashboard(
             },
             onTodayClick = { viewModel.updateDate(LocalDate.now()) },
             onCalendarClick = { showDatePicker = true },
-            onProfileClick = onProfileClick
+            onProfileClick = onProfileClick,
+            activeProfile = activeProfile
         )
     }
 }
