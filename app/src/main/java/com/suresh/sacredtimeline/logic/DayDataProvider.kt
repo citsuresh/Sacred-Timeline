@@ -11,6 +11,8 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
+import java.time.ZoneOffset
+import kotlin.math.*
 
 class DayDataProvider(private val context: Context) {
     private val repository = SettingsRepository(context)
@@ -25,9 +27,6 @@ class DayDataProvider(private val context: Context) {
         val enabledChandrashtamamStars = repository.enabledChandrashtamamStars.first()
 
         val system = repository.lunarMonthSystem.first()
-        val birthStarConfigId = repository.birthStar.first()
-        val birthStarIndex = try { birthStarConfigId.split("_")[1].toInt() } catch(e: Exception) { 1 }
-
         val profilesRepo = BirthProfilesRepository(context)
         val activeProfile = if (usePrimaryProfile) {
             profilesRepo.getPrimaryProfile()
@@ -41,6 +40,23 @@ class DayDataProvider(private val context: Context) {
                 BirthChartCalculator.calculateChart(profile).lagnaHouse
             } catch (_: Exception) { null }
         }
+
+        val birthStarIndex = activeProfile?.let { p ->
+            try {
+                val dateVal = LocalDate.parse(p.birthDate)
+                val timeVal = try { LocalTime.parse(p.birthTime) } catch (_: Exception) { LocalTime.of(6, 0) }
+                val totalMinutes = (p.timezoneOffsetHours * 60).toInt()
+                val zoneOffset = ZoneOffset.ofHoursMinutes(totalMinutes / 60, abs(totalMinutes % 60))
+                val instant = dateVal.atTime(timeVal).atZone(zoneOffset).toInstant()
+                val jd = (instant.toEpochMilli() / 86400000.0) + 2440587.5
+                val t = (jd - 2451545.0) / 36525.0
+                val ayanamsha = LunarCalendarUtils.calculateLahiriAyanamsha(jd)
+                val moonLong = (LunarCalendarUtils.calculateMoonLongitudeHighPrecision(t) - ayanamsha + 360.0) % 360.0
+                (floor(moonLong / (360.0 / 27.0)).toInt()).coerceIn(0, 26) + 1
+            } catch (_: Exception) {
+                try { repository.birthStar.first().split("_")[1].toInt() } catch (_: Exception) { 1 }
+            }
+        } ?: try { repository.birthStar.first().split("_")[1].toInt() } catch (_: Exception) { 1 }
 
         val sunResult = sunProvider.getSunTimes(lat, lng, date, sunDef)
         val timings = provider.getTimings(date, sunResult.sunrise, sunResult.sunset, style, sunDef, lat, lng, 15, 60, lagnaRasi)

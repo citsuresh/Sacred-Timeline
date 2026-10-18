@@ -28,7 +28,9 @@ import com.suresh.sacredtimeline.R
 import com.suresh.sacredtimeline.data.BirthProfilesRepository
 import com.suresh.sacredtimeline.data.SettingsRepository
 import com.suresh.sacredtimeline.logic.BirthChartCalculator
+import com.suresh.sacredtimeline.logic.DasaCalculator
 import com.suresh.sacredtimeline.model.BirthProfile
+import com.suresh.sacredtimeline.model.Metadata
 import com.suresh.sacredtimeline.ui.theme.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -288,18 +290,21 @@ fun ProfileDetailsContent(
                 HorizontalDivider()
                 Spacer(modifier = Modifier.height(4.dp))
 
-                // Explicit Summary of Lagna & Moon Rasi in Profile Card
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
+                // Stacked Summary of Lagna, Moon Rasi & Birth Star in Profile Card
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                         Text(text = stringResource(R.string.label_lagna), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
                         Text(text = getLocalizedRasiFullName(context, chartResult.lagnaHouse), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
                     }
-                    Column(modifier = Modifier.weight(1f)) {
+                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                         Text(text = stringResource(R.string.label_moon_rasi), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
                         Text(text = getLocalizedRasiFullName(context, chartResult.rasiHouse), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                    }
+                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Text(text = "Birth Star (Nakshatra)", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+                        val dasaRes = remember(p) { DasaCalculator.calculateVimsottariDasa(p) }
+                        val starResId = remember(dasaRes.birthNakshatra) { Metadata.getStarResIdFromConfigId("STAR_${dasaRes.birthNakshatra}") }
+                        Text(text = stringResource(starResId), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
                     }
                 }
 
@@ -429,6 +434,7 @@ fun ProfileDetailsContent(
 
         // Macro Insights Card with Clickable Dasa & Bhukti row & Info icon
         Card(modifier = Modifier.fillMaxWidth()) {
+            val dasaResult = remember(p) { DasaCalculator.calculateVimsottariDasa(p) }
             Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text(text = stringResource(R.string.macro_insights), style = MaterialTheme.typography.titleMedium)
                 
@@ -445,7 +451,7 @@ fun ProfileDetailsContent(
                     ) {
                         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                             Text(text = stringResource(R.string.active_dasa_bhukti), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-                            Text(text = stringResource(R.string.default_dasa_bhukti), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                            Text(text = "${dasaResult.currentMahadasa} Dasa - ${dasaResult.currentBhukti} Bhukti", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
                         }
                         Icon(Icons.Default.Info, contentDescription = "View Vimsottari Dasa Timeline", tint = MaterialTheme.colorScheme.primary)
                     }

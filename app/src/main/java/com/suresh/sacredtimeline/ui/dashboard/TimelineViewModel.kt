@@ -165,6 +165,7 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
                 refreshJob = viewModelScope.launch {
                     cacheMutex.withLock { cachedDays.clear() }
                     cacheManager.clearCache()
+                    _uiState.value = TimelineUiState.Loading
                     preloadData(selectedDate.value, repository.preloadDays.first())
                 }
             }

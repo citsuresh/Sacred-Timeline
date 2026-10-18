@@ -26,6 +26,8 @@ class CacheManager(private val context: Context) {
         prettyPrint = false
     }
 
+    private fun getFile(): File = File(context.cacheDir, fileName)
+
     fun saveCache(latitude: Double, longitude: Double, data: Map<LocalDate, DayData>) {
         try {
             val container = CacheContainer(
@@ -36,7 +38,7 @@ class CacheManager(private val context: Context) {
                 data = data
             )
             val jsonString = json.encodeToString(container)
-            val file = File(context.cacheDir, fileName)
+            val file = getFile()
             val tempFile = File(context.cacheDir, "$fileName.tmp")
             
             // Atomic save: write to tmp then rename
@@ -51,7 +53,7 @@ class CacheManager(private val context: Context) {
 
     fun loadCache(currentLat: Double, currentLng: Double): Map<LocalDate, DayData>? {
         return try {
-            val file = File(context.cacheDir, fileName)
+            val file = getFile()
             if (!file.exists()) return null
             
             val jsonString = file.readText()
@@ -63,9 +65,6 @@ class CacheManager(private val context: Context) {
             // 2. Check location (max 1km difference approx)
             val dist = Math.abs(container.latitude - currentLat) + Math.abs(container.longitude - currentLng)
             if (dist > 0.01) return null // Roughly 1km
-            
-            // 3. Check timestamp (optional, we use sliding window anyway)
-            // if (System.currentTimeMillis() - container.timestamp > 7 * 24 * 3600 * 1000) return null
 
             container.data
         } catch (e: Exception) {
@@ -76,7 +75,7 @@ class CacheManager(private val context: Context) {
 
     fun clearCache() {
         try {
-            val file = File(context.cacheDir, fileName)
+            val file = getFile()
             if (file.exists()) file.delete()
         } catch (e: Exception) {
             e.printStackTrace()

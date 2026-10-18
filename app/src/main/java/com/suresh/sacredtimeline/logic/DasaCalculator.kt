@@ -51,6 +51,12 @@ object DasaCalculator {
         "Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury"
     )
 
+    private val nakshatraNames = listOf(
+        "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashirsha", "Ardra", "Punarvasu", "Pushya", "Ashlesha",
+        "Magha", "Purva Phalguni", "Uttara Phalguni", "Hasta", "Chitra", "Swati", "Vishakha", "Anuradha", "Jyeshtha",
+        "Mula", "Purva Ashadha", "Uttara Ashadha", "Shravana", "Dhanishta", "Shatabhisha", "Purva Bhadrapada", "Uttara Bhadrapada", "Revati"
+    )
+
     fun calculateVimsottariDasa(profile: BirthProfile, targetDate: LocalDate = LocalDate.now()): DasaResult {
         val date = try { LocalDate.parse(profile.birthDate) } catch (_: Exception) { LocalDate.of(1995, 6, 15) }
         val time = try { LocalTime.parse(profile.birthTime) } catch (_: Exception) { LocalTime.of(6, 0) }
@@ -203,7 +209,7 @@ object DasaCalculator {
 
         return DasaResult(
             birthNakshatra = nakshatraIndex + 1,
-            birthNakshatraName = "Star #${nakshatraIndex + 1}",
+            birthNakshatraName = nakshatraNames[nakshatraIndex % 27],
             startingPlanet = startingLord,
             balanceYearsAtBirth = balanceYears,
             currentMahadasa = currentDasa,

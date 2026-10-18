@@ -27,6 +27,7 @@ import androidx.glance.action.clickable
 import androidx.glance.appwidget.action.actionRunCallback
 import com.suresh.sacredtimeline.R
 import com.suresh.sacredtimeline.MainActivity
+import com.suresh.sacredtimeline.data.BirthProfilesRepository
 import com.suresh.sacredtimeline.data.CacheManager
 import com.suresh.sacredtimeline.data.SettingsRepository
 import com.suresh.sacredtimeline.logic.DayDataProvider
@@ -71,6 +72,11 @@ class PanchangamWidget : GlanceAppWidget() {
             lng = repository.manualLongitude.first()
         }
 
+        val primaryProfile = BirthProfilesRepository(context).getPrimaryProfile()
+        val primaryProfileId = primaryProfile?.id ?: "default"
+        val primaryProfileName = primaryProfile?.nameEnglish ?: "Primary"
+        val headerTitle = "$primaryProfileName - Primary"
+
         // 2. Fetch Data (Cache or Network)
         val cache = cacheManager.loadCache(lat, lng)
         val dayData: DayData = if (cache?.containsKey(date) == true) {
@@ -95,7 +101,8 @@ class PanchangamWidget : GlanceAppWidget() {
                     now = now,
                     columnVisibility = columnVisibility,
                     columnOrder = columnOrder,
-                    timeFormatter = timeFormatter
+                    timeFormatter = timeFormatter,
+                    headerTitle = headerTitle
                 )
             }
         }
@@ -108,7 +115,8 @@ class PanchangamWidget : GlanceAppWidget() {
         now: LocalTime,
         columnVisibility: Set<String>,
         columnOrder: List<String>,
-        timeFormatter: DateTimeFormatter
+        timeFormatter: DateTimeFormatter,
+        headerTitle: String
     ) {
         Box(
             modifier = GlanceModifier
@@ -131,6 +139,7 @@ class PanchangamWidget : GlanceAppWidget() {
                                     dayData = dayData,
                                     now = now,
                                     timeFormatter = timeFormatter,
+                                    headerTitle = headerTitle,
                                     modifier = GlanceModifier.defaultWeight()
                                 )
                             }
@@ -264,6 +273,7 @@ class PanchangamWidget : GlanceAppWidget() {
         dayData: DayData,
         now: LocalTime,
         timeFormatter: DateTimeFormatter,
+        headerTitle: String,
         modifier: GlanceModifier = GlanceModifier
     ) {
         val currentGowri = dayData.gowriNeram.find { it.isCurrent(now) }
@@ -302,12 +312,13 @@ class PanchangamWidget : GlanceAppWidget() {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = context.getString(R.string.nav_universal),
+                        text = "${context.getString(R.string.nav_universal)} • $headerTitle",
                         style = TextStyle(
-                            fontSize = 11.sp,
+                            fontSize = 9.sp,
                             fontWeight = FontWeight.Bold,
-                            color = ColorProvider(Color.Black.copy(alpha = 0.6f))
-                        )
+                            color = ColorProvider(Color.Black.copy(alpha = 0.7f))
+                        ),
+                        maxLines = 1
                     )
                     
                     Spacer(modifier = GlanceModifier.height(4.dp))

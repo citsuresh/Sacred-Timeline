@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.suresh.sacredtimeline.R
 import com.suresh.sacredtimeline.data.RemindersRepository
+import com.suresh.sacredtimeline.logic.DasaCalculator
 import com.suresh.sacredtimeline.model.*
 import com.suresh.sacredtimeline.ui.dashboard.TimelineViewModel
 import com.suresh.sacredtimeline.ui.theme.*
@@ -171,8 +172,15 @@ fun DashboardDetailSheet(
                     }
 
                     if (detail is DashboardDetail.TimelineTiming && detail.timing is TharaBalamTiming) {
-                        val birthStarId by viewModel.birthStar.collectAsState()
-                        val birthStarRes = Metadata.getStarResIdFromConfigId(birthStarId)
+                        val activeProfile by viewModel.activeProfile.collectAsState(initial = null)
+                        val birthStarIdx = remember(activeProfile) {
+                            activeProfile?.let { p ->
+                                try {
+                                    DasaCalculator.calculateVimsottariDasa(p).birthNakshatra
+                                } catch (_: Exception) { 1 }
+                            } ?: 1
+                        }
+                        val birthStarRes = Metadata.getStarResIdFromConfigId("STAR_$birthStarIdx")
                         Text(
                             text = stringResource(R.string.settings_birth_star) + ": " + stringResource(birthStarRes),
                             style = MaterialTheme.typography.labelMedium,
