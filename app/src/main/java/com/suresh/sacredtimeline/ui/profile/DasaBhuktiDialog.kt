@@ -380,11 +380,10 @@ fun DualLaneTimelineView(dasaResult: DasaCalculator.DasaResult) {
         }
 
         if (isLandscape) {
-            val horizontalScrollState = rememberScrollState()
-            
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .weight(1f)
+                    .fillMaxWidth()
                     .horizontalScroll(horizontalScrollState)
             ) {
                 Box(
@@ -471,11 +470,10 @@ fun DualLaneTimelineView(dasaResult: DasaCalculator.DasaResult) {
             }
         } else {
             // Vertical Timeline for Portrait with 3-letter Month Abbreviations (Jan, Feb, Mar...)
-            val verticalScrollState = rememberScrollState()
-
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .weight(1f)
+                    .fillMaxWidth()
                     .verticalScroll(verticalScrollState)
             ) {
                 Box(
