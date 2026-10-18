@@ -1,21 +1,24 @@
-# Implementation Plan - Dual Hora Compatibility Indicators (3-Phase Approach)
+# Implementation Plan - Phase 3: Background Watchdog & Health Check Component
 
-## Phase 1: UI Finalization (Dummy Compatibility Data)
-- **Scope**: 
-  - Update `TimingCard.kt` to display **dual compatibility icons** in the Hora card header:
-    - **Old Icon**: Positioned near the **top-left** of the header (weekday compatibility).
-    - **New Icon**: Positioned near the **top-right** of the header using the **Person icon** (`Icons.Default.Person`) tinted with its compatibility color (Green/Red/White).
-  - Use dummy compatibility data to validate the UX presentation.
-- **Files**: `TimingCard.kt`
+## User Review Required
+> [!IMPORTANT]
+> This plan implements an always-running background watchdog (`WatchdogWorker`), circuit-breaker crash-loop protection (max 3 consecutive failures), dedicated watchdog notification channel (`channel_watchdog`), and a bottom Settings health check dashboard with manual stop protection and confirmation dialogs.
 
-## Phase 2: Actual Compatibility Logic & Calculator Support
-- **Scope**: 
-  - Implement actual model and calculator logic (Lagna house lordships: Trikona 1,5,9 vs Dustana 6,8,12) for the new personal compatibility indicator.
-- **Files**: `PanchangamCalculator.kt`, `MockPanchangamProvider.kt`, `DayDataProvider.kt`
+## Proposed Phased Breakdown
 
-## Phase 3: Dashboard Detail Sheet UI Update & Verification
+### Part 1: Watchdog Worker & State Tracking (`WatchdogWorker.kt`, `SettingsRepository.kt`, `SacredTimelineApp.kt`)
 - **Scope**:
-  - Implement dual compatibility summary cards in the main header of `DashboardDetailSheet.kt`.
-  - Implement dual icons for sub-hora list items, ensuring proper layout spacing so the NOW line text never overlaps them.
-  - Verification & testing (build, unit tests, and review).
-- **Files**: `DashboardDetailSheet.kt`
+  - Add `channel_watchdog` notification channel in `SacredTimelineApp.kt`.
+  - Add manual stop flags and consecutive failure counters in `SettingsRepository.kt`.
+  - Build `WatchdogWorker.kt` to query WorkManager work states (`WidgetUpdateWorker`, `ReminderWorker`), auto-restart failed tasks (unless manually stopped), enforce circuit breaker (max 3 failures), and dispatch notifications on recovery or critical failure.
+
+### Part 2: Settings Health Check Dashboard UI (`SettingsScreen.kt`)
+- **Scope**:
+  - Add a Health Check section at the bottom of `SettingsScreen.kt`.
+  - Display Primary Profile name at the top.
+  - Render component status cards (`WidgetUpdateWorker`, `ReminderWorker`) with live state badges and **Restart** / **Stop** / **Resume** buttons with confirmation dialogs.
+
+### Part 3: Verification & Build
+- **Scope**:
+  - Run unit tests: `gradle_build(":app:testDebugUnitTest")`.
+  - Assemble debug APK: `gradle_build(":app:assembleDebug")`.

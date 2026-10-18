@@ -17,11 +17,23 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
+import android.content.Context
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.suresh.sacredtimeline.R
+import com.suresh.sacredtimeline.data.BirthProfilesRepository
+import com.suresh.sacredtimeline.data.RemindersRepository
+import com.suresh.sacredtimeline.data.SettingsRepository
 import com.suresh.sacredtimeline.ui.navigation.ViewMode
+import com.suresh.sacredtimeline.ui.theme.CompatibilityConflicting
+import com.suresh.sacredtimeline.ui.theme.CompatibilityFavorable
+import com.suresh.sacredtimeline.worker.WatchdogWorker
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -444,6 +456,11 @@ fun SettingsScreen(
                     }
                 }
             }
+
+            // 8. Background Health & Watchdog
+            item {
+                HealthCheckSection(LocalContext.current)
+            }
         }
     }
 }
@@ -630,5 +647,227 @@ fun SettingsClickableItem(
             modifier = Modifier.weight(1f).padding(end = 16.dp)
         )
         Icon(Icons.Default.ChevronRight, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+@Composable
+fun HealthCheckSection(context: Context) {
+    val scope = rememberCoroutineScope()
+    val profilesRepo = remember { BirthProfilesRepository(context) }
+    val settingsRepo = remember { SettingsRepository(context) }
+    val primaryProfile = remember { profilesRepo.getPrimaryProfile() }
+    val primaryName = primaryProfile?.nameEnglish ?: "Primary"
+
+    val is24Hour by settingsRepo.timeFormat24h.collectAsState(initial = false)
+    val dateFormat by settingsRepo.dateFormat.collectAsState(initial = "DD-MM-YYYY")
+    val lastUpdateTimestamp by settingsRepo.widgetLastUpdateTimestamp.collectAsState(initial = 0L)
+
+    var widgetState by remember { mutableStateOf("Loading...") }
+    var reminderState by remember { mutableStateOf("Loading...") }
+    var lastReminderText by remember { mutableStateOf<String?>(null) }
+    var lastReminderTime by remember { mutableStateOf(0L) }
+    var componentToStop by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(Unit) {
+        withContext(Dispatchers.IO) {
+            widgetState = WatchdogWorker.getComponentState(context, "WidgetUpdateWorker")
+            reminderState = WatchdogWorker.getComponentState(context, "ReminderWorker")
+            if (settingsRepo.widgetLastUpdateTimestamp.first() == 0L) {
+                settingsRepo.setWidgetLastUpdateTimestamp(System.currentTimeMillis())
+            }
+            try {
+                val reminders = RemindersRepository(context).getAllReminders()
+                if (reminders.isNotEmpty()) {
+                    val latest = reminders.maxByOrNull { it.triggerTime.toEpochMilli() }
+                    if (latest != null) {
+                        lastReminderText = latest.eventTitle
+                        lastReminderTime = latest.triggerTime.toEpochMilli()
+                    }
+                }
+            } catch (_: Exception) {}
+        }
+    }
+
+    if (componentToStop != null) {
+        AlertDialog(
+            onDismissRequest = { componentToStop = null },
+            title = { Text(stringResource(R.string.stop_component_title)) },
+            text = { Text(stringResource(R.string.stop_component_msg)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    val key = componentToStop!!
+                    componentToStop = null
+                    scope.launch(Dispatchers.IO) {
+                        WatchdogWorker.stopComponent(context, key)
+                        if (key == "WidgetUpdateWorker") {
+                            widgetState = WatchdogWorker.getComponentState(context, key)
+                        } else {
+                            reminderState = WatchdogWorker.getComponentState(context, key)
+                        }
+                    }
+                }) {
+                    Text(stringResource(R.string.btn_stop), color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { componentToStop = null }) {
+                    Text(stringResource(R.string.btn_cancel))
+                }
+            }
+        )
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        SettingsSection(title = stringResource(R.string.bg_health_watchdog)) {
+            Text(
+                text = stringResource(R.string.active_primary_profile_format, "$primaryName - Primary"),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            // 1. Widget Update Worker Card
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+            ) {
+                Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(text = stringResource(R.string.widget_update_worker), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.status_format, getLocalizedStatusText(context, widgetState)), style = MaterialTheme.typography.bodySmall, color = when(widgetState.uppercase()) {
+                        "RUNNING", "ENQUEUED" -> CompatibilityFavorable
+                        "FAILED", "CANCELLED" -> CompatibilityConflicting
+                        else -> MaterialTheme.colorScheme.onSurfaceVariant
+                    })
+                    val formattedUpdate = formatTimestamp(lastUpdateTimestamp, is24Hour, dateFormat, context)
+                    Text(text = stringResource(R.string.last_update_label, formattedUpdate), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (widgetState == "STOPPED_BY_USER") {
+                            Button(onClick = {
+                                scope.launch(Dispatchers.IO) {
+                                    WatchdogWorker.restartComponent(context, "WidgetUpdateWorker")
+                                    widgetState = WatchdogWorker.getComponentState(context, "WidgetUpdateWorker")
+                                }
+                            }) {
+                                Text(stringResource(R.string.btn_resume))
+                            }
+                        } else {
+                            OutlinedButton(onClick = {
+                                scope.launch(Dispatchers.IO) {
+                                    WatchdogWorker.restartComponent(context, "WidgetUpdateWorker")
+                                    widgetState = WatchdogWorker.getComponentState(context, "WidgetUpdateWorker")
+                                }
+                            }) {
+                                Text(stringResource(R.string.btn_restart))
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            OutlinedButton(
+                                onClick = { componentToStop = "WidgetUpdateWorker" },
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                            ) {
+                                Text(stringResource(R.string.btn_stop))
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 2. Reminders Engine Card
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+            ) {
+                Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(text = stringResource(R.string.reminders_engine), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.status_format, getLocalizedStatusText(context, reminderState)), style = MaterialTheme.typography.bodySmall, color = when(reminderState.uppercase()) {
+                        "RUNNING", "ENQUEUED" -> CompatibilityFavorable
+                        "FAILED", "CANCELLED" -> CompatibilityConflicting
+                        else -> MaterialTheme.colorScheme.onSurfaceVariant
+                    })
+                    val formattedReminderTime = formatTimestamp(lastReminderTime, is24Hour, dateFormat, context)
+                    val reminderDisplay = if (lastReminderText != null) {
+                        stringResource(R.string.last_reminder_label, lastReminderText!!, formattedReminderTime)
+                    } else {
+                        stringResource(R.string.no_reminders)
+                    }
+                    Text(text = reminderDisplay, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (reminderState == "STOPPED_BY_USER") {
+                            Button(onClick = {
+                                scope.launch(Dispatchers.IO) {
+                                    WatchdogWorker.restartComponent(context, "ReminderWorker")
+                                    reminderState = WatchdogWorker.getComponentState(context, "ReminderWorker")
+                                }
+                            }) {
+                                Text(stringResource(R.string.btn_resume))
+                            }
+                        } else {
+                            OutlinedButton(onClick = {
+                                scope.launch(Dispatchers.IO) {
+                                    WatchdogWorker.restartComponent(context, "ReminderWorker")
+                                    reminderState = WatchdogWorker.getComponentState(context, "ReminderWorker")
+                                }
+                            }) {
+                                Text(stringResource(R.string.btn_restart))
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            OutlinedButton(
+                                onClick = { componentToStop = "ReminderWorker" },
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                            ) {
+                                Text(stringResource(R.string.btn_stop))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+private fun getLocalizedStatusText(context: Context, state: String): String {
+    val resId = when (state.uppercase()) {
+        "RUNNING" -> R.string.status_running
+        "ENQUEUED" -> R.string.status_enqueued
+        "SUCCEEDED" -> R.string.status_succeeded
+        "FAILED" -> R.string.status_failed
+        "CANCELLED" -> R.string.status_cancelled
+        "STOPPED_BY_USER" -> R.string.status_stopped_by_user
+        else -> R.string.status_enqueued
+    }
+    return context.getString(resId)
+}
+
+private fun formatTimestamp(epochMillis: Long, is24Hour: Boolean, dateFormat: String, context: Context): String {
+    if (epochMillis == 0L) return context.getString(R.string.never)
+    try {
+        val instant = java.time.Instant.ofEpochMilli(epochMillis)
+        val zone = java.time.ZoneId.systemDefault()
+        val zdt = instant.atZone(zone)
+        val datePattern = when (dateFormat) {
+            "MM-DD-YYYY" -> "MM-dd-yyyy"
+            "YYYY-MM-DD" -> "yyyy-MM-dd"
+            else -> "dd-MM-yyyy"
+        }
+        val timePattern = if (is24Hour) "HH:mm:ss" else "hh:mm a"
+        val formatter = java.time.format.DateTimeFormatter.ofPattern("$datePattern • $timePattern")
+        return zdt.format(formatter)
+    } catch (_: Exception) {
+        return epochMillis.toString()
     }
 }

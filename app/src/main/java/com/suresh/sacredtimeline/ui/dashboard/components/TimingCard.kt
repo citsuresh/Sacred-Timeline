@@ -174,59 +174,79 @@ fun TimingCard(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                // 0. Dual Compatibility Badges for Hora (Top-Left: Old, Top-Right: Person icon with compatibility color)
+                // 0. Dual Compatibility Badges for Hora
                 if (timing is Hora && sHeight > 40.dp) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 2.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // 1. Old Compatibility Icon (Top-Left)
-                        val iconOld = when (timing.compatibility) {
-                            HoraCompatibility.FAVORABLE -> Icons.Default.CheckCircle
-                            HoraCompatibility.CONFLICTING -> Icons.Default.Cancel
-                            HoraCompatibility.NEUTRAL -> Icons.Default.RadioButtonUnchecked
-                        }
-                        val colorOld = when (timing.compatibility) {
-                            HoraCompatibility.FAVORABLE -> CompatibilityFavorable
-                            HoraCompatibility.CONFLICTING -> CompatibilityConflicting
-                            HoraCompatibility.NEUTRAL -> CompatibilityNeutral
-                        }
-                        Surface(
-                            color = Color.White,
-                            shape = CircleShape,
-                            shadowElevation = 1.dp,
-                            modifier = Modifier.size(if (sHeight > 60.dp) 18.dp else 14.dp)
+                    val iconSize = if (sHeight > 60.dp) 12.dp else 9.dp
+                    val surfaceSize = if (sHeight > 60.dp) 18.dp else 14.dp
+
+                    val actualIconOld = when (timing.compatibility) {
+                        HoraCompatibility.FAVORABLE -> Icons.Default.CheckCircle
+                        HoraCompatibility.CONFLICTING -> Icons.Default.Cancel
+                        HoraCompatibility.NEUTRAL -> Icons.Default.RadioButtonUnchecked
+                    }
+                    val colorOld = when (timing.compatibility) {
+                        HoraCompatibility.FAVORABLE -> CompatibilityFavorable
+                        HoraCompatibility.CONFLICTING -> CompatibilityConflicting
+                        HoraCompatibility.NEUTRAL -> CompatibilityNeutral
+                    }
+                    val colorNew = when (timing.natalCompatibility) {
+                        HoraCompatibility.FAVORABLE -> CompatibilityFavorable
+                        HoraCompatibility.CONFLICTING -> CompatibilityConflicting
+                        HoraCompatibility.NEUTRAL -> CompatibilityNeutral
+                    }
+
+                    if (isHoraWithSub) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 2.dp),
+                            verticalArrangement = Arrangement.spacedBy(2.dp),
+                            horizontalAlignment = Alignment.Start
                         ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                Icon(
-                                    imageVector = iconOld,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(if (sHeight > 60.dp) 12.dp else 9.dp),
-                                    tint = colorOld
-                                )
+                            Surface(
+                                color = Color.White,
+                                shape = CircleShape,
+                                shadowElevation = 1.dp,
+                                modifier = Modifier.size(surfaceSize)
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    Icon(imageVector = actualIconOld, contentDescription = null, modifier = Modifier.size(iconSize), tint = colorOld)
+                                }
+                            }
+                            Surface(
+                                color = Color.White,
+                                shape = CircleShape,
+                                shadowElevation = 1.dp,
+                                modifier = Modifier.size(surfaceSize)
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    Icon(imageVector = Icons.Default.Person, contentDescription = null, modifier = Modifier.size(iconSize), tint = colorNew)
+                                }
                             }
                         }
-
-                        // 2. New Natal Compatibility Person Icon (Top-Right)
-                        val colorNew = when (timing.natalCompatibility) {
-                            HoraCompatibility.FAVORABLE -> CompatibilityFavorable
-                            HoraCompatibility.CONFLICTING -> CompatibilityConflicting
-                            HoraCompatibility.NEUTRAL -> CompatibilityNeutral
-                        }
-                        Surface(
-                            color = Color.White,
-                            shape = CircleShape,
-                            shadowElevation = 1.dp,
-                            modifier = Modifier.size(if (sHeight > 60.dp) 18.dp else 14.dp)
+                    } else {
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 2.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                Icon(
-                                    imageVector = Icons.Default.Person,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(if (sHeight > 60.dp) 12.dp else 9.dp),
-                                    tint = colorNew
-                                )
+                            Surface(
+                                color = Color.White,
+                                shape = CircleShape,
+                                shadowElevation = 1.dp,
+                                modifier = Modifier.size(surfaceSize)
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    Icon(imageVector = actualIconOld, contentDescription = null, modifier = Modifier.size(iconSize), tint = colorOld)
+                                }
+                            }
+                            Surface(
+                                color = Color.White,
+                                shape = CircleShape,
+                                shadowElevation = 1.dp,
+                                modifier = Modifier.size(surfaceSize)
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    Icon(imageVector = Icons.Default.Person, contentDescription = null, modifier = Modifier.size(iconSize), tint = colorNew)
+                                }
                             }
                         }
                     }

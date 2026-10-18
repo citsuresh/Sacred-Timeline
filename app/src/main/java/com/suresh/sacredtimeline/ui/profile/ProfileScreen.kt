@@ -301,7 +301,7 @@ fun ProfileDetailsContent(
                         Text(text = getLocalizedRasiFullName(context, chartResult.rasiHouse), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
                     }
                     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                        Text(text = "Birth Star (Nakshatra)", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+                        Text(text = stringResource(R.string.settings_birth_star), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
                         val dasaRes = remember(p) { DasaCalculator.calculateVimsottariDasa(p) }
                         val starResId = remember(dasaRes.birthNakshatra) { Metadata.getStarResIdFromConfigId("STAR_${dasaRes.birthNakshatra}") }
                         Text(text = stringResource(starResId), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
@@ -354,20 +354,20 @@ fun ProfileDetailsContent(
                     // Lagna Lord
                     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                         Text(text = "${stringResource(R.string.lagna_lord)}:", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
-                        Text(text = "${analysis.lagnaLord.planet} (${formatHouses(analysis.lagnaLord.houses)})", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+                        Text(text = "${Metadata.getPlanetName(analysis.lagnaLord.planet, context)} (${formatHousesLocalized(context, analysis.lagnaLord.houses)})", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
                     }
 
                     // Yogakaraka
                     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                         Text(text = "${stringResource(R.string.yogakaraka)}:", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
-                        Text(text = analysis.yogakaraka?.let { "${it.planet} (${formatHouses(it.houses)})" } ?: "None", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+                        Text(text = analysis.yogakaraka?.let { "${Metadata.getPlanetName(it.planet, context)} (${formatHousesLocalized(context, it.houses)})" } ?: stringResource(R.string.label_none), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
                     }
 
                     // Trikonadhipathis
                     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                         Text(text = "${stringResource(R.string.trikonadhipathis)}:", style = MaterialTheme.typography.bodyMedium, color = CompatibilityFavorable, fontWeight = FontWeight.Bold)
                         analysis.trikonaLords.forEach { item ->
-                            Text(text = "• ${item.planet} (${formatHouses(item.houses)})", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+                            Text(text = "• ${Metadata.getPlanetName(item.planet, context)} (${formatHousesLocalized(context, item.houses)})", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
                         }
                     }
 
@@ -375,7 +375,7 @@ fun ProfileDetailsContent(
                     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                         Text(text = "${stringResource(R.string.dusthanadhipathis)}:", style = MaterialTheme.typography.bodyMedium, color = CompatibilityConflicting, fontWeight = FontWeight.Bold)
                         analysis.dustanaLords.forEach { item ->
-                            Text(text = "• ${item.planet} (${formatHouses(item.houses)})", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+                            Text(text = "• ${Metadata.getPlanetName(item.planet, context)} (${formatHousesLocalized(context, item.houses)})", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
                         }
                     }
 
@@ -383,30 +383,30 @@ fun ProfileDetailsContent(
                     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                         Text(text = "${stringResource(R.string.kendradhipathis)}:", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                         analysis.kendraLords.forEach { item ->
-                            Text(text = "• ${item.planet} (${formatHouses(item.houses)})", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+                            Text(text = "• ${Metadata.getPlanetName(item.planet, context)} (${formatHousesLocalized(context, item.houses)})", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
                         }
                     }
 
                     // Upachayathipathis
                     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                        Text(text = "Upachayathipathis (3rd, 6th, 10th, 11th Lords):", style = MaterialTheme.typography.bodyMedium, color = CompatibilityFavorable, fontWeight = FontWeight.Bold)
+                        Text(text = "${stringResource(R.string.upachayathipathis)}:", style = MaterialTheme.typography.bodyMedium, color = CompatibilityFavorable, fontWeight = FontWeight.Bold)
                         analysis.upachayaLords.forEach { item ->
-                            Text(text = "• ${item.planet} (${formatHouses(item.houses)})", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+                            Text(text = "• ${Metadata.getPlanetName(item.planet, context)} (${formatHousesLocalized(context, item.houses)})", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
                         }
                     }
 
                     // Marakadhipathis
                     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                        Text(text = "Marakadhipathis (2nd, 7th Lords):", style = MaterialTheme.typography.bodyMedium, color = CompatibilityConflicting, fontWeight = FontWeight.Bold)
+                        Text(text = "${stringResource(R.string.marakadhipathis)}:", style = MaterialTheme.typography.bodyMedium, color = CompatibilityConflicting, fontWeight = FontWeight.Bold)
                         analysis.marakaLords.forEach { item ->
-                            Text(text = "• ${item.planet} (${formatHouses(item.houses)})", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+                            Text(text = "• ${Metadata.getPlanetName(item.planet, context)} (${formatHousesLocalized(context, item.houses)})", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
                         }
                     }
 
                     // Badhaka Lord
                     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                        Text(text = "Badhaka Lord (Obstruction Lord):", style = MaterialTheme.typography.bodyMedium, color = CompatibilityConflicting, fontWeight = FontWeight.Bold)
-                        Text(text = "• ${analysis.badhakaLord.planet} (${formatHouses(analysis.badhakaLord.houses)})", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+                        Text(text = "${stringResource(R.string.badhaka_lord)}:", style = MaterialTheme.typography.bodyMedium, color = CompatibilityConflicting, fontWeight = FontWeight.Bold)
+                        Text(text = "• ${Metadata.getPlanetName(analysis.badhakaLord.planet, context)} (${formatHousesLocalized(context, analysis.badhakaLord.houses)})", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
                     }
                 }
 
@@ -451,7 +451,10 @@ fun ProfileDetailsContent(
                     ) {
                         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                             Text(text = stringResource(R.string.active_dasa_bhukti), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-                            Text(text = "${dasaResult.currentMahadasa} Dasa - ${dasaResult.currentBhukti} Bhukti", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                            val mahaDasaLocalized = Metadata.getPlanetName(dasaResult.currentMahadasa, context)
+                            val bhuktiLocalized = Metadata.getPlanetName(dasaResult.currentBhukti, context)
+                            val dasaText = "$mahaDasaLocalized ${stringResource(R.string.label_dasa)} - $bhuktiLocalized ${stringResource(R.string.label_bhukti)}"
+                            Text(text = dasaText, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
                         }
                         Icon(Icons.Default.Info, contentDescription = "View Vimsottari Dasa Timeline", tint = MaterialTheme.colorScheme.primary)
                     }
@@ -723,16 +726,27 @@ private fun getBadhakaHouse(lagnaHouse: Int): Int {
     }
 }
 
-private fun formatHouses(houses: List<Int>): String {
-    return houses.joinToString(", ") { h ->
-        val suffix = when (h) {
-            1 -> "st"
-            2 -> "nd"
-            3 -> "rd"
-            else -> "th"
-        }
-        "$h$suffix House"
+private fun getLocalizedHouseName(context: android.content.Context, h: Int): String {
+    val resId = when (h) {
+        1 -> R.string.house_1
+        2 -> R.string.house_2
+        3 -> R.string.house_3
+        4 -> R.string.house_4
+        5 -> R.string.house_5
+        6 -> R.string.house_6
+        7 -> R.string.house_7
+        8 -> R.string.house_8
+        9 -> R.string.house_9
+        10 -> R.string.house_10
+        11 -> R.string.house_11
+        12 -> R.string.house_12
+        else -> 0
     }
+    return if (resId != 0) context.getString(resId) else "$h House"
+}
+
+private fun formatHousesLocalized(context: android.content.Context, houses: List<Int>): String {
+    return houses.joinToString(", ") { getLocalizedHouseName(context, it) }
 }
 
 private fun analyzeLagna(lagnaHouse: Int): LagnaAnalysis {

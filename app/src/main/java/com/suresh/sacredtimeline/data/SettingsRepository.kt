@@ -59,6 +59,11 @@ class SettingsRepository(private val context: Context) {
         val ENABLED_CHANDRASHTAMAM_STARS = stringSetPreferencesKey("enabled_chandrashtamam_stars")
         val BIRTH_STAR = stringPreferencesKey("birth_star")
         val ACTIVE_PROFILE_ID = stringPreferencesKey("active_profile_id")
+        val STOPPED_WIDGET_WORKER = booleanPreferencesKey("stopped_widget_worker")
+        val FAILURE_COUNT_WIDGET_WORKER = intPreferencesKey("failure_count_widget_worker")
+        val WIDGET_LAST_UPDATE_TIMESTAMP = longPreferencesKey("widget_last_update_timestamp")
+        val STOPPED_REMINDER_WORKER = booleanPreferencesKey("stopped_reminder_worker")
+        val FAILURE_COUNT_REMINDER_WORKER = intPreferencesKey("failure_count_reminder_worker")
     }
 
     val compositeScale: Flow<Float> = context.dataStore.data.map { it[Keys.COMPOSITE_SCALE] ?: 1.0f }
@@ -112,6 +117,58 @@ class SettingsRepository(private val context: Context) {
                 prefs[Keys.ACTIVE_PROFILE_ID] = id
             } else {
                 prefs.remove(Keys.ACTIVE_PROFILE_ID)
+            }
+        }
+    }
+
+    val widgetLastUpdateTimestamp: Flow<Long> = context.dataStore.data.map { it[Keys.WIDGET_LAST_UPDATE_TIMESTAMP] ?: 0L }
+
+    suspend fun setWidgetLastUpdateTimestamp(timestamp: Long) {
+        context.dataStore.edit { prefs ->
+            prefs[Keys.WIDGET_LAST_UPDATE_TIMESTAMP] = timestamp
+        }
+    }
+
+    fun isComponentManuallyStopped(key: String): Flow<Boolean> = context.dataStore.data.map { prefs ->
+        when (key) {
+            "WidgetUpdateWorker" -> prefs[Keys.STOPPED_WIDGET_WORKER] ?: false
+            "ReminderWorker" -> prefs[Keys.STOPPED_REMINDER_WORKER] ?: false
+            else -> false
+        }
+    }
+
+    suspend fun setComponentStopped(key: String, stopped: Boolean) {
+        context.dataStore.edit { prefs ->
+            when (key) {
+                "WidgetUpdateWorker" -> prefs[Keys.STOPPED_WIDGET_WORKER] = stopped
+            }
+        }
+    }
+
+    suspend fun incrementFailureCount(key: String): Int {
+        var count = 0
+        context.dataStore.edit { prefs ->
+            val k = when (key) {
+                "WidgetUpdateWorker" -> Keys.FAILURE_COUNT_WIDGET_WORKER
+                else -> null
+            }
+            if (k != null) {
+                count = (prefs[k] ?: 0) + 1
+                prefs[k] = count
+            }
+        }
+        return count
+    }
+
+    suspend fun resetFailureCount(key: String) {
+        context.dataStore.edit { prefs ->
+            val k = when (key) {
+                "WidgetUpdateWorker" -> Keys.FAILURE_COUNT_WIDGET_WORKER
+                "ReminderWorker" -> Keys.FAILURE_COUNT_REMINDER_WORKER
+                else -> null
+            }
+            if (k != null) {
+                prefs[k] = 0
             }
         }
     }

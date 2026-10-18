@@ -30,11 +30,15 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.suresh.sacredtimeline.R
 import com.suresh.sacredtimeline.data.SettingsRepository
 import com.suresh.sacredtimeline.logic.DasaCalculator
 import com.suresh.sacredtimeline.model.BirthProfile
+import com.suresh.sacredtimeline.model.Metadata
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -50,6 +54,7 @@ fun DasaBhuktiDialog(
         DasaCalculator.calculateVimsottariDasa(profile)
     }
 
+    val context = LocalContext.current
     val dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
     var selectedTab by remember { mutableStateOf(0) } // 0 = List View, 1 = Visual Track
     val listState = rememberLazyListState()
@@ -65,24 +70,40 @@ fun DasaBhuktiDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(text = "Vimsottari Dasa & Bhukti Timeline", style = MaterialTheme.typography.titleLarge)
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(text = stringResource(R.string.dasa_bhukti_title), style = MaterialTheme.typography.titleLarge)
+
                 Text(
-                    text = "Active: ${dasaResult.currentMahadasa} Dasa — ${dasaResult.currentBhukti} Bhukti",
-                    style = MaterialTheme.typography.bodyMedium,
+                    text = stringResource(R.string.active_prefix),
+                    style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold
                 )
+
+                val mahaName = Metadata.getPlanetName(dasaResult.currentMahadasa, context)
+                val dasaLbl = stringResource(R.string.label_dasa)
+                val bhuktiName = Metadata.getPlanetName(dasaResult.currentBhukti, context)
+                val bhuktiLbl = stringResource(R.string.label_bhukti)
+                val activeNameText = "$mahaName $dasaLbl — $bhuktiName $bhuktiLbl"
+
+                Text(
+                    text = activeNameText,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
                 TabRow(selectedTabIndex = selectedTab) {
                     Tab(
                         selected = selectedTab == 0,
                         onClick = { selectedTab = 0 },
-                        text = { Text("List View") }
+                        text = { Text(stringResource(R.string.tab_list_view)) }
                     )
                     Tab(
                         selected = selectedTab == 1,
                         onClick = { selectedTab = 1 },
-                        text = { Text("Visual Track") }
+                        text = { Text(stringResource(R.string.tab_visual_track)) }
                     )
                 }
             }
@@ -113,22 +134,41 @@ fun DasaBhuktiDialog(
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                                        Row(
+                                            modifier = Modifier.weight(1f).padding(end = 4.dp),
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
                                             Box(
                                                 modifier = Modifier
                                                     .size(14.dp)
                                                     .background(getPlanetColor(dasa.planet), MaterialTheme.shapes.extraSmall)
                                             )
+                                            val planetName = Metadata.getPlanetName(dasa.planet, context)
+                                            val dasaLabel = stringResource(R.string.label_dasa)
+                                            val yrsStr = String.format(Locale.US, "%.1f", dasa.totalYears)
+                                            val dasaText = "$planetName $dasaLabel ($yrsStr yrs)"
+
                                             Text(
-                                                text = "${dasa.planet} Dasa (${String.format(Locale.US, "%.1f", dasa.totalYears)} yrs)",
+                                                text = dasaText,
                                                 style = MaterialTheme.typography.bodyLarge,
                                                 fontWeight = FontWeight.Bold,
                                                 color = if (isActiveDasa) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
                                             )
                                         }
                                         if (isActiveDasa) {
-                                            Badge(containerColor = MaterialTheme.colorScheme.primary) {
-                                                Text("Active", color = MaterialTheme.colorScheme.onPrimary)
+                                            Surface(
+                                                color = MaterialTheme.colorScheme.primary,
+                                                shape = MaterialTheme.shapes.extraSmall
+                                            ) {
+                                                Text(
+                                                    text = stringResource(R.string.badge_active),
+                                                    style = MaterialTheme.typography.labelSmall,
+                                                    color = MaterialTheme.colorScheme.onPrimary,
+                                                    maxLines = 1,
+                                                    softWrap = false,
+                                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                                )
                                             }
                                         }
                                     }
@@ -142,7 +182,7 @@ fun DasaBhuktiDialog(
                                     HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
                                     Spacer(modifier = Modifier.height(2.dp))
 
-                                    Text(text = "Bhuktis (Sub-periods):", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                                    Text(text = stringResource(R.string.bhuktis_sub_periods), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
                                     dasa.bhuktis.forEach { bhukti ->
                                         val isActiveBhukti = isActiveDasa && bhukti.planet == dasaResult.currentBhukti
                                         Row(
@@ -155,8 +195,12 @@ fun DasaBhuktiDialog(
                                                         .size(8.dp)
                                                         .background(getPlanetColor(bhukti.planet), MaterialTheme.shapes.extraSmall)
                                                 )
+                                                val bhuktiPlanet = Metadata.getPlanetName(bhukti.planet, context)
+                                                val bhuktiLabel = stringResource(R.string.label_bhukti)
+                                                val bhuktiText = "$bhuktiPlanet $bhuktiLabel"
+
                                                 Text(
-                                                    text = "${bhukti.planet} Bhukti",
+                                                    text = bhuktiText,
                                                     style = MaterialTheme.typography.bodySmall,
                                                     fontWeight = if (isActiveBhukti) FontWeight.Bold else FontWeight.Normal,
                                                     color = if (isActiveBhukti) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
@@ -182,7 +226,7 @@ fun DasaBhuktiDialog(
         },
         confirmButton = {
             Button(onClick = onDismiss) {
-                Text("Close")
+                Text(stringResource(R.string.btn_close))
             }
         }
     )
@@ -193,6 +237,9 @@ fun DualLaneTimelineView(dasaResult: DasaCalculator.DasaResult) {
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
     val context = LocalContext.current
+    val isDark = androidx.compose.foundation.isSystemInDarkTheme()
+    val axisTextColor = if (isDark) Color.White else Color.DarkGray
+    val gridLineColor = if (isDark) Color.LightGray.copy(alpha = 0.4f) else Color.LightGray
     val settingsRepo = remember { SettingsRepository(context) }
     val showNowLine by settingsRepo.showNowLine.collectAsState(initial = true)
     val nowLineColorInt by settingsRepo.nowLineColor.collectAsState(initial = 0xFF4CAF50.toInt())
@@ -217,16 +264,29 @@ fun DualLaneTimelineView(dasaResult: DasaCalculator.DasaResult) {
         val endEpoch = endDate.toEpochDay().toDouble()
         val spanEpoch = endEpoch - startEpoch
         val todayEpoch = LocalDate.now().toEpochDay().toDouble()
-        val fraction = ((todayEpoch - startEpoch) / spanEpoch).coerceIn(0.0, 1.0)
+
+        var attempts = 0
+        while ((if (isLandscape) horizontalScrollState.maxValue == 0 else verticalScrollState.maxValue == 0) && attempts < 15) {
+            kotlinx.coroutines.delay(20)
+            attempts++
+        }
 
         if (isLandscape) {
             val totalWidth = 800.dp.value * density.density * effectiveScale
-            val targetScroll = (totalWidth * fraction - 200.0).coerceAtLeast(0.0)
-            horizontalScrollState.animateScrollTo(targetScroll.toInt())
+            val xNow = (((todayEpoch - startEpoch) / spanEpoch) * totalWidth)
+            val centerOffset = 400.dp.value * density.density
+            val max = horizontalScrollState.maxValue
+            val targetScroll = (xNow - centerOffset).coerceIn(0.0, max.toDouble()).toInt()
+            android.util.Log.d("scrollToNow", "landscape max=$max, target=$targetScroll")
+            horizontalScrollState.scrollTo(targetScroll)
         } else {
             val totalHeight = 700.dp.value * effectiveScale * density.density
-            val targetScroll = (totalHeight * fraction - 200.0).coerceAtLeast(0.0)
-            verticalScrollState.animateScrollTo(targetScroll.toInt())
+            val yNow = (30.0 + ((todayEpoch - startEpoch) / spanEpoch) * (totalHeight - 40f))
+            val centerOffset = 225.dp.value * density.density
+            val max = verticalScrollState.maxValue
+            val targetScroll = (yNow - centerOffset).coerceIn(0.0, max.toDouble()).toInt()
+            android.util.Log.d("scrollToNow", "portrait max=$max, target=$targetScroll")
+            verticalScrollState.scrollTo(targetScroll)
         }
     }
 
@@ -242,44 +302,81 @@ fun DualLaneTimelineView(dasaResult: DasaCalculator.DasaResult) {
                     trackScale = (trackScale * zoom).coerceIn(0.1f, 15.0f)
                 }
             }
-            .padding(2.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+            .padding(4.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-        Row(
+        Column(
             modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Text(
+                text = if (isLandscape) stringResource(R.string.track_horizontal) else stringResource(R.string.track_vertical),
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = stringResource(R.string.span_format, birthDate.format(dateFormatter), endDate.format(dateFormatter)),
+                style = MaterialTheme.typography.bodySmall,
+                fontSize = 11.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(
+                        onClick = { scope.launch { scrollToNow() } },
+                        modifier = Modifier.size(28.dp),
+                        colors = IconButtonDefaults.iconButtonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                    ) {
+                        Icon(Icons.Default.Today, contentDescription = "Jump to Now", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(15.dp))
+                    }
+                    IconButton(onClick = { trackScale = (trackScale - 0.2f).coerceIn(0.1f, 15.0f) }, modifier = Modifier.size(28.dp)) {
+                        Icon(Icons.Default.Remove, contentDescription = "Zoom Out", modifier = Modifier.size(14.dp))
+                    }
+                    Text(text = String.format(Locale.US, "%.1fx", trackScale), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                    IconButton(onClick = { trackScale = (trackScale + 0.2f).coerceIn(0.1f, 15.0f) }, modifier = Modifier.size(28.dp)) {
+                        Icon(Icons.Default.Add, contentDescription = "Zoom In", modifier = Modifier.size(14.dp))
+                    }
+                }
+            }
+        }
+
+        // Column Headers Row (Above Canvas)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(40.dp)
+                .padding(horizontal = 4.dp, vertical = 6.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
-                Text(
-                    text = if (isLandscape) "Horizontal Track (Pinch to Zoom)" else "Vertical Track (Pinch to Zoom)",
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    text = "Span: ${birthDate.format(dateFormatter)} → ${endDate.format(dateFormatter)}",
-                    style = MaterialTheme.typography.bodySmall,
-                    fontSize = 11.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(2.dp), verticalAlignment = Alignment.CenterVertically) {
-                IconButton(
-                    onClick = { scope.launch { scrollToNow() } },
-                    modifier = Modifier.size(28.dp),
-                    colors = IconButtonDefaults.iconButtonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
-                ) {
-                    Icon(Icons.Default.Today, contentDescription = "Jump to Now", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(15.dp))
-                }
-                IconButton(onClick = { trackScale = (trackScale - 0.2f).coerceIn(0.1f, 15.0f) }, modifier = Modifier.size(28.dp)) {
-                    Icon(Icons.Default.Remove, contentDescription = "Zoom Out", modifier = Modifier.size(14.dp))
-                }
-                Text(text = String.format(Locale.US, "%.1fx", trackScale), style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
-                IconButton(onClick = { trackScale = (trackScale + 0.2f).coerceIn(0.1f, 15.0f) }, modifier = Modifier.size(28.dp)) {
-                    Icon(Icons.Default.Add, contentDescription = "Zoom In", modifier = Modifier.size(14.dp))
-                }
-            }
+            Text(
+                text = stringResource(R.string.label_year_mon),
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                color = axisTextColor,
+                modifier = Modifier.width(90.dp)
+            )
+            Text(
+                text = stringResource(R.string.label_mahadasa),
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                color = axisTextColor,
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = stringResource(R.string.label_bhukti_heading),
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                color = axisTextColor,
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Center
+            )
         }
 
         if (isLandscape) {
@@ -298,13 +395,9 @@ fun DualLaneTimelineView(dasaResult: DasaCalculator.DasaResult) {
                     Canvas(modifier = Modifier.fillMaxSize()) {
                         val w = size.width
                         val h = size.height
-                        val laneHeight = (h - 50f) / 2f
-                        val yMahadasa = 25f
+                        val laneHeight = (h - 20f) / 2f
+                        val yMahadasa = 10f
                         val yBhukti = yMahadasa + laneHeight + 10f
-
-                        val labelStyle = TextStyle(fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.DarkGray)
-                        drawText(textMeasurer.measure("Mahadasa", style = labelStyle), topLeft = Offset(10f, 5f))
-                        drawText(textMeasurer.measure("Bhukti", style = labelStyle), topLeft = Offset(10f, yBhukti - 18f))
 
                         val startEpoch = birthDate.toEpochDay().toDouble()
                         val endEpoch = endDate.toEpochDay().toDouble()
@@ -331,7 +424,8 @@ fun DualLaneTimelineView(dasaResult: DasaCalculator.DasaResult) {
 
                             if (boxWidth > 40.0) {
                                 val fgColor = getPlanetFgColor(dasa.planet)
-                                val textLayout = textMeasurer.measure(dasa.planet, style = TextStyle(fontSize = 10.sp, fontWeight = FontWeight.Bold, color = fgColor))
+                                val planetLocalized = Metadata.getPlanetName(dasa.planet, context)
+                                val textLayout = textMeasurer.measure(planetLocalized, style = TextStyle(fontSize = 10.sp, fontWeight = FontWeight.Bold, color = fgColor))
                                 drawText(textLayout, topLeft = Offset(xStart.toFloat() + 4f, yMahadasa + laneHeight / 2f - 8f))
                             }
 
@@ -356,7 +450,8 @@ fun DualLaneTimelineView(dasaResult: DasaCalculator.DasaResult) {
 
                                 if (bWidth > 30.0) {
                                     val bFgColor = getPlanetFgColor(bhukti.planet)
-                                    val bText = textMeasurer.measure(bhukti.planet.take(3), style = TextStyle(fontSize = 8.sp, fontWeight = FontWeight.Bold, color = bFgColor))
+                                    val bhuktiLocalized = Metadata.getPlanetName(bhukti.planet, context).take(3)
+                                    val bText = textMeasurer.measure(bhuktiLocalized, style = TextStyle(fontSize = 8.sp, fontWeight = FontWeight.Bold, color = bFgColor))
                                     drawText(bText, topLeft = Offset(bxStart.toFloat() + 2f, yBhukti + laneHeight / 2f - 6f))
                                 }
                             }
@@ -397,11 +492,6 @@ fun DualLaneTimelineView(dasaResult: DasaCalculator.DasaResult) {
                         val xMahadasa = timeAxisWidth + 5f
                         val xBhukti = xMahadasa + laneWidth
 
-                        val labelStyle = TextStyle(fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.DarkGray)
-                        drawText(textMeasurer.measure("Year / Mon", style = labelStyle), topLeft = Offset(5f, 2f))
-                        drawText(textMeasurer.measure("Mahadasa", style = labelStyle), topLeft = Offset(xMahadasa, 2f))
-                        drawText(textMeasurer.measure("Bhukti", style = labelStyle), topLeft = Offset(xBhukti, 2f))
-
                         val startEpoch = birthDate.toEpochDay().toDouble()
                         val endEpoch = endDate.toEpochDay().toDouble()
                         val spanEpoch = endEpoch - startEpoch
@@ -419,9 +509,9 @@ fun DualLaneTimelineView(dasaResult: DasaCalculator.DasaResult) {
                             if (yYearPos >= 0f && yYearPos <= h && (yYearPos - lastDrawnY > 22f)) {
                                 lastDrawnY = yYearPos
                                 val yearText = "$year"
-                                val yearLayout = textMeasurer.measure(yearText, style = TextStyle(fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.Black))
+                                val yearLayout = textMeasurer.measure(yearText, style = TextStyle(fontSize = 11.sp, fontWeight = FontWeight.Bold, color = axisTextColor))
                                 drawText(yearLayout, topLeft = Offset(5f, yYearPos))
-                                drawLine(Color.LightGray, Offset(timeAxisWidth, yYearPos), Offset(w, yYearPos), 1.0f)
+                                drawLine(gridLineColor, Offset(timeAxisWidth, yYearPos), Offset(w, yYearPos), 1.0f)
 
                                 // Dynamically show 3-letter month abbreviations when zoomed in (trackScale >= 2.0f)
                                 if (trackScale >= 2.0f) {
@@ -463,7 +553,8 @@ fun DualLaneTimelineView(dasaResult: DasaCalculator.DasaResult) {
 
                             if (boxHeight > 25.0) {
                                 val fgColor = getPlanetFgColor(dasa.planet)
-                                val textLayout = textMeasurer.measure(dasa.planet, style = TextStyle(fontSize = 10.sp, fontWeight = FontWeight.Bold, color = fgColor))
+                                val planetLocalized = Metadata.getPlanetName(dasa.planet, context)
+                                val textLayout = textMeasurer.measure(planetLocalized, style = TextStyle(fontSize = 10.sp, fontWeight = FontWeight.Bold, color = fgColor))
                                 drawText(textLayout, topLeft = Offset(xMahadasa + 8f, yStart.toFloat() + boxHeight.toFloat() / 2f - 6f))
                             }
 
@@ -489,7 +580,8 @@ fun DualLaneTimelineView(dasaResult: DasaCalculator.DasaResult) {
 
                                 if (bHeight > 20.0) {
                                     val bFgColor = getPlanetFgColor(bhukti.planet)
-                                    val bText = textMeasurer.measure(bhukti.planet.take(3), style = TextStyle(fontSize = 8.sp, fontWeight = FontWeight.Bold, color = bFgColor))
+                                    val bhuktiLocalized = Metadata.getPlanetName(bhukti.planet, context).take(3)
+                                    val bText = textMeasurer.measure(bhuktiLocalized, style = TextStyle(fontSize = 8.sp, fontWeight = FontWeight.Bold, color = bFgColor))
                                     drawText(bText, topLeft = Offset(xBhukti + 8f, byStart.toFloat() + bHeight.toFloat() / 2f - 5f))
                                 }
                             }

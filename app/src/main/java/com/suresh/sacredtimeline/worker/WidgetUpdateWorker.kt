@@ -57,6 +57,7 @@ class WidgetUpdateWorker(
             // 4. Schedule next transition
             scheduleNextTransition(applicationContext, lat, lng)
 
+            repository.setWidgetLastUpdateTimestamp(System.currentTimeMillis())
             Result.success()
         } catch (e: Exception) {
             Result.retry()

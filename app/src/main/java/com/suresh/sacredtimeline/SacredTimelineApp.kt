@@ -12,6 +12,7 @@ class SacredTimelineApp : Application() {
         super.onCreate()
         // Initial schedule with default 15 mins (SettingsViewModel will update if changed)
         WidgetUpdateWorker.enqueuePeriodicWork(this, 15L)
+        com.suresh.sacredtimeline.worker.WatchdogWorker.enqueuePeriodicWork(this)
 
         // Pre-create exact 1-to-1 notification channels on app startup
         createAllNotificationChannels(this)
@@ -35,7 +36,8 @@ class SacredTimelineApp : Application() {
                     Triple("channel_festival", "Tamil Festival Reminders", "Reminders for Tamil Festival events"),
                     Triple("channel_solar", "Solar & Sun Reminders", "Reminders for Sunrise and Sunset events"),
                     Triple("channel_custom", "Custom Reminders", "Reminders for custom user events"),
-                    Triple("channel_default", "General Notifications", "General app notifications and non-reminder alerts")
+                    Triple("channel_default", "General Notifications", "General app notifications and non-reminder alerts"),
+                    Triple("channel_watchdog", "Watchdog & Health Alerts", "Alerts and recovery notifications for background components")
                 )
 
                 channels.forEach { (id, name, desc) ->

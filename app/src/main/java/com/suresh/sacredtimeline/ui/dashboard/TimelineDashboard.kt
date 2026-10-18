@@ -193,9 +193,9 @@ fun TimelineDashboard(
         }
     }
 
-    // Pager -> View: Update selectedDate when user swipes
+    // Pager -> View: Update selectedDate when user swipes and settles
     LaunchedEffect(pagerState) {
-        snapshotFlow { pagerState.currentPage }.collect { page ->
+        snapshotFlow { pagerState.settledPage }.collect { page ->
             if (page in dates.indices) {
                 val date = dates[page]
                 if (date != selectedDate) {

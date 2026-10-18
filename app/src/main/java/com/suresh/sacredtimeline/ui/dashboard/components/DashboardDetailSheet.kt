@@ -513,8 +513,17 @@ fun DashboardDetailSheet(
                             modifier = Modifier.fillMaxSize(),
                             verticalArrangement = Arrangement.spacedBy(0.dp)
                         ) {
-                            val pattern = if (timeFormat24h) "HH:mm" else "h:mm a"
+                            val pattern = if (timeFormat24h) "HH:mm" else "h:mm"
                             val formatter = DateTimeFormatter.ofPattern(pattern)
+                            val formatTime: (java.time.LocalTime) -> String = { time ->
+                                val baseTime = time.format(formatter)
+                                if (!timeFormat24h) {
+                                    val amPm = if (time.hour >= 12) context.getString(R.string.pm_abbr) else context.getString(R.string.am_abbr)
+                                    "$baseTime $amPm"
+                                } else {
+                                    baseTime
+                                }
+                            }
 
                             detail.timing.subHoras.forEach { sub ->
                                 val subColor = SacredTimelineColors.getTimingColor(sub)
@@ -576,7 +585,7 @@ fun DashboardDetailSheet(
                                         }
 
                                         Text(
-                                            text = "${sub.startTime.format(formatter)} - ${sub.endTime.format(formatter)}  •  ${Metadata.getPlanetName(sub.planet, context)}",
+                                            text = "${formatTime(sub.startTime)} - ${formatTime(sub.endTime)}  •  ${Metadata.getPlanetName(sub.planet, context)}",
                                             style = MaterialTheme.typography.labelMedium,
                                             fontWeight = FontWeight.Bold,
                                             color = textColor

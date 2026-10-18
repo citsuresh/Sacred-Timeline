@@ -15,6 +15,8 @@ object Metadata {
             "Jupiter" -> R.string.planet_jupiter
             "Venus" -> R.string.planet_venus
             "Saturn" -> R.string.planet_saturn
+            "Rahu" -> R.string.planet_rahu
+            "Ketu" -> R.string.planet_ketu
             else -> R.string.app_name // Fallback
         }
     }
