@@ -337,7 +337,11 @@ object PanchangamCalculator {
         val planets = listOf("Sun", "Venus", "Mercury", "Moon", "Saturn", "Jupiter", "Mars")
         val mainPlanetIndex = planets.indexOf(hora.name).takeIf { it != -1 } ?: 0
         
-        val totalDurationMillis = Duration.between(hora.startTime, hora.endTime).toMillis()
+        val totalDurationMillis = if (hora.endTime.isBefore(hora.startTime)) {
+            Duration.between(hora.startTime, LocalTime.MAX).toMillis() + Duration.between(LocalTime.MIN, hora.endTime).toMillis() + 1
+        } else {
+            Duration.between(hora.startTime, hora.endTime).toMillis()
+        }
         if (totalDurationMillis <= 0) return emptyList()
 
         var currentStart = hora.startTime
@@ -351,7 +355,9 @@ object PanchangamCalculator {
             val currentEnd = if (i == 6) {
                 hora.endTime
             } else {
-                currentStart.plusNanos(subDurationMillis * 1_000_000)
+                val nanosToAdd = subDurationMillis * 1_000_000
+                val newNanos = currentStart.toNanoOfDay() + nanosToAdd
+                LocalTime.ofNanoOfDay(newNanos % 86400000000000L)
             }
 
             val auspiciousness = when (subPlanet) {
