@@ -43,7 +43,3 @@ Future development phases for the Sacred Timeline project.
 ## Phase 10: Widget Polish & Glance Theming
 - **Dynamic Theming**: Adapting home screen glance widgets to Material You dynamic colors.
 - **Glance Layout Variants**: Additional compact widget formats while preserving core glanceability ("Right Now" status + manual refresh).
-
-## Phase 11: Auspiciousness Scoring Engine & Gauge (1–100%)
-- **Weighted Multi-Factor Scoring**: Real-time evaluation combining active Horas, Nalla Neram, Gowri Neram, Rahu Kalam, Maitra/Brahma Muhurthams, and personal birth star / Chandrashtamam status into a 1–100% favorability score.
-- **Visual Gauge UI**: Circular arc or linear progress indicator on the dashboard header / detail sheet providing an at-a-glance percentage rating of the present moment.
