@@ -7,6 +7,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.suresh.sacredtimeline.R
 import com.suresh.sacredtimeline.data.CacheManager
 import com.suresh.sacredtimeline.data.SettingsRepository
 import com.suresh.sacredtimeline.logic.DayDataProvider
@@ -42,7 +43,7 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
     private val _selectedDate = MutableStateFlow(LocalDate.now())
     val selectedDate: StateFlow<LocalDate> = _selectedDate
 
-    private val _uiState = MutableStateFlow<TimelineUiState>(TimelineUiState.Loading)
+    private val _uiState = MutableStateFlow<TimelineUiState>(TimelineUiState.Loading())
     val uiState: StateFlow<TimelineUiState> = _uiState
 
     private val _viewMode = MutableStateFlow(ViewMode.COMPOSITE)
@@ -165,7 +166,7 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
                 refreshJob = viewModelScope.launch {
                     cacheMutex.withLock { cachedDays.clear() }
                     cacheManager.clearCache()
-                    _uiState.value = TimelineUiState.Loading
+                    _uiState.value = TimelineUiState.Loading()
                     preloadData(selectedDate.value, repository.preloadDays.first())
                 }
             }
@@ -179,7 +180,34 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
             }
         }
 
-        // Observe Location Settings
+        // Initial startup sequence: Load location first, then preload dashboard data
+        viewModelScope.launch {
+            try {
+                _uiState.value = TimelineUiState.Loading(getApplication<Application>().getString(R.string.loading_location))
+                val mode = repository.locationMode.first()
+                if (mode == "MANUAL") {
+                    val city = repository.manualCityName.first()
+                    val lat = repository.manualLatitude.first()
+                    val lng = repository.manualLongitude.first()
+                    _locationName.value = city
+                    _isLocationAuto.value = false
+                    currentLocation = lat to lng
+                    val diskData = cacheManager.loadCache(lat, lng)
+                    if (diskData != null) {
+                        cacheMutex.withLock { cachedDays.putAll(diskData) }
+                        updateSuccessState()
+                    }
+                } else if (mode == "AUTO") {
+                    onLocationPermissionGranted()
+                }
+            } catch (_: Exception) {}
+
+            // Load dashboard data with the correctly resolved location
+            _uiState.value = TimelineUiState.Loading(getApplication<Application>().getString(R.string.calculating_panchangam))
+            preloadData(selectedDate.value, repository.preloadDays.first())
+        }
+
+        // Observe Location Settings (subsequent changes only)
         viewModelScope.launch {
             combine(
                 repository.locationMode, 
@@ -188,33 +216,18 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
                 repository.manualLongitude
             ) { mode, city, lat, lng ->
                 Triple(mode, city, lat to lng)
-            }.collect { (mode, city, coords) ->
-                val hasChanged = if (mode == "MANUAL") {
-                    _locationName.value != city || currentLocation != coords || _isLocationAuto.value
-                } else {
-                    false 
-                }
-
+            }.drop(1).collect { (mode, city, coords) ->
                 if (mode == "MANUAL") {
                     _locationName.value = city
                     _isLocationAuto.value = false
                     currentLocation = coords
                     
-                    if (hasChanged) {
-                        cacheMutex.withLock { cachedDays.clear() }
+                    cacheMutex.withLock { cachedDays.clear() }
+                    cacheManager.clearCache()
+                    refreshJob?.cancel()
+                    refreshJob = viewModelScope.launch {
                         preloadData(selectedDate.value, repository.preloadDays.first())
                         triggerWidgetSync()
-                    } else if (cachedDays.isEmpty()) {
-                        // Cold start in Manual Mode: Try to load from disk
-                        val diskData = cacheManager.loadCache(coords.first, coords.second)
-                        if (diskData != null) {
-                            cacheMutex.withLock {
-                                cachedDays.putAll(diskData)
-                            }
-                            updateSuccessState()
-                        }
-                        // Refresh/Preload silently
-                        preloadData(selectedDate.value, repository.preloadDays.first())
                     }
                 } else if (mode == "AUTO") {
                     onLocationPermissionGranted()
@@ -222,11 +235,11 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
             }
         }
 
-        // Observe date changes and preload
+        // Observe date changes and preload (subsequent changes only)
         viewModelScope.launch {
             combine(selectedDate, repository.preloadDays) { date, days ->
                 date to days
-            }.collect { (date, days) ->
+            }.drop(1).collect { (date, days) ->
                 refreshJob?.cancel()
                 refreshJob = viewModelScope.launch {
                     preloadData(date, days)
@@ -439,10 +452,10 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
     }
 
     private suspend fun preloadData(centerDate: LocalDate, rangeDays: Int = 3) {
-        // Ensure at least the current date is loading if no data
-        val isEmpty = cacheMutex.withLock { cachedDays.isEmpty() }
-        if (isEmpty) {
-            _uiState.value = TimelineUiState.Loading
+        // If center date is not cached, show loading state
+        val centerCached = cacheMutex.withLock { cachedDays.containsKey(centerDate) }
+        if (!centerCached) {
+            _uiState.value = TimelineUiState.Loading(getApplication<Application>().getString(R.string.calculating_panchangam))
         }
 
         // Fetch range: -rangeDays to +rangeDays
@@ -473,7 +486,7 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
 }
 
 sealed interface TimelineUiState {
-    data object Loading : TimelineUiState
+    data class Loading(val message: String = "") : TimelineUiState
     data class Success(
         val days: Map<LocalDate, DayData>,
         val locationName: String,

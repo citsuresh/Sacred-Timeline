@@ -141,7 +141,21 @@ fun TimelinePager(
     ) {
         when (val res = uiState) {
             is TimelineUiState.Loading -> {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                Column(
+                    modifier = Modifier.align(Alignment.Center),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    CircularProgressIndicator()
+                    if (res.message.isNotEmpty()) {
+                        Text(
+                            text = res.message,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
             }
             is TimelineUiState.Success -> {
                 HorizontalPager(

@@ -951,4 +951,7 @@
     <string name="longitude_label">Longitude *</string>
     <string name="required_placeholder">Required</string>
     <string name="test_notification_triggered">Test notification triggered manually!</string>
+    <string name="loading_location">Loading location…</string>
+    <string name="calculating_panchangam">Calculating Panchangam &amp; Ephemeris…</string>
+    <string name="loading_preferences">Loading preferences…</string>
 </resources>

@@ -901,4 +901,7 @@
     <string name="longitude_label">தீர்க்காங்கு (Longitude) *</string>
     <string name="required_placeholder">தேவை</string>
     <string name="test_notification_triggered">கைமுறையாகத் தூண்டப்பட்ட சோதனை அறிவிப்பு!</string>
+    <string name="loading_location">இருப்பிடத்தைத் தீர்மானிக்கிறது…</string>
+    <string name="calculating_panchangam">பஞ்சாங்கம் மற்றும் வானியல் கணக்கீடுகள்…</string>
+    <string name="loading_preferences">விருப்பத்தேர்வுகள் ஏற்றப்படுகின்றன…</string>
 </resources>
