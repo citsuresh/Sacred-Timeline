@@ -79,3 +79,6 @@ Historical record of architectural and UI/UX choices.
     - Implemented high-precision ephemeris Sidereal Ascendant (`LagnaCalculator.getLagnaRashi`) using rigorous Meeus GMST/LST formulas and fractional timezone offset handling (`+05:30`).
     - Implemented Vimsottari Dasa & Bhukti calculation engine (`DasaCalculator`) with exact birth balance slicing, 120-year boundary enforcement, and zero-gap continuity verified by automated unit tests.
     - Standardized universal planetary colors (`SunColor`, `MoonColor`, `RahuColor`, `KetuColor`, etc.) with high-contrast text foreground colors (`SunFgColor`, `VenusFgColor`, etc.).
+- **Progressive Startup Sequencing & Granular Loading Feedback**:
+    - Refactored `TimelineViewModel` and `MainActivity` to enforce strict sequential loading (Location resolution first -> Ephemeris & Panchangam calculation second), eliminating race conditions and double-refreshes.
+    - Added progressive, localized loading feedback messages (`"Loading location…"`, `"Calculating Panchangam & Ephemeris…"`, `"Loading preferences…"`) displayed with circular progress indicators during cold starts and uncached date picker jumps.
