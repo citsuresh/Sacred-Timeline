@@ -27,7 +27,7 @@ Future development phases for the Sacred Timeline project.
 - **Accessibility Suite**: Font scaling for Tamil script, high-contrast modes, and screen reader semantic descriptions.
 
 ## Phase 6: Performance & Hybrid Caching
-- **Per-Day File Caching**: Granular O(1) disk caching for ephemeris data to optimize memory and date-jump performance.
+- **Per-Day File Caging**: Granular O(1) disk caching for ephemeris data to optimize memory and date-jump performance.
 - **Background Task Optimization**: Battery-friendly WorkManager scheduling with WakeLocks for reminder and widget reliability.
 
 ## Phase 7: UI/UX Refinement & Sticky Labels
@@ -43,3 +43,9 @@ Future development phases for the Sacred Timeline project.
 ## Phase 10: Widget Polish & Glance Theming
 - **Dynamic Theming**: Adapting home screen glance widgets to Material You dynamic colors.
 - **Glance Layout Variants**: Additional compact widget formats while preserving core glanceability ("Right Now" status + manual refresh).
+
+## Phase 11: Multi-Factor Scoring Engine & Personal Power Meter
+- **Overview**: Real-time evaluation combining Tithi, Nakshatra, Yoga, Thara Balam, Hora, and Chandrashtamam into a 0–100% favorability score with visual gauge and breakdown.
+- **Documentation**: 
+    - Design Spec: [SCORING_ENGINE_SPEC.md](file:///C:/MyFiles/Git/AndroidStudioProjects/SacredTimeline/docs/SCORING_ENGINE_SPEC.md)
+    - Implementation Plan: [scoring_engine_implementation_plan.md](file:///C:/MyFiles/Git/AndroidStudioProjects/SacredTimeline/docs/scoring_engine_implementation_plan.md)

@@ -1,24 +1,32 @@
-# Implementation Plan - Phase 3: Background Watchdog & Health Check Component
+# Implementation Plan - Multi-Factor Scoring Engine & Personal Power Meter
 
 ## User Review Required
 > [!IMPORTANT]
-> This plan implements an always-running background watchdog (`WatchdogWorker`), circuit-breaker crash-loop protection (max 3 consecutive failures), dedicated watchdog notification channel (`channel_watchdog`), and a bottom Settings health check dashboard with manual stop protection and confirmation dialogs.
+> This plan outlines the implementation of the **Multi-Factor Scoring Engine & Personal Power Meter** (Phase 11), featuring a real-time **"Now Score"** (0-100%), human-friendly interpretation bands, Chandrashtamam/malefic Tara Bala penalty overrides, transparent factor breakdown audit view, and user-configurable weights in Settings.
 
-## Proposed Phased Breakdown
+## Proposed Components & Changes
 
-### Part 1: Watchdog Worker & State Tracking (`WatchdogWorker.kt`, `SettingsRepository.kt`, `SacredTimelineApp.kt`)
+### 1. Domain Logic & Scoring Engine (`ScoringEngine.kt`, `ScoringWeightsConfig.kt`)
 - **Scope**:
-  - Add `channel_watchdog` notification channel in `SacredTimelineApp.kt`.
-  - Add manual stop flags and consecutive failure counters in `SettingsRepository.kt`.
-  - Build `WatchdogWorker.kt` to query WorkManager work states (`WidgetUpdateWorker`, `ReminderWorker`), auto-restart failed tasks (unless manually stopped), enforce circuit breaker (max 3 failures), and dispatch notifications on recovery or critical failure.
+  - Create `ScoringWeightsConfig` data model (Thara Bala 15%, Chandrashtamam/Afflictions 15%, Transit 15%, Dasa 15%, Hora 15%, Yoga 15%, Tithi 10% = 100%).
+  - Implement `ScoringEngine` calculator function taking `DayData`, `BirthProfile`, current `LocalTime`, and weights.
+  - Implement rating band mapping (`Very Favorable`, `Favorable`, `Mixed`, `Challenging`, `Avoid`) and color mappings.
+  - Implement critical personal warning override (e.g., active Chandrashtamam caps score at 35%).
+  - Generate itemized score breakdown points for transparency audit.
 
-### Part 2: Settings Health Check Dashboard UI (`SettingsScreen.kt`)
+### 2. Settings & Persistence (`SettingsRepository.kt`, `ScoringSettingsScreen.kt`)
 - **Scope**:
-  - Add a Health Check section at the bottom of `SettingsScreen.kt`.
-  - Display Primary Profile name at the top.
-  - Render component status cards (`WidgetUpdateWorker`, `ReminderWorker`) with live state badges and **Restart** / **Stop** / **Resume** buttons with confirmation dialogs.
+  - Add DataStore preferences for custom scoring weights in `SettingsRepository.kt`.
+  - Build UI controls in Settings allowing users to customize weight percentages with real-time total validation (summing to 100%).
 
-### Part 3: Verification & Build
+### 3. Dashboard UI & Power Meter Component (`PowerMeterCard.kt`, `ScoreBreakdownDialog.kt`, `TimelineDashboard.kt`)
 - **Scope**:
-  - Run unit tests: `gradle_build(":app:testDebugUnitTest")`.
-  - Assemble debug APK: `gradle_build(":app:assembleDebug")`.
+  - Build `PowerMeterCard` (circular arc gauge showing percentage, band title, and color status) placed prominently above the timeline.
+  - Build `ScoreBreakdownDialog` to display transparent factor-by-factor contributions upon tapping the gauge.
+  - Wire up live score updates as time transitions or date is selected.
+
+### 4. Verification Plan
+- **Automated Tests**:
+  - Unit tests verifying scoring bounds (0-100), Chandrashtamam penalty overrides, and weight normalization.
+- **Build Verification**:
+  - Compile debug build: `gradle_build(":app:assembleDebug")`.
