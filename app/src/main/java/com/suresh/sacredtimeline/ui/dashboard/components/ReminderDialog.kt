@@ -216,7 +216,7 @@ fun ReminderDialog(
                             onClick = { expandedItem = true },
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("Event: $eventTitle")
+                            Text(stringResource(R.string.event_title_format, eventTitle))
                         }
                         DropdownMenu(
                             expanded = expandedItem,

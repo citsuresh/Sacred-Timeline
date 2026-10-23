@@ -289,7 +289,7 @@ fun ProfileAddDialog(
                     isError = showError && !isNameValid,
                     supportingText = {
                         if (showError && !isNameValid) {
-                            Text("Name is required", color = MaterialTheme.colorScheme.error)
+                            Text(stringResource(R.string.error_name_required), color = MaterialTheme.colorScheme.error)
                         }
                     },
                     modifier = Modifier.fillMaxWidth()
@@ -311,9 +311,9 @@ fun ProfileAddDialog(
                     isError = showError && !isDateValid,
                     supportingText = {
                         if (showError && !isDateValid) {
-                            Text("Format must be $dateFormat", color = MaterialTheme.colorScheme.error)
+                            Text(stringResource(R.string.error_format_must_be, dateFormat), color = MaterialTheme.colorScheme.error)
                         } else {
-                            Text("Format: $dateFormat")
+                            Text(stringResource(R.string.format_label, dateFormat))
                         }
                     },
                     modifier = Modifier.fillMaxWidth()
@@ -323,13 +323,13 @@ fun ProfileAddDialog(
                 OutlinedTextField(
                     value = birthTime,
                     onValueChange = { birthTime = it },
-                    label = { Text("Birth Time (${if (is24Hour) "HH:MM (24-hour)" else "hh:MM AM/PM"}) *") },
+                    label = { Text(stringResource(R.string.birth_time_label, if (is24Hour) "HH:MM (24-hour)" else "hh:MM AM/PM")) },
                     isError = showError && !isTimeValid,
                     supportingText = {
                         if (showError && !isTimeValid) {
-                            Text(if (is24Hour) "Format must be HH:MM (24-hour)" else "Format must be hh:MM AM/PM", color = MaterialTheme.colorScheme.error)
+                            Text(stringResource(R.string.error_format_must_be, if (is24Hour) "HH:MM (24-hour)" else "hh:MM AM/PM"), color = MaterialTheme.colorScheme.error)
                         } else {
-                            Text(if (is24Hour) "Format: HH:MM (24-hour)" else "Format: hh:MM AM/PM")
+                            Text(stringResource(R.string.format_label, if (is24Hour) "HH:MM (24-hour)" else "hh:MM AM/PM"))
                         }
                     },
                     modifier = Modifier.fillMaxWidth()
@@ -353,11 +353,11 @@ fun ProfileAddDialog(
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = placeExpanded && suggestions.isNotEmpty()) },
                         supportingText = {
                             if (showError && !isPlaceValid) {
-                                Text("Birth place and coordinates required", color = MaterialTheme.colorScheme.error)
+                                Text(stringResource(R.string.error_birth_place_required), color = MaterialTheme.colorScheme.error)
                             } else if (geoStatusText.isNotEmpty()) {
                                 Text(geoStatusText, color = if (geoStatusText.contains("✓")) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error)
                             } else {
-                                Text(if (isSearching) "Searching locations..." else "Type 3+ letters for town/village suggestions")
+                                Text(if (isSearching) stringResource(R.string.searching_locations) else stringResource(R.string.type_for_suggestions))
                             }
                         },
                         modifier = Modifier
@@ -377,7 +377,7 @@ fun ProfileAddDialog(
                                     latitude = suggestion.latitude.toString()
                                     longitude = suggestion.longitude.toString()
                                     placeExpanded = false
-                                    geoStatusText = "✓ Coordinates auto-resolved"
+                                    geoStatusText = context.getString(R.string.coordinates_resolved)
                                 }
                             )
                         }
@@ -392,15 +392,15 @@ fun ProfileAddDialog(
                     OutlinedTextField(
                         value = latitude,
                         onValueChange = { latitude = it },
-                        label = { Text("Latitude *") },
-                        placeholder = { Text("Required") },
+                        label = { Text(stringResource(R.string.latitude_label)) },
+                        placeholder = { Text(stringResource(R.string.required_placeholder)) },
                         modifier = Modifier.weight(1f)
                     )
                     OutlinedTextField(
                         value = longitude,
                         onValueChange = { longitude = it },
-                        label = { Text("Longitude *") },
-                        placeholder = { Text("Required") },
+                        label = { Text(stringResource(R.string.longitude_label)) },
+                        placeholder = { Text(stringResource(R.string.required_placeholder)) },
                         modifier = Modifier.weight(1f)
                     )
                 }

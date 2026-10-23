@@ -1,21 +1,22 @@
 # Project State
 
-**Phase**: Alpha/Stable (Phase 11 Complete - Personalized Astrological Profiles & Vimsottari Dasa Engine)
+**Phase**: Alpha/Stable (Phase 12 Complete - Background Watchdog, Health Check Dashboard, Comprehensive Localization, and UI/UX Polish)
 
 ## 1. Recently Implemented
-- **Personalized Astrological Profiles & Storage**: Implemented `BirthProfile` data model and `BirthProfilesRepository` with atomic JSON persistence, primary profile management, dual name fields (English and Regional script), and offline coordinate auto-resolution.
-- **Live Global Geocoder Autocomplete (`GeoHelper`)**: Integrated Android's system `Geocoder` (forced to `Locale.ENGLISH` for cross-language consistency) with zero API keys required, enabling live autocomplete for any town, village, or city worldwide.
-- **High-Precision Ephemeris & Lagna Engine (`BirthChartCalculator` & `LagnaCalculator`)**: Upgraded Sidereal Ascendant (Lagna) calculations using rigorous Meeus Chapter 12/13 GMST/LST formulas and fractional timezone offset handling (`+05:30`).
-- **Visual Astrological Charts (`AstroChartCanvas`)**: Built native Compose grid and diamond chart renderers supporting **South Indian Grid** and **North Indian Diamond** chart styles with traditional Lagna (`Lag`) and Moon Rasi (`Rasi`) markers and localized 3-letter abbreviations.
-- **Global Date & Time Settings Parity**: Added Date Format settings (`DD-MM-YYYY`, `MM-DD-YYYY`, `YYYY-MM-DD`) in Settings, synchronized with 12h/24h time formatting across the entire app.
-- **Vimsottari Dasa & Bhukti Calculator (`DasaCalculator` & `DasaBhuktiDialog`)**: Implemented complete 120-year Mahadasa and Bhukti calculation engine with exact birth balance slicing, 120-year boundary enforcement, List View with active Dasa auto-focus, and Visual Track with dual-lane Gantt chart, zoom controls, pinch-to-zoom, and "Jump to Now" button.
-- **Strict Bilingual Localization Parity**: Completed comprehensive localization audits across English and Tamil (`values-ta/strings.xml`), ensuring all profile screens, dialogs, chart box abbreviations, and 12-house Macro Planetary Insights transit interpretations are fully translated.
+- **Background Watchdog & Health Check Dashboard (`WatchdogWorker` & Settings Dashboard)**: Implemented an always-running background monitor for `WidgetUpdateWorker` and `ReminderWorker`, featuring circuit-breaker crash-loop protection (max 3 consecutive retries), manual stop protection, dedicated notification channels (`channel_watchdog`), real-time status indicators (`RUNNING`, `ENQUEUED`, `FAILED`, `STOPPED_BY_USER`), and formatted last update/reminder timestamps matching user date & time preferences.
+- **Profile Avatars & Initials Badges**: Profile photo picker, background color palette, and initials customization with circular preview badges.
+- **Active vs. Primary Profile Separation**: Active session profile drives Dashboard UI (Thara Balam, Chandrashtamam, Hora compatibility, charts), while Primary profile powers background workers and Glance widgets with dedicated header title (`[Name] - Primary`).
+- **Natal Hora Compatibility & Dual Compatibility UI**: Side-by-side general weekday and personal natal compatibility indicators on timeline cards and detail sheets inside white circular legibility containers.
+- **Rasi Chart Sign Lords & Lagna Lordships Aspects Breakdown**: Complete Lagna lordship analysis (Lagnadipathi, Yogakaraka, Trikona, Dusthana, Kendra, Upachaya, Maraka, Badhaka) with info dialog and 100% Tamil/English localization parity.
+- **Midnight-Crossing Sub-Hora Calculation Fix**: Upgraded `calculateSubHoras()` in `PanchangamCalculator` with cross-day duration math and nano-of-day time wrapping, ensuring all 24 horas (including midnight-crossing night horas) correctly populate sub-horas.
+- **Scroll-to-Now Precision**: Implemented exact pixel coordinate math (`yNow - centerOffset` and `xNow - centerOffset`) for both the dashboard and Dasa/Bhukti Visual Track, with layout-aware state observation (`maxValue > 0`) ensuring instant and reliable "Go to Now" execution on launch and button click.
+- **Strict Bilingual Localization Parity**: Externalized all user-facing strings and completed fluent Tamil translations across settings, profiles, Dasa/Bhukti timelines, and visual track canvas labels.
 
 ## 2. Technical Stack
 - **UI**: Kotlin, Compose (M3), Jetpack Glance (Widgets), Navigation 3.
 - **Logic**: ELP-2000 / Meeus / IAU 1982 (Sidereal), Lahiri Ayanamsha, Vimsottari Dasa Engine.
 - **Storage**: DataStore (Settings), Disk JSON (Atomic Cache, Reminders, Birth Profiles JSON).
-- **Background**: Jetpack WorkManager (`ReminderWorker`, `WidgetUpdateWorker`).
+- **Background**: Jetpack WorkManager (`ReminderWorker`, `WidgetUpdateWorker`, `WatchdogWorker`).
 
 ## 3. Next Focus
 - **Adaptive Layouts**: List-Detail patterns for Tablets/Foldables.

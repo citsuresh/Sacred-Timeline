@@ -870,6 +870,9 @@
     <string name="initials_placeholder">Leave blank for color only</string>
     <string name="general_rule">General Rule</string>
     <string name="personal_natal_rule">Personal Natal Rule</string>
+    <string name="natal_compatibility_favorable">Favorable for your Lagna (rules Trikona 1, 5, 9)</string>
+    <string name="natal_compatibility_conflicting">Challenging for your Lagna (rules Dustana 6, 8, 12)</string>
+    <string name="natal_compatibility_neutral">Neutral for your Lagna chart</string>
     <string name="upachaya_desc">• Upachayathipathis (Growth Lords - 3, 6, 10, 11): Lords of houses of steady growth, enterprise, and material improvement over time.</string>
     <string name="maraka_desc">• Marakadhipathis (Death-Inflicting Lords - 2, 7): Lords of houses associated with vital energy transition and wealth accumulation.</string>
     <string name="badhaka_desc">• Badhaka Lord (Obstruction Lord): The lord of the specific obstruction house depending on whether the Lagna is Movable (11th), Fixed (9th), or Dual (7th).</string>
@@ -935,4 +938,17 @@
     <string name="planet_ketu">Ketu</string>
     <string name="am_abbr">AM</string>
     <string name="pm_abbr">PM</string>
+    <string name="event_title_format">Event: %s</string>
+    <string name="error_name_required">Name is required</string>
+    <string name="error_format_must_be">Format must be %s</string>
+    <string name="format_label">Format: %s</string>
+    <string name="birth_time_label">Birth Time (%s) *</string>
+    <string name="error_birth_place_required">Birth place and coordinates required</string>
+    <string name="searching_locations">Searching locations…</string>
+    <string name="type_for_suggestions">Type 3+ letters for town/village suggestions</string>
+    <string name="coordinates_resolved">✓ Coordinates auto-resolved</string>
+    <string name="latitude_label">Latitude *</string>
+    <string name="longitude_label">Longitude *</string>
+    <string name="required_placeholder">Required</string>
+    <string name="test_notification_triggered">Test notification triggered manually!</string>
 </resources>

@@ -352,12 +352,17 @@ fun DashboardDetailSheet(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Column(modifier = Modifier.weight(1f)) {
+                                    val typeStr = when (rem.reminderType) {
+                                        ReminderType.START_RELATIVE -> stringResource(R.string.relative_to_start)
+                                        ReminderType.END_RELATIVE -> stringResource(R.string.relative_to_end)
+                                        ReminderType.CUSTOM_ABSOLUTE -> stringResource(R.string.custom_time_before)
+                                    }
                                     val summary = buildString {
-                                        append(rem.reminderType.name.replace("_", " ").lowercase())
+                                        append(typeStr)
                                         if (rem.offsetDays > 0) append(" • ${rem.offsetDays}d")
                                         if (rem.offsetHours > 0) append(" • ${rem.offsetHours}h")
-                                        if (rem.offsetMinutes > 0) append(" • ${rem.offsetMinutes}m before")
-                                        if (rem.isRecurring) append(" • 🔁 All Occurrences")
+                                        if (rem.offsetMinutes > 0) append(" • ${rem.offsetMinutes}m")
+                                        if (rem.isRecurring) append(" • 🔁")
                                     }
                                     Text(summary, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.primary)
                                 }
@@ -366,7 +371,7 @@ fun DashboardDetailSheet(
                                         onClick = { editingReminder = rem },
                                         modifier = Modifier.size(24.dp)
                                     ) {
-                                        Icon(Icons.Default.Edit, contentDescription = "Edit", tint = MaterialTheme.colorScheme.primary)
+                                        Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit_reminder), tint = MaterialTheme.colorScheme.primary)
                                     }
                                     Spacer(modifier = Modifier.width(4.dp))
                                     IconButton(
@@ -382,7 +387,7 @@ fun DashboardDetailSheet(
                                         },
                                         modifier = Modifier.size(24.dp)
                                     ) {
-                                        Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
+                                        Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.btn_delete), tint = MaterialTheme.colorScheme.error)
                                     }
                                 }
                             }
@@ -429,8 +434,13 @@ fun DashboardDetailSheet(
                                     fontWeight = FontWeight.Bold,
                                     color = contentColor
                                 )
+                                val birthStarTextRes = when (detail.timing.compatibility) {
+                                    HoraCompatibility.FAVORABLE -> R.string.birth_star_favorable
+                                    HoraCompatibility.CONFLICTING -> R.string.birth_star_conflicting
+                                    HoraCompatibility.NEUTRAL -> R.string.birth_star_neutral
+                                }
                                 Text(
-                                    text = stringResource(R.string.birth_star_favorable),
+                                    text = stringResource(birthStarTextRes),
                                     style = MaterialTheme.typography.labelSmall,
                                     color = contentColor.copy(alpha = 0.8f)
                                 )
@@ -462,13 +472,13 @@ fun DashboardDetailSheet(
                                     fontWeight = FontWeight.Bold,
                                     color = contentColor
                                 )
-                                val natalCompText = when (detail.timing.natalCompatibility) {
-                                    HoraCompatibility.FAVORABLE -> "Favorable for your Lagna (rules Trikona 1, 5, 9)"
-                                    HoraCompatibility.CONFLICTING -> "Challenging for your Lagna (rules Dustana 6, 8, 12)"
-                                    HoraCompatibility.NEUTRAL -> "Neutral for your Lagna chart"
+                                val natalCompTextRes = when (detail.timing.natalCompatibility) {
+                                    HoraCompatibility.FAVORABLE -> R.string.natal_compatibility_favorable
+                                    HoraCompatibility.CONFLICTING -> R.string.natal_compatibility_conflicting
+                                    HoraCompatibility.NEUTRAL -> R.string.natal_compatibility_neutral
                                 }
                                 Text(
-                                    text = natalCompText,
+                                    text = stringResource(natalCompTextRes),
                                     style = MaterialTheme.typography.labelSmall,
                                     color = contentColor.copy(alpha = 0.8f)
                                 )
@@ -617,7 +627,7 @@ fun DashboardDetailSheet(
                                         shape = RoundedCornerShape(4.dp)
                                     ) {
                                         Text(
-                                            text = "NOW",
+                                            text = stringResource(R.string.label_now_line),
                                             style = MaterialTheme.typography.labelSmall,
                                             color = Color.White,
                                             modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp),

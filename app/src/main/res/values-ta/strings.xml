@@ -885,4 +885,20 @@
     <string name="last_reminder_label">கடைசி நினைவூட்டல்: %1$s (%2$s)</string>
     <string name="am_abbr">மு.ப</string>
     <string name="pm_abbr">பி.ப</string>
+    <string name="natal_compatibility_favorable">உங்கள் லக்னத்திற்கு சாதகமானது (திரிகோண 1, 5, 9 அதிபதிகள்)</string>
+    <string name="natal_compatibility_conflicting">உங்கள் லக்னத்திற்கு சவாலானது (துஸ்தான 6, 8, 12 அதிபதிகள்)</string>
+    <string name="natal_compatibility_neutral">உங்கள் லக்னத்திற்கு நடுநிலையானது</string>
+    <string name="event_title_format">நிகழ்வு: %s</string>
+    <string name="error_name_required">பெயர் அவசியம்</string>
+    <string name="error_format_must_be">வடிவம் %s ஆக இருக்க வேண்டும்</string>
+    <string name="format_label">வடிவம்: %s</string>
+    <string name="birth_time_label">பிறந்த நேரம் (%s) *</string>
+    <string name="error_birth_place_required">பிறந்த இடம் மற்றும் ஆயத்தொலைவுகள் அவசியம்</string>
+    <string name="searching_locations">இடங்களைத் தேடுகிறது…</string>
+    <string name="type_for_suggestions">ஊர்/கிராமப் பரிந்துரைகளுக்கு 3+ எழுத்துக்களை உள்ளிடவும்</string>
+    <string name="coordinates_resolved">✓ ஆயத்தொலைவுகள் தானாக கண்டறியப்பட்டன</string>
+    <string name="latitude_label">அகலாங்கு (Latitude) *</string>
+    <string name="longitude_label">தீர்க்காங்கு (Longitude) *</string>
+    <string name="required_placeholder">தேவை</string>
+    <string name="test_notification_triggered">கைமுறையாகத் தூண்டப்பட்ட சோதனை அறிவிப்பு!</string>
 </resources>
