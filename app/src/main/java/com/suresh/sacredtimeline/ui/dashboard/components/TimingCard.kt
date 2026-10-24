@@ -3,6 +3,7 @@ package com.suresh.sacredtimeline.ui.dashboard.components
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -34,9 +35,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.compose.ui.layout.onGloballyPositioned
 import com.suresh.sacredtimeline.R
 import com.suresh.sacredtimeline.model.*
 import com.suresh.sacredtimeline.ui.theme.*
@@ -51,9 +54,12 @@ fun TimingCard(
     segments: List<LaneSegment>,
     showSubHoras: Boolean = false,
     currentTime: LocalTime = LocalTime.now(),
+    scrollState: ScrollState,
     onClick: () -> Unit
 ) {
     if (segments.isEmpty()) return
+
+    val scrollOffset = scrollState.value.toFloat()
 
     val topOffset = calculateOffset(timing.startTime, hourHeight)
     val bottomOffset = calculateOffset(timing.endTime, hourHeight)
@@ -63,6 +69,21 @@ fun TimingCard(
     val contentColor = SacredTimelineColors.getContentColor(timingColor)
     val density = LocalDensity.current
     val interactionSource = remember { MutableInteractionSource() }
+
+    val textHeightPx = with(density) { 64.dp.toPx() }
+
+    val cardTopPx = with(density) { topOffset.toPx() }
+    val cardBottomPx = with(density) { bottomOffset.toPx() }
+    val cardHeightPx = cardBottomPx - cardTopPx
+
+    val maxScrollOffset = (cardHeightPx - textHeightPx).coerceAtLeast(0f)
+    val cardScreenY = cardTopPx - scrollOffset
+    val textOffsetYPx = when {
+        cardScreenY >= 0f -> 0f
+        else -> (-cardScreenY).coerceIn(0f, maxScrollOffset)
+    }
+
+    android.util.Log.d("GlidingDebug", "Card: ${timing.name} | scrollOffset: $scrollOffset | cardTopPx: $cardTopPx | cardScreenY: $cardScreenY | textHeightPx: $textHeightPx | textOffsetYPx: $textOffsetYPx")
 
     BoxWithConstraints(
         modifier = Modifier
@@ -155,24 +176,33 @@ fun TimingCard(
                 .thenByDescending { java.time.Duration.between(it.startTime, it.endTime).toMinutes() }
         ).firstOrNull() ?: segments[0]
         
-        val sOffset = calculateOffset(widestSegment.startTime, hourHeight) - topOffset
-        val sHeight = calculateOffset(widestSegment.endTime, hourHeight) - calculateOffset(widestSegment.startTime, hourHeight)
+        val sHeight = totalHeight
         
         Box(
             modifier = Modifier
-                .offset(x = maxWidth * widestSegment.offsetFactor, y = sOffset)
+                .offset(x = maxWidth * widestSegment.offsetFactor)
+                .offset {
+                    val currentScroll = scrollState.value.toFloat()
+                    val screenY = cardTopPx - currentScroll
+                    val dy = when {
+                        screenY >= 0f -> 0f
+                        else -> (-screenY).coerceIn(0f, maxScrollOffset)
+                    }
+                    android.util.Log.d("GlidingLayout", "Card: ${timing.name} | currentScroll: $currentScroll | screenY: $screenY | dy: $dy")
+                    IntOffset(0, dy.toInt())
+                }
                 .size(width = maxWidth * widestSegment.widthFactor, height = sHeight)
                 .zIndex(1f)
         ) {
             val isHoraWithSub = timing is Hora && showSubHoras && sHeight > 50.dp && timing.subHoras.isNotEmpty() && timing.isCurrent(currentTime)
             Row(
                 modifier = Modifier.fillMaxSize().padding(horizontal = 2.dp, vertical = 2.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.Top
             ) {
                 Column(
-                    modifier = Modifier.fillMaxHeight().weight(if (isHoraWithSub) 0.58f else 1f),
+                    modifier = Modifier.fillMaxHeight().weight(if (isHoraWithSub) 0.58f else 1f).padding(top = 2.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                    verticalArrangement = Arrangement.Top
                 ) {
                 // 0. Dual Compatibility Badges for Hora
                 if (timing is Hora && sHeight > 40.dp) {

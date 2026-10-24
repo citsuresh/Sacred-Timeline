@@ -63,6 +63,7 @@ fun TimelineDashboard(
     val showSubHoras by viewModel.showSubHoras.collectAsState(initial = false)
     val timelineViewStyleStr by viewModel.timelineViewStyle.collectAsState()
     val activeProfile by viewModel.activeProfile.collectAsState(initial = null)
+    val scrollToNowEvent by viewModel.scrollToNowEvent.collectAsState()
     val timelineViewStyle = remember(timelineViewStyleStr) {
         try { TimelineViewStyle.valueOf(timelineViewStyleStr) } catch (ignore: Exception) { TimelineViewStyle.EQUAL_DISTRIBUTION }
     }
@@ -259,7 +260,8 @@ fun TimelineDashboard(
                 selectedDetail = detail
                 showSheet = true
             },
-            onTodayClick = { viewModel.updateDate(LocalDate.now()) },
+            onTodayClick = { viewModel.goToNow() },
+            scrollToNowEvent = scrollToNowEvent,
             onCalendarClick = { showDatePicker = true },
             onProfileClick = onProfileClick,
             activeProfile = activeProfile
@@ -311,7 +313,8 @@ fun TimelineDashboard(
                 selectedDetail = detail
                 showSheet = true
             },
-            onTodayClick = { viewModel.updateDate(LocalDate.now()) },
+            onTodayClick = { viewModel.goToNow() },
+            scrollToNowEvent = scrollToNowEvent,
             onCalendarClick = { showDatePicker = true },
             onProfileClick = onProfileClick,
             activeProfile = activeProfile

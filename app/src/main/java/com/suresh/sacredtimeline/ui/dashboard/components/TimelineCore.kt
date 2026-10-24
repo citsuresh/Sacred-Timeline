@@ -16,6 +16,7 @@ import kotlin.math.abs
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -99,7 +100,8 @@ fun TimelinePager(
     onDetailClick: (com.suresh.sacredtimeline.model.DashboardDetail) -> Unit = {},
     isLandscape: Boolean,
     viewStyle: TimelineViewStyle = TimelineViewStyle.EQUAL_DISTRIBUTION,
-    showSubHoras: Boolean = false
+    showSubHoras: Boolean = false,
+    scrollToNowEvent: Long = 0L
 ) {
     val hourHeight = BASE_HOUR_HEIGHT * timelineScale
     
@@ -194,7 +196,8 @@ fun TimelinePager(
                             isHeaderExpanded = isHeaderExpanded,
                             onToggleHeaderExpanded = onToggleHeaderExpanded,
                             viewStyle = viewStyle,
-                            showSubHoras = showSubHoras
+                            showSubHoras = showSubHoras,
+                            scrollToNowEvent = scrollToNowEvent
                         )
                     } else {
                         Box(modifier = Modifier.fillMaxSize()) {
@@ -258,7 +261,8 @@ fun TimelineContent(
     isHeaderExpanded: Boolean = false,
     onToggleHeaderExpanded: (Boolean) -> Unit = {},
     viewStyle: TimelineViewStyle = TimelineViewStyle.EQUAL_DISTRIBUTION,
-    showSubHoras: Boolean = false
+    showSubHoras: Boolean = false,
+    scrollToNowEvent: Long = 0L
 ) {
     val scrollState = rememberScrollState()
     val density = LocalDensity.current
@@ -281,6 +285,14 @@ fun TimelineContent(
             val nowOffset = with(density) { calculateOffset(currentTime, hourHeight).toPx() }
             val centerOffset = containerHeight / 2
             scrollState.scrollTo((nowOffset - centerOffset).toInt().coerceAtLeast(0))
+        }
+    }
+
+    LaunchedEffect(scrollToNowEvent) {
+        if (scrollToNowEvent > 0L && containerHeight > 0 && isToday) {
+            val nowOffset = with(density) { calculateOffset(LocalTime.now(), hourHeight).toPx() }
+            val centerOffset = containerHeight / 2
+            scrollState.animateScrollTo((nowOffset - centerOffset).toInt().coerceAtLeast(0))
         }
     }
 
@@ -462,7 +474,8 @@ fun TimelineContent(
                                     viewStyle = viewStyle,
                                     forceSingleLane = colId == "YOGAM" || colId == "THARA_BALAM" || colId == "HORA" || colId == "GOWRI" || colId == "CHANDRASHTAMAM",
                                     showSubHoras = showSubHoras,
-                                    currentTime = currentTime
+                                    currentTime = currentTime,
+                                    scrollState = scrollState
                                 )
                                 if (index < visibleCols.size - 1) {
                                     VerticalDivider(thickness = 1.dp, color = Color.LightGray.copy(alpha = 0.3f))
@@ -517,7 +530,8 @@ fun TimelineContent(
                                         PillarConfig(leftCat, rightCat)
                                     } else null,
                                     showSubHoras = showSubHoras,
-                                    currentTime = currentTime
+                                    currentTime = currentTime,
+                                    scrollState = scrollState
                                 )
                             }
                         }
@@ -752,7 +766,8 @@ fun TimelineColumn(
     pillarConfig: PillarConfig? = null,
     forceSingleLane: Boolean = false,
     showSubHoras: Boolean = false,
-    currentTime: LocalTime = LocalTime.now()
+    currentTime: LocalTime = LocalTime.now(),
+    scrollState: ScrollState
 ) {
     Box(modifier = modifier.fillMaxHeight()) {
         val segmentsMap = remember(timings, viewStyle, pillarConfig, forceSingleLane) {
@@ -767,6 +782,7 @@ fun TimelineColumn(
                 segments = segments,
                 showSubHoras = showSubHoras,
                 currentTime = currentTime,
+                scrollState = scrollState,
                 onClick = { onTimingClick(timing) }
             )
         }

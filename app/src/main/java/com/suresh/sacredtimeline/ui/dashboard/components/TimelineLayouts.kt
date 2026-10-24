@@ -79,7 +79,8 @@ fun PortraitTimelineLayout(
     onTodayClick: () -> Unit,
     onCalendarClick: () -> Unit,
     onProfileClick: () -> Unit = {},
-    activeProfile: BirthProfile? = null
+    activeProfile: BirthProfile? = null,
+    scrollToNowEvent: Long = 0L
 ) {
     Scaffold(
         topBar = {
@@ -185,7 +186,8 @@ fun PortraitTimelineLayout(
                     onZoomIn = onZoomIn,
                     onZoomOut = onZoomOut,
                     onDetailClick = onDetailClick,
-                    isLandscape = false
+                    isLandscape = false,
+                    scrollToNowEvent = scrollToNowEvent
                 )
             }
         }
@@ -234,7 +236,8 @@ fun LandscapeTimelineLayout(
     onTodayClick: () -> Unit,
     onCalendarClick: () -> Unit,
     onProfileClick: () -> Unit = {},
-    activeProfile: BirthProfile? = null
+    activeProfile: BirthProfile? = null,
+    scrollToNowEvent: Long = 0L
 ) {
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Row(modifier = Modifier.fillMaxSize()) {
@@ -439,7 +442,8 @@ fun LandscapeTimelineLayout(
                     onZoomIn = onZoomIn,
                     onZoomOut = onZoomOut,
                     onDetailClick = onDetailClick,
-                    isLandscape = true
+                    isLandscape = true,
+                    scrollToNowEvent = scrollToNowEvent
                 )
             }
         }

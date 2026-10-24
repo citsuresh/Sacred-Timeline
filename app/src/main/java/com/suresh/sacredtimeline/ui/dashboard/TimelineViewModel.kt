@@ -343,8 +343,19 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    private val _scrollToNowEvent = MutableStateFlow(0L)
+    val scrollToNowEvent: StateFlow<Long> = _scrollToNowEvent
+
     fun updateDate(date: LocalDate) {
         _selectedDate.value = date
+    }
+
+    fun goToNow() {
+        if (_selectedDate.value == LocalDate.now()) {
+            _scrollToNowEvent.value = System.currentTimeMillis()
+        } else {
+            _selectedDate.value = LocalDate.now()
+        }
     }
 
     fun updateTimelineScale(scale: Float) {
