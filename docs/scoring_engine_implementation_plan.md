@@ -1,36 +1,30 @@
-# Implementation Plan - Multi-Factor Scoring Engine & Personal Power Meter
+# Implementation Plan - Multi-Factor Scoring Engine & Personal Power Meter (Phase 10)
 
 ## User Review Required
 > [!IMPORTANT]
-> This plan outlines the implementation of the **Multi-Factor Scoring Engine & Personal Power Meter** (Phase 11), featuring a real-time **"Now Score"** (0-100%), human-friendly interpretation bands, Chandrashtamam/malefic Tara Bala penalty overrides, transparent factor breakdown audit view, user-configurable weights in Settings, and strict bilingual localization parity (English & Tamil).
+> **Strict Prerequisite**: All work on Phase 10 is dependent on the completion of the prerequisite refactoring outlined in [sun_indicators_refactoring_implementation_plan.md](file:///C:/MyFiles/Git/AndroidStudioProjects/SacredTimeline/docs/sun_indicators_refactoring_implementation_plan.md). That refactoring must be fully implemented, verified, and committed independently before starting this plan.
 
-## Proposed Components & Changes
+---
 
-### 1. Domain Logic & Scoring Engine (`ScoringEngine.kt`, `ScoringWeightsConfig.kt`)
-- **Scope**:
-  - Create `ScoringWeightsConfig` data model (Thara Bala 15%, Chandrashtamam/Afflictions 15%, Transit 15%, Dasa 15%, Hora 15%, Yoga 15%, Tithi 10% = 100%).
-  - Implement `ScoringEngine` calculator function taking `DayData`, `BirthProfile`, current `LocalTime`, and weights.
-  - Implement rating band mapping (`Very Favorable`, `Favorable`, `Mixed`, `Challenging`, `Avoid`) and color mappings.
-  - Implement critical personal warning override (e.g., active Chandrashtamam caps score at 35%).
-  - Generate itemized score breakdown points for transparency audit.
+## Phase 10: Multi-Factor Scoring Engine & Personal Power Meter Implementation Plan
 
-### 2. Settings & Persistence (`SettingsRepository.kt`, `ScoringSettingsScreen.kt`)
-- **Scope**:
-  - Add DataStore preferences for custom scoring weights in `SettingsRepository.kt`.
-  - Build UI controls in Settings allowing users to customize weight percentages with real-time total validation (summing to 100%).
+### Milestone 1: Interactive UI Prototype Skeleton & Ergonomics
+- **Phase A: Header Power Meter Row (`PowerMeterRow.kt`)**
+  - Compact, color-coded status bar with quick action icon buttons (`[🔍 Find Best Window]`, `[⏱️ Preview Time]`, `[📊 Toggle Heatmap Track]`).
+- **Phase B: Score Breakdown Sheet (`ScoreBreakdownSheet.kt`, `SpeedometerCanvas.kt`)**
+  - Modal bottom sheet featuring an enlarged center-aligned semi-circular speedometer canvas with a needle pointer, score percentage, band title, and itemized factor cards.
+- **Phase C: 24-Hour Score Heatmap Track Column (`ScoreHeatmapColumn.kt`)**
+  - Optional toggleable vertical gradient column (Red to Green) across the timeline with tap-to-inspect time selection.
+- **Phase D: Floating NOW Gauge & Interactive Preview Line (`NowIndicator.kt`, `PreviewIndicator.kt`)**
+  - Circular speedometer gauge attached to the NOW line with persistent horizontal drag and vertical slop detection to spawn preview mode.
+  - Purple Preview Line with independent vertical drag gesture isolation (`PointerEventPass.Initial`) preventing parent timeline scroll interference.
 
-### 3. Dashboard UI & Power Meter Component (`PowerMeterCard.kt`, `ScoreBreakdownDialog.kt`, `TimelineDashboard.kt`)
-- **Scope**:
-  - Build `PowerMeterCard` (circular arc gauge showing percentage, band title, and color status) placed prominently above the timeline.
-  - Build `ScoreBreakdownDialog` to display transparent factor-by-factor contributions upon tapping the gauge.
-  - Wire up live score updates as time transitions or date is selected.
+### Milestone 2: Domain Scoring Engine & Real Wiring
+- **Phase E: Core Scoring Engine (`ScoringWeightsConfig.kt`, `ScoringEngine.kt`)**
+  - Weighted factor calculation (Thara Bala 20%, Transits 20%, Dasa 20%, Hora 15%, Yoga 15%, Tithi 10% = 100%), rating bands, and warning overrides (Chandrashtamam penalty).
+- **Phase F: Wiring & Settings Persistence (`SettingsRepository.kt`)**
+  - Connect real scoring engine outputs to UI components and add weight customization preferences in Settings.
 
-### 4. Localization & Translation Parity (`strings.xml`, `values-ta/strings.xml`)
-- **Scope**:
-  - Externalize all rating bands (`Very Favorable`, `Favorable`, `Mixed`, `Challenging`, `Avoid`), breakdown titles, and weight labels into `values/strings.xml` and complete fluent Tamil translations in `values-ta/strings.xml`.
-
-### 5. Verification Plan
-- **Automated Tests**:
-  - Unit tests verifying scoring bounds (0-100), Chandrashtamam penalty overrides, and weight normalization.
-- **Build Verification**:
-  - Compile debug build: `gradle_build(":app:assembleDebug")`.
+### Milestone 3: Verification & Build Check
+- Compile debug build: `gradle_build(":app:assembleDebug")`.
+- Run automated unit tests verifying scoring bounds and weight normalization.

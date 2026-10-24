@@ -30,9 +30,9 @@ Future development phases for the Sacred Timeline project.
 - **Per-Day File Caging**: Granular O(1) disk caching for ephemeris data to optimize memory and date-jump performance.
 - **Background Task Optimization**: Battery-friendly WorkManager scheduling with WakeLocks for reminder and widget reliability.
 
-## Phase 7: UI/UX Refinement & Sticky Labels
-- **Sticky Timeline Labels**: Floating text/icons within long timing cards as the user scrolls.
+## Phase 7: UI/UX Refinement
 - **Bilingual Polish**: Perfect alignment for Tamil + English mixed-mode labels across sheets and cards.
+- **Component Modularization**: Refactor large monolithic files such as `SunIndicators.kt` (~1,440 lines) into modular domain sub-components (`CustomIcons.kt`, `TimelineItemComponents.kt`, `SunTimesDisplay.kt`, `TimelineIndicators.kt`) to improve maintainability and edit robustness.
 
 ## Phase 8: Traditional Iconography (Complete)
 - **Icon Sourcing**: High-fidelity custom PNGs for Pradosham (Nandi), Shivaratri (Shiva), and Chaturthi (Ganesha).
@@ -40,15 +40,11 @@ Future development phases for the Sacred Timeline project.
 ## Phase 9: Configuration Presets & Custom Timelines (Complete)
 - **Custom Timeline Persistence**: DataStore sandbox to remember user's manual column visibility and order.
 
-## Phase 10: Widget Polish & Glance Theming
-- **Dynamic Theming**: Adapting home screen glance widgets to Material You dynamic colors.
-- **Glance Layout Variants**: Additional compact widget formats while preserving core glanceability ("Right Now" status + manual refresh).
-
-## Phase 11: Multi-Factor Scoring Engine & Personal Power Meter
+## Phase 10: Multi-Factor Scoring Engine & Personal Power Meter
 - **Overview**: Real-time evaluation combining Tithi, Nakshatra, Yoga, Thara Balam, Hora, and Chandrashtamam into a 0–100% favorability score with visual gauge and breakdown.
 - **Documentation**: 
     - Design Spec: [SCORING_ENGINE_SPEC.md](file:///C:/MyFiles/Git/AndroidStudioProjects/SacredTimeline/docs/SCORING_ENGINE_SPEC.md)
     - Implementation Plan: [scoring_engine_implementation_plan.md](file:///C:/MyFiles/Git/AndroidStudioProjects/SacredTimeline/docs/scoring_engine_implementation_plan.md)
 
-## Phase 12: Astrological Compatibility Matching (Porutham)
+## Phase 11: Astrological Compatibility Matching (Porutham)
 - **Overview**: Profile-to-profile comparison engine evaluating traditional 10 Poruthams (Dina, Gana, Mahendra, Stree Deergha, Yoni, Rasi, Rasi Athipathi, Vasya, Rajju, and Vedha) between any two saved birth profiles with detailed traditional score breakdowns and overall compatibility ratings.
