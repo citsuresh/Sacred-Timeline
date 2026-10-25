@@ -106,7 +106,8 @@ fun TimelinePager(
     isHeatmapVisible: Boolean = false,
     activeProfile: BirthProfile? = null,
     onIntervalClick: (LocalTime) -> Unit = {},
-    horaScoringMode: String = "NATAL"
+    horaScoringMode: String = "NATAL",
+    showNowGauge: Boolean = true
 ) {
     val hourHeight = BASE_HOUR_HEIGHT * timelineScale
     
@@ -207,7 +208,8 @@ fun TimelinePager(
                             isHeatmapVisible = isHeatmapVisible,
                             activeProfile = activeProfile,
                             onIntervalClick = onIntervalClick,
-                            horaScoringMode = horaScoringMode
+                            horaScoringMode = horaScoringMode,
+                            showNowGauge = showNowGauge
                         )
                     } else {
                         Box(modifier = Modifier.fillMaxSize()) {
@@ -277,7 +279,8 @@ fun TimelineContent(
     isHeatmapVisible: Boolean = false,
     activeProfile: BirthProfile? = null,
     onIntervalClick: (LocalTime) -> Unit = {},
-    horaScoringMode: String = "NATAL"
+    horaScoringMode: String = "NATAL",
+    showNowGauge: Boolean = true
 ) {
     val scrollState = rememberScrollState()
     val density = LocalDensity.current
@@ -583,7 +586,8 @@ fun TimelineContent(
                             thickness = nowLineThickness.dp,
                             onGaugeClick = onGaugeClick,
                             activeProfile = activeProfile,
-                            horaScoringMode = horaScoringMode
+                            horaScoringMode = horaScoringMode,
+                            showNowGauge = showNowGauge
                         )
                     }
                 }

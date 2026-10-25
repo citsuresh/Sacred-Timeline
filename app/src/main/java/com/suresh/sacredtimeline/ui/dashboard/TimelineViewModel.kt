@@ -59,6 +59,12 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
 
     val timeFormat24h = repository.timeFormat24h
     val horaScoringMode = repository.horaScoringMode
+    val showNowGauge: StateFlow<Boolean> = repository.showNowGauge.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), true
+    )
+    val showPowerMeterRow: StateFlow<Boolean> = repository.showPowerMeterRow.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), true
+    )
     
     val showNowLine: StateFlow<Boolean> = repository.showNowLine.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), true

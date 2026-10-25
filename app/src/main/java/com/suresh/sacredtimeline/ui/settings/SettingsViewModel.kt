@@ -523,7 +523,12 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     fun updateTithiWeight(w: Float) { viewModelScope.launch { repository.updateTithiWeight(w) } }
 
     val horaScoringMode = repository.horaScoringMode
+    val showPowerMeterRow = repository.showPowerMeterRow
+    val showNowGauge = repository.showNowGauge
+
     fun setHoraScoringMode(mode: String) { viewModelScope.launch { repository.setHoraScoringMode(mode) } }
+    fun setShowPowerMeterRow(show: Boolean) { viewModelScope.launch { repository.setShowPowerMeterRow(show) } }
+    fun setShowNowGauge(show: Boolean) { viewModelScope.launch { repository.setShowNowGauge(show) } }
 }
 
 sealed interface SearchState {

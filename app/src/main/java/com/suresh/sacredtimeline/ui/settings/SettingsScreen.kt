@@ -195,10 +195,22 @@ fun SettingsScreen(
 
             // Scoring & Power Meter
             item {
-                SettingsSection(title = "Scoring & Power Meter") {
+                SettingsSection(title = stringResource(R.string.section_scoring_power_meter)) {
                     SettingsClickableItem(
-                        label = "Configure Scoring Weights",
+                        label = stringResource(R.string.settings_configure_scoring_weights),
                         onClick = onNavigateToScoringWeightsSettings
+                    )
+                    val showPowerMeterRow by viewModel.showPowerMeterRow.collectAsState(initial = true)
+                    SettingsToggleItem(
+                        label = stringResource(R.string.settings_show_power_meter_row),
+                        checked = showPowerMeterRow,
+                        onCheckedChange = { viewModel.setShowPowerMeterRow(it) }
+                    )
+                    val showNowGauge by viewModel.showNowGauge.collectAsState(initial = true)
+                    SettingsToggleItem(
+                        label = stringResource(R.string.settings_show_now_gauge),
+                        checked = showNowGauge,
+                        onCheckedChange = { viewModel.setShowNowGauge(it) }
                     )
                 }
             }

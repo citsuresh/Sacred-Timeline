@@ -71,6 +71,8 @@ class SettingsRepository(private val context: Context) {
         val YOGA_WEIGHT = floatPreferencesKey("yoga_weight")
         val TITHI_WEIGHT = floatPreferencesKey("tithi_weight")
         val HORA_SCORING_MODE = stringPreferencesKey("hora_scoring_mode")
+        val SHOW_POWER_METER_ROW = booleanPreferencesKey("show_power_meter_row")
+        val SHOW_NOW_GAUGE = booleanPreferencesKey("show_now_gauge")
     }
 
     val compositeScale: Flow<Float> = context.dataStore.data.map { it[Keys.COMPOSITE_SCALE] ?: 1.0f }
@@ -83,6 +85,8 @@ class SettingsRepository(private val context: Context) {
     val yogaWeight: Flow<Float> = context.dataStore.data.map { it[Keys.YOGA_WEIGHT] ?: 0.15f }
     val tithiWeight: Flow<Float> = context.dataStore.data.map { it[Keys.TITHI_WEIGHT] ?: 0.10f }
     val horaScoringMode: Flow<String> = context.dataStore.data.map { it[Keys.HORA_SCORING_MODE] ?: "NATAL" }
+    val showPowerMeterRow: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_POWER_METER_ROW] ?: true }
+    val showNowGauge: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHOW_NOW_GAUGE] ?: true }
     
     val columnVisibility: Flow<Set<String>> = context.dataStore.data.map { 
         it[Keys.COLUMN_VISIBILITY] ?: setOf("UNIVERSAL", "CHANDRASHTAMAM", "YOGAM", "THARA_BALAM")
@@ -534,4 +538,6 @@ class SettingsRepository(private val context: Context) {
     suspend fun updateYogaWeight(w: Float) { context.dataStore.edit { it[Keys.YOGA_WEIGHT] = w } }
     suspend fun updateTithiWeight(w: Float) { context.dataStore.edit { it[Keys.TITHI_WEIGHT] = w } }
     suspend fun setHoraScoringMode(mode: String) { context.dataStore.edit { it[Keys.HORA_SCORING_MODE] = mode } }
+    suspend fun setShowPowerMeterRow(show: Boolean) { context.dataStore.edit { it[Keys.SHOW_POWER_METER_ROW] = show } }
+    suspend fun setShowNowGauge(show: Boolean) { context.dataStore.edit { it[Keys.SHOW_NOW_GAUGE] = show } }
 }

@@ -926,5 +926,7 @@
     <string name="label_hora_scoring_mode">ஹோரை மதிப்பீட்டு முறை (Hora Scoring Mode)</string>
     <string name="option_natal_birth">ஜன்ம நட்சத்திரப் பொருத்தம்</string>
     <string name="option_general_weekday">பொதுவான கிழமைத் தன்மை</string>
-    <string name="label_hora_quality_desc">ஹோரை தரம் (தனிப்பயனாக்கப்பட்ட பொருத்தம்)</string>
+    <string name="label_hora_quality_desc">ஹோரை தரம் (தனிப்பയனாக்கப்பட்ட பொருத்தம்)</string>
+    <string name="settings_show_power_meter_row">சக்தி அளவுகோல் வரிசையைக் காட்டு (Power Meter)</string>
+    <string name="settings_show_now_gauge">நடப்பு நேரக் குறியீட்டுக் காட்டி (NOW Line Gauge)</string>
 </resources>

@@ -38,7 +38,8 @@ fun BoxScope.NowIndicator(
     thickness: Dp = 2.dp,
     onGaugeClick: () -> Unit = {},
     activeProfile: BirthProfile? = null,
-    horaScoringMode: String = "NATAL"
+    horaScoringMode: String = "NATAL",
+    showNowGauge: Boolean = true
 ) {
     var currentTime by remember { mutableStateOf(LocalTime.now()) }
     
@@ -113,48 +114,50 @@ fun BoxScope.NowIndicator(
         )
     }
 
-    Surface(
-        onClick = { onGaugeClick() },
-        color = Color.White,
-        shape = CircleShape,
-        border = BorderStroke(2.5.dp, color),
-        shadowElevation = 6.dp,
-        modifier = Modifier
-            .offset(
-                x = with(density) { dragOffsetPx.toDp() },
-                y = topOffset - 32.dp
-            )
-            .size(64.dp)
-            .align(badgeAlignment)
-            .pointerInput(Unit) {
-                detectHorizontalDragGestures { change, dragAmount ->
-                    change.consume()
-                    dragOffsetPx += dragAmount
+    if (showNowGauge) {
+        Surface(
+            onClick = { onGaugeClick() },
+            color = Color.White,
+            shape = CircleShape,
+            border = BorderStroke(2.5.dp, color),
+            shadowElevation = 6.dp,
+            modifier = Modifier
+                .offset(
+                    x = with(density) { dragOffsetPx.toDp() },
+                    y = topOffset - 32.dp
+                )
+                .size(64.dp)
+                .align(badgeAlignment)
+                .pointerInput(Unit) {
+                    detectHorizontalDragGestures { change, dragAmount ->
+                        change.consume()
+                        dragOffsetPx += dragAmount
+                    }
                 }
-            }
-    ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(2.dp)
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
             ) {
-                SpeedometerCanvas(
-                    score = score,
-                    modifier = Modifier.size(42.dp, 21.dp),
-                    strokeWidth = 6.dp,
-                    showNeedle = true
-                )
-                Spacer(modifier = Modifier.height(1.dp))
-                Text(
-                    text = "${score.toInt()}%",
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Black,
-                    color = Color.Black
-                )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.padding(2.dp)
+                ) {
+                    SpeedometerCanvas(
+                        score = score,
+                        modifier = Modifier.size(42.dp, 21.dp),
+                        strokeWidth = 6.dp,
+                        showNeedle = true
+                    )
+                    Spacer(modifier = Modifier.height(1.dp))
+                    Text(
+                        text = "${score.toInt()}%",
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Black,
+                        color = Color.Black
+                    )
+                }
             }
         }
     }

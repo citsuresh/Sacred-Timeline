@@ -91,7 +91,9 @@ fun PortraitTimelineLayout(
     onGaugeClick: () -> Unit = {},
     onIntervalClick: (LocalTime) -> Unit = {},
     horaScoringMode: String = "NATAL",
-    isLoading: Boolean = false
+    isLoading: Boolean = false,
+    showPowerMeterRow: Boolean = true,
+    showNowGauge: Boolean = true
 ) {
     Scaffold(
         topBar = {
@@ -164,15 +166,17 @@ fun PortraitTimelineLayout(
                 onDateSelected = onDateSelected
             )
             
-            PowerMeterRow(
-                score = score,
-                bandTitle = bandTitle,
-                onBreakdownClick = onBreakdownClick,
-                onPreviewClick = onPreviewClick,
-                onHeatmapToggle = onHeatmapToggle,
-                isHeatmapVisible = isHeatmapVisible,
-                isLoading = isLoading
-            )
+            if (showPowerMeterRow) {
+                PowerMeterRow(
+                    score = score,
+                    bandTitle = bandTitle,
+                    onBreakdownClick = onBreakdownClick,
+                    onPreviewClick = onPreviewClick,
+                    onHeatmapToggle = onHeatmapToggle,
+                    isHeatmapVisible = isHeatmapVisible,
+                    isLoading = isLoading
+                )
+            }
             
             Box(modifier = Modifier.weight(1f)) {
                 TimelinePager(
@@ -213,7 +217,8 @@ fun PortraitTimelineLayout(
                     isHeatmapVisible = isHeatmapVisible,
                     activeProfile = activeProfile,
                     onIntervalClick = onIntervalClick,
-                    horaScoringMode = horaScoringMode
+                    horaScoringMode = horaScoringMode,
+                    showNowGauge = showNowGauge
                 )
             }
         }
@@ -273,7 +278,9 @@ fun LandscapeTimelineLayout(
     onGaugeClick: () -> Unit = {},
     onIntervalClick: (LocalTime) -> Unit = {},
     horaScoringMode: String = "NATAL",
-    isLoading: Boolean = false
+    isLoading: Boolean = false,
+    showPowerMeterRow: Boolean = true,
+    showNowGauge: Boolean = true
 ) {
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Row(modifier = Modifier.fillMaxSize()) {
@@ -484,7 +491,8 @@ fun LandscapeTimelineLayout(
                     isHeatmapVisible = isHeatmapVisible,
                     activeProfile = activeProfile,
                     onIntervalClick = onIntervalClick,
-                    horaScoringMode = horaScoringMode
+                    horaScoringMode = horaScoringMode,
+                    showNowGauge = showNowGauge
                 )
             }
         }

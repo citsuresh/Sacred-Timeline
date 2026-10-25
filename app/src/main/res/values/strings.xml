@@ -977,4 +977,6 @@
     <string name="option_natal_birth">Natal Birth</string>
     <string name="option_general_weekday">General Weekday</string>
     <string name="label_hora_quality_desc">Hora Quality (Personalized Compatibility Weight)</string>
+    <string name="settings_show_power_meter_row">Show Power Meter Row</string>
+    <string name="settings_show_now_gauge">Show NOW Line Gauge</string>
 </resources>

@@ -66,6 +66,8 @@ fun TimelineDashboard(
     val showYogam by viewModel.showYogam.collectAsState()
     val showTharaBalam by viewModel.showTharaBalam.collectAsState()
     val showSubHoras by viewModel.showSubHoras.collectAsState(initial = false)
+    val showPowerMeterRow by viewModel.showPowerMeterRow.collectAsState(initial = true)
+    val showNowGauge by viewModel.showNowGauge.collectAsState(initial = true)
     val timelineViewStyleStr by viewModel.timelineViewStyle.collectAsState()
     val activeProfile by viewModel.activeProfile.collectAsState(initial = null)
     val scrollToNowEvent by viewModel.scrollToNowEvent.collectAsState()
@@ -317,7 +319,9 @@ fun TimelineDashboard(
                 }
             },
             horaScoringMode = horaScoringMode,
-            isLoading = uiState is TimelineUiState.Loading
+            isLoading = uiState is TimelineUiState.Loading,
+            showPowerMeterRow = showPowerMeterRow,
+            showNowGauge = showNowGauge
         )
     } else {
         PortraitTimelineLayout(
@@ -385,7 +389,9 @@ fun TimelineDashboard(
                 }
             },
             horaScoringMode = horaScoringMode,
-            isLoading = uiState is TimelineUiState.Loading
+            isLoading = uiState is TimelineUiState.Loading,
+            showPowerMeterRow = showPowerMeterRow,
+            showNowGauge = showNowGauge
         )
     }
 }
