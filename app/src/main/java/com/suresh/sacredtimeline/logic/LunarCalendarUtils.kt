@@ -50,7 +50,7 @@ object LunarCalendarUtils {
         }
     }
 
-    fun getLunarDayInfo(date: LocalDate, system: String = "AMANTA"): LunarDayInfo {
+    fun getLunarDayInfo(date: LocalDate, system: String = "AMANTA", sunrise: LocalTime? = null, lat: Double = 11.0, lng: Double = 78.0): LunarDayInfo {
         val zoneId = ZoneId.systemDefault()
         val dayStart = date.atStartOfDay(zoneId).toInstant()
         val dayEnd = date.plusDays(1).atStartOfDay(zoneId).toInstant()
@@ -61,27 +61,19 @@ object LunarCalendarUtils {
         val nakshatras = findIntervalsForDay(dayStart, dayEnd) { getLunarValues(it).second }
             .map { it.copy(resId = getNakshatraResId(it.value)) }
 
-        val noonValue = getLunarValues(date.atTime(12, 0).atZone(zoneId).toInstant()).first
+        val sunriseTime = sunrise ?: calculateSunriseSunset(lat, lng, date, zoneId = zoneId).first
+        val sunriseInstant = date.atTime(sunriseTime).atZone(zoneId).toInstant()
+        val sunriseValue = getLunarValues(sunriseInstant).first
         
         // Handle Amanta (South) vs Purnimanta (North) Paksha logic
-        val isValarpirai = if (system == "PURNIMANTA") {
-            // Purnimanta: Month starts at Purnima (15).
-            // Valarpirai (Bright half) is Tithis 1-15 (same as Amanta).
-            // Theipirai (Dark half) is Tithis 16-30.
-            // In some contexts, Purnimanta shifts the *month name*, but the *Paksha* 
-            // of a specific day remains defined by the Tithi (1-15 is Bright, 16-30 is Dark).
-            // If the user wants to swap the *definition* of Paksha, we adjust here.
-            noonValue <= 15
-        } else {
-            noonValue <= 15
-        }
+        val isValarpirai = sunriseValue <= 15
 
         return LunarDayInfo(
             tithis = tithis,
             nakshatras = nakshatras,
             pakshaResId = if (isValarpirai) R.string.paksha_valarpirai else R.string.paksha_theipirai,
-            pakshaDay = if (isValarpirai) noonValue else noonValue - 15,
-            currentTithi = noonValue
+            pakshaDay = if (isValarpirai) sunriseValue else sunriseValue - 15,
+            currentTithi = sunriseValue
         )
     }
 

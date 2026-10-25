@@ -62,7 +62,7 @@ class DayDataProvider(private val context: Context) {
         val timings = provider.getTimings(date, sunResult.sunrise, sunResult.sunset, style, sunDef, lat, lng, 15, 60, lagnaRasi)
         
         val tamilCalendar = TamilCalendarUtils.getTamilDate(date)
-        val lunarDayInfo = LunarCalendarUtils.getLunarDayInfo(date, system)
+        val lunarDayInfo = LunarCalendarUtils.getLunarDayInfo(date, system, sunResult.sunrise, lat, lng)
         
         val zoneId = ZoneId.systemDefault()
         val sunriseInstant = date.atTime(sunResult.sunrise).atZone(zoneId).toInstant()
