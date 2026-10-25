@@ -124,6 +124,7 @@ fun TimelineDashboard(
         ScoreBreakdownSheet(
             score = scoreResult.totalScore,
             bandTitle = scoreResult.bandTitle,
+            factorScores = scoreResult.factorScores,
             onDismiss = { showScoreBreakdown = false },
             onNavigateToScoringWeights = {
                 showScoreBreakdown = false
