@@ -68,15 +68,7 @@ object ScoringEngine {
             else -> 0.7f
         }
 
-        // 5. Gowri Neram active at currentTime
-        val activeGowri = dayData.gowriNeram.find { it.isCurrent(currentTime) }
-        val gowriScore = when (activeGowri?.name) {
-            "Labam", "Dhanam", "Sugam", "Amirtham" -> 0.95f
-            "Rogam", "Visham", "Sorisal" -> 0.3f
-            else -> 0.6f
-        }
-
-        // 6. Thara Bala & Tithi
+        // 5. Thara Bala & Tithi
         val tharaScore = 0.80f
         val tithiScore = 0.80f
         val transitScore = 0.75f
@@ -91,21 +83,22 @@ object ScoringEngine {
 
         val finalScore = (weightedSum * 100f).coerceIn(0f, 100f)
 
+        // Clean score rating bands without Yoga terminology (Amirtha/Siddha/Madhyama removed)
         val bandTitle = when {
-            finalScore >= 80f -> "Amirtha Yoga (Highly Auspicious)"
-            finalScore >= 65f -> "Siddha Yoga (Favorable)"
-            finalScore >= 50f -> "Madhyama (Neutral)"
+            finalScore >= 80f -> "Highly Favorable"
+            finalScore >= 65f -> "Favorable"
+            finalScore >= 50f -> "Neutral"
             finalScore >= 35f -> "Caution / Sub-Optimal"
-            else -> "Inauspicious Window"
+            else -> "Inauspicious Period"
         }
 
         val factors = mapOf(
-            "Thara Bala" to (tharaScore * 100f),
-            "Transits" to (transitScore * 100f),
-            "Hora (${activeHora?.name ?: "General"})" to (horaScore * 100f),
-            "Yogam (${activeYogam?.name ?: "General"})" to (yogaScore * 100f),
-            "Gowri (${activeGowri?.name ?: "General"})" to (gowriScore * 100f),
-            "Tithi" to (tithiScore * 100f)
+            "Thara Bala (Personal Star)" to (tharaScore * weights.tharaBalaWeight * 100f),
+            "Transit Positions (Gochara)" to (transitScore * weights.transitWeight * 100f),
+            "Dasa / Bhukti Period" to (dasaScore * weights.dasaWeight * 100f),
+            "Hora Quality (${activeHora?.name ?: ""})" to (horaScore * weights.horaWeight * 100f),
+            "Yoga Quality (${activeYogam?.name ?: ""})" to (yogaScore * weights.yogaWeight * 100f),
+            "Tithi & Paksha Quality" to (tithiScore * weights.tithiWeight * 100f)
         )
 
         return ScoreResult(
