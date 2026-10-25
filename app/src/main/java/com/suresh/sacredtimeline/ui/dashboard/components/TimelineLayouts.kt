@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import com.suresh.sacredtimeline.R
 import com.suresh.sacredtimeline.model.BirthProfile
 import com.suresh.sacredtimeline.model.Timing
+import java.time.LocalTime
 import com.suresh.sacredtimeline.ui.dashboard.TimelineUiState
 import com.suresh.sacredtimeline.ui.profile.ProfileAvatarBadge
 import com.suresh.sacredtimeline.ui.navigation.ViewMode
@@ -87,7 +88,8 @@ fun PortraitTimelineLayout(
     onPreviewClick: () -> Unit = {},
     onHeatmapToggle: () -> Unit = {},
     isHeatmapVisible: Boolean = false,
-    onGaugeClick: () -> Unit = {}
+    onGaugeClick: () -> Unit = {},
+    onIntervalClick: (LocalTime) -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -206,7 +208,8 @@ fun PortraitTimelineLayout(
                     scrollToNowEvent = scrollToNowEvent,
                     onGaugeClick = onGaugeClick,
                     isHeatmapVisible = isHeatmapVisible,
-                    activeProfile = activeProfile
+                    activeProfile = activeProfile,
+                    onIntervalClick = onIntervalClick
                 )
             }
         }
@@ -263,7 +266,8 @@ fun LandscapeTimelineLayout(
     onPreviewClick: () -> Unit = {},
     onHeatmapToggle: () -> Unit = {},
     isHeatmapVisible: Boolean = false,
-    onGaugeClick: () -> Unit = {}
+    onGaugeClick: () -> Unit = {},
+    onIntervalClick: (LocalTime) -> Unit = {}
 ) {
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Row(modifier = Modifier.fillMaxSize()) {
@@ -472,7 +476,8 @@ fun LandscapeTimelineLayout(
                     scrollToNowEvent = scrollToNowEvent,
                     onGaugeClick = onGaugeClick,
                     isHeatmapVisible = isHeatmapVisible,
-                    activeProfile = activeProfile
+                    activeProfile = activeProfile,
+                    onIntervalClick = onIntervalClick
                 )
             }
         }

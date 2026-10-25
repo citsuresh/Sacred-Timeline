@@ -109,6 +109,7 @@ fun TimelineDashboard(
 
     var showScoreBreakdown by remember { mutableStateOf(false) }
     var isHeatmapVisible by remember { mutableStateOf(false) }
+    var heatmapInspectedResult by remember { mutableStateOf<ScoreResult?>(null) }
 
     val scoreResult = remember(uiState, selectedDate, activeProfile) {
         val dayData = (uiState as? TimelineUiState.Success)?.days?.get(selectedDate)
@@ -120,14 +121,20 @@ fun TimelineDashboard(
         }
     }
 
+    val activeScoreResult = heatmapInspectedResult ?: scoreResult
+
     if (showScoreBreakdown) {
         ScoreBreakdownSheet(
-            score = scoreResult.totalScore,
-            bandTitle = scoreResult.bandTitle,
-            factorScores = scoreResult.factorScores,
-            onDismiss = { showScoreBreakdown = false },
+            score = activeScoreResult.totalScore,
+            bandTitle = activeScoreResult.bandTitle,
+            factorScores = activeScoreResult.factorScores,
+            onDismiss = { 
+                showScoreBreakdown = false
+                heatmapInspectedResult = null
+            },
             onNavigateToScoringWeights = {
                 showScoreBreakdown = false
+                heatmapInspectedResult = null
                 onNavigateToScoringWeights()
             }
         )
@@ -300,7 +307,14 @@ fun TimelineDashboard(
             onBreakdownClick = { showScoreBreakdown = true },
             onHeatmapToggle = { isHeatmapVisible = !isHeatmapVisible },
             isHeatmapVisible = isHeatmapVisible,
-            onGaugeClick = { showScoreBreakdown = true }
+            onGaugeClick = { showScoreBreakdown = true },
+            onIntervalClick = { clickedTime ->
+                val dayData = (uiState as? TimelineUiState.Success)?.days?.get(selectedDate)
+                if (dayData != null) {
+                    heatmapInspectedResult = ScoringEngine.calculateScore(dayData, activeProfile, clickedTime)
+                    showScoreBreakdown = true
+                }
+            }
         )
     } else {
         PortraitTimelineLayout(
@@ -359,7 +373,14 @@ fun TimelineDashboard(
             onBreakdownClick = { showScoreBreakdown = true },
             onHeatmapToggle = { isHeatmapVisible = !isHeatmapVisible },
             isHeatmapVisible = isHeatmapVisible,
-            onGaugeClick = { showScoreBreakdown = true }
+            onGaugeClick = { showScoreBreakdown = true },
+            onIntervalClick = { clickedTime ->
+                val dayData = (uiState as? TimelineUiState.Success)?.days?.get(selectedDate)
+                if (dayData != null) {
+                    heatmapInspectedResult = ScoringEngine.calculateScore(dayData, activeProfile, clickedTime)
+                    showScoreBreakdown = true
+                }
+            }
         )
     }
 }

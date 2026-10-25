@@ -2,6 +2,7 @@ package com.suresh.sacredtimeline.ui.dashboard.components
 
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -27,7 +28,8 @@ fun ScoreHeatmapColumn(
     activeProfile: BirthProfile?,
     hourHeight: Dp,
     scrollState: ScrollState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onIntervalClick: (LocalTime) -> Unit = {}
 ) {
     val density = LocalDensity.current
 
@@ -86,6 +88,7 @@ fun ScoreHeatmapColumn(
                     .height(height)
                     .offset(y = topOffset)
                     .background(interval.color, RoundedCornerShape(4.dp))
+                    .clickable { onIntervalClick(interval.startTime) }
                     .padding(top = 4.dp, start = 2.dp, end = 2.dp),
                 contentAlignment = Alignment.TopCenter
             ) {

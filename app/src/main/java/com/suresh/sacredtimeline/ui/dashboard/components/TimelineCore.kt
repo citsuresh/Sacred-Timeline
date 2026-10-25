@@ -104,7 +104,8 @@ fun TimelinePager(
     scrollToNowEvent: Long = 0L,
     onGaugeClick: () -> Unit = {},
     isHeatmapVisible: Boolean = false,
-    activeProfile: BirthProfile? = null
+    activeProfile: BirthProfile? = null,
+    onIntervalClick: (LocalTime) -> Unit = {}
 ) {
     val hourHeight = BASE_HOUR_HEIGHT * timelineScale
     
@@ -203,7 +204,8 @@ fun TimelinePager(
                             scrollToNowEvent = scrollToNowEvent,
                             onGaugeClick = onGaugeClick,
                             isHeatmapVisible = isHeatmapVisible,
-                            activeProfile = activeProfile
+                            activeProfile = activeProfile,
+                            onIntervalClick = onIntervalClick
                         )
                     } else {
                         Box(modifier = Modifier.fillMaxSize()) {
@@ -271,7 +273,8 @@ fun TimelineContent(
     scrollToNowEvent: Long = 0L,
     onGaugeClick: () -> Unit = {},
     isHeatmapVisible: Boolean = false,
-    activeProfile: BirthProfile? = null
+    activeProfile: BirthProfile? = null,
+    onIntervalClick: (LocalTime) -> Unit = {}
 ) {
     val scrollState = rememberScrollState()
     val density = LocalDensity.current
@@ -450,7 +453,8 @@ fun TimelineContent(
                                 activeProfile = activeProfile,
                                 hourHeight = hourHeight,
                                 scrollState = scrollState,
-                                modifier = Modifier.padding(horizontal = 4.dp)
+                                modifier = Modifier.padding(horizontal = 4.dp),
+                                onIntervalClick = onIntervalClick
                             )
                             VerticalDivider(thickness = 1.dp, color = Color.LightGray.copy(alpha = 0.3f))
                         }
