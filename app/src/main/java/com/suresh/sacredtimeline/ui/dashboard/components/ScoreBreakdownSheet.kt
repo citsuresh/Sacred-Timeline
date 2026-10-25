@@ -12,15 +12,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.suresh.sacredtimeline.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScoreBreakdownSheet(
     score: Float, // 0 to 100
     bandTitle: String,
+    factorScores: Map<String, Float> = emptyMap(),
     onDismiss: () -> Unit,
     onNavigateToScoringWeights: () -> Unit = {}
 ) {
@@ -46,7 +49,7 @@ fun ScoreBreakdownSheet(
                     Text(text = "⚡", fontSize = 22.sp)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Power Score Breakdown",
+                        text = stringResource(R.string.title_power_score_breakdown),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -82,7 +85,7 @@ fun ScoreBreakdownSheet(
                         SpeedometerCanvas(
                             score = score,
                             modifier = Modifier.fillMaxSize(),
-                            strokeWidth = 18.dp,
+                            strokeWidth = 22.dp,
                             showNeedle = true
                         )
                     }
@@ -110,24 +113,35 @@ fun ScoreBreakdownSheet(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Itemized Factor Contributors:",
+                text = stringResource(R.string.label_itemized_factor_contributors),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            FactorContributorCard("Thara Balam (Personal Star)", "Favorable Tara Bala alignment.", "+20 / 20")
-            Spacer(modifier = Modifier.height(8.dp))
-            FactorContributorCard("Transit Influences (Jupiter)", "Supportive planetary transit position.", "+18 / 20")
-            Spacer(modifier = Modifier.height(8.dp))
-            FactorContributorCard("Dasa / Bhukti Period", "Favorable major/minor planetary period.", "+16 / 20")
-            Spacer(modifier = Modifier.height(8.dp))
-            FactorContributorCard("Hora Quality & Compatibility", "Auspicious planetary hour (Hora).", "+15 / 15")
-            Spacer(modifier = Modifier.height(8.dp))
-            FactorContributorCard("Yoga Quality", "Benefic daily Yoga.", "+12 / 15")
-            Spacer(modifier = Modifier.height(8.dp))
-            FactorContributorCard("Tithi & Paksha Quality", "Lunar day (Tithi) influence.", "+8 / 10")
+            if (factorScores.isNotEmpty()) {
+                factorScores.forEach { (factorName, factorScore) ->
+                    FactorContributorCard(
+                        title = factorName,
+                        subtitle = stringResource(R.string.subtitle_weighted_factor_score),
+                        scoreBadge = "${factorScore.toInt()} pts"
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+            } else {
+                FactorContributorCard("Thara Balam (Personal Star)", "Favorable Tara Bala alignment.", "20 pts")
+                Spacer(modifier = Modifier.height(8.dp))
+                FactorContributorCard("Transit Influences (Jupiter)", "Supportive planetary transit position.", "18 pts")
+                Spacer(modifier = Modifier.height(8.dp))
+                FactorContributorCard("Dasa / Bhukti Period", "Favorable major/minor planetary period.", "16 pts")
+                Spacer(modifier = Modifier.height(8.dp))
+                FactorContributorCard("Hora Quality & Compatibility", "Auspicious planetary hour (Hora).", "15 pts")
+                Spacer(modifier = Modifier.height(8.dp))
+                FactorContributorCard("Yoga Quality", "Benefic daily Yoga.", "12 pts")
+                Spacer(modifier = Modifier.height(8.dp))
+                FactorContributorCard("Tithi & Paksha Quality", "Lunar day (Tithi) influence.", "8 pts")
+            }
 
             Spacer(modifier = Modifier.height(32.dp))
         }

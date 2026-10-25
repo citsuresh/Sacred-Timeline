@@ -12,8 +12,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.suresh.sacredtimeline.R
 import java.time.LocalTime
 
 @Composable
@@ -51,7 +53,7 @@ fun BoxScope.PreviewIndicator(
             .align(Alignment.TopStart)
     ) {
         Text(
-            text = "Preview",
+            text = stringResource(R.string.label_preview),
             color = Color.White,
             style = MaterialTheme.typography.labelSmall,
             modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)

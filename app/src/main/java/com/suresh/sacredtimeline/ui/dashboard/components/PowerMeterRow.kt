@@ -13,9 +13,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.suresh.sacredtimeline.R
 
 @Composable
 fun PowerMeterRow(
@@ -63,7 +65,7 @@ fun PowerMeterRow(
                 Spacer(modifier = Modifier.width(8.dp))
                 Column {
                     Text(
-                        text = "Power Meter",
+                        text = stringResource(R.string.label_power_meter),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 9.sp
@@ -82,10 +84,10 @@ fun PowerMeterRow(
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 IconButton(onClick = { /* TODO: Best window action */ }, modifier = Modifier.size(32.dp)) {
-                    Icon(Icons.Default.Search, contentDescription = "Find Best Window", modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
+                    Icon(Icons.Default.Search, contentDescription = stringResource(R.string.cd_find_best_window), modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
                 }
                 IconButton(onClick = { onPreviewClick() }, modifier = Modifier.size(32.dp)) {
-                    Icon(Icons.Default.Schedule, contentDescription = "Preview Time", modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
+                    Icon(Icons.Default.Schedule, contentDescription = stringResource(R.string.cd_preview_time), modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
                 }
                 IconButton(
                     onClick = { onHeatmapToggle() },
@@ -96,7 +98,7 @@ fun PowerMeterRow(
                 ) {
                     Icon(
                         Icons.Default.BarChart,
-                        contentDescription = "Toggle Heatmap",
+                        contentDescription = stringResource(R.string.cd_toggle_heatmap),
                         modifier = Modifier.size(18.dp),
                         tint = if (isHeatmapVisible) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary
                     )
