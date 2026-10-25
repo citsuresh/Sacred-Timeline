@@ -904,4 +904,23 @@
     <string name="loading_location">இருப்பிடத்தைத் தீர்மானிக்கிறது…</string>
     <string name="calculating_panchangam">பஞ்சாங்கம் மற்றும் வானியல் கணக்கீடுகள்…</string>
     <string name="loading_preferences">விருப்பத்தேர்வுகள் ஏற்றப்படுகின்றன…</string>
+    <string name="label_power_meter">சக்தி அளவுகோல் (Power Meter)</string>
+    <string name="title_power_score_breakdown">சக்தி மதிப்பெண் பகுப்பாய்வு</string>
+    <string name="label_itemized_factor_contributors">காரணிகளின் பங்களிப்பு விவரங்கள்:</string>
+    <string name="subtitle_weighted_factor_score">எடைடப்பட்ட ஜோதிட காரணி மதிப்பெண்.</string>
+    <string name="title_scoring_weights_settings">மதிப்பெண் எடை அமைப்பு (Scoring Weights)</string>
+    <string name="desc_scoring_weights">ஜோதிட சக்தி மதிப்பெண் கணக்கிடுவதில் ஒவ்வொரு காரணியின் பங்களிப்பு எடையைச் சரிசெய்யவும். (பரிந்துரைக்கப்பட்ட மொத்தத் தொகை: 100%)</string>
+    <string name="label_total_weight_sum">மொத்த எடை கூடுதல்:</string>
+    <string name="section_scoring_power_meter">மதிப்பீடு &amp; சக்தி அளவுகோல்</string>
+    <string name="settings_configure_scoring_weights">மதிப்பெண் எடைகளை அமைக்கவும்</string>
+    <string name="label_preview">முன்னோட்டம்</string>
+    <string name="cd_find_best_window">சிறந்த நேரத்தைக் கண்டறியவும்</string>
+    <string name="cd_preview_time">நேர முன்னோட்டம்</string>
+    <string name="cd_toggle_heatmap">வெப்ப வரைபடத்தை மாற்றுக (Heatmap)</string>
+    <string name="factor_thara_balam">தார பலம் (ஜன்ம நட்சத்திரம்)</string>
+    <string name="factor_transits">கோச்சார கிரக நிலைகள்</string>
+    <string name="factor_dasa">தசா / புக்தி காலம்</string>
+    <string name="factor_hora">ஹோரை தரம்</string>
+    <string name="factor_yoga">யோக தரம்</string>
+    <string name="factor_tithi">திதி &amp; பட்ச தரம்</string>
 </resources>

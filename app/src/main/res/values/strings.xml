@@ -954,4 +954,23 @@
     <string name="loading_location">Loading location…</string>
     <string name="calculating_panchangam">Calculating Panchangam &amp; Ephemeris…</string>
     <string name="loading_preferences">Loading preferences…</string>
+    <string name="label_power_meter">Power Meter</string>
+    <string name="title_power_score_breakdown">Power Score Breakdown</string>
+    <string name="label_itemized_factor_contributors">Itemized Factor Contributors:</string>
+    <string name="subtitle_weighted_factor_score">Weighted astrological factor score.</string>
+    <string name="title_scoring_weights_settings">Scoring Weights Configuration</string>
+    <string name="desc_scoring_weights">Adjust the relative contribution weight of each factor in the astrological power score calculation. (Recommended total sum: 100%)</string>
+    <string name="label_total_weight_sum">Total Weight Sum:</string>
+    <string name="section_scoring_power_meter">Scoring &amp; Power Meter</string>
+    <string name="settings_configure_scoring_weights">Configure Scoring Weights</string>
+    <string name="label_preview">Preview</string>
+    <string name="cd_find_best_window">Find Best Window</string>
+    <string name="cd_preview_time">Preview Time</string>
+    <string name="cd_toggle_heatmap">Toggle Heatmap</string>
+    <string name="factor_thara_balam">Thara Balam (Personal Star)</string>
+    <string name="factor_transits">Transit Positions (Gochara)</string>
+    <string name="factor_dasa">Dasa / Bhukti Period</string>
+    <string name="factor_hora">Hora Quality</string>
+    <string name="factor_yoga">Yoga Quality</string>
+    <string name="factor_tithi">Tithi &amp; Paksha Quality</string>
 </resources>
