@@ -33,6 +33,7 @@ import com.suresh.sacredtimeline.ui.settings.TimelineDisplaySettingsScreen
 import com.suresh.sacredtimeline.ui.settings.TithiSettingsScreen
 import com.suresh.sacredtimeline.ui.settings.NakshatraSettingsScreen
 import com.suresh.sacredtimeline.ui.settings.ChandrashtamamSettingsScreen
+import com.suresh.sacredtimeline.ui.settings.ScoringWeightsSettingsScreen
 import com.suresh.sacredtimeline.ui.theme.SacredTimelineTheme
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -404,7 +405,8 @@ class MainActivity : AppCompatActivity() {
                                     viewMode = key.mode,
                                     initialTargetDate = targetDate,
                                     onMenuClick = { scope.launch { drawerState.open() } },
-                                    onProfileClick = { backStack.add(NavRoute.Profile) }
+                                    onProfileClick = { backStack.add(NavRoute.Profile) },
+                                    onNavigateToScoringWeights = { backStack.add(NavRoute.ScoringWeightsSettings) }
                                 ) 
                             }
                             NavRoute.Profile -> NavEntry(key) {
@@ -423,6 +425,16 @@ class MainActivity : AppCompatActivity() {
                                     },
                                     onNavigateToRemindersSettings = {
                                         backStack.add(NavRoute.RemindersSettings)
+                                    },
+                                    onNavigateToScoringWeightsSettings = {
+                                        backStack.add(NavRoute.ScoringWeightsSettings)
+                                    }
+                                )
+                            }
+                            NavRoute.ScoringWeightsSettings -> NavEntry(key) {
+                                ScoringWeightsSettingsScreen(
+                                    onBack = {
+                                        backStack.removeLastOrNull()
                                     }
                                 )
                             }

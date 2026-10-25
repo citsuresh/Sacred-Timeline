@@ -428,22 +428,22 @@ fun TimelineContent(
                     TimeGrid(hourHeight = hourHeight)
                     NightShade(sunrise = dayData.sunrise, sunset = dayData.sunset, hourHeight = hourHeight)
 
+                    val visibleCols = if (viewMode == ViewMode.UNIVERSAL) {
+                        buildList {
+                            add("HORA")
+                            if (dayData.chandrashtamam.isNotEmpty()) add("CHANDRASHTAMAM")
+                            add("GOWRI")
+                            add("NERAM_MUHURTHAM")
+                            if (showYogam) add("YOGAM")
+                            if (showTharaBalam) add("THARA_BALAM")
+                        }
+                    } else {
+                        columnOrder.filter { columnVisibility.contains(it) }
+                    }
+
                     Row(modifier = Modifier.fillMaxSize()) {
                         TimeMarkersColumn(sunrise = dayData.sunrise, sunset = dayData.sunset, hourHeight = hourHeight, is24Hour = is24Hour)
                         Box(modifier = Modifier.fillMaxHeight().width(1.dp).background(SeparatorGrey))
-                        
-                        val visibleCols = if (viewMode == ViewMode.UNIVERSAL) {
-                            buildList {
-                                add("HORA")
-                                if (dayData.chandrashtamam.isNotEmpty()) add("CHANDRASHTAMAM")
-                                add("GOWRI")
-                                add("NERAM_MUHURTHAM")
-                                if (showYogam) add("YOGAM")
-                                if (showTharaBalam) add("THARA_BALAM")
-                            }
-                        } else {
-                            columnOrder.filter { columnVisibility.contains(it) }
-                        }
 
                         val isCompositeMode = viewMode == ViewMode.COMPOSITE || viewMode == ViewMode.CUSTOM || viewMode == ViewMode.UNIVERSAL
                         val isMergedLayout = viewStyle == TimelineViewStyle.ORTHOGONAL_STEPPED || viewStyle == TimelineViewStyle.FIXED_3_TRACK
@@ -560,8 +560,10 @@ fun TimelineContent(
 
                     if (isToday && showNowLine) {
                         NowIndicator(
-                            currentTime, 
-                            hourHeight = hourHeight, 
+                            currentTime = currentTime, 
+                            hourHeight = hourHeight,
+                            dayData = dayData,
+                            visibleCols = visibleCols,
                             color = Color(nowLineColor), 
                             thickness = nowLineThickness.dp
                         )

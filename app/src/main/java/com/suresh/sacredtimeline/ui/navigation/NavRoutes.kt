@@ -43,5 +43,8 @@ sealed interface NavRoute : NavKey {
     data object RemindersSettings : NavRoute
 
     @Serializable
+    data object ScoringWeightsSettings : NavRoute
+
+    @Serializable
     data object Profile : NavRoute
 }

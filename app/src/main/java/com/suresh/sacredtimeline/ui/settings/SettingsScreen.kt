@@ -42,6 +42,7 @@ fun SettingsScreen(
     onBack: () -> Unit,
     onNavigateToTimelineDisplaySettings: () -> Unit,
     onNavigateToRemindersSettings: () -> Unit,
+    onNavigateToScoringWeightsSettings: () -> Unit,
     viewModel: SettingsViewModel = viewModel()
 ) {
     val compositeScale by viewModel.compositeScale.collectAsState()
@@ -188,6 +189,16 @@ fun SettingsScreen(
                     SettingsClickableItem(
                         label = stringResource(R.string.settings_manage_reminders),
                         onClick = onNavigateToRemindersSettings
+                    )
+                }
+            }
+
+            // Scoring & Power Meter
+            item {
+                SettingsSection(title = "Scoring & Power Meter") {
+                    SettingsClickableItem(
+                        label = "Configure Scoring Weights",
+                        onClick = onNavigateToScoringWeightsSettings
                     )
                 }
             }

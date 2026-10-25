@@ -507,6 +507,20 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             }
         }
     }
+
+    val tharaBalaWeight = repository.tharaBalaWeight
+    val transitWeight = repository.transitWeight
+    val dasaWeight = repository.dasaWeight
+    val horaWeight = repository.horaWeight
+    val yogaWeight = repository.yogaWeight
+    val tithiWeight = repository.tithiWeight
+
+    fun updateTharaBalaWeight(w: Float) { viewModelScope.launch { repository.updateTharaBalaWeight(w) } }
+    fun updateTransitWeight(w: Float) { viewModelScope.launch { repository.updateTransitWeight(w) } }
+    fun updateDasaWeight(w: Float) { viewModelScope.launch { repository.updateDasaWeight(w) } }
+    fun updateHoraWeight(w: Float) { viewModelScope.launch { repository.updateHoraWeight(w) } }
+    fun updateYogaWeight(w: Float) { viewModelScope.launch { repository.updateYogaWeight(w) } }
+    fun updateTithiWeight(w: Float) { viewModelScope.launch { repository.updateTithiWeight(w) } }
 }
 
 sealed interface SearchState {

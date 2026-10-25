@@ -64,10 +64,23 @@ class SettingsRepository(private val context: Context) {
         val WIDGET_LAST_UPDATE_TIMESTAMP = longPreferencesKey("widget_last_update_timestamp")
         val STOPPED_REMINDER_WORKER = booleanPreferencesKey("stopped_reminder_worker")
         val FAILURE_COUNT_REMINDER_WORKER = intPreferencesKey("failure_count_reminder_worker")
+        val THARA_BALA_WEIGHT = floatPreferencesKey("thara_bala_weight")
+        val TRANSIT_WEIGHT = floatPreferencesKey("transit_weight")
+        val DASA_WEIGHT = floatPreferencesKey("dasa_weight")
+        val HORA_WEIGHT = floatPreferencesKey("hora_weight")
+        val YOGA_WEIGHT = floatPreferencesKey("yoga_weight")
+        val TITHI_WEIGHT = floatPreferencesKey("tithi_weight")
     }
 
     val compositeScale: Flow<Float> = context.dataStore.data.map { it[Keys.COMPOSITE_SCALE] ?: 1.0f }
     val singleViewScale: Flow<Float> = context.dataStore.data.map { it[Keys.SINGLE_VIEW_SCALE] ?: 0.5f }
+
+    val tharaBalaWeight: Flow<Float> = context.dataStore.data.map { it[Keys.THARA_BALA_WEIGHT] ?: 0.20f }
+    val transitWeight: Flow<Float> = context.dataStore.data.map { it[Keys.TRANSIT_WEIGHT] ?: 0.20f }
+    val dasaWeight: Flow<Float> = context.dataStore.data.map { it[Keys.DASA_WEIGHT] ?: 0.20f }
+    val horaWeight: Flow<Float> = context.dataStore.data.map { it[Keys.HORA_WEIGHT] ?: 0.15f }
+    val yogaWeight: Flow<Float> = context.dataStore.data.map { it[Keys.YOGA_WEIGHT] ?: 0.15f }
+    val tithiWeight: Flow<Float> = context.dataStore.data.map { it[Keys.TITHI_WEIGHT] ?: 0.10f }
     
     val columnVisibility: Flow<Set<String>> = context.dataStore.data.map { 
         it[Keys.COLUMN_VISIBILITY] ?: setOf("UNIVERSAL", "CHANDRASHTAMAM", "YOGAM", "THARA_BALAM")
@@ -511,4 +524,11 @@ class SettingsRepository(private val context: Context) {
             }
         }
     }
+
+    suspend fun updateTharaBalaWeight(w: Float) { context.dataStore.edit { it[Keys.THARA_BALA_WEIGHT] = w } }
+    suspend fun updateTransitWeight(w: Float) { context.dataStore.edit { it[Keys.TRANSIT_WEIGHT] = w } }
+    suspend fun updateDasaWeight(w: Float) { context.dataStore.edit { it[Keys.DASA_WEIGHT] = w } }
+    suspend fun updateHoraWeight(w: Float) { context.dataStore.edit { it[Keys.HORA_WEIGHT] = w } }
+    suspend fun updateYogaWeight(w: Float) { context.dataStore.edit { it[Keys.YOGA_WEIGHT] = w } }
+    suspend fun updateTithiWeight(w: Float) { context.dataStore.edit { it[Keys.TITHI_WEIGHT] = w } }
 }

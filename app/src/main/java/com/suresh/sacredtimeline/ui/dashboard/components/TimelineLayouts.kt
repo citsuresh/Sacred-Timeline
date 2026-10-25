@@ -80,7 +80,13 @@ fun PortraitTimelineLayout(
     onCalendarClick: () -> Unit,
     onProfileClick: () -> Unit = {},
     activeProfile: BirthProfile? = null,
-    scrollToNowEvent: Long = 0L
+    scrollToNowEvent: Long = 0L,
+    score: Float = 78f,
+    bandTitle: String = "Amirtha Yoga",
+    onBreakdownClick: () -> Unit = {},
+    onPreviewClick: () -> Unit = {},
+    onHeatmapToggle: () -> Unit = {},
+    isHeatmapVisible: Boolean = false
 ) {
     Scaffold(
         topBar = {
@@ -151,6 +157,15 @@ fun PortraitTimelineLayout(
                 selectedDate = selectedDate,
                 dates = dates,
                 onDateSelected = onDateSelected
+            )
+            
+            PowerMeterRow(
+                score = score,
+                bandTitle = bandTitle,
+                onBreakdownClick = onBreakdownClick,
+                onPreviewClick = onPreviewClick,
+                onHeatmapToggle = onHeatmapToggle,
+                isHeatmapVisible = isHeatmapVisible
             )
             
             Box(modifier = Modifier.weight(1f)) {

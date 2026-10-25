@@ -16,11 +16,14 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.suresh.sacredtimeline.R
+import com.suresh.sacredtimeline.logic.ScoreResult
+import com.suresh.sacredtimeline.logic.ScoringEngine
 import com.suresh.sacredtimeline.ui.dashboard.components.*
 import com.suresh.sacredtimeline.ui.navigation.ViewMode
 import com.suresh.sacredtimeline.ui.theme.SacredTimelineTheme
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.ZoneOffset
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class, ExperimentalFoundationApi::class)
@@ -31,7 +34,8 @@ fun TimelineDashboard(
     viewMode: ViewMode = ViewMode.COMPOSITE,
     initialTargetDate: LocalDate? = null,
     onMenuClick: () -> Unit = {},
-    onProfileClick: () -> Unit = {}
+    onProfileClick: () -> Unit = {},
+    onNavigateToScoringWeights: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val selectedDate by viewModel.selectedDate.collectAsState()
@@ -102,6 +106,31 @@ fun TimelineDashboard(
     var selectedDetail by remember { mutableStateOf<com.suresh.sacredtimeline.model.DashboardDetail?>(null) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSheet by remember { mutableStateOf(false) }
+
+    var showScoreBreakdown by remember { mutableStateOf(false) }
+    var isHeatmapVisible by remember { mutableStateOf(false) }
+
+    val scoreResult = remember(uiState, selectedDate, activeProfile) {
+        val dayData = (uiState as? TimelineUiState.Success)?.days?.get(selectedDate)
+        if (dayData != null) {
+            val inspectTime = if (selectedDate == LocalDate.now()) LocalTime.now() else LocalTime.of(12, 0)
+            ScoringEngine.calculateScore(dayData, activeProfile, inspectTime)
+        } else {
+            ScoreResult(78f, "Amirtha Yoga (Highly Auspicious)", emptyMap())
+        }
+    }
+
+    if (showScoreBreakdown) {
+        ScoreBreakdownSheet(
+            score = scoreResult.totalScore,
+            bandTitle = scoreResult.bandTitle,
+            onDismiss = { showScoreBreakdown = false },
+            onNavigateToScoringWeights = {
+                showScoreBreakdown = false
+                onNavigateToScoringWeights()
+            }
+        )
+    }
 
     if (showSheet && selectedDetail != null) {
         DashboardDetailSheet(
@@ -317,7 +346,12 @@ fun TimelineDashboard(
             scrollToNowEvent = scrollToNowEvent,
             onCalendarClick = { showDatePicker = true },
             onProfileClick = onProfileClick,
-            activeProfile = activeProfile
+            activeProfile = activeProfile,
+            score = scoreResult.totalScore,
+            bandTitle = scoreResult.bandTitle,
+            onBreakdownClick = { showScoreBreakdown = true },
+            onHeatmapToggle = { isHeatmapVisible = !isHeatmapVisible },
+            isHeatmapVisible = isHeatmapVisible
         )
     }
 }
