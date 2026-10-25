@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -149,19 +150,22 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
     )
 
     val activeProfile: StateFlow<BirthProfile?> = repository.activeProfileId.map { activeId ->
-        val profilesRepo = com.suresh.sacredtimeline.data.BirthProfilesRepository(application)
-        val all = profilesRepo.getAllProfiles()
-        all.find { it.id == activeId } ?: profilesRepo.getPrimaryProfile()
-    }.stateIn(
+        withContext(Dispatchers.IO) {
+            val profilesRepo = com.suresh.sacredtimeline.data.BirthProfilesRepository(application)
+            val all = profilesRepo.getAllProfiles()
+            all.find { it.id == activeId } ?: profilesRepo.getPrimaryProfile()
+        }
+    }.flowOn(Dispatchers.IO).stateIn(
         viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        com.suresh.sacredtimeline.data.BirthProfilesRepository(application).getPrimaryProfile()
+        SharingStarted.Eagerly,
+        null
     )
 
     init {
         // Observe active profile changes and re-calculate dashboard
         viewModelScope.launch {
             repository.activeProfileId.drop(1).collect { _ ->
+                android.util.Log.d("SacredTimelineRefresh", "RELOAD TRIGGER: Active profile changed")
                 refreshJob?.cancel()
                 refreshJob = viewModelScope.launch {
                     cacheMutex.withLock { cachedDays.clear() }
@@ -182,6 +186,7 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
 
         // Initial startup sequence: Load location first, then preload dashboard data
         viewModelScope.launch {
+            android.util.Log.d("SacredTimelineRefresh", "RELOAD TRIGGER: Initial startup sequence running")
             try {
                 _uiState.value = TimelineUiState.Loading(getApplication<Application>().getString(R.string.loading_location))
                 val mode = repository.locationMode.first()
@@ -217,6 +222,7 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
             ) { mode, city, lat, lng ->
                 Triple(mode, city, lat to lng)
             }.drop(1).collect { (mode, city, coords) ->
+                android.util.Log.d("SacredTimelineRefresh", "RELOAD TRIGGER: Location settings changed to mode: $mode")
                 if (mode == "MANUAL") {
                     _locationName.value = city
                     _isLocationAuto.value = false
@@ -240,6 +246,7 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
             combine(selectedDate, repository.preloadDays) { date, days ->
                 date to days
             }.drop(1).collect { (date, days) ->
+                android.util.Log.d("SacredTimelineRefresh", "RELOAD TRIGGER: Selected date changed to: $date")
                 refreshJob?.cancel()
                 refreshJob = viewModelScope.launch {
                     preloadData(date, days)
@@ -257,7 +264,6 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
                 repository.specialPeriodStyle,
                 repository.lunarMonthSystem
             ) { values ->
-                // Use array for combine > 5 flows
                 DataRefreshTrigger(
                     tithis = values[0] as Set<String>,
                     stars = values[1] as Set<String>,
@@ -266,7 +272,8 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
                     style = values[4] as String,
                     system = values[5] as String
                 )
-            }.drop(1).collect { 
+            }.drop(1).collect { trigger ->
+                android.util.Log.d("SacredTimelineRefresh", "RELOAD TRIGGER: Ephemeris/Convention settings changed: $trigger")
                 refreshJob?.cancel()
                 refreshJob = viewModelScope.launch {
                     cacheMutex.withLock { cachedDays.clear() }
