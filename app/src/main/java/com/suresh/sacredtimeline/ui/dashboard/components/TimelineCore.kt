@@ -268,21 +268,11 @@ fun TimelineContent(
     val density = LocalDensity.current
     var containerHeight by remember { mutableStateOf(0) }
     
-    var currentTime by remember { mutableStateOf(LocalTime.now()) }
     val isToday = date == LocalDate.now()
-    
-    LaunchedEffect(isToday) {
-        if (isToday) {
-            while (true) {
-                currentTime = LocalTime.now()
-                delay(60000 - (System.currentTimeMillis() % 60000))
-            }
-        }
-    }
     
     LaunchedEffect(containerHeight) {
         if (containerHeight > 0 && isToday) {
-            val nowOffset = with(density) { calculateOffset(currentTime, hourHeight).toPx() }
+            val nowOffset = with(density) { calculateOffset(LocalTime.now(), hourHeight).toPx() }
             val centerOffset = containerHeight / 2
             scrollState.scrollTo((nowOffset - centerOffset).toInt().coerceAtLeast(0))
         }
@@ -474,7 +464,6 @@ fun TimelineContent(
                                     viewStyle = viewStyle,
                                     forceSingleLane = colId == "YOGAM" || colId == "THARA_BALAM" || colId == "HORA" || colId == "GOWRI" || colId == "CHANDRASHTAMAM",
                                     showSubHoras = showSubHoras,
-                                    currentTime = currentTime,
                                     scrollState = scrollState
                                 )
                                 if (index < visibleCols.size - 1) {
@@ -530,7 +519,6 @@ fun TimelineContent(
                                         PillarConfig(leftCat, rightCat)
                                     } else null,
                                     showSubHoras = showSubHoras,
-                                    currentTime = currentTime,
                                     scrollState = scrollState
                                 )
                             }
@@ -560,7 +548,6 @@ fun TimelineContent(
 
                     if (isToday && showNowLine) {
                         NowIndicator(
-                            currentTime = currentTime, 
                             hourHeight = hourHeight,
                             dayData = dayData,
                             visibleCols = visibleCols,
