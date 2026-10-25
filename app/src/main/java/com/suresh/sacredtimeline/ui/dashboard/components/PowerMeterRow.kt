@@ -1,5 +1,6 @@
 package com.suresh.sacredtimeline.ui.dashboard.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -38,12 +39,13 @@ fun PowerMeterRow(
     }
 
     Surface(
-        color = MaterialTheme.colorScheme.surfaceContainerHighest,
-        shape = RoundedCornerShape(8.dp),
+        color = if (isLoading) MaterialTheme.colorScheme.surfaceContainerHighest else scoreColor.copy(alpha = 0.12f),
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, if (isLoading) MaterialTheme.colorScheme.outline.copy(alpha = 0.2f) else scoreColor.copy(alpha = 0.4f)),
         modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -51,33 +53,48 @@ fun PowerMeterRow(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.clickable(enabled = !isLoading) { onBreakdownClick() }
             ) {
+                // Transparent background mini-gauge + percentage text below
                 Box(
                     modifier = Modifier
-                        .size(36.dp)
-                        .background(scoreColor.copy(alpha = 0.2f), RoundedCornerShape(6.dp)),
+                        .wrapContentWidth()
+                        .height(36.dp)
+                        .background(Color.Transparent, RoundedCornerShape(6.dp)),
                     contentAlignment = Alignment.Center
                 ) {
                     if (isLoading) {
                         CircularProgressIndicator(
-                            modifier = Modifier.size(20.dp),
+                            modifier = Modifier.size(18.dp),
                             strokeWidth = 2.dp,
                             color = MaterialTheme.colorScheme.primary
                         )
                     } else {
-                        Text(
-                            text = score.toInt().toString(),
-                            color = scoreColor,
-                            fontWeight = FontWeight.Black,
-                            fontSize = 14.sp
-                        )
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            SpeedometerCanvas(
+                                score = score,
+                                modifier = Modifier.size(32.dp, 16.dp),
+                                strokeWidth = 3.5.dp,
+                                showNeedle = true
+                            )
+                            Spacer(modifier = Modifier.height(1.dp))
+                            Text(
+                                text = "${score.toInt()}%",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Black,
+                                fontSize = 10.sp,
+                                color = scoreColor
+                            )
+                        }
                     }
                 }
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(10.dp))
                 Column {
                     Text(
                         text = stringResource(R.string.label_power_meter),
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                         fontSize = 9.sp
                     )
                     Text(
@@ -91,17 +108,17 @@ fun PowerMeterRow(
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                horizontalArrangement = Arrangement.spacedBy(2.dp)
             ) {
-                IconButton(onClick = { /* TODO: Best window action */ }, modifier = Modifier.size(32.dp)) {
-                    Icon(Icons.Default.Search, contentDescription = stringResource(R.string.cd_find_best_window), modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
+                IconButton(onClick = { /* TODO: Best window action */ }, modifier = Modifier.size(30.dp)) {
+                    Icon(Icons.Default.Search, contentDescription = stringResource(R.string.cd_find_best_window), modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary)
                 }
-                IconButton(onClick = { onPreviewClick() }, modifier = Modifier.size(32.dp)) {
-                    Icon(Icons.Default.Schedule, contentDescription = stringResource(R.string.cd_preview_time), modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
+                IconButton(onClick = { onPreviewClick() }, modifier = Modifier.size(30.dp)) {
+                    Icon(Icons.Default.Schedule, contentDescription = stringResource(R.string.cd_preview_time), modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary)
                 }
                 IconButton(
                     onClick = { onHeatmapToggle() },
-                    modifier = Modifier.size(32.dp),
+                    modifier = Modifier.size(30.dp),
                     colors = IconButtonDefaults.iconButtonColors(
                         containerColor = if (isHeatmapVisible) MaterialTheme.colorScheme.primary else Color.Transparent
                     )
@@ -109,7 +126,7 @@ fun PowerMeterRow(
                     Icon(
                         Icons.Default.BarChart,
                         contentDescription = stringResource(R.string.cd_toggle_heatmap),
-                        modifier = Modifier.size(18.dp),
+                        modifier = Modifier.size(16.dp),
                         tint = if (isHeatmapVisible) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary
                     )
                 }
