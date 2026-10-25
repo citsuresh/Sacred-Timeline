@@ -85,7 +85,6 @@ fun PortraitTimelineLayout(
     score: Float = 78f,
     bandTitle: String = "Amirtha Yoga",
     onBreakdownClick: () -> Unit = {},
-    onPreviewClick: () -> Unit = {},
     onHeatmapToggle: () -> Unit = {},
     isHeatmapVisible: Boolean = false,
     onGaugeClick: () -> Unit = {},
@@ -171,7 +170,6 @@ fun PortraitTimelineLayout(
                     score = score,
                     bandTitle = bandTitle,
                     onBreakdownClick = onBreakdownClick,
-                    onPreviewClick = onPreviewClick,
                     onHeatmapToggle = onHeatmapToggle,
                     isHeatmapVisible = isHeatmapVisible,
                     isLoading = isLoading
@@ -272,7 +270,6 @@ fun LandscapeTimelineLayout(
     score: Float = 78f,
     bandTitle: String = "Amirtha Yoga",
     onBreakdownClick: () -> Unit = {},
-    onPreviewClick: () -> Unit = {},
     onHeatmapToggle: () -> Unit = {},
     isHeatmapVisible: Boolean = false,
     onGaugeClick: () -> Unit = {},

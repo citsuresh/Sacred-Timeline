@@ -42,7 +42,8 @@ fun ScoreHeatmapColumn(
                 dayData.specialPeriods +
                 dayData.chandrashtamam +
                 dayData.yogam +
-                dayData.tharaBalam
+                dayData.tharaBalam +
+                dayData.maitraMuhurtham
 
         allTimings.forEach { timing ->
             times.add(timing.startTime)

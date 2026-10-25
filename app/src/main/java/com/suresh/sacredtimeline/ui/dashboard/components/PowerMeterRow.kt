@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BarChart
-import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -25,7 +24,6 @@ fun PowerMeterRow(
     score: Float, // 0 to 100
     bandTitle: String,
     onBreakdownClick: () -> Unit,
-    onPreviewClick: () -> Unit,
     onHeatmapToggle: () -> Unit,
     isHeatmapVisible: Boolean,
     modifier: Modifier = Modifier,
@@ -112,9 +110,6 @@ fun PowerMeterRow(
             ) {
                 IconButton(onClick = { /* TODO: Best window action */ }, modifier = Modifier.size(30.dp)) {
                     Icon(Icons.Default.Search, contentDescription = stringResource(R.string.cd_find_best_window), modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary)
-                }
-                IconButton(onClick = { onPreviewClick() }, modifier = Modifier.size(30.dp)) {
-                    Icon(Icons.Default.Schedule, contentDescription = stringResource(R.string.cd_preview_time), modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary)
                 }
                 IconButton(
                     onClick = { onHeatmapToggle() },
