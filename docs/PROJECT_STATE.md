@@ -1,9 +1,9 @@
 # Project State
 
-**Phase**: Alpha/Stable (Phase 10 In-Progress - Multi-Factor Scoring Engine & Interactive Time Inspector Preview Line)
+**Phase**: Stable (Phase 10 Complete - Multi-Factor Scoring Engine & 24-Hour Score Heatmap Column)
 
 ## 1. Recently Implemented
-- **Multi-Factor Scoring Engine & Personal Power Meter (Phase 10 Prototype & Engine)**: Implemented the scoring engine core (`ScoringEngine.kt`, `ScoringWeightsConfig.kt`), Option 1 Header Power Meter Row with quick action buttons (`[🔍 Best Window]` and `[⏱️ Preview]`), Option 2 Floating NOW Gauge with directional touch slop and vertical drag to spawn the Purple Preview Line (Inspector Mode), transparent `ScoreBreakdownDialog`, and the 24-hour toggleable `ScoreHeatmapColumn`.
+- **Multi-Factor Scoring Engine & Personal Power Meter (Phase 10 Complete)**: Implemented the scoring engine core (`ScoringEngine.kt`, `ScoringWeightsConfig.kt`) supporting 6 weighted astrological factors, malefic penalty overrides (Rahu Kalam, Yamagandam, Chandrashtamam), Hora scoring mode toggle (Natal vs. General), Power Meter Row with live mini-gauge (`SpeedometerCanvas`), modal `ScoreBreakdownSheet`, and the 24-hour toggleable `ScoreHeatmapColumn` with complete interval transition coverage (including Maitra Muhurtham). Refined UI by omitting redundant interactive preview line in favor of the persistent at-a-glance heatmap column.
 
 ## 2. Technical Stack
 - **UI**: Kotlin, Compose (M3), Jetpack Glance (Widgets), Navigation 3.
