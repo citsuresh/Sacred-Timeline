@@ -22,6 +22,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.suresh.sacredtimeline.R
+import com.suresh.sacredtimeline.logic.ScoreResult
+import com.suresh.sacredtimeline.logic.ScoringEngine
 import com.suresh.sacredtimeline.model.DayData
 import kotlinx.coroutines.delay
 import java.time.LocalTime
@@ -31,7 +33,6 @@ fun BoxScope.NowIndicator(
     hourHeight: Dp,
     dayData: DayData? = null,
     visibleCols: List<String> = emptyList(),
-    score: Float = 89f,
     color: Color = Color.Red,
     thickness: Dp = 2.dp,
     onGaugeClick: () -> Unit = {}
@@ -44,6 +45,15 @@ fun BoxScope.NowIndicator(
             delay(60000 - (System.currentTimeMillis() % 60000))
         }
     }
+
+    val scoreResult = remember(dayData, currentTime) {
+        if (dayData != null) {
+            ScoringEngine.calculateScore(dayData, null, currentTime)
+        } else {
+            ScoreResult(71f, "Siddha Yoga", emptyMap())
+        }
+    }
+    val score = scoreResult.totalScore
 
     val topOffset = calculateOffset(currentTime, hourHeight)
     val density = LocalDensity.current
