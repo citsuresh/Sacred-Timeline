@@ -86,7 +86,8 @@ fun PortraitTimelineLayout(
     onBreakdownClick: () -> Unit = {},
     onPreviewClick: () -> Unit = {},
     onHeatmapToggle: () -> Unit = {},
-    isHeatmapVisible: Boolean = false
+    isHeatmapVisible: Boolean = false,
+    onGaugeClick: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -202,7 +203,8 @@ fun PortraitTimelineLayout(
                     onZoomOut = onZoomOut,
                     onDetailClick = onDetailClick,
                     isLandscape = false,
-                    scrollToNowEvent = scrollToNowEvent
+                    scrollToNowEvent = scrollToNowEvent,
+                    onGaugeClick = onGaugeClick
                 )
             }
         }
@@ -252,7 +254,14 @@ fun LandscapeTimelineLayout(
     onCalendarClick: () -> Unit,
     onProfileClick: () -> Unit = {},
     activeProfile: BirthProfile? = null,
-    scrollToNowEvent: Long = 0L
+    scrollToNowEvent: Long = 0L,
+    score: Float = 78f,
+    bandTitle: String = "Amirtha Yoga",
+    onBreakdownClick: () -> Unit = {},
+    onPreviewClick: () -> Unit = {},
+    onHeatmapToggle: () -> Unit = {},
+    isHeatmapVisible: Boolean = false,
+    onGaugeClick: () -> Unit = {}
 ) {
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Row(modifier = Modifier.fillMaxSize()) {
@@ -458,7 +467,8 @@ fun LandscapeTimelineLayout(
                     onZoomOut = onZoomOut,
                     onDetailClick = onDetailClick,
                     isLandscape = true,
-                    scrollToNowEvent = scrollToNowEvent
+                    scrollToNowEvent = scrollToNowEvent,
+                    onGaugeClick = onGaugeClick
                 )
             }
         }

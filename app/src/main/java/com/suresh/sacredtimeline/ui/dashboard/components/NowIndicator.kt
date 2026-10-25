@@ -33,7 +33,8 @@ fun BoxScope.NowIndicator(
     visibleCols: List<String> = emptyList(),
     score: Float = 89f,
     color: Color = Color.Red,
-    thickness: Dp = 2.dp
+    thickness: Dp = 2.dp,
+    onGaugeClick: () -> Unit = {}
 ) {
     var currentTime by remember { mutableStateOf(LocalTime.now()) }
     
@@ -100,6 +101,7 @@ fun BoxScope.NowIndicator(
     }
 
     Surface(
+        onClick = { onGaugeClick() },
         color = Color.White,
         shape = CircleShape,
         border = BorderStroke(2.5.dp, color),

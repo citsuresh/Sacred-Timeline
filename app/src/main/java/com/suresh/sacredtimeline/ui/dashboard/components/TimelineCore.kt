@@ -101,7 +101,8 @@ fun TimelinePager(
     isLandscape: Boolean,
     viewStyle: TimelineViewStyle = TimelineViewStyle.EQUAL_DISTRIBUTION,
     showSubHoras: Boolean = false,
-    scrollToNowEvent: Long = 0L
+    scrollToNowEvent: Long = 0L,
+    onGaugeClick: () -> Unit = {}
 ) {
     val hourHeight = BASE_HOUR_HEIGHT * timelineScale
     
@@ -197,7 +198,8 @@ fun TimelinePager(
                             onToggleHeaderExpanded = onToggleHeaderExpanded,
                             viewStyle = viewStyle,
                             showSubHoras = showSubHoras,
-                            scrollToNowEvent = scrollToNowEvent
+                            scrollToNowEvent = scrollToNowEvent,
+                            onGaugeClick = onGaugeClick
                         )
                     } else {
                         Box(modifier = Modifier.fillMaxSize()) {
@@ -262,7 +264,8 @@ fun TimelineContent(
     onToggleHeaderExpanded: (Boolean) -> Unit = {},
     viewStyle: TimelineViewStyle = TimelineViewStyle.EQUAL_DISTRIBUTION,
     showSubHoras: Boolean = false,
-    scrollToNowEvent: Long = 0L
+    scrollToNowEvent: Long = 0L,
+    onGaugeClick: () -> Unit = {}
 ) {
     val scrollState = rememberScrollState()
     val density = LocalDensity.current
@@ -552,7 +555,8 @@ fun TimelineContent(
                             dayData = dayData,
                             visibleCols = visibleCols,
                             color = Color(nowLineColor), 
-                            thickness = nowLineThickness.dp
+                            thickness = nowLineThickness.dp,
+                            onGaugeClick = onGaugeClick
                         )
                     }
                 }

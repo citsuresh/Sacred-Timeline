@@ -293,7 +293,13 @@ fun TimelineDashboard(
             scrollToNowEvent = scrollToNowEvent,
             onCalendarClick = { showDatePicker = true },
             onProfileClick = onProfileClick,
-            activeProfile = activeProfile
+            activeProfile = activeProfile,
+            score = scoreResult.totalScore,
+            bandTitle = scoreResult.bandTitle,
+            onBreakdownClick = { showScoreBreakdown = true },
+            onHeatmapToggle = { isHeatmapVisible = !isHeatmapVisible },
+            isHeatmapVisible = isHeatmapVisible,
+            onGaugeClick = { showScoreBreakdown = true }
         )
     } else {
         PortraitTimelineLayout(
@@ -351,7 +357,8 @@ fun TimelineDashboard(
             bandTitle = scoreResult.bandTitle,
             onBreakdownClick = { showScoreBreakdown = true },
             onHeatmapToggle = { isHeatmapVisible = !isHeatmapVisible },
-            isHeatmapVisible = isHeatmapVisible
+            isHeatmapVisible = isHeatmapVisible,
+            onGaugeClick = { showScoreBreakdown = true }
         )
     }
 }
