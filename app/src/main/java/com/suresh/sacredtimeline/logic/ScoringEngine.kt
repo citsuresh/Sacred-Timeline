@@ -21,36 +21,21 @@ object ScoringEngine {
         weights: ScoringWeightsConfig = ScoringWeightsConfig(),
         horaScoringMode: String = "NATAL"
     ): ScoreResult {
-        // 1. Check Special Periods (Yamagandam, Rahu Kalam, Kuligai) active at currentTime
+        // 1. Check Strict Malefic Special Periods (Yamagandam, Rahu Kalam) active at currentTime
         val activeSpecial = dayData.specialPeriods.find { it.isCurrent(currentTime) }
         val specialName = activeSpecial?.name ?: ""
         
-        if (specialName.contains("Yamagam", true) || specialName.contains("Rahu", true) || specialName.contains("Kuli", true)) {
-            val penaltyName = when {
-                specialName.contains("Yamagam", true) -> "Yamagandam (Inauspicious Period)"
-                specialName.contains("Rahu", true) -> "Rahu Kalam (Inauspicious Period)"
-                else -> "Kuligai (Inauspicious Period)"
-            }
-            return ScoreResult(
-                totalScore = 25f,
-                bandTitle = penaltyName,
-                factorScores = mapOf(
-                    "Special Period" to 20f,
-                    "Hora" to 30f,
-                    "Yogam" to 30f,
-                    "Tithi" to 40f
-                )
-            )
+        val specialPenaltyMultiplier = if (specialName.contains("Yamagam", true) || specialName.contains("Rahu", true)) {
+            0.3f // Heavy penalty multiplier for Rahu/Yama
+        } else {
+            1.0f
         }
 
         // 2. Check Chandrashtamam active at currentTime
-        val activeChandrashtamam = dayData.chandrashtamam.find { it.isCurrent(currentTime) }
-        if (activeChandrashtamam != null) {
-            return ScoreResult(
-                totalScore = 20f,
-                bandTitle = "Chandrashtamam (Caution)",
-                factorScores = mapOf("Transit" to 10f, "Yogam" to 30f)
-            )
+        val chandrashtamamPenaltyMultiplier = if (dayData.chandrashtamam.any { it.isCurrent(currentTime) }) {
+            0.4f // Heavy penalty multiplier for Chandrashtamam
+        } else {
+            1.0f
         }
 
         // 3. Active Yogam at currentTime (Amirtha, Siddha vs Marana, Vadha)
@@ -63,17 +48,15 @@ object ScoringEngine {
             else -> 0.6f
         }
 
-        // 4. Active Hora at currentTime (Distinguishing Natal vs General Weekday mode)
+        // 4. Active Hora at currentTime (Respecting user-selected Hora Scoring Mode)
         val activeHora = dayData.hora.find { it.isCurrent(currentTime) }
         val horaScore = if (horaScoringMode == "NATAL") {
-            // User-specific natal compatibility against birth ascendant/rasi
             when (activeHora?.natalCompatibility) {
                 HoraCompatibility.FAVORABLE -> 1.0f
-                HoraCompatibility.CONFLICTING -> 0.2f
+                HoraCompatibility.CONFLICTING -> 0.3f
                 HoraCompatibility.NEUTRAL, null -> getGeneralHoraScore(activeHora)
             }
         } else {
-            // General planetary weekday nature (independent of birth profile)
             getGeneralHoraScore(activeHora)
         }
 
@@ -90,8 +73,10 @@ object ScoringEngine {
                           (yogaScore * weights.yogaWeight) +
                           (tithiScore * weights.tithiWeight)
 
-        val finalScore = (weightedSum * 100f).coerceIn(0f, 100f)
+        var finalScore = (weightedSum * 100f) * specialPenaltyMultiplier * chandrashtamamPenaltyMultiplier
+        finalScore = finalScore.coerceIn(0f, 100f)
 
+        // Strictly one of the 5 standardized rating bands based on score percentage
         val bandTitle = when {
             finalScore >= 80f -> "Highly Favorable"
             finalScore >= 65f -> "Favorable"
