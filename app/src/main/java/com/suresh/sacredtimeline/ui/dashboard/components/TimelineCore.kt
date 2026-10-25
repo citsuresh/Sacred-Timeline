@@ -102,7 +102,9 @@ fun TimelinePager(
     viewStyle: TimelineViewStyle = TimelineViewStyle.EQUAL_DISTRIBUTION,
     showSubHoras: Boolean = false,
     scrollToNowEvent: Long = 0L,
-    onGaugeClick: () -> Unit = {}
+    onGaugeClick: () -> Unit = {},
+    isHeatmapVisible: Boolean = false,
+    activeProfile: BirthProfile? = null
 ) {
     val hourHeight = BASE_HOUR_HEIGHT * timelineScale
     
@@ -199,7 +201,9 @@ fun TimelinePager(
                             viewStyle = viewStyle,
                             showSubHoras = showSubHoras,
                             scrollToNowEvent = scrollToNowEvent,
-                            onGaugeClick = onGaugeClick
+                            onGaugeClick = onGaugeClick,
+                            isHeatmapVisible = isHeatmapVisible,
+                            activeProfile = activeProfile
                         )
                     } else {
                         Box(modifier = Modifier.fillMaxSize()) {
@@ -265,7 +269,9 @@ fun TimelineContent(
     viewStyle: TimelineViewStyle = TimelineViewStyle.EQUAL_DISTRIBUTION,
     showSubHoras: Boolean = false,
     scrollToNowEvent: Long = 0L,
-    onGaugeClick: () -> Unit = {}
+    onGaugeClick: () -> Unit = {},
+    isHeatmapVisible: Boolean = false,
+    activeProfile: BirthProfile? = null
 ) {
     val scrollState = rememberScrollState()
     val density = LocalDensity.current
@@ -437,6 +443,17 @@ fun TimelineContent(
                     Row(modifier = Modifier.fillMaxSize()) {
                         TimeMarkersColumn(sunrise = dayData.sunrise, sunset = dayData.sunset, hourHeight = hourHeight, is24Hour = is24Hour)
                         Box(modifier = Modifier.fillMaxHeight().width(1.dp).background(SeparatorGrey))
+
+                        if (isHeatmapVisible) {
+                            ScoreHeatmapColumn(
+                                dayData = dayData,
+                                activeProfile = activeProfile,
+                                hourHeight = hourHeight,
+                                scrollState = scrollState,
+                                modifier = Modifier.padding(horizontal = 4.dp)
+                            )
+                            VerticalDivider(thickness = 1.dp, color = Color.LightGray.copy(alpha = 0.3f))
+                        }
 
                         val isCompositeMode = viewMode == ViewMode.COMPOSITE || viewMode == ViewMode.CUSTOM || viewMode == ViewMode.UNIVERSAL
                         val isMergedLayout = viewStyle == TimelineViewStyle.ORTHOGONAL_STEPPED || viewStyle == TimelineViewStyle.FIXED_3_TRACK

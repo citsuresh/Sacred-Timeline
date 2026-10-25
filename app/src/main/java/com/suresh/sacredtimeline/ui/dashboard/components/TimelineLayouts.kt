@@ -204,7 +204,9 @@ fun PortraitTimelineLayout(
                     onDetailClick = onDetailClick,
                     isLandscape = false,
                     scrollToNowEvent = scrollToNowEvent,
-                    onGaugeClick = onGaugeClick
+                    onGaugeClick = onGaugeClick,
+                    isHeatmapVisible = isHeatmapVisible,
+                    activeProfile = activeProfile
                 )
             }
         }
@@ -468,7 +470,9 @@ fun LandscapeTimelineLayout(
                     onDetailClick = onDetailClick,
                     isLandscape = true,
                     scrollToNowEvent = scrollToNowEvent,
-                    onGaugeClick = onGaugeClick
+                    onGaugeClick = onGaugeClick,
+                    isHeatmapVisible = isHeatmapVisible,
+                    activeProfile = activeProfile
                 )
             }
         }
