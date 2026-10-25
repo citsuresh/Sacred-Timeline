@@ -2,6 +2,7 @@ package com.suresh.sacredtimeline.logic
 
 import com.suresh.sacredtimeline.model.DayData
 import com.suresh.sacredtimeline.model.BirthProfile
+import com.suresh.sacredtimeline.model.HoraCompatibility
 import java.time.LocalTime
 
 data class ScoreResult(
@@ -59,13 +60,17 @@ object ScoringEngine {
             else -> 0.6f
         }
 
-        // 4. Active Hora at currentTime
+        // 4. Active Hora at currentTime (Prioritizing User-Specific Natal Compatibility if available)
         val activeHora = dayData.hora.find { it.isCurrent(currentTime) }
-        val horaScore = when (activeHora?.auspiciousness) {
-            com.suresh.sacredtimeline.model.Auspiciousness.GREEN -> 0.9f
-            com.suresh.sacredtimeline.model.Auspiciousness.ORANGE -> 0.6f
-            com.suresh.sacredtimeline.model.Auspiciousness.RED, com.suresh.sacredtimeline.model.Auspiciousness.DARK_RED -> 0.3f
-            else -> 0.7f
+        val horaScore = when (activeHora?.natalCompatibility) {
+            HoraCompatibility.FAVORABLE -> 1.0f
+            HoraCompatibility.CONFLICTING -> 0.3f
+            HoraCompatibility.NEUTRAL, null -> when (activeHora?.auspiciousness) {
+                com.suresh.sacredtimeline.model.Auspiciousness.GREEN -> 0.85f
+                com.suresh.sacredtimeline.model.Auspiciousness.ORANGE -> 0.6f
+                com.suresh.sacredtimeline.model.Auspiciousness.RED, com.suresh.sacredtimeline.model.Auspiciousness.DARK_RED -> 0.3f
+                else -> 0.7f
+            }
         }
 
         // 5. Thara Bala & Tithi
@@ -83,7 +88,6 @@ object ScoringEngine {
 
         val finalScore = (weightedSum * 100f).coerceIn(0f, 100f)
 
-        // Clean score rating bands without Yoga terminology (Amirtha/Siddha/Madhyama removed)
         val bandTitle = when {
             finalScore >= 80f -> "Highly Favorable"
             finalScore >= 65f -> "Favorable"
