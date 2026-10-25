@@ -48,6 +48,7 @@ fun TimelineDashboard(
     
     // Use initial = null or handle properly to avoid flicker during state load
     val timeFormat24h by viewModel.timeFormat24h.collectAsState(initial = false)
+    val horaScoringMode by viewModel.horaScoringMode.collectAsState(initial = "NATAL")
     val showNowLine by viewModel.showNowLine.collectAsState(initial = true)
     val nowLineColor by viewModel.nowLineColor.collectAsState()
     val nowLineThickness by viewModel.nowLineThickness.collectAsState()
@@ -111,13 +112,13 @@ fun TimelineDashboard(
     var isHeatmapVisible by remember { mutableStateOf(false) }
     var heatmapInspectedResult by remember { mutableStateOf<ScoreResult?>(null) }
 
-    val scoreResult = remember(uiState, selectedDate, activeProfile) {
+    val scoreResult = remember(uiState, selectedDate, activeProfile, horaScoringMode) {
         val dayData = (uiState as? TimelineUiState.Success)?.days?.get(selectedDate)
         if (dayData != null) {
             val inspectTime = if (selectedDate == LocalDate.now()) LocalTime.now() else LocalTime.of(12, 0)
-            ScoringEngine.calculateScore(dayData, activeProfile, inspectTime)
+            ScoringEngine.calculateScore(dayData, activeProfile, inspectTime, horaScoringMode = horaScoringMode)
         } else {
-            ScoreResult(78f, "Amirtha Yoga (Highly Auspicious)", emptyMap())
+            ScoreResult(78f, "Highly Favorable", emptyMap())
         }
     }
 
@@ -311,10 +312,11 @@ fun TimelineDashboard(
             onIntervalClick = { clickedTime ->
                 val dayData = (uiState as? TimelineUiState.Success)?.days?.get(selectedDate)
                 if (dayData != null) {
-                    heatmapInspectedResult = ScoringEngine.calculateScore(dayData, activeProfile, clickedTime)
+                    heatmapInspectedResult = ScoringEngine.calculateScore(dayData, activeProfile, clickedTime, horaScoringMode = horaScoringMode)
                     showScoreBreakdown = true
                 }
-            }
+            },
+            horaScoringMode = horaScoringMode
         )
     } else {
         PortraitTimelineLayout(
@@ -377,10 +379,11 @@ fun TimelineDashboard(
             onIntervalClick = { clickedTime ->
                 val dayData = (uiState as? TimelineUiState.Success)?.days?.get(selectedDate)
                 if (dayData != null) {
-                    heatmapInspectedResult = ScoringEngine.calculateScore(dayData, activeProfile, clickedTime)
+                    heatmapInspectedResult = ScoringEngine.calculateScore(dayData, activeProfile, clickedTime, horaScoringMode = horaScoringMode)
                     showScoreBreakdown = true
                 }
-            }
+            },
+            horaScoringMode = horaScoringMode
         )
     }
 }

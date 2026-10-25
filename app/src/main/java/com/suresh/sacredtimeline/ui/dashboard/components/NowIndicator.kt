@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import com.suresh.sacredtimeline.R
 import com.suresh.sacredtimeline.logic.ScoreResult
 import com.suresh.sacredtimeline.logic.ScoringEngine
+import com.suresh.sacredtimeline.model.BirthProfile
 import com.suresh.sacredtimeline.model.DayData
 import kotlinx.coroutines.delay
 import java.time.LocalTime
@@ -35,7 +36,9 @@ fun BoxScope.NowIndicator(
     visibleCols: List<String> = emptyList(),
     color: Color = Color.Red,
     thickness: Dp = 2.dp,
-    onGaugeClick: () -> Unit = {}
+    onGaugeClick: () -> Unit = {},
+    activeProfile: BirthProfile? = null,
+    horaScoringMode: String = "NATAL"
 ) {
     var currentTime by remember { mutableStateOf(LocalTime.now()) }
     
@@ -46,11 +49,11 @@ fun BoxScope.NowIndicator(
         }
     }
 
-    val scoreResult = remember(dayData, currentTime) {
+    val scoreResult = remember(dayData, currentTime, activeProfile, horaScoringMode) {
         if (dayData != null) {
-            ScoringEngine.calculateScore(dayData, null, currentTime)
+            ScoringEngine.calculateScore(dayData, activeProfile, currentTime, horaScoringMode = horaScoringMode)
         } else {
-            ScoreResult(71f, "Siddha Yoga", emptyMap())
+            ScoreResult(71f, "Favorable", emptyMap())
         }
     }
     val score = scoreResult.totalScore

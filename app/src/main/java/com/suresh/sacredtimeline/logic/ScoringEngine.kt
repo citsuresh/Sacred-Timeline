@@ -2,7 +2,9 @@ package com.suresh.sacredtimeline.logic
 
 import com.suresh.sacredtimeline.model.DayData
 import com.suresh.sacredtimeline.model.BirthProfile
+import com.suresh.sacredtimeline.model.Hora
 import com.suresh.sacredtimeline.model.HoraCompatibility
+import com.suresh.sacredtimeline.model.Auspiciousness
 import java.time.LocalTime
 
 data class ScoreResult(
@@ -16,7 +18,8 @@ object ScoringEngine {
         dayData: DayData,
         birthProfile: BirthProfile?,
         currentTime: LocalTime = LocalTime.now(),
-        weights: ScoringWeightsConfig = ScoringWeightsConfig()
+        weights: ScoringWeightsConfig = ScoringWeightsConfig(),
+        horaScoringMode: String = "NATAL"
     ): ScoreResult {
         // 1. Check Special Periods (Yamagandam, Rahu Kalam, Kuligai) active at currentTime
         val activeSpecial = dayData.specialPeriods.find { it.isCurrent(currentTime) }
@@ -60,17 +63,18 @@ object ScoringEngine {
             else -> 0.6f
         }
 
-        // 4. Active Hora at currentTime (Prioritizing User-Specific Natal Compatibility if available)
+        // 4. Active Hora at currentTime (Distinguishing Natal vs General Weekday mode)
         val activeHora = dayData.hora.find { it.isCurrent(currentTime) }
-        val horaScore = when (activeHora?.natalCompatibility) {
-            HoraCompatibility.FAVORABLE -> 1.0f
-            HoraCompatibility.CONFLICTING -> 0.3f
-            HoraCompatibility.NEUTRAL, null -> when (activeHora?.auspiciousness) {
-                com.suresh.sacredtimeline.model.Auspiciousness.GREEN -> 0.85f
-                com.suresh.sacredtimeline.model.Auspiciousness.ORANGE -> 0.6f
-                com.suresh.sacredtimeline.model.Auspiciousness.RED, com.suresh.sacredtimeline.model.Auspiciousness.DARK_RED -> 0.3f
-                else -> 0.7f
+        val horaScore = if (horaScoringMode == "NATAL") {
+            // User-specific natal compatibility against birth ascendant/rasi
+            when (activeHora?.natalCompatibility) {
+                HoraCompatibility.FAVORABLE -> 1.0f
+                HoraCompatibility.CONFLICTING -> 0.2f
+                HoraCompatibility.NEUTRAL, null -> getGeneralHoraScore(activeHora)
             }
+        } else {
+            // General planetary weekday nature (independent of birth profile)
+            getGeneralHoraScore(activeHora)
         }
 
         // 5. Thara Bala & Tithi
@@ -110,5 +114,18 @@ object ScoringEngine {
             bandTitle = bandTitle,
             factorScores = factors
         )
+    }
+
+    private fun getGeneralHoraScore(hora: Hora?): Float {
+        val name = hora?.name?.lowercase() ?: ""
+        return when {
+            name.contains("jupiter") || name.contains("sun") || name.contains("venus") -> 0.95f
+            name.contains("moon") || name.contains("mercury") -> 0.75f
+            name.contains("mars") || name.contains("saturn") || name.contains("rahu") -> 0.35f
+            hora?.auspiciousness == Auspiciousness.GREEN -> 0.85f
+            hora?.auspiciousness == Auspiciousness.ORANGE -> 0.5f
+            hora?.auspiciousness == Auspiciousness.RED || hora?.auspiciousness == Auspiciousness.DARK_RED -> 0.25f
+            else -> 0.6f
+        }
     }
 }

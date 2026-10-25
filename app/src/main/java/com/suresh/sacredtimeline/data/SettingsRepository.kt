@@ -70,6 +70,7 @@ class SettingsRepository(private val context: Context) {
         val HORA_WEIGHT = floatPreferencesKey("hora_weight")
         val YOGA_WEIGHT = floatPreferencesKey("yoga_weight")
         val TITHI_WEIGHT = floatPreferencesKey("tithi_weight")
+        val HORA_SCORING_MODE = stringPreferencesKey("hora_scoring_mode")
     }
 
     val compositeScale: Flow<Float> = context.dataStore.data.map { it[Keys.COMPOSITE_SCALE] ?: 1.0f }
@@ -81,6 +82,7 @@ class SettingsRepository(private val context: Context) {
     val horaWeight: Flow<Float> = context.dataStore.data.map { it[Keys.HORA_WEIGHT] ?: 0.15f }
     val yogaWeight: Flow<Float> = context.dataStore.data.map { it[Keys.YOGA_WEIGHT] ?: 0.15f }
     val tithiWeight: Flow<Float> = context.dataStore.data.map { it[Keys.TITHI_WEIGHT] ?: 0.10f }
+    val horaScoringMode: Flow<String> = context.dataStore.data.map { it[Keys.HORA_SCORING_MODE] ?: "NATAL" }
     
     val columnVisibility: Flow<Set<String>> = context.dataStore.data.map { 
         it[Keys.COLUMN_VISIBILITY] ?: setOf("UNIVERSAL", "CHANDRASHTAMAM", "YOGAM", "THARA_BALAM")
@@ -531,4 +533,5 @@ class SettingsRepository(private val context: Context) {
     suspend fun updateHoraWeight(w: Float) { context.dataStore.edit { it[Keys.HORA_WEIGHT] = w } }
     suspend fun updateYogaWeight(w: Float) { context.dataStore.edit { it[Keys.YOGA_WEIGHT] = w } }
     suspend fun updateTithiWeight(w: Float) { context.dataStore.edit { it[Keys.TITHI_WEIGHT] = w } }
+    suspend fun setHoraScoringMode(mode: String) { context.dataStore.edit { it[Keys.HORA_SCORING_MODE] = mode } }
 }

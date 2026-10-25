@@ -923,4 +923,8 @@
     <string name="factor_hora">ஹோரை தரம்</string>
     <string name="factor_yoga">யோக தரம்</string>
     <string name="factor_tithi">திதி &amp; பட்ச தரம்</string>
+    <string name="label_hora_scoring_mode">ஹோரை மதிப்பீட்டு முறை (Hora Scoring Mode)</string>
+    <string name="option_natal_birth">ஜன்ம நட்சத்திரப் பொருத்தம்</string>
+    <string name="option_general_weekday">பொதுவான கிழமைத் தன்மை</string>
+    <string name="label_hora_quality_desc">ஹோரை தரம் (தனிப்பயனாக்கப்பட்ட பொருத்தம்)</string>
 </resources>

@@ -973,4 +973,8 @@
     <string name="factor_hora">Hora Quality</string>
     <string name="factor_yoga">Yoga Quality</string>
     <string name="factor_tithi">Tithi &amp; Paksha Quality</string>
+    <string name="label_hora_scoring_mode">Hora Scoring Mode</string>
+    <string name="option_natal_birth">Natal Birth</string>
+    <string name="option_general_weekday">General Weekday</string>
+    <string name="label_hora_quality_desc">Hora Quality (Personalized Compatibility Weight)</string>
 </resources>

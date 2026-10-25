@@ -58,6 +58,7 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
     private val cacheMutex = Mutex()
 
     val timeFormat24h = repository.timeFormat24h
+    val horaScoringMode = repository.horaScoringMode
     
     val showNowLine: StateFlow<Boolean> = repository.showNowLine.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), true

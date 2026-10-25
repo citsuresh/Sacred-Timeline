@@ -29,6 +29,7 @@ fun ScoringWeightsSettingsScreen(
     val hora by viewModel.horaWeight.collectAsState(initial = 0.15f)
     val yoga by viewModel.yogaWeight.collectAsState(initial = 0.15f)
     val tithi by viewModel.tithiWeight.collectAsState(initial = 0.10f)
+    val horaScoringMode by viewModel.horaScoringMode.collectAsState(initial = "NATAL")
 
     val totalSum = tharaBala + transit + dasa + hora + yoga + tithi
 
@@ -83,6 +84,35 @@ fun ScoringWeightsSettingsScreen(
             WeightSlider(stringResource(R.string.factor_transits), transit) { viewModel.updateTransitWeight(it) }
             WeightSlider(stringResource(R.string.factor_dasa), dasa) { viewModel.updateDasaWeight(it) }
             WeightSlider(stringResource(R.string.factor_hora), hora) { viewModel.updateHoraWeight(it) }
+
+            // Hora Scoring Mode Toggle Card (Segmented Button)
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = stringResource(R.string.label_hora_scoring_mode),
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                        SegmentedButton(
+                            selected = horaScoringMode == "NATAL",
+                            onClick = { viewModel.setHoraScoringMode("NATAL") },
+                            shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2)
+                        ) {
+                            Text(stringResource(R.string.option_natal_birth))
+                        }
+                        SegmentedButton(
+                            selected = horaScoringMode == "GENERAL",
+                            onClick = { viewModel.setHoraScoringMode("GENERAL") },
+                            shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2)
+                        ) {
+                            Text(stringResource(R.string.option_general_weekday))
+                        }
+                    }
+                }
+            }
+
             WeightSlider(stringResource(R.string.factor_yoga), yoga) { viewModel.updateYogaWeight(it) }
             WeightSlider(stringResource(R.string.factor_tithi), tithi) { viewModel.updateTithiWeight(it) }
         }

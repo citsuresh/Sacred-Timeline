@@ -89,7 +89,8 @@ fun PortraitTimelineLayout(
     onHeatmapToggle: () -> Unit = {},
     isHeatmapVisible: Boolean = false,
     onGaugeClick: () -> Unit = {},
-    onIntervalClick: (LocalTime) -> Unit = {}
+    onIntervalClick: (LocalTime) -> Unit = {},
+    horaScoringMode: String = "NATAL"
 ) {
     Scaffold(
         topBar = {
@@ -209,7 +210,8 @@ fun PortraitTimelineLayout(
                     onGaugeClick = onGaugeClick,
                     isHeatmapVisible = isHeatmapVisible,
                     activeProfile = activeProfile,
-                    onIntervalClick = onIntervalClick
+                    onIntervalClick = onIntervalClick,
+                    horaScoringMode = horaScoringMode
                 )
             }
         }
@@ -267,7 +269,8 @@ fun LandscapeTimelineLayout(
     onHeatmapToggle: () -> Unit = {},
     isHeatmapVisible: Boolean = false,
     onGaugeClick: () -> Unit = {},
-    onIntervalClick: (LocalTime) -> Unit = {}
+    onIntervalClick: (LocalTime) -> Unit = {},
+    horaScoringMode: String = "NATAL"
 ) {
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Row(modifier = Modifier.fillMaxSize()) {
@@ -477,7 +480,8 @@ fun LandscapeTimelineLayout(
                     onGaugeClick = onGaugeClick,
                     isHeatmapVisible = isHeatmapVisible,
                     activeProfile = activeProfile,
-                    onIntervalClick = onIntervalClick
+                    onIntervalClick = onIntervalClick,
+                    horaScoringMode = horaScoringMode
                 )
             }
         }

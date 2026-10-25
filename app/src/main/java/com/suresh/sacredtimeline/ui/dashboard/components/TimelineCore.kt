@@ -105,7 +105,8 @@ fun TimelinePager(
     onGaugeClick: () -> Unit = {},
     isHeatmapVisible: Boolean = false,
     activeProfile: BirthProfile? = null,
-    onIntervalClick: (LocalTime) -> Unit = {}
+    onIntervalClick: (LocalTime) -> Unit = {},
+    horaScoringMode: String = "NATAL"
 ) {
     val hourHeight = BASE_HOUR_HEIGHT * timelineScale
     
@@ -205,7 +206,8 @@ fun TimelinePager(
                             onGaugeClick = onGaugeClick,
                             isHeatmapVisible = isHeatmapVisible,
                             activeProfile = activeProfile,
-                            onIntervalClick = onIntervalClick
+                            onIntervalClick = onIntervalClick,
+                            horaScoringMode = horaScoringMode
                         )
                     } else {
                         Box(modifier = Modifier.fillMaxSize()) {
@@ -274,7 +276,8 @@ fun TimelineContent(
     onGaugeClick: () -> Unit = {},
     isHeatmapVisible: Boolean = false,
     activeProfile: BirthProfile? = null,
-    onIntervalClick: (LocalTime) -> Unit = {}
+    onIntervalClick: (LocalTime) -> Unit = {},
+    horaScoringMode: String = "NATAL"
 ) {
     val scrollState = rememberScrollState()
     val density = LocalDensity.current
@@ -454,7 +457,8 @@ fun TimelineContent(
                                 hourHeight = hourHeight,
                                 scrollState = scrollState,
                                 modifier = Modifier.padding(horizontal = 4.dp),
-                                onIntervalClick = onIntervalClick
+                                onIntervalClick = onIntervalClick,
+                                horaScoringMode = horaScoringMode
                             )
                             VerticalDivider(thickness = 1.dp, color = Color.LightGray.copy(alpha = 0.3f))
                         }
@@ -577,7 +581,9 @@ fun TimelineContent(
                             visibleCols = visibleCols,
                             color = Color(nowLineColor), 
                             thickness = nowLineThickness.dp,
-                            onGaugeClick = onGaugeClick
+                            onGaugeClick = onGaugeClick,
+                            activeProfile = activeProfile,
+                            horaScoringMode = horaScoringMode
                         )
                     }
                 }

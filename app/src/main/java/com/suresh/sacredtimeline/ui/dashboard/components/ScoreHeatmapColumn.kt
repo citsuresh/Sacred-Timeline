@@ -29,11 +29,12 @@ fun ScoreHeatmapColumn(
     hourHeight: Dp,
     scrollState: ScrollState,
     modifier: Modifier = Modifier,
-    onIntervalClick: (LocalTime) -> Unit = {}
+    onIntervalClick: (LocalTime) -> Unit = {},
+    horaScoringMode: String = "NATAL"
 ) {
     val density = LocalDensity.current
 
-    val intervals = remember(dayData, activeProfile) {
+    val intervals = remember(dayData, activeProfile, horaScoringMode) {
         val times = mutableSetOf(LocalTime.MIN, LocalTime.MAX)
         val allTimings = dayData.nallaNeram +
                 dayData.gowriNeram +
@@ -61,7 +62,7 @@ fun ScoreHeatmapColumn(
             val midMinutes = (start.toSecondOfDay() + end.toSecondOfDay()) / 2
             val midTime = LocalTime.ofSecondOfDay(midMinutes.toLong().coerceIn(0, 86399))
             
-            val result = ScoringEngine.calculateScore(dayData, activeProfile, midTime)
+            val result = ScoringEngine.calculateScore(dayData, activeProfile, midTime, horaScoringMode = horaScoringMode)
             val color = scoreToColor(result.totalScore)
 
             list.add(HeatmapInterval(start, end, result.totalScore, color))

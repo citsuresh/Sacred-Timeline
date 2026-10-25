@@ -521,6 +521,9 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     fun updateHoraWeight(w: Float) { viewModelScope.launch { repository.updateHoraWeight(w) } }
     fun updateYogaWeight(w: Float) { viewModelScope.launch { repository.updateYogaWeight(w) } }
     fun updateTithiWeight(w: Float) { viewModelScope.launch { repository.updateTithiWeight(w) } }
+
+    val horaScoringMode = repository.horaScoringMode
+    fun setHoraScoringMode(mode: String) { viewModelScope.launch { repository.setHoraScoringMode(mode) } }
 }
 
 sealed interface SearchState {
