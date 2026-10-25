@@ -4,15 +4,17 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.suresh.sacredtimeline.R
 import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -33,10 +35,10 @@ fun ScoringWeightsSettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Scoring Weights Configuration") },
+                title = { Text(stringResource(R.string.title_scoring_weights_settings)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -55,7 +57,7 @@ fun ScoringWeightsSettingsScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "Adjust the relative contribution weight of each factor in the astrological power score calculation. (Recommended total sum: 100%)",
+                text = stringResource(R.string.desc_scoring_weights),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -72,17 +74,17 @@ fun ScoringWeightsSettingsScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Total Weight Sum:", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.label_total_weight_sum), fontWeight = FontWeight.Bold)
                     Text("${(totalSum * 100).toInt()}%", fontWeight = FontWeight.Black, fontSize = 18.sp)
                 }
             }
 
-            WeightSlider("Thara Bala (Personal Star)", tharaBala) { viewModel.updateTharaBalaWeight(it) }
-            WeightSlider("Transit Positions (Gochara)", transit) { viewModel.updateTransitWeight(it) }
-            WeightSlider("Dasa / Bhukti Period", dasa) { viewModel.updateDasaWeight(it) }
-            WeightSlider("Hora Quality", hora) { viewModel.updateHoraWeight(it) }
-            WeightSlider("Yoga Quality", yoga) { viewModel.updateYogaWeight(it) }
-            WeightSlider("Tithi & Paksha Quality", tithi) { viewModel.updateTithiWeight(it) }
+            WeightSlider(stringResource(R.string.factor_thara_balam), tharaBala) { viewModel.updateTharaBalaWeight(it) }
+            WeightSlider(stringResource(R.string.factor_transits), transit) { viewModel.updateTransitWeight(it) }
+            WeightSlider(stringResource(R.string.factor_dasa), dasa) { viewModel.updateDasaWeight(it) }
+            WeightSlider(stringResource(R.string.factor_hora), hora) { viewModel.updateHoraWeight(it) }
+            WeightSlider(stringResource(R.string.factor_yoga), yoga) { viewModel.updateYogaWeight(it) }
+            WeightSlider(stringResource(R.string.factor_tithi), tithi) { viewModel.updateTithiWeight(it) }
         }
     }
 }
