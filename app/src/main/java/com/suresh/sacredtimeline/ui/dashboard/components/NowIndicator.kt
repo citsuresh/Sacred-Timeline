@@ -23,11 +23,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.suresh.sacredtimeline.R
 import com.suresh.sacredtimeline.model.DayData
+import kotlinx.coroutines.delay
 import java.time.LocalTime
 
 @Composable
 fun BoxScope.NowIndicator(
-    currentTime: LocalTime,
     hourHeight: Dp,
     dayData: DayData? = null,
     visibleCols: List<String> = emptyList(),
@@ -35,13 +35,21 @@ fun BoxScope.NowIndicator(
     color: Color = Color.Red,
     thickness: Dp = 2.dp
 ) {
+    var currentTime by remember { mutableStateOf(LocalTime.now()) }
+    
+    LaunchedEffect(Unit) {
+        while (true) {
+            currentTime = LocalTime.now()
+            delay(60000 - (System.currentTimeMillis() % 60000))
+        }
+    }
+
     val topOffset = calculateOffset(currentTime, hourHeight)
     val density = LocalDensity.current
     
     var dragOffsetPx by remember { mutableStateOf(0f) }
 
-    // Auto-reset manual drag when hour changes so it re-evaluates empty lanes automatically
-    LaunchedEffect(currentTime.hour) {
+    LaunchedEffect(currentTime.minute) {
         dragOffsetPx = 0f
     }
     
@@ -62,7 +70,7 @@ fun BoxScope.NowIndicator(
 
     val badgeAlignment = if (emptyColIndex >= 0 && visibleCols.isNotEmpty()) {
         val bias = -0.7f + (1.4f * emptyColIndex / (visibleCols.size - 1).coerceAtLeast(1))
-        BiasAlignment(bias, 0f)
+        BiasAlignment(bias, -1f)
     } else {
         Alignment.TopCenter
     }
