@@ -347,6 +347,7 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
     val scrollToNowEvent: StateFlow<Long> = _scrollToNowEvent
 
     fun updateDate(date: LocalDate) {
+        android.util.Log.d("SacredTimelineRefresh", "ViewModel.updateDate called with date: $date")
         _selectedDate.value = date
     }
 
@@ -481,6 +482,7 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
         }
 
         val snapshot = cacheMutex.withLock { cachedDays.toMap() }
+        android.util.Log.d("SacredTimelineRefresh", "ViewModel emitting TimelineUiState.Success with ${snapshot.size} cached days")
         _uiState.value = TimelineUiState.Success(
             days = snapshot,
             locationName = _locationName.value,
@@ -492,6 +494,7 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
     }
 
     private suspend fun fetchDayData(date: LocalDate): DayData {
+        android.util.Log.d("SacredTimelineRefresh", "ViewModel.fetchDayData executing for date: $date")
         return DayDataProvider(getApplication()).fetchDayData(date, currentLocation.first, currentLocation.second)
     }
 }
