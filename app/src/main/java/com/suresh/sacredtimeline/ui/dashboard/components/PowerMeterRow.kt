@@ -27,9 +27,11 @@ fun PowerMeterRow(
     onPreviewClick: () -> Unit,
     onHeatmapToggle: () -> Unit,
     isHeatmapVisible: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isLoading: Boolean = false
 ) {
     val scoreColor = when {
+        isLoading -> Color.Gray
         score >= 75f -> Color(0xFF4CAF50) // Green
         score >= 50f -> Color(0xFFFF9800) // Orange/Gold
         else -> Color(0xFFE53935) // Red
@@ -47,7 +49,7 @@ fun PowerMeterRow(
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.clickable { onBreakdownClick() }
+                modifier = Modifier.clickable(enabled = !isLoading) { onBreakdownClick() }
             ) {
                 Box(
                     modifier = Modifier
@@ -55,12 +57,20 @@ fun PowerMeterRow(
                         .background(scoreColor.copy(alpha = 0.2f), RoundedCornerShape(6.dp)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = score.toInt().toString(),
-                        color = scoreColor,
-                        fontWeight = FontWeight.Black,
-                        fontSize = 14.sp
-                    )
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    } else {
+                        Text(
+                            text = score.toInt().toString(),
+                            color = scoreColor,
+                            fontWeight = FontWeight.Black,
+                            fontSize = 14.sp
+                        )
+                    }
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 Column {
@@ -71,7 +81,7 @@ fun PowerMeterRow(
                         fontSize = 9.sp
                     )
                     Text(
-                        text = bandTitle,
+                        text = if (isLoading) "Calculating…" else bandTitle,
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface

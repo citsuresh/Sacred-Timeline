@@ -118,7 +118,7 @@ fun TimelineDashboard(
             val inspectTime = if (selectedDate == LocalDate.now()) LocalTime.now() else LocalTime.of(12, 0)
             ScoringEngine.calculateScore(dayData, activeProfile, inspectTime, horaScoringMode = horaScoringMode)
         } else {
-            ScoreResult(78f, "Highly Favorable", emptyMap())
+            ScoreResult(0f, "Calculating...", emptyMap())
         }
     }
 
@@ -316,7 +316,8 @@ fun TimelineDashboard(
                     showScoreBreakdown = true
                 }
             },
-            horaScoringMode = horaScoringMode
+            horaScoringMode = horaScoringMode,
+            isLoading = uiState is TimelineUiState.Loading
         )
     } else {
         PortraitTimelineLayout(
@@ -383,7 +384,8 @@ fun TimelineDashboard(
                     showScoreBreakdown = true
                 }
             },
-            horaScoringMode = horaScoringMode
+            horaScoringMode = horaScoringMode,
+            isLoading = uiState is TimelineUiState.Loading
         )
     }
 }
