@@ -82,3 +82,6 @@ Historical record of architectural and UI/UX choices.
 - **Progressive Startup Sequencing & Granular Loading Feedback**:
     - Refactored `TimelineViewModel` and `MainActivity` to enforce strict sequential loading (Location resolution first -> Ephemeris & Panchangam calculation second), eliminating race conditions and double-refreshes.
     - Added progressive, localized loading feedback messages (`"Loading location…"`, `"Calculating Panchangam & Ephemeris…"`, `"Loading preferences…"`) displayed with circular progress indicators during cold starts and uncached date picker jumps.
+- **Dynamic Reminder Start Time & Future Date Context**:
+    - Enhanced `ReminderDialog` and `AddGenericReminderDialog` to dynamically query ephemeris and calculation engines (`LunarCalendarUtils`, `SunriseSunsetProvider`) for the exact astronomical start time of Nakshatras, Tithis, and Solar events instead of falling back to 6:00 AM.
+    - Updated `ReminderWorker` to format notification messages contextually: showing just the time if triggering on the event day (`"Starts at 03:39 PM"`), or explicitly including future dates if triggering in advance (`"Starts Oct 27 at 03:39 PM"` or `"Starts tomorrow at 03:39 PM"`).
