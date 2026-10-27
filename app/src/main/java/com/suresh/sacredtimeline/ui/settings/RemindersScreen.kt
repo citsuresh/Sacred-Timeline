@@ -356,6 +356,41 @@ fun AddGenericReminderDialog(
         return today
     }
 
+    fun calculateEventStartTime(cat: String, title: String, date: LocalDate): LocalTime {
+        when (cat.uppercase()) {
+            "NAKSHATRA" -> {
+                val starIdx = nakshatraNames.indexOf(title) + 1
+                if (starIdx in 1..27) {
+                    try {
+                        val info = LunarCalendarUtils.getLunarDayInfo(date, "AMANTA")
+                        info.nakshatras.find { it.value == starIdx }?.startTime?.let { instant ->
+                            return instant.atZone(ZoneId.systemDefault()).toLocalTime()
+                        }
+                    } catch (_: Exception) {}
+                }
+            }
+            "TITHI" -> {
+                val tithiIdx = tithiNames.indexOf(title) + 1
+                if (tithiIdx in 1..30) {
+                    try {
+                        val info = LunarCalendarUtils.getLunarDayInfo(date, "AMANTA")
+                        info.tithis.find { it.value == tithiIdx }?.startTime?.let { instant ->
+                            return instant.atZone(ZoneId.systemDefault()).toLocalTime()
+                        }
+                    } catch (_: Exception) {}
+                }
+            }
+            "SOLAR" -> {
+                try {
+                    val sun = com.suresh.sacredtimeline.logic.SunriseSunsetProvider().getSunTimes(13.0827, 80.2707, date)
+                    if (title.contains("Sunrise", true)) return sun.sunrise else if (title.contains("Sunset", true)) return sun.sunset
+                } catch (_: Exception) {}
+            }
+            else -> {}
+        }
+        return LocalTime.of(6, 0)
+    }
+
     var timeStr by remember { mutableStateOf("06:00") }
     var customTimeStr by remember { mutableStateOf("06:00") }
     var offsetDays by remember { mutableStateOf(existingReminder?.offsetDays?.toString() ?: "0") }
@@ -535,13 +570,16 @@ fun AddGenericReminderDialog(
 
                 Spacer(modifier = Modifier.height(8.dp))
                 val targetDateForPreview = calculateNextDate(selectedCategory, eventTitle)
+                val resolvedStartTime = remember(selectedCategory, eventTitle, targetDateForPreview) {
+                    calculateEventStartTime(selectedCategory, eventTitle, targetDateForPreview)
+                }
                 val pd = offsetDays.toIntOrNull() ?: 0
                 val ph = offsetHours.toIntOrNull() ?: 0
                 val pm = offsetMinutes.toIntOrNull() ?: 15
 
                 val pTriggerDT = when (selectedType) {
                     ReminderType.START_RELATIVE, ReminderType.END_RELATIVE -> {
-                        targetDateForPreview.atTime(LocalTime.of(6, 0)).minusDays(pd.toLong()).minusHours(ph.toLong()).minusMinutes(pm.toLong())
+                        targetDateForPreview.atTime(resolvedStartTime).minusDays(pd.toLong()).minusHours(ph.toLong()).minusMinutes(pm.toLong())
                     }
                     ReminderType.CUSTOM_ABSOLUTE -> {
                         val ct = try { LocalTime.parse(customTimeStr) } catch (_: Exception) { LocalTime.of(6, 0) }
@@ -569,13 +607,14 @@ fun AddGenericReminderDialog(
             TextButton(onClick = {
                 if (eventTitle.isBlank()) return@TextButton
                 val date = existingReminder?.eventDate ?: calculateNextDate(selectedCategory, eventTitle)
+                val resolvedStartTime = calculateEventStartTime(selectedCategory, eventTitle, date)
                 val d = offsetDays.toIntOrNull() ?: 0
                 val h = offsetHours.toIntOrNull() ?: 0
                 val m = offsetMinutes.toIntOrNull() ?: 15
 
                 val triggerDateTime = when (selectedType) {
                     ReminderType.START_RELATIVE, ReminderType.END_RELATIVE -> {
-                        date.atTime(LocalTime.of(6, 0)).minusDays(d.toLong()).minusHours(h.toLong()).minusMinutes(m.toLong())
+                        date.atTime(resolvedStartTime).minusDays(d.toLong()).minusHours(h.toLong()).minusMinutes(m.toLong())
                     }
                     ReminderType.CUSTOM_ABSOLUTE -> {
                         val ct = try { LocalTime.parse(customTimeStr) } catch (_: Exception) { LocalTime.of(6, 0) }
@@ -599,7 +638,7 @@ fun AddGenericReminderDialog(
                     isRecurring = isRecurring,
                     timeDisplay = when (selectedType) {
                         ReminderType.CUSTOM_ABSOLUTE -> customTimeStr
-                        else -> "06:00 AM"
+                        else -> resolvedStartTime.format(DateTimeFormatter.ofPattern("hh:mm a"))
                     }
                 )
 

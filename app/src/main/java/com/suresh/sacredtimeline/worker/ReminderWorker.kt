@@ -13,6 +13,7 @@ import com.suresh.sacredtimeline.MainActivity
 import com.suresh.sacredtimeline.data.RemindersRepository
 import com.suresh.sacredtimeline.model.Reminder
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 
 class ReminderWorker(
@@ -90,11 +91,20 @@ class ReminderWorker(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        val eventDate = LocalDate.parse(eventDateStr)
+        val today = LocalDate.now()
         val contentText = buildString {
             append(eventTitle)
             if (timeDisplay.isNotEmpty()) {
                 val action = if (reminderType == "END_RELATIVE") "Ends at" else "Starts at"
-                append(" • $action $timeDisplay")
+                if (today == eventDate) {
+                    append(" • $action $timeDisplay")
+                } else if (eventDate == today.plusDays(1)) {
+                    append(" • $action tomorrow at $timeDisplay")
+                } else {
+                    val dateFormatted = eventDate.format(DateTimeFormatter.ofPattern("MMM dd"))
+                    append(" • $action $dateFormatted at $timeDisplay")
+                }
             }
         }
 
