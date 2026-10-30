@@ -110,6 +110,37 @@ fun ScoreBreakdownSheet(
                 }
             }
 
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = stringResource(R.string.label_activity_guidance),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            val recommendationRes = when {
+                score >= 80f -> R.string.rec_highly_favorable
+                score >= 65f -> R.string.rec_favorable
+                score >= 50f -> R.string.rec_neutral
+                score >= 35f -> R.string.rec_caution
+                else -> R.string.rec_inauspicious
+            }
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(14.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f))
+            ) {
+                Text(
+                    text = stringResource(recommendationRes),
+                    modifier = Modifier.padding(16.dp),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            }
+
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(

@@ -979,4 +979,10 @@
     <string name="label_hora_quality_desc">Hora Quality (Personalized Compatibility Weight)</string>
     <string name="settings_show_power_meter_row">Show Power Meter Row</string>
     <string name="settings_show_now_gauge">Show NOW Line Gauge</string>
+    <string name="label_activity_guidance">Activity Guidance &amp; Recommendations:</string>
+    <string name="rec_highly_favorable">Ideal for auspicious beginnings, signing contracts, financial investments, and starting new ventures.</string>
+    <string name="rec_favorable">Good for general business meetings, travel, social events, and productive work.</string>
+    <string name="rec_neutral">Suitable for routine daily tasks, maintenance, and regular administrative work.</string>
+    <string name="rec_caution">Exercise patience. Avoid major decisions, risky investments, or starting important new projects.</string>
+    <string name="rec_inauspicious">Best reserved for introspection, meditation, spiritual practice, and clearing backlog tasks.</string>
 </resources>

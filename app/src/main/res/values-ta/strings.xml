@@ -929,4 +929,10 @@
     <string name="label_hora_quality_desc">ஹோரை தரம் (தனிப்பയனாக்கப்பட்ட பொருத்தம்)</string>
     <string name="settings_show_power_meter_row">சக்தி அளவுகோல் வரிசையைக் காட்டு (Power Meter)</string>
     <string name="settings_show_now_gauge">நடப்பு நேரக் குறியீட்டுக் காட்டி (NOW Line Gauge)</string>
+    <string name="label_activity_guidance">செயல்பாட்டு வழிகாட்டுதல் &amp; பரிந்துரைகள்:</string>
+    <string name="rec_highly_favorable">சுப காரியங்கள் தொடங்க, ஒப்பந்தங்களில் கையெழுத்திட, புதிய முதலீடுகள் மற்றும் முயற்சிகளுக்கு மிகவும் உகந்தது.</string>
+    <string name="rec_favorable">வணிக சந்திப்புகள், பயணம், சமூக நிகழ்வுகள் மற்றும் பயனுள்ள பணிகளுக்கு நல்லது.</string>
+    <string name="rec_neutral">வழக்கமான தினசரி பணிகள் மற்றும் நிர்வாகப் பணிகளுக்கு ஏற்றது.</string>
+    <string name="rec_caution">பொறுமை அவசியம். முக்கிய முடிவுகள், ஆபத்தான முதலீடுகள் அல்லது புதிய திட்டங்களைத் தவிர்க்கவும்.</string>
+    <string name="rec_inauspicious">ஆன்மீக வழிபாடு, தியானம் மற்றும் பழைய பணிகளை முடிக்க சிறந்தது.</string>
 </resources>
