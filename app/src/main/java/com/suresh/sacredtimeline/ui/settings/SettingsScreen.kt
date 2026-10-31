@@ -441,6 +441,8 @@ fun SettingsScreen(
                         val isVisible = widgetColumnVisibility.contains(colId)
                         ColumnOrderItem(
                             name = when(colId) {
+                                "POWER_METER" -> "Power Meter Widget"
+                                "SCORE_GAUGE" -> "Score Gauge Widget"
                                 "UNIVERSAL" -> stringResource(R.string.nav_universal)
                                 "NERAM_MUHURTHAM" -> stringResource(R.string.nav_neram_muhurtham)
                                 "NERAM" -> stringResource(R.string.nav_nalla_neram)

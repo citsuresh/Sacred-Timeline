@@ -31,6 +31,8 @@ import com.suresh.sacredtimeline.data.BirthProfilesRepository
 import com.suresh.sacredtimeline.data.CacheManager
 import com.suresh.sacredtimeline.data.SettingsRepository
 import com.suresh.sacredtimeline.logic.DayDataProvider
+import com.suresh.sacredtimeline.logic.ScoringEngine
+import com.suresh.sacredtimeline.logic.ScoreResult
 import com.suresh.sacredtimeline.model.*
 import com.suresh.sacredtimeline.ui.theme.*
 import kotlinx.coroutines.flow.first
@@ -133,6 +135,16 @@ class PanchangamWidget : GlanceAppWidget() {
                 columnOrder.forEach { colId ->
                     if (columnVisibility.contains(colId)) {
                         when (colId) {
+                            "SCORE_GAUGE" -> {
+                                val primaryProfile = BirthProfilesRepository(context).getPrimaryProfile()
+                                val scoreResult = ScoringEngine.calculateScore(dayData, primaryProfile, now)
+                                ScoreGaugeColumn(context, scoreResult, GlanceModifier.defaultWeight())
+                            }
+                            "POWER_METER" -> {
+                                val primaryProfile = BirthProfilesRepository(context).getPrimaryProfile()
+                                val scoreResult = ScoringEngine.calculateScore(dayData, primaryProfile, now)
+                                PowerMeterColumn(context, scoreResult, GlanceModifier.defaultWeight())
+                            }
                             "UNIVERSAL" -> {
                                 UniversalTimingColumn(
                                     context = context,
@@ -666,6 +678,124 @@ class PanchangamWidget : GlanceAppWidget() {
                             )
                         }
                     }
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun ScoreGaugeColumn(
+        context: Context,
+        scoreResult: ScoreResult,
+        modifier: GlanceModifier = GlanceModifier
+    ) {
+        val scoreColor = when {
+            scoreResult.totalScore >= 75f -> Color(0xFF4CAF50)
+            scoreResult.totalScore >= 50f -> Color(0xFFFF9800)
+            else -> Color(0xFFE53935)
+        }
+
+        Box(
+            modifier = modifier
+                .fillMaxHeight()
+                .padding(4.dp)
+                .cornerRadius(8.dp)
+                .background(scoreColor.copy(alpha = 0.15f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                modifier = GlanceModifier
+                    .fillMaxSize()
+                    .padding(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Power Meter",
+                    style = TextStyle(
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = ColorProvider(scoreColor)
+                    )
+                )
+                Spacer(modifier = GlanceModifier.height(8.dp))
+                Text(
+                    text = "${scoreResult.totalScore.toInt()}%",
+                    style = TextStyle(
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = ColorProvider(scoreColor)
+                    )
+                )
+                Spacer(modifier = GlanceModifier.height(4.dp))
+                Text(
+                    text = scoreResult.bandTitle,
+                    style = TextStyle(
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = ColorProvider(Color.Black)
+                    ),
+                    maxLines = 1
+                )
+            }
+        }
+    }
+
+    @Composable
+    private fun PowerMeterColumn(
+        context: Context,
+        scoreResult: ScoreResult,
+        modifier: GlanceModifier = GlanceModifier
+    ) {
+        val scoreColor = when {
+            scoreResult.totalScore >= 75f -> Color(0xFF4CAF50)
+            scoreResult.totalScore >= 50f -> Color(0xFFFF9800)
+            else -> Color(0xFFE53935)
+        }
+
+        Box(
+            modifier = modifier
+                .fillMaxHeight()
+                .padding(4.dp)
+                .cornerRadius(8.dp)
+                .background(scoreColor.copy(alpha = 0.15f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                modifier = GlanceModifier
+                    .fillMaxSize()
+                    .padding(8.dp),
+                horizontalAlignment = Alignment.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Power Score",
+                    style = TextStyle(
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = ColorProvider(Color.Gray)
+                    )
+                )
+                Spacer(modifier = GlanceModifier.height(4.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "${scoreResult.totalScore.toInt()}%",
+                        style = TextStyle(
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = ColorProvider(scoreColor)
+                        )
+                    )
+                    Spacer(modifier = GlanceModifier.width(6.dp))
+                    Text(
+                        text = scoreResult.bandTitle,
+                        style = TextStyle(
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = ColorProvider(Color.Black)
+                        ),
+                        maxLines = 1
+                    )
                 }
             }
         }
