@@ -102,6 +102,14 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         viewModelScope, SharingStarted.WhileSubscribed(5000), 0.22f
     )
 
+    val scoreGaugeBgColor: StateFlow<Int> = repository.scoreGaugeBgColor.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), 0x00000000
+    )
+
+    val scoreGaugeBgOpacity: StateFlow<Float> = repository.scoreGaugeBgOpacity.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0f
+    )
+
     val preloadDays: StateFlow<Int> = repository.preloadDays.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), 30)
 
@@ -341,6 +349,30 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
                 com.suresh.sacredtimeline.widget.PanchangamWidget().updateAll(getApplication())
                 com.suresh.sacredtimeline.widget.ScoreGaugeWidget().updateAll(getApplication())
                 com.suresh.sacredtimeline.widget.PowerMeterWidget().updateAll(getApplication())
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            WidgetUpdateWorker.triggerImmediateUpdate(getApplication())
+        }
+    }
+
+    fun setScoreGaugeBgColor(color: Int) {
+        viewModelScope.launch {
+            repository.setScoreGaugeBgColor(color)
+            try {
+                com.suresh.sacredtimeline.widget.ScoreGaugeWidget().updateAll(getApplication())
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            WidgetUpdateWorker.triggerImmediateUpdate(getApplication())
+        }
+    }
+
+    fun setScoreGaugeBgOpacity(opacity: Float) {
+        viewModelScope.launch {
+            repository.setScoreGaugeBgOpacity(opacity)
+            try {
+                com.suresh.sacredtimeline.widget.ScoreGaugeWidget().updateAll(getApplication())
             } catch (e: Exception) {
                 e.printStackTrace()
             }

@@ -424,9 +424,9 @@ fun SettingsScreen(
                 }
             }
 
-            // 6. Home Screen Widget
+            // 6. Home Screen Widget - Panchangam Timings
             item {
-                SettingsSection(title = stringResource(R.string.settings_widget_mgmt)) {
+                SettingsSection(title = "Home Screen Widget - Panchangam Timings") {
                     val refreshMinutes by viewModel.widgetRefreshMinutes.collectAsState()
                     val refreshOptions = listOf(15, 30, 60)
                     val refreshLabels = refreshOptions.map { if (it < 60) stringResource(R.string.settings_refresh_min, it) else stringResource(R.string.settings_refresh_hr, it / 60) }
@@ -435,23 +435,6 @@ fun SettingsScreen(
                         selected = if (refreshMinutes < 60) stringResource(R.string.settings_refresh_min, refreshMinutes) else stringResource(R.string.settings_refresh_hr, refreshMinutes / 60),
                         options = refreshLabels, onOptionSelected = { label -> val index = refreshLabels.indexOf(label); if (index != -1) viewModel.setWidgetRefreshMinutes(refreshOptions[index]) }
                     )
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), thickness = 0.5.dp)
-                    val backgroundOpacity by viewModel.widgetBackgroundOpacity.collectAsState()
-                    Column(modifier = Modifier.padding(vertical = 8.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text("Widget Background Opacity", style = MaterialTheme.typography.bodyLarge)
-                            Text("${(backgroundOpacity * 100).toInt()}%", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-                        }
-                        Slider(
-                            value = backgroundOpacity,
-                            onValueChange = { viewModel.setWidgetBackgroundOpacity(it) },
-                            valueRange = 0.0f..1.0f,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), thickness = 0.5.dp)
                     Text(stringResource(R.string.settings_widget_columns), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(vertical = 8.dp))
                     widgetColumnOrder.forEachIndexed { index, colId ->
@@ -478,6 +461,74 @@ fun SettingsScreen(
                             onMoveDown = if (index < widgetColumnOrder.size - 1) { { viewModel.moveWidgetColumn(colId, 1) } } else null
                         )
                         if (index < widgetColumnOrder.size - 1) HorizontalDivider(modifier = Modifier.padding(horizontal = 8.dp), thickness = 0.5.dp)
+                    }
+                }
+            }
+
+            // Home Screen Widget - Power Meter
+            item {
+                SettingsSection(title = "Home Screen Widget - Power Meter") {
+                    val backgroundOpacity by viewModel.widgetBackgroundOpacity.collectAsState()
+                    Column(modifier = Modifier.padding(vertical = 8.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text("Background Opacity / Tint", style = MaterialTheme.typography.bodyLarge)
+                            Text("${(backgroundOpacity * 100).toInt()}%", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+                        }
+                        Slider(
+                            value = backgroundOpacity,
+                            onValueChange = { viewModel.setWidgetBackgroundOpacity(it) },
+                            valueRange = 0.0f..1.0f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            }
+
+            // Home Screen Widget - Score Gauge
+            item {
+                SettingsSection(title = "Home Screen Widget - Score Gauge") {
+                    val gaugeBgColor by viewModel.scoreGaugeBgColor.collectAsState()
+                    val gaugeBgOpacity by viewModel.scoreGaugeBgOpacity.collectAsState()
+
+                    val colorOptions = listOf(0x00000000, 0xFFFFFFFF.toInt(), 0xFF000000.toInt(), 0xFF1B5E20.toInt(), 0xFFC62828.toInt(), 0xFFFF8F00.toInt())
+                    val colorLabels = listOf("Transparent", "White", "Black", "Dark Green", "Dark Red", "Amber")
+                    val selectedColorLabel = when (gaugeBgColor) {
+                        0xFFFFFFFF.toInt() -> "White"
+                        0xFF000000.toInt() -> "Black"
+                        0xFF1B5E20.toInt() -> "Dark Green"
+                        0xFFC62828.toInt() -> "Dark Red"
+                        0xFFFF8F00.toInt() -> "Amber"
+                        else -> "Transparent"
+                    }
+
+                    SettingsDropdownItem(
+                        label = "Background Color",
+                        selected = selectedColorLabel,
+                        options = colorLabels,
+                        onOptionSelected = { label ->
+                            val index = colorLabels.indexOf(label)
+                            if (index != -1) viewModel.setScoreGaugeBgColor(colorOptions[index])
+                        }
+                    )
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), thickness = 0.5.dp)
+
+                    Column(modifier = Modifier.padding(vertical = 8.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text("Background Opacity", style = MaterialTheme.typography.bodyLarge)
+                            Text("${(gaugeBgOpacity * 100).toInt()}%", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+                        }
+                        Slider(
+                            value = gaugeBgOpacity,
+                            onValueChange = { viewModel.setScoreGaugeBgOpacity(it) },
+                            valueRange = 0.0f..1.0f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
                 }
             }

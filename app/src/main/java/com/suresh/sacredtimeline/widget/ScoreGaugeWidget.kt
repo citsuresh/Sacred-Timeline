@@ -71,27 +71,36 @@ class ScoreGaugeWidget : GlanceAppWidget() {
 
         val primaryProfile = BirthProfilesRepository(context).getPrimaryProfile()
         val scoreResult = ScoringEngine.calculateScore(dayData, primaryProfile, now)
+        val bgColorInt = repository.scoreGaugeBgColor.first()
+        val bgOpacity = repository.scoreGaugeBgOpacity.first()
 
         provideContent {
             GlanceTheme {
-                ScoreGaugeWidgetContent(scoreResult)
+                ScoreGaugeWidgetContent(scoreResult, bgColorInt, bgOpacity)
             }
         }
     }
 
     @Composable
-    private fun ScoreGaugeWidgetContent(scoreResult: com.suresh.sacredtimeline.logic.ScoreResult) {
+    private fun ScoreGaugeWidgetContent(
+        scoreResult: com.suresh.sacredtimeline.logic.ScoreResult,
+        bgColorInt: Int,
+        bgOpacity: Float
+    ) {
         val size = LocalSize.current
         val widthDp = size.width
         val heightDp = size.height
+
+        val containerBg = if (bgColorInt == 0x00000000) Color.Transparent else Color(bgColorInt).copy(alpha = bgOpacity)
 
         val bitmap = SpeedometerBitmapUtils.createSpeedometerBitmap(scoreResult.totalScore, width = 400, height = 220)
 
         Box(
             modifier = GlanceModifier
                 .fillMaxSize()
-                .background(Color.Transparent)
-                .padding(2.dp)
+                .background(containerBg)
+                .cornerRadius(16.dp)
+                .padding(4.dp)
                 .clickable(actionStartActivity<MainActivity>()),
             contentAlignment = Alignment.Center
         ) {

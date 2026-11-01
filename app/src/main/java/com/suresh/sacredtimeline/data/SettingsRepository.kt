@@ -74,6 +74,8 @@ class SettingsRepository(private val context: Context) {
         val SHOW_POWER_METER_ROW = booleanPreferencesKey("show_power_meter_row")
         val SHOW_NOW_GAUGE = booleanPreferencesKey("show_now_gauge")
         val WIDGET_BACKGROUND_OPACITY = floatPreferencesKey("widget_background_opacity")
+        val SCORE_GAUGE_BG_COLOR = intPreferencesKey("score_gauge_bg_color")
+        val SCORE_GAUGE_BG_OPACITY = floatPreferencesKey("score_gauge_bg_opacity")
     }
 
     val compositeScale: Flow<Float> = context.dataStore.data.map { it[Keys.COMPOSITE_SCALE] ?: 1.0f }
@@ -391,6 +393,17 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun setWidgetBackgroundOpacity(opacity: Float) {
         context.dataStore.edit { it[Keys.WIDGET_BACKGROUND_OPACITY] = opacity }
+    }
+
+    val scoreGaugeBgColor: Flow<Int> = context.dataStore.data.map { it[Keys.SCORE_GAUGE_BG_COLOR] ?: 0x00000000 }
+    val scoreGaugeBgOpacity: Flow<Float> = context.dataStore.data.map { it[Keys.SCORE_GAUGE_BG_OPACITY] ?: 0.0f }
+
+    suspend fun setScoreGaugeBgColor(color: Int) {
+        context.dataStore.edit { it[Keys.SCORE_GAUGE_BG_COLOR] = color }
+    }
+
+    suspend fun setScoreGaugeBgOpacity(opacity: Float) {
+        context.dataStore.edit { it[Keys.SCORE_GAUGE_BG_OPACITY] = opacity }
     }
 
     suspend fun setPreloadDays(days: Int) {
