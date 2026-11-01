@@ -25,8 +25,8 @@ object ScoringEngine {
         val activeSpecial = dayData.specialPeriods.find { it.isCurrent(currentTime) }
         val specialName = activeSpecial?.name ?: ""
         
-        val specialPenaltyMultiplier = if (specialName.contains("Yamagam", true) || specialName.contains("Rahu", true)) {
-            0.3f // Heavy penalty multiplier for Rahu/Yama
+        val specialPenaltyMultiplier = if (specialName.contains("Yama", true) || specialName.contains("Rahu", true) || specialName.contains("Kuli", true)) {
+            0.3f // Heavy penalty multiplier for Rahu/Yama/Kuligai
         } else {
             1.0f
         }

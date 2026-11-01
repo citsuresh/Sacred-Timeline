@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
@@ -171,7 +172,7 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
     init {
         // Observe active profile changes and re-calculate dashboard
         viewModelScope.launch {
-            repository.activeProfileId.drop(1).collect { _ ->
+            repository.activeProfileId.drop(1).distinctUntilChanged().collect { _ ->
                 android.util.Log.d("SacredTimelineRefresh", "RELOAD TRIGGER: Active profile changed")
                 refreshJob?.cancel()
                 refreshJob = viewModelScope.launch {
@@ -228,7 +229,7 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
                 repository.manualLongitude
             ) { mode, city, lat, lng ->
                 Triple(mode, city, lat to lng)
-            }.drop(1).collect { (mode, city, coords) ->
+            }.drop(1).distinctUntilChanged().collect { (mode, city, coords) ->
                 android.util.Log.d("SacredTimelineRefresh", "RELOAD TRIGGER: Location settings changed to mode: $mode")
                 if (mode == "MANUAL") {
                     _locationName.value = city
@@ -279,7 +280,7 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
                     style = values[4] as String,
                     system = values[5] as String
                 )
-            }.drop(1).collect { trigger ->
+            }.drop(1).distinctUntilChanged().collect { trigger ->
                 android.util.Log.d("SacredTimelineRefresh", "RELOAD TRIGGER: Ephemeris/Convention settings changed: $trigger")
                 refreshJob?.cancel()
                 refreshJob = viewModelScope.launch {
