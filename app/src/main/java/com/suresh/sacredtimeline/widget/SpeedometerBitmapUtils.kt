@@ -21,7 +21,7 @@ object SpeedometerBitmapUtils {
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
 
-        val arcStrokeWidth = 24f
+        val arcStrokeWidth = 34f
         // Generous padding so the top stroke and arc have plenty of headroom and never get clipped
         val padding = 32f
         val radius = (width / 2f) - (arcStrokeWidth / 2f) - padding

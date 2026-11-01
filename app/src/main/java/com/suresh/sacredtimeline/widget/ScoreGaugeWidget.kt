@@ -38,9 +38,10 @@ import java.time.LocalTime
 class ScoreGaugeWidget : GlanceAppWidget() {
     override val sizeMode: SizeMode = SizeMode.Responsive(
         setOf(
-            DpSize(70.dp, 70.dp),
-            DpSize(140.dp, 140.dp),
-            DpSize(220.dp, 220.dp)
+            DpSize(60.dp, 60.dp),
+            DpSize(120.dp, 120.dp),
+            DpSize(200.dp, 200.dp),
+            DpSize(300.dp, 300.dp)
         )
     )
 
@@ -84,20 +85,13 @@ class ScoreGaugeWidget : GlanceAppWidget() {
         val widthDp = size.width
         val heightDp = size.height
 
-        val scoreColor = when {
-            scoreResult.totalScore >= 75f -> Color(0xFF4CAF50)
-            scoreResult.totalScore >= 50f -> Color(0xFFFF9800)
-            else -> Color(0xFFE53935)
-        }
-
-        val bitmapWidth = (widthDp.value * 2.5f).toInt().coerceIn(160, 600)
-        val bitmapHeight = (heightDp.value * 2.5f).toInt().coerceIn(80, 300)
+        val bitmap = SpeedometerBitmapUtils.createSpeedometerBitmap(scoreResult.totalScore, width = 400, height = 220)
 
         Box(
             modifier = GlanceModifier
                 .fillMaxSize()
                 .background(Color.Transparent)
-                .padding(4.dp)
+                .padding(2.dp)
                 .clickable(actionStartActivity<MainActivity>()),
             contentAlignment = Alignment.Center
         ) {
@@ -106,46 +100,43 @@ class ScoreGaugeWidget : GlanceAppWidget() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                if (heightDp.value > 85) {
+                if (heightDp.value > 80) {
                     Text(
                         text = "⚡ Power",
                         style = TextStyle(
-                            fontSize = if (widthDp.value < 120) 9.sp else 11.sp,
+                            fontSize = if (widthDp.value < 100) 8.sp else 11.sp,
                             fontWeight = FontWeight.Bold,
-                            color = ColorProvider(scoreColor)
+                            color = ColorProvider(SpeedometerBitmapUtils.getScoreSegmentColor(scoreResult.totalScore))
                         )
                     )
-                    Spacer(modifier = GlanceModifier.height(2.dp))
                 }
 
-                val bitmap = SpeedometerBitmapUtils.createSpeedometerBitmap(scoreResult.totalScore, width = bitmapWidth, height = bitmapHeight)
                 Image(
                     provider = ImageProvider(bitmap),
                     contentDescription = null,
-                    modifier = GlanceModifier.fillMaxWidth().defaultWeight()
+                    modifier = GlanceModifier.fillMaxWidth().defaultWeight(),
+                    contentScale = androidx.glance.layout.ContentScale.Fit
                 )
 
-                if (heightDp.value > 65) {
-                    Spacer(modifier = GlanceModifier.height(2.dp))
-                    val badgeColor = SpeedometerBitmapUtils.getScoreSegmentColor(scoreResult.totalScore)
-                    val textColor = if (scoreResult.totalScore in 50f..70f) Color.Black else Color.White
-                    Box(
-                        modifier = GlanceModifier
-                            .background(badgeColor)
-                            .cornerRadius(10.dp)
-                            .padding(horizontal = 8.dp, vertical = 2.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = if (widthDp.value < 130) "${scoreResult.totalScore.toInt()}%" else "${scoreResult.totalScore.toInt()}% • ${scoreResult.bandTitle}",
-                            style = TextStyle(
-                                fontSize = if (widthDp.value < 130) 9.sp else 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = ColorProvider(textColor)
-                            ),
-                            maxLines = 1
-                        )
-                    }
+                Spacer(modifier = GlanceModifier.height(1.dp))
+                val badgeColor = SpeedometerBitmapUtils.getScoreSegmentColor(scoreResult.totalScore)
+                val textColor = if (scoreResult.totalScore in 50f..70f) Color.Black else Color.White
+                Box(
+                    modifier = GlanceModifier
+                        .background(badgeColor)
+                        .cornerRadius(10.dp)
+                        .padding(horizontal = 8.dp, vertical = 2.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = if (widthDp.value < 110) "${scoreResult.totalScore.toInt()}%" else "${scoreResult.totalScore.toInt()}% • ${scoreResult.bandTitle}",
+                        style = TextStyle(
+                            fontSize = if (widthDp.value < 110) 12.sp else 15.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = ColorProvider(textColor)
+                        ),
+                        maxLines = 1
+                    )
                 }
             }
         }
