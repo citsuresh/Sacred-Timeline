@@ -8,7 +8,16 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 object SpeedometerBitmapUtils {
-    fun createSpeedometerBitmap(score: Float, width: Int = 300, height: Int = 160): Bitmap {
+    fun getScoreSegmentColor(score: Float): androidx.compose.ui.graphics.Color {
+        val seg = ((score.coerceIn(0f, 99.99f) / 10f)).toInt().coerceIn(0, 9)
+        val hexColors = listOf(
+            0xFFD32F2F, 0xFFE53935, 0xFFFF5722, 0xFFFF9800, 0xFFFFC107,
+            0xFFFFEB3B, 0xFFCDDC39, 0xFF8BC34A, 0xFF4CAF50, 0xFF2E7D32
+        )
+        return androidx.compose.ui.graphics.Color(hexColors[seg])
+    }
+
+    fun createSpeedometerBitmap(score: Float, width: Int = 320, height: Int = 160): Bitmap {
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
 
@@ -51,21 +60,40 @@ object SpeedometerBitmapUtils {
             canvas.drawArc(rectF, startAngle, segAngle, false, paint)
         }
 
-        // Draw needle
+        // Draw needle with white outline for visibility on dark backgrounds
         val angleDeg = 180f + (score.coerceIn(0f, 100f) / 100f) * 180f
         val angleRad = Math.toRadians(angleDeg.toDouble())
         val needleLength = radius * 0.85f
         val tipX = centerX + (needleLength * cos(angleRad)).toFloat()
         val tipY = centerY + (needleLength * sin(angleRad)).toFloat()
 
+        // White outline stroke
+        val outlinePaint = Paint().apply {
+            isAntiAlias = true
+            color = android.graphics.Color.WHITE
+            strokeWidth = 12f
+            strokeCap = Paint.Cap.ROUND
+        }
+        canvas.drawLine(centerX, centerY, tipX, tipY, outlinePaint)
+
+        // Black core needle stroke
         val needlePaint = Paint().apply {
             isAntiAlias = true
             color = android.graphics.Color.BLACK
-            this.strokeWidth = 4f
+            strokeWidth = 6f
             strokeCap = Paint.Cap.ROUND
         }
         canvas.drawLine(centerX, centerY, tipX, tipY, needlePaint)
 
+        // White pin outline
+        val pinOutlinePaint = Paint().apply {
+            isAntiAlias = true
+            color = android.graphics.Color.WHITE
+            style = Paint.Style.FILL
+        }
+        canvas.drawCircle(centerX, centerY, 10f, pinOutlinePaint)
+
+        // Black center pin
         val pinPaint = Paint().apply {
             isAntiAlias = true
             color = android.graphics.Color.BLACK

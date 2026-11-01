@@ -12,6 +12,7 @@ import androidx.glance.GlanceTheme
 import androidx.glance.LocalSize
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.SizeMode
+import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
 import androidx.glance.layout.*
@@ -126,15 +127,25 @@ class ScoreGaugeWidget : GlanceAppWidget() {
 
                 if (heightDp.value > 65) {
                     Spacer(modifier = GlanceModifier.height(2.dp))
-                    Text(
-                        text = if (widthDp.value < 130) "${scoreResult.totalScore.toInt()}%" else "${scoreResult.totalScore.toInt()}% • ${scoreResult.bandTitle}",
-                        style = TextStyle(
-                            fontSize = if (widthDp.value < 130) 9.sp else 11.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = ColorProvider(Color.White)
-                        ),
-                        maxLines = 1
-                    )
+                    val badgeColor = SpeedometerBitmapUtils.getScoreSegmentColor(scoreResult.totalScore)
+                    val textColor = if (scoreResult.totalScore in 50f..70f) Color.Black else Color.White
+                    Box(
+                        modifier = GlanceModifier
+                            .background(badgeColor)
+                            .cornerRadius(10.dp)
+                            .padding(horizontal = 8.dp, vertical = 2.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = if (widthDp.value < 130) "${scoreResult.totalScore.toInt()}%" else "${scoreResult.totalScore.toInt()}% • ${scoreResult.bandTitle}",
+                            style = TextStyle(
+                                fontSize = if (widthDp.value < 130) 9.sp else 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = ColorProvider(textColor)
+                            ),
+                            maxLines = 1
+                        )
+                    }
                 }
             }
         }
