@@ -5,4 +5,5 @@
     android:minHeight="110dp"
     android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="0"
+    android:previewLayout="@layout/widget_preview_panchangam"
     android:widgetCategory="home_screen" />

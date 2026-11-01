@@ -5,10 +5,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.DpSize
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
+import androidx.glance.LocalSize
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
@@ -33,6 +36,14 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 class PowerMeterWidget : GlanceAppWidget() {
+    override val sizeMode: SizeMode = SizeMode.Responsive(
+        setOf(
+            DpSize(110.dp, 50.dp),
+            DpSize(180.dp, 80.dp),
+            DpSize(260.dp, 120.dp)
+        )
+    )
+
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val repository = SettingsRepository(context)
         val cacheManager = CacheManager(context)
@@ -69,18 +80,29 @@ class PowerMeterWidget : GlanceAppWidget() {
 
     @Composable
     private fun PowerMeterWidgetContent(scoreResult: com.suresh.sacredtimeline.logic.ScoreResult) {
+        val size = LocalSize.current
+        val widthDp = size.width
+        val heightDp = size.height
+
         val scoreColor = when {
             scoreResult.totalScore >= 75f -> Color(0xFF4CAF50)
             scoreResult.totalScore >= 50f -> Color(0xFFFF9800)
             else -> Color(0xFFE53935)
         }
+        val badgeColor = SpeedometerBitmapUtils.getScoreSegmentColor(scoreResult.totalScore)
+
+        val bitmapWidth = (widthDp.value * 2f).toInt().coerceIn(120, 400)
+        val bitmapHeight = (heightDp.value * 2f).toInt().coerceIn(60, 200)
+
+        val imageWidth = (widthDp.value * 0.35f).coerceIn(40f, 120f).dp
+        val imageHeight = (imageWidth * 0.5f)
 
         Box(
             modifier = GlanceModifier
                 .fillMaxSize()
-                .background(scoreColor.copy(alpha = 0.12f)) // Matches dashboard PowerMeterRow background color
-                .cornerRadius(12.dp)
-                .padding(10.dp)
+                .background(badgeColor.copy(alpha = 0.22f)) // Matches the exact color where the needle points!
+                .cornerRadius(16.dp)
+                .padding(8.dp)
                 .clickable(actionStartActivity<MainActivity>()),
             contentAlignment = Alignment.Center
         ) {
@@ -93,17 +115,17 @@ class PowerMeterWidget : GlanceAppWidget() {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    val bitmap = SpeedometerBitmapUtils.createSpeedometerBitmap(scoreResult.totalScore, width = 120, height = 60)
+                    val bitmap = SpeedometerBitmapUtils.createSpeedometerBitmap(scoreResult.totalScore, width = bitmapWidth, height = bitmapHeight)
                     Image(
                         provider = ImageProvider(bitmap),
                         contentDescription = null,
-                        modifier = GlanceModifier.size(48.dp, 24.dp)
+                        modifier = GlanceModifier.size(imageWidth, imageHeight)
                     )
                     Spacer(modifier = GlanceModifier.height(1.dp))
                     Text(
                         text = "${scoreResult.totalScore.toInt()}%",
                         style = TextStyle(
-                            fontSize = 9.sp,
+                            fontSize = if (widthDp.value < 140) 9.sp else 12.sp,
                             fontWeight = FontWeight.Bold,
                             color = ColorProvider(scoreColor)
                         )
@@ -118,7 +140,7 @@ class PowerMeterWidget : GlanceAppWidget() {
                     Text(
                         text = "Power Meter",
                         style = TextStyle(
-                            fontSize = 9.sp,
+                            fontSize = if (widthDp.value < 140) 8.sp else 11.sp,
                             fontWeight = FontWeight.Bold,
                             color = ColorProvider(Color.DarkGray)
                         )
@@ -127,7 +149,7 @@ class PowerMeterWidget : GlanceAppWidget() {
                     Text(
                         text = scoreResult.bandTitle,
                         style = TextStyle(
-                            fontSize = 11.sp,
+                            fontSize = if (widthDp.value < 140) 10.sp else 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = ColorProvider(Color.Black)
                         ),

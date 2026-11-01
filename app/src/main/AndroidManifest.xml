@@ -58,7 +58,7 @@
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/panchangam_widget_info" />
+                android:resource="@xml/score_gauge_widget_info" />
         </receiver>
 
         <receiver
@@ -71,7 +71,7 @@
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/panchangam_widget_info" />
+                android:resource="@xml/power_meter_widget_info" />
         </receiver>
 
         <receiver
