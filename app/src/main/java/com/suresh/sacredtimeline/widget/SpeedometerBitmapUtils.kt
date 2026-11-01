@@ -17,14 +17,16 @@ object SpeedometerBitmapUtils {
         return androidx.compose.ui.graphics.Color(hexColors[seg])
     }
 
-    fun createSpeedometerBitmap(score: Float, width: Int = 320, height: Int = 160): Bitmap {
+    fun createSpeedometerBitmap(score: Float, width: Int = 360, height: Int = 220): Bitmap {
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
 
         val arcStrokeWidth = 24f
-        val radius = (width / 2f) - (arcStrokeWidth / 2f)
+        // Generous padding so the top stroke and arc have plenty of headroom and never get clipped
+        val padding = 32f
+        val radius = (width / 2f) - (arcStrokeWidth / 2f) - padding
         val centerX = width / 2f
-        val centerY = height.toFloat()
+        val centerY = height.toFloat() - padding
 
         val rectF = RectF(
             centerX - radius,

@@ -12,6 +12,7 @@ import com.suresh.sacredtimeline.data.SettingsRepository
 import com.suresh.sacredtimeline.ui.navigation.ViewMode
 import kotlinx.coroutines.Dispatchers
 import com.suresh.sacredtimeline.worker.WidgetUpdateWorker
+import androidx.glance.appwidget.updateAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -95,6 +96,10 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
     val widgetRefreshMinutes: StateFlow<Int> = repository.widgetRefreshMinutes.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), 15
+    )
+
+    val widgetBackgroundOpacity: StateFlow<Float> = repository.widgetBackgroundOpacity.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), 0.22f
     )
 
     val preloadDays: StateFlow<Int> = repository.preloadDays.stateIn(
@@ -222,7 +227,10 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun updateWidgetColumnVisibility(column: String, visible: Boolean) {
-        viewModelScope.launch { repository.updateWidgetColumnVisibility(column, visible) }
+        viewModelScope.launch {
+            repository.updateWidgetColumnVisibility(column, visible)
+            WidgetUpdateWorker.triggerImmediateUpdate(getApplication())
+        }
     }
 
     fun moveWidgetColumn(column: String, direction: Int) {
@@ -319,7 +327,25 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun setWidgetRefreshMinutes(minutes: Int) {
-        viewModelScope.launch { repository.setWidgetRefreshMinutes(minutes) }
+        viewModelScope.launch {
+            repository.setWidgetRefreshMinutes(minutes)
+            WidgetUpdateWorker.enqueuePeriodicWork(getApplication(), minutes.toLong())
+            WidgetUpdateWorker.triggerImmediateUpdate(getApplication())
+        }
+    }
+
+    fun setWidgetBackgroundOpacity(opacity: Float) {
+        viewModelScope.launch {
+            repository.setWidgetBackgroundOpacity(opacity)
+            try {
+                com.suresh.sacredtimeline.widget.PanchangamWidget().updateAll(getApplication())
+                com.suresh.sacredtimeline.widget.ScoreGaugeWidget().updateAll(getApplication())
+                com.suresh.sacredtimeline.widget.PowerMeterWidget().updateAll(getApplication())
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            WidgetUpdateWorker.triggerImmediateUpdate(getApplication())
+        }
     }
 
     fun setPreloadDays(days: Int) {

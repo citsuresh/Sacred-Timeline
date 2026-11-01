@@ -436,6 +436,23 @@ fun SettingsScreen(
                         options = refreshLabels, onOptionSelected = { label -> val index = refreshLabels.indexOf(label); if (index != -1) viewModel.setWidgetRefreshMinutes(refreshOptions[index]) }
                     )
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), thickness = 0.5.dp)
+                    val backgroundOpacity by viewModel.widgetBackgroundOpacity.collectAsState()
+                    Column(modifier = Modifier.padding(vertical = 8.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text("Widget Background Opacity", style = MaterialTheme.typography.bodyLarge)
+                            Text("${(backgroundOpacity * 100).toInt()}%", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+                        }
+                        Slider(
+                            value = backgroundOpacity,
+                            onValueChange = { viewModel.setWidgetBackgroundOpacity(it) },
+                            valueRange = 0.0f..1.0f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), thickness = 0.5.dp)
                     Text(stringResource(R.string.settings_widget_columns), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(vertical = 8.dp))
                     widgetColumnOrder.forEachIndexed { index, colId ->
                         val isVisible = widgetColumnVisibility.contains(colId)

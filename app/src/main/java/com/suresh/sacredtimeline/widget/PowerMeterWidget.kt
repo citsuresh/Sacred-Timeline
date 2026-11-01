@@ -70,16 +70,17 @@ class PowerMeterWidget : GlanceAppWidget() {
 
         val primaryProfile = BirthProfilesRepository(context).getPrimaryProfile()
         val scoreResult = ScoringEngine.calculateScore(dayData, primaryProfile, now)
+        val backgroundOpacity = repository.widgetBackgroundOpacity.first()
 
         provideContent {
             GlanceTheme {
-                PowerMeterWidgetContent(scoreResult)
+                PowerMeterWidgetContent(scoreResult, backgroundOpacity)
             }
         }
     }
 
     @Composable
-    private fun PowerMeterWidgetContent(scoreResult: com.suresh.sacredtimeline.logic.ScoreResult) {
+    private fun PowerMeterWidgetContent(scoreResult: com.suresh.sacredtimeline.logic.ScoreResult, backgroundOpacity: Float) {
         val size = LocalSize.current
         val widthDp = size.width
         val heightDp = size.height
@@ -91,16 +92,13 @@ class PowerMeterWidget : GlanceAppWidget() {
         }
         val badgeColor = SpeedometerBitmapUtils.getScoreSegmentColor(scoreResult.totalScore)
 
-        val bitmapWidth = (widthDp.value * 2f).toInt().coerceIn(120, 400)
-        val bitmapHeight = (heightDp.value * 2f).toInt().coerceIn(60, 200)
-
         val imageWidth = (widthDp.value * 0.35f).coerceIn(40f, 120f).dp
         val imageHeight = (imageWidth * 0.5f)
 
         Box(
             modifier = GlanceModifier
                 .fillMaxSize()
-                .background(badgeColor.copy(alpha = 0.22f)) // Matches the exact color where the needle points!
+                .background(badgeColor.copy(alpha = backgroundOpacity)) // Configurable via Settings
                 .cornerRadius(16.dp)
                 .padding(8.dp)
                 .clickable(actionStartActivity<MainActivity>()),
@@ -115,7 +113,7 @@ class PowerMeterWidget : GlanceAppWidget() {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    val bitmap = SpeedometerBitmapUtils.createSpeedometerBitmap(scoreResult.totalScore, width = bitmapWidth, height = bitmapHeight)
+                    val bitmap = SpeedometerBitmapUtils.createSpeedometerBitmap(scoreResult.totalScore)
                     Image(
                         provider = ImageProvider(bitmap),
                         contentDescription = null,

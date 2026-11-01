@@ -73,6 +73,7 @@ class SettingsRepository(private val context: Context) {
         val HORA_SCORING_MODE = stringPreferencesKey("hora_scoring_mode")
         val SHOW_POWER_METER_ROW = booleanPreferencesKey("show_power_meter_row")
         val SHOW_NOW_GAUGE = booleanPreferencesKey("show_now_gauge")
+        val WIDGET_BACKGROUND_OPACITY = floatPreferencesKey("widget_background_opacity")
     }
 
     val compositeScale: Flow<Float> = context.dataStore.data.map { it[Keys.COMPOSITE_SCALE] ?: 1.0f }
@@ -384,6 +385,12 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun setWidgetRefreshMinutes(minutes: Int) {
         context.dataStore.edit { it[Keys.WIDGET_REFRESH_MINUTES] = minutes }
+    }
+
+    val widgetBackgroundOpacity: Flow<Float> = context.dataStore.data.map { it[Keys.WIDGET_BACKGROUND_OPACITY] ?: 0.22f }
+
+    suspend fun setWidgetBackgroundOpacity(opacity: Float) {
+        context.dataStore.edit { it[Keys.WIDGET_BACKGROUND_OPACITY] = opacity }
     }
 
     suspend fun setPreloadDays(days: Int) {
