@@ -3,7 +3,7 @@
 **Phase**: Stable (Phase 10 Complete - Multi-Factor Scoring Engine & 24-Hour Score Heatmap Column)
 
 ## 1. Recently Implemented
-- **Multi-Factor Scoring Engine & Widgets Synchronization**: Updated `WidgetUpdateWorker` to automatically refresh and update `ScoreGaugeWidget` and `PowerMeterWidget` alongside `PanchangamWidget` on background interval ticks and slot transition boundaries.
+- **Phase 3 Adaptive Layouts**: Implemented Material 3 Adaptive `ListDetailPaneScaffold` (`AdaptiveTimelineDashboard.kt`) supporting master-detail side-by-side views for wide screens (tablets and foldables) with strict bilingual localization parity.
 
 ## 2. Technical Stack
 - **UI**: Kotlin, Compose (M3), Jetpack Glance (Widgets), Navigation 3.

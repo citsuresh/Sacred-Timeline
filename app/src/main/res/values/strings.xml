@@ -1005,4 +1005,6 @@
     <string name="widget_score_gauge_name">Score Gauge Widget</string>
     <string name="label_power">⚡ Power</string>
     <string name="event_label_format">Event: %s</string>
+    <string name="adaptive_detail_prefix">Detail: %s</string>
+    <string name="adaptive_select_prompt">Select a period on the timeline for wide-screen detail</string>
 </resources>

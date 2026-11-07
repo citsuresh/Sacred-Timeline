@@ -25,7 +25,6 @@ import androidx.navigation3.ui.NavDisplay
 import androidx.navigationevent.compose.LocalNavigationEventDispatcherOwner
 import androidx.navigationevent.compose.rememberNavigationEventDispatcherOwner
 import com.suresh.sacredtimeline.data.SettingsRepository
-import com.suresh.sacredtimeline.ui.dashboard.TimelineDashboard
 import com.suresh.sacredtimeline.ui.navigation.NavRoute
 import com.suresh.sacredtimeline.ui.navigation.ViewMode
 import com.suresh.sacredtimeline.ui.settings.SettingsScreen
@@ -401,7 +400,7 @@ class MainActivity : AppCompatActivity() {
                                         try { java.time.LocalDate.parse(it) } catch (e: Exception) { null }
                                     }
                                 }
-                                TimelineDashboard(
+                                com.suresh.sacredtimeline.ui.dashboard.AdaptiveTimelineDashboard(
                                     viewMode = key.mode,
                                     initialTargetDate = targetDate,
                                     onMenuClick = { scope.launch { drawerState.open() } },

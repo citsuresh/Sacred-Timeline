@@ -955,4 +955,6 @@
     <string name="widget_score_gauge_name">மதிப்பெண் அளவுகோல் விட்ஜெட்</string>
     <string name="label_power">⚡ சக்தி</string>
     <string name="event_label_format">நிகழ்வு: %s</string>
+    <string name="adaptive_detail_prefix">விவரம்: %s</string>
+    <string name="adaptive_select_prompt">அகன்ற திரை விவரங்களைக் காண காலக்கோட்டில் ஒரு காலப்பகுதியைத் தேர்ந்தெடுக்கவும்</string>
 </resources>
