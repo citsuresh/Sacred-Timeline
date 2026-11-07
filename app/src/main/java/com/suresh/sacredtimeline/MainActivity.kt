@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material.icons.Icons
@@ -176,12 +178,17 @@ class MainActivity : AppCompatActivity() {
                         val currentRoute = backStack.lastOrNull()
                         val currentViewMode = (currentRoute as? NavRoute.Dashboard)?.mode
                         
-                        Text(
-                            stringResource(R.string.app_name),
-                            modifier = Modifier.padding(16.dp),
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                        HorizontalDivider()
+                        Column(
+                            modifier = Modifier
+                                .verticalScroll(rememberScrollState())
+                                .padding(vertical = 12.dp)
+                        ) {
+                            Text(
+                                stringResource(R.string.app_name),
+                                modifier = Modifier.padding(16.dp),
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                            HorizontalDivider()
                         
                         NavigationDrawerItem(
                             label = { Text(stringResource(R.string.nav_universal)) },
@@ -357,15 +364,15 @@ class MainActivity : AppCompatActivity() {
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
                         NavigationDrawerItem(
-                            label = { Text(stringResource(R.string.nav_search)) },
-                            selected = currentRoute is NavRoute.Search,
+                            label = { Text(stringResource(R.string.nav_settings)) },
+                            selected = currentRoute is NavRoute.Settings,
                             onClick = {
-                                if (currentRoute !is NavRoute.Search) {
-                                    backStack.add(NavRoute.Search)
+                                if (currentRoute !is NavRoute.Settings) {
+                                    backStack.add(NavRoute.Settings)
                                 }
                                 scope.launch { drawerState.close() }
                             },
-                            icon = { Icon(Icons.Default.Search, contentDescription = null) }
+                            icon = { Icon(Icons.Default.Settings, contentDescription = null) }
                         )
 
                         NavigationDrawerItem(
@@ -381,18 +388,19 @@ class MainActivity : AppCompatActivity() {
                         )
 
                         NavigationDrawerItem(
-                            label = { Text(stringResource(R.string.nav_settings)) },
-                            selected = currentRoute is NavRoute.Settings,
+                            label = { Text(stringResource(R.string.nav_search)) },
+                            selected = currentRoute is NavRoute.Search,
                             onClick = {
-                                if (currentRoute !is NavRoute.Settings) {
-                                    backStack.add(NavRoute.Settings)
+                                if (currentRoute !is NavRoute.Search) {
+                                    backStack.add(NavRoute.Search)
                                 }
                                 scope.launch { drawerState.close() }
                             },
-                            icon = { Icon(Icons.Default.Settings, contentDescription = null) }
+                            icon = { Icon(Icons.Default.Search, contentDescription = null) }
                         )
                     }
                 }
+            }
             ) {
                 NavDisplay(
                     backStack = backStack,

@@ -1,11 +1,14 @@
 package com.suresh.sacredtimeline.ui.search
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Celebration
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
@@ -19,6 +22,11 @@ import com.suresh.sacredtimeline.R
 import com.suresh.sacredtimeline.data.VerifiedHolidays
 import com.suresh.sacredtimeline.logic.PanchangamCalculator
 import com.suresh.sacredtimeline.logic.SunriseSunsetProvider
+import com.suresh.sacredtimeline.logic.TamilCalendarUtils
+import com.suresh.sacredtimeline.ui.theme.HolidayPale
+import com.suresh.sacredtimeline.ui.theme.HolidayPurple
+import com.suresh.sacredtimeline.ui.theme.SubhaMuhurthamGold
+import com.suresh.sacredtimeline.ui.theme.SubhaMuhurthamPale
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -173,38 +181,73 @@ fun SearchScreen(
                             "Muhurthams" -> stringResource(R.string.category_muhurtham)
                             else -> event.category
                         }
+                        val tamilDate = remember(event.date) { TamilCalendarUtils.getTamilDate(event.date) }
+                        val tamilMonth = stringResource(tamilDate.monthResId)
+                        val tamilYear = stringResource(tamilDate.yearResId)
+
+                        val icon = if (event.isMuhurtham) Icons.Default.AutoAwesome else Icons.Default.Celebration
+                        val iconTint = if (event.isMuhurtham) SubhaMuhurthamGold else HolidayPurple
+                        val cardBg = if (event.isMuhurtham) SubhaMuhurthamPale else HolidayPale
+                        val borderColor = if (event.isMuhurtham) SubhaMuhurthamGold.copy(alpha = 0.5f) else HolidayPurple.copy(alpha = 0.4f)
 
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable { onDateSelected(event.date) },
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                            colors = CardDefaults.cardColors(containerColor = cardBg),
+                            border = BorderStroke(1.dp, borderColor)
                         ) {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(16.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
+                                horizontalArrangement = Arrangement.spacedBy(16.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
+                                Surface(
+                                    shape = MaterialTheme.shapes.medium,
+                                    color = iconTint.copy(alpha = 0.2f),
+                                    modifier = Modifier.size(44.dp)
+                                ) {
+                                    Box(contentAlignment = Alignment.Center) {
+                                        Icon(
+                                            imageVector = icon,
+                                            contentDescription = null,
+                                            tint = iconTint,
+                                            modifier = Modifier.size(24.dp)
+                                        )
+                                    }
+                                }
+
                                 Column(modifier = Modifier.weight(1f)) {
+                                    // 1. English Date
+                                    Text(
+                                        text = event.date.format(DateTimeFormatter.ofPattern("MMM dd, yyyy")),
+                                        style = MaterialTheme.typography.titleSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = iconTint
+                                    )
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    // 2. Tamil Date
+                                    Text(
+                                        text = "${tamilDate.day} $tamilMonth, $tamilYear",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Spacer(modifier = Modifier.height(6.dp))
+                                    // 3. Event Title & Category
                                     Text(
                                         text = event.title,
                                         style = MaterialTheme.typography.titleMedium,
                                         fontWeight = FontWeight.Bold
                                     )
-                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Spacer(modifier = Modifier.height(2.dp))
                                     Text(
                                         text = localizedCategory,
                                         style = MaterialTheme.typography.labelMedium,
-                                        color = MaterialTheme.colorScheme.primary
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
-                                Text(
-                                    text = event.date.format(DateTimeFormatter.ofPattern("MMM dd, yyyy")),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.Medium
-                                )
                             }
                         }
                     }
