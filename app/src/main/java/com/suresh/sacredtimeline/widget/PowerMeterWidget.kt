@@ -9,6 +9,7 @@ import androidx.compose.ui.unit.DpSize
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
+import androidx.glance.LocalContext
 import androidx.glance.LocalSize
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.SizeMode
@@ -136,7 +137,7 @@ class PowerMeterWidget : GlanceAppWidget() {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Power Meter",
+                        text = LocalContext.current.getString(com.suresh.sacredtimeline.R.string.label_power_meter),
                         style = TextStyle(
                             fontSize = if (widthDp.value < 140) 8.sp else 11.sp,
                             fontWeight = FontWeight.Bold,

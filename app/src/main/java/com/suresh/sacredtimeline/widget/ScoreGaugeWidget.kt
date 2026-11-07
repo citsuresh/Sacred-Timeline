@@ -9,6 +9,7 @@ import androidx.compose.ui.unit.DpSize
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
+import androidx.glance.LocalContext
 import androidx.glance.LocalSize
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.SizeMode
@@ -111,7 +112,7 @@ class ScoreGaugeWidget : GlanceAppWidget() {
             ) {
                 if (heightDp.value > 80) {
                     Text(
-                        text = "⚡ Power",
+                        text = LocalContext.current.getString(com.suresh.sacredtimeline.R.string.label_power),
                         style = TextStyle(
                             fontSize = if (widthDp.value < 100) 8.sp else 11.sp,
                             fontWeight = FontWeight.Bold,

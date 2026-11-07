@@ -9,6 +9,8 @@ import com.suresh.sacredtimeline.logic.DayDataProvider
 import com.suresh.sacredtimeline.logic.LunarCalendarUtils
 import com.suresh.sacredtimeline.model.DayData
 import com.suresh.sacredtimeline.widget.PanchangamWidget
+import com.suresh.sacredtimeline.widget.PowerMeterWidget
+import com.suresh.sacredtimeline.widget.ScoreGaugeWidget
 import kotlinx.coroutines.flow.first
 import java.time.Duration
 import java.time.LocalDate
@@ -51,8 +53,10 @@ class WidgetUpdateWorker(
                 refillCache(lat, lng, today, repository, cacheManager)
             }
 
-            // 3. Update the widget (It will read from the same cache)
+            // 3. Update all widgets (They will read from the same cache)
             PanchangamWidget().updateAll(applicationContext)
+            ScoreGaugeWidget().updateAll(applicationContext)
+            PowerMeterWidget().updateAll(applicationContext)
 
             // 4. Schedule next transition
             scheduleNextTransition(applicationContext, lat, lng)
