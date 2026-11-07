@@ -47,4 +47,7 @@ sealed interface NavRoute : NavKey {
 
     @Serializable
     data object Profile : NavRoute
+
+    @Serializable
+    data object Search : NavRoute
 }

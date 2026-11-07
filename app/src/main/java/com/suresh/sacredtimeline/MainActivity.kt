@@ -357,6 +357,18 @@ class MainActivity : AppCompatActivity() {
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
                         NavigationDrawerItem(
+                            label = { Text(stringResource(R.string.nav_search)) },
+                            selected = currentRoute is NavRoute.Search,
+                            onClick = {
+                                if (currentRoute !is NavRoute.Search) {
+                                    backStack.add(NavRoute.Search)
+                                }
+                                scope.launch { drawerState.close() }
+                            },
+                            icon = { Icon(Icons.Default.Search, contentDescription = null) }
+                        )
+
+                        NavigationDrawerItem(
                             label = { Text(stringResource(R.string.nav_profile)) },
                             selected = currentRoute is NavRoute.Profile,
                             onClick = {
@@ -405,8 +417,19 @@ class MainActivity : AppCompatActivity() {
                                     initialTargetDate = targetDate,
                                     onMenuClick = { scope.launch { drawerState.open() } },
                                     onProfileClick = { backStack.add(NavRoute.Profile) },
-                                    onNavigateToScoringWeights = { backStack.add(NavRoute.ScoringWeightsSettings) }
+                                    onNavigateToScoringWeights = { backStack.add(NavRoute.ScoringWeightsSettings) },
+                                    onSearchClick = { backStack.add(NavRoute.Search) }
                                 ) 
+                            }
+                            NavRoute.Search -> NavEntry(key) {
+                                com.suresh.sacredtimeline.ui.search.SearchScreen(
+                                    onBack = { backStack.removeLastOrNull() },
+                                    onDateSelected = { date ->
+                                        intent?.putExtra("target_date", date.toString())
+                                        backStack.clear()
+                                        backStack.add(NavRoute.Dashboard(ViewMode.UNIVERSAL))
+                                    }
+                                )
                             }
                             NavRoute.Profile -> NavEntry(key) {
                                 com.suresh.sacredtimeline.ui.profile.ProfileScreen(

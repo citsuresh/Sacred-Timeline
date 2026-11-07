@@ -1007,4 +1007,15 @@
     <string name="event_label_format">Event: %s</string>
     <string name="adaptive_detail_prefix">Detail: %s</string>
     <string name="adaptive_select_prompt">Select a period on the timeline for wide-screen detail</string>
+    <string name="nav_search">Search</string>
+    <string name="search_title">Search Panchangam &amp; Festivals</string>
+    <string name="search_hint">Search festivals, holidays, muhurthams…</string>
+    <string name="no_results">No matching events found</string>
+    <string name="category_all">All</string>
+    <string name="category_holidays">Holidays</string>
+    <string name="category_festivals">Festivals</string>
+    <string name="category_muhurtham">Muhurthams</string>
+    <string name="label_back">Back</string>
+    <string name="label_clear">Clear</string>
+    <string name="subha_muhurtham_title">Subha Muhurtham</string>
 </resources>

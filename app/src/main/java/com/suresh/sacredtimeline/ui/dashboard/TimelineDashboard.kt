@@ -35,7 +35,8 @@ fun TimelineDashboard(
     initialTargetDate: LocalDate? = null,
     onMenuClick: () -> Unit = {},
     onProfileClick: () -> Unit = {},
-    onNavigateToScoringWeights: () -> Unit = {}
+    onNavigateToScoringWeights: () -> Unit = {},
+    onSearchClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val selectedDate by viewModel.selectedDate.collectAsState()
@@ -391,7 +392,8 @@ fun TimelineDashboard(
             horaScoringMode = horaScoringMode,
             isLoading = uiState is TimelineUiState.Loading,
             showPowerMeterRow = showPowerMeterRow,
-            showNowGauge = showNowGauge
+            showNowGauge = showNowGauge,
+            onSearchClick = onSearchClick
         )
     }
 }

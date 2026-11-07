@@ -957,4 +957,15 @@
     <string name="event_label_format">நிகழ்வு: %s</string>
     <string name="adaptive_detail_prefix">விவரம்: %s</string>
     <string name="adaptive_select_prompt">அகன்ற திரை விவரங்களைக் காண காலக்கோட்டில் ஒரு காலப்பகுதியைத் தேர்ந்தெடுக்கவும்</string>
+    <string name="nav_search">தேடு (Search)</string>
+    <string name="search_title">பஞ்சாங்கம் &amp; திருவிழாக்கள் தேடல்</string>
+    <string name="search_hint">விழாக்கள், விடுமுறைகள், முகூர்த்தங்களைத் தேடுங்கள்…</string>
+    <string name="no_results">பொருந்தும் நிகழ்வுகள் எதுவும் காணப்படவில்லை</string>
+    <string name="category_all">அனைத்தும்</string>
+    <string name="category_holidays">விடுமுறைகள்</string>
+    <string name="category_festivals">விழாக்கள்</string>
+    <string name="category_muhurtham">முகூர்த்தங்கள்</string>
+    <string name="label_back">பின்செல்</string>
+    <string name="label_clear">அழி</string>
+    <string name="subha_muhurtham_title">சுப முகூர்த்தம்</string>
 </resources>

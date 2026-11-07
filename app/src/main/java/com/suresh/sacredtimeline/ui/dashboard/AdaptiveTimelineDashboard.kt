@@ -24,7 +24,8 @@ fun AdaptiveTimelineDashboard(
     initialTargetDate: LocalDate? = null,
     onMenuClick: () -> Unit = {},
     onProfileClick: () -> Unit = {},
-    onNavigateToScoringWeights: () -> Unit = {}
+    onNavigateToScoringWeights: () -> Unit = {},
+    onSearchClick: () -> Unit = {}
 ) {
     val navigator = rememberListDetailPaneScaffoldNavigator<Any>()
     var selectedItem by remember { mutableStateOf<Any?>(null) }
@@ -40,7 +41,8 @@ fun AdaptiveTimelineDashboard(
                 initialTargetDate = initialTargetDate,
                 onMenuClick = onMenuClick,
                 onProfileClick = onProfileClick,
-                onNavigateToScoringWeights = onNavigateToScoringWeights
+                onNavigateToScoringWeights = onNavigateToScoringWeights,
+                onSearchClick = onSearchClick
             )
         },
         detailPane = {

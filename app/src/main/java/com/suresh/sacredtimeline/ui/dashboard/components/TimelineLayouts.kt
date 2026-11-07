@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Today
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -92,7 +93,8 @@ fun PortraitTimelineLayout(
     horaScoringMode: String = "NATAL",
     isLoading: Boolean = false,
     showPowerMeterRow: Boolean = true,
-    showNowGauge: Boolean = true
+    showNowGauge: Boolean = true,
+    onSearchClick: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -140,6 +142,9 @@ fun PortraitTimelineLayout(
                     }
                 },
                 actions = {
+                    IconButton(onClick = onSearchClick) {
+                        Icon(Icons.Default.Search, contentDescription = stringResource(R.string.nav_search))
+                    }
                     IconButton(onClick = onTodayClick) {
                         Icon(Icons.Filled.Today, contentDescription = stringResource(R.string.label_today))
                     }

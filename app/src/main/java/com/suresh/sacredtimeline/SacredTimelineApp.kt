@@ -12,6 +12,7 @@ class SacredTimelineApp : Application() {
         super.onCreate()
         // Initial schedule with default 15 mins (SettingsViewModel will update if changed)
         WidgetUpdateWorker.enqueuePeriodicWork(this, 15L)
+        WidgetUpdateWorker.triggerImmediateUpdate(this)
         com.suresh.sacredtimeline.worker.WatchdogWorker.enqueuePeriodicWork(this)
 
         // Pre-create exact 1-to-1 notification channels on app startup
