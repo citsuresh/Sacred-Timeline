@@ -125,16 +125,16 @@ fun RemindersScreen(
                             val channelId = "sacred_timeline_alerts_v2"
                             val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                val channel = NotificationChannel(channelId, "Test Notifications", NotificationManager.IMPORTANCE_HIGH).apply {
-                                    description = "Test notifications channel"
+                                val channel = NotificationChannel(channelId, context.getString(R.string.test_notifications_channel_name), NotificationManager.IMPORTANCE_HIGH).apply {
+                                    description = context.getString(R.string.test_notifications_channel_desc)
                                     enableVibration(true)
                                 }
                                 notificationManager?.createNotificationChannel(channel)
                             }
                             val notification = NotificationCompat.Builder(context, channelId)
                                 .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
-                                .setContentTitle("Sacred Timeline Test")
-                                .setContentText("Test notification triggered manually!")
+                                .setContentTitle(context.getString(R.string.test_notification_title))
+                                .setContentText(context.getString(R.string.test_notification_text))
                                 .setPriority(NotificationCompat.PRIORITY_MAX)
                                 .setDefaults(NotificationCompat.DEFAULT_ALL)
                                 .setAutoCancel(true)
@@ -465,7 +465,7 @@ fun AddGenericReminderDialog(
                             onClick = { expandedItem = true },
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("Event: $eventTitle")
+                            Text(stringResource(R.string.event_label_format, eventTitle))
                         }
                         DropdownMenu(
                             expanded = expandedItem,

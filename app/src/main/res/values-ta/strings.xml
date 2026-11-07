@@ -935,4 +935,24 @@
     <string name="rec_neutral">வழக்கமான தினசரி பணிகள் மற்றும் நிர்வாகப் பணிகளுக்கு ஏற்றது.</string>
     <string name="rec_caution">பொறுமை அவசியம். முக்கிய முடிவுகள், ஆபத்தான முதலீடுகள் அல்லது புதிய திட்டங்களைத் தவிர்க்கவும்.</string>
     <string name="rec_inauspicious">ஆன்மீக வழிபாடு, தியானம் மற்றும் பழைய பணிகளை முடிக்க சிறந்தது.</string>
+    <string name="widget_panchangam_title">முகப்பு திரை விட்ஜெட் - பஞ்சாங்க நேரங்கள்</string>
+    <string name="widget_power_meter_title">முகப்பு திரை விட்ஜெட் - சக்தி அளவுகோல்</string>
+    <string name="widget_score_gauge_title">முகப்பு திரை விட்ஜெட் - மதிப்பெண் அளவுகோல்</string>
+    <string name="bg_opacity_tint">பின்னணி ஒளிபுகாமை / நிறம்</string>
+    <string name="bg_opacity">பின்னணி ஒளிபுகாமை</string>
+    <string name="bg_color">பின்னணி நிறம்</string>
+    <string name="color_transparent">ஒளிபுகும் (Transparent)</string>
+    <string name="color_white">வெள்ளை</string>
+    <string name="color_black">கருப்பு</string>
+    <string name="color_dark_green">அடர் பச்சை</string>
+    <string name="color_dark_red">அடர் சிவப்பு</string>
+    <string name="color_amber">மஞ்சள்-சிவப்பு (Amber)</string>
+    <string name="test_notifications_channel_name">சோதனை அறிவிப்புகள்</string>
+    <string name="test_notifications_channel_desc">சோதனை அறிவிப்புகள் கால்வாய்</string>
+    <string name="test_notification_title">சேக்ரெட் டைம்லைன் சோதனை</string>
+    <string name="test_notification_text">சோதனை அறிவிப்பு கைமுறையாக தூண்டப்பட்டது!</string>
+    <string name="widget_power_meter_name">சக்தி அளவுகோல் விட்ஜெட்</string>
+    <string name="widget_score_gauge_name">மதிப்பெண் அளவுகோல் விட்ஜெட்</string>
+    <string name="label_power">⚡ சக்தி</string>
+    <string name="event_label_format">நிகழ்வு: %s</string>
 </resources>

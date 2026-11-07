@@ -985,4 +985,24 @@
     <string name="rec_neutral">Suitable for routine daily tasks, maintenance, and regular administrative work.</string>
     <string name="rec_caution">Exercise patience. Avoid major decisions, risky investments, or starting important new projects.</string>
     <string name="rec_inauspicious">Best reserved for introspection, meditation, spiritual practice, and clearing backlog tasks.</string>
+    <string name="widget_panchangam_title">Home Screen Widget - Panchangam Timings</string>
+    <string name="widget_power_meter_title">Home Screen Widget - Power Meter</string>
+    <string name="widget_score_gauge_title">Home Screen Widget - Score Gauge</string>
+    <string name="bg_opacity_tint">Background Opacity / Tint</string>
+    <string name="bg_opacity">Background Opacity</string>
+    <string name="bg_color">Background Color</string>
+    <string name="color_transparent">Transparent</string>
+    <string name="color_white">White</string>
+    <string name="color_black">Black</string>
+    <string name="color_dark_green">Dark Green</string>
+    <string name="color_dark_red">Dark Red</string>
+    <string name="color_amber">Amber</string>
+    <string name="test_notifications_channel_name">Test Notifications</string>
+    <string name="test_notifications_channel_desc">Test notifications channel</string>
+    <string name="test_notification_title">Sacred Timeline Test</string>
+    <string name="test_notification_text">Test notification triggered manually!</string>
+    <string name="widget_power_meter_name">Power Meter Widget</string>
+    <string name="widget_score_gauge_name">Score Gauge Widget</string>
+    <string name="label_power">⚡ Power</string>
+    <string name="event_label_format">Event: %s</string>
 </resources>

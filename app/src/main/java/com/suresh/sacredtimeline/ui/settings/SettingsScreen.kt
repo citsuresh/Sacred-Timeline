@@ -426,7 +426,7 @@ fun SettingsScreen(
 
             // 6. Home Screen Widget - Panchangam Timings
             item {
-                SettingsSection(title = "Home Screen Widget - Panchangam Timings") {
+                SettingsSection(title = stringResource(R.string.widget_panchangam_title)) {
                     val refreshMinutes by viewModel.widgetRefreshMinutes.collectAsState()
                     val refreshOptions = listOf(15, 30, 60)
                     val refreshLabels = refreshOptions.map { if (it < 60) stringResource(R.string.settings_refresh_min, it) else stringResource(R.string.settings_refresh_hr, it / 60) }
@@ -441,8 +441,8 @@ fun SettingsScreen(
                         val isVisible = widgetColumnVisibility.contains(colId)
                         ColumnOrderItem(
                             name = when(colId) {
-                                "POWER_METER" -> "Power Meter Widget"
-                                "SCORE_GAUGE" -> "Score Gauge Widget"
+                                "POWER_METER" -> stringResource(R.string.widget_power_meter_name)
+                                "SCORE_GAUGE" -> stringResource(R.string.widget_score_gauge_name)
                                 "UNIVERSAL" -> stringResource(R.string.nav_universal)
                                 "NERAM_MUHURTHAM" -> stringResource(R.string.nav_neram_muhurtham)
                                 "NERAM" -> stringResource(R.string.nav_nalla_neram)
@@ -467,14 +467,14 @@ fun SettingsScreen(
 
             // Home Screen Widget - Power Meter
             item {
-                SettingsSection(title = "Home Screen Widget - Power Meter") {
+                SettingsSection(title = stringResource(R.string.widget_power_meter_title)) {
                     val backgroundOpacity by viewModel.widgetBackgroundOpacity.collectAsState()
                     Column(modifier = Modifier.padding(vertical = 8.dp)) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text("Background Opacity / Tint", style = MaterialTheme.typography.bodyLarge)
+                            Text(stringResource(R.string.bg_opacity_tint), style = MaterialTheme.typography.bodyLarge)
                             Text("${(backgroundOpacity * 100).toInt()}%", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
                         }
                         Slider(
@@ -489,23 +489,30 @@ fun SettingsScreen(
 
             // Home Screen Widget - Score Gauge
             item {
-                SettingsSection(title = "Home Screen Widget - Score Gauge") {
+                SettingsSection(title = stringResource(R.string.widget_score_gauge_title)) {
                     val gaugeBgColor by viewModel.scoreGaugeBgColor.collectAsState()
                     val gaugeBgOpacity by viewModel.scoreGaugeBgOpacity.collectAsState()
 
                     val colorOptions = listOf(0x00000000, 0xFFFFFFFF.toInt(), 0xFF000000.toInt(), 0xFF1B5E20.toInt(), 0xFFC62828.toInt(), 0xFFFF8F00.toInt())
-                    val colorLabels = listOf("Transparent", "White", "Black", "Dark Green", "Dark Red", "Amber")
+                    val colorLabels = listOf(
+                        stringResource(R.string.color_transparent),
+                        stringResource(R.string.color_white),
+                        stringResource(R.string.color_black),
+                        stringResource(R.string.color_dark_green),
+                        stringResource(R.string.color_dark_red),
+                        stringResource(R.string.color_amber)
+                    )
                     val selectedColorLabel = when (gaugeBgColor) {
-                        0xFFFFFFFF.toInt() -> "White"
-                        0xFF000000.toInt() -> "Black"
-                        0xFF1B5E20.toInt() -> "Dark Green"
-                        0xFFC62828.toInt() -> "Dark Red"
-                        0xFFFF8F00.toInt() -> "Amber"
-                        else -> "Transparent"
+                        0xFFFFFFFF.toInt() -> stringResource(R.string.color_white)
+                        0xFF000000.toInt() -> stringResource(R.string.color_black)
+                        0xFF1B5E20.toInt() -> stringResource(R.string.color_dark_green)
+                        0xFFC62828.toInt() -> stringResource(R.string.color_dark_red)
+                        0xFFFF8F00.toInt() -> stringResource(R.string.color_amber)
+                        else -> stringResource(R.string.color_transparent)
                     }
 
                     SettingsDropdownItem(
-                        label = "Background Color",
+                        label = stringResource(R.string.bg_color),
                         selected = selectedColorLabel,
                         options = colorLabels,
                         onOptionSelected = { label ->
@@ -520,7 +527,7 @@ fun SettingsScreen(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text("Background Opacity", style = MaterialTheme.typography.bodyLarge)
+                            Text(stringResource(R.string.bg_opacity), style = MaterialTheme.typography.bodyLarge)
                             Text("${(gaugeBgOpacity * 100).toInt()}%", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
                         }
                         Slider(
