@@ -9,12 +9,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -22,19 +18,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
-import androidx.navigation3.runtime.NavEntry
-import androidx.navigation3.ui.NavDisplay
 import androidx.navigationevent.compose.LocalNavigationEventDispatcherOwner
 import androidx.navigationevent.compose.rememberNavigationEventDispatcherOwner
 import com.suresh.sacredtimeline.data.SettingsRepository
+import com.suresh.sacredtimeline.ui.navigation.MainDrawerContent
+import com.suresh.sacredtimeline.ui.navigation.MainNavGraph
 import com.suresh.sacredtimeline.ui.navigation.NavRoute
 import com.suresh.sacredtimeline.ui.navigation.ViewMode
-import com.suresh.sacredtimeline.ui.settings.SettingsScreen
-import com.suresh.sacredtimeline.ui.settings.TimelineDisplaySettingsScreen
-import com.suresh.sacredtimeline.ui.settings.TithiSettingsScreen
-import com.suresh.sacredtimeline.ui.settings.NakshatraSettingsScreen
-import com.suresh.sacredtimeline.ui.settings.ChandrashtamamSettingsScreen
-import com.suresh.sacredtimeline.ui.settings.ScoringWeightsSettingsScreen
 import com.suresh.sacredtimeline.ui.theme.SacredTimelineTheme
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -130,391 +120,26 @@ class MainActivity : AppCompatActivity() {
             else -> androidx.compose.foundation.isSystemInDarkTheme()
         }
 
-        if (showSwitchConfirm != null) {
-            AlertDialog(
-                onDismissRequest = { showSwitchConfirm = null },
-                title = { Text(stringResource(R.string.confirm_switch_title)) },
-                text = { Text(stringResource(R.string.confirm_switch_text)) },
-                confirmButton = {
-                    TextButton(onClick = {
-                        val mode = showSwitchConfirm!!
-                        showSwitchConfirm = null
-                        scope.launch {
-                            val targetColId = when (mode) {
-                                ViewMode.UNIVERSAL -> null
-                                ViewMode.NERAM_MUHURTHAM -> "NERAM_MUHURTHAM"
-                                ViewMode.NERAM -> "NERAM"
-                                ViewMode.GOWRI -> "GOWRI"
-                                ViewMode.HORA -> "HORA"
-                                ViewMode.MAITRA -> "MAITRA"
-                                ViewMode.CHANDRASHTAMAM -> "CHANDRASHTAMAM"
-                                ViewMode.YOGAM -> "YOGAM"
-                                ViewMode.THARA_BALAM -> "THARA_BALAM"
-                                else -> null
-                            }
-                            repository.setSingleVisibleColumn(targetColId)
-                            repository.setDefaultLaunchView(mode)
-                            backStack.clear()
-                            backStack.add(NavRoute.Dashboard(mode))
-                            drawerState.close()
-                        }
-                    }) {
-                        Text(stringResource(R.string.btn_ok))
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showSwitchConfirm = null }) {
-                        Text(stringResource(R.string.btn_cancel))
-                    }
-                }
-            )
-        }
-
         SacredTimelineTheme(darkTheme = isDarkTheme) {
             ModalNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
-                    ModalDrawerSheet {
-                        val currentRoute = backStack.lastOrNull()
-                        val currentViewMode = (currentRoute as? NavRoute.Dashboard)?.mode
-                        
-                        Column(
-                            modifier = Modifier
-                                .verticalScroll(rememberScrollState())
-                                .padding(vertical = 12.dp)
-                        ) {
-                            Text(
-                                stringResource(R.string.app_name),
-                                modifier = Modifier.padding(16.dp),
-                                style = MaterialTheme.typography.titleLarge
-                            )
-                            HorizontalDivider()
-                        
-                        NavigationDrawerItem(
-                            label = { Text(stringResource(R.string.nav_universal)) },
-                            selected = currentViewMode == ViewMode.UNIVERSAL,
-                            onClick = {
-                                if (currentViewMode == ViewMode.CUSTOM) {
-                                    showSwitchConfirm = ViewMode.UNIVERSAL
-                                } else {
-                                    scope.launch {
-                                        repository.setSingleVisibleColumn(null)
-                                        backStack.clear()
-                                        backStack.add(NavRoute.Dashboard(ViewMode.UNIVERSAL))
-                                        drawerState.close()
-                                    }
-                                }
-                            },
-                            icon = { Icon(Icons.Default.AllInclusive, contentDescription = null) }
-                        )
-                        NavigationDrawerItem(
-                            label = { Text(stringResource(R.string.nav_neram_muhurtham)) },
-                            selected = currentViewMode == ViewMode.NERAM_MUHURTHAM,
-                            onClick = {
-                                if (currentViewMode == ViewMode.CUSTOM) {
-                                    showSwitchConfirm = ViewMode.NERAM_MUHURTHAM
-                                } else {
-                                    scope.launch {
-                                        repository.setSingleVisibleColumn("NERAM_MUHURTHAM")
-                                        backStack.clear()
-                                        backStack.add(NavRoute.Dashboard(ViewMode.NERAM_MUHURTHAM))
-                                        drawerState.close()
-                                    }
-                                }
-                            },
-                            icon = { Icon(Icons.Default.AutoAwesome, contentDescription = null) }
-                        )
-                        NavigationDrawerItem(
-                            label = { Text(stringResource(R.string.nav_nalla_neram)) },
-                            selected = currentViewMode == ViewMode.NERAM,
-                            onClick = {
-                                if (currentViewMode == ViewMode.CUSTOM) {
-                                    showSwitchConfirm = ViewMode.NERAM
-                                } else {
-                                    scope.launch {
-                                        repository.setSingleVisibleColumn("NERAM")
-                                        backStack.clear()
-                                        backStack.add(NavRoute.Dashboard(ViewMode.NERAM))
-                                        drawerState.close()
-                                    }
-                                }
-                            },
-                            icon = { Icon(Icons.Default.Star, contentDescription = null) }
-                        )
-                        NavigationDrawerItem(
-                            label = { Text(stringResource(R.string.nav_gowri_neram)) },
-                            selected = currentViewMode == ViewMode.GOWRI,
-                            onClick = {
-                                if (currentViewMode == ViewMode.CUSTOM) {
-                                    showSwitchConfirm = ViewMode.GOWRI
-                                } else {
-                                    scope.launch {
-                                        repository.setSingleVisibleColumn("GOWRI")
-                                        backStack.clear()
-                                        backStack.add(NavRoute.Dashboard(ViewMode.GOWRI))
-                                        drawerState.close()
-                                    }
-                                }
-                            },
-                            icon = { Icon(Icons.Default.Dashboard, contentDescription = null) }
-                        )
-                        NavigationDrawerItem(
-                            label = { Text(stringResource(R.string.nav_hora)) },
-                            selected = currentViewMode == ViewMode.HORA,
-                            onClick = {
-                                if (currentViewMode == ViewMode.CUSTOM) {
-                                    showSwitchConfirm = ViewMode.HORA
-                                } else {
-                                    scope.launch {
-                                        repository.setSingleVisibleColumn("HORA")
-                                        backStack.clear()
-                                        backStack.add(NavRoute.Dashboard(ViewMode.HORA))
-                                        drawerState.close()
-                                    }
-                                }
-                            },
-                            icon = { Icon(Icons.Default.Schedule, contentDescription = null) }
-                        )
-                        NavigationDrawerItem(
-                            label = { Text(stringResource(R.string.nav_maitra)) },
-                            selected = currentViewMode == ViewMode.MAITRA,
-                            onClick = {
-                                if (currentViewMode == ViewMode.CUSTOM) {
-                                    showSwitchConfirm = ViewMode.MAITRA
-                                } else {
-                                    scope.launch {
-                                        repository.setSingleVisibleColumn("MAITRA")
-                                        backStack.clear()
-                                        backStack.add(NavRoute.Dashboard(ViewMode.MAITRA))
-                                        drawerState.close()
-                                    }
-                                }
-                            },
-                            icon = { Icon(Icons.Default.AutoAwesome, contentDescription = null) }
-                        )
-                        NavigationDrawerItem(
-                            label = { Text(stringResource(R.string.nav_chandrashtamam)) },
-                            selected = currentViewMode == ViewMode.CHANDRASHTAMAM,
-                            onClick = {
-                                if (currentViewMode == ViewMode.CUSTOM) {
-                                    showSwitchConfirm = ViewMode.CHANDRASHTAMAM
-                                } else {
-                                    scope.launch {
-                                        repository.setSingleVisibleColumn("CHANDRASHTAMAM")
-                                        backStack.clear()
-                                        backStack.add(NavRoute.Dashboard(ViewMode.CHANDRASHTAMAM))
-                                        drawerState.close()
-                                    }
-                                }
-                            },
-                            icon = { Icon(Icons.Default.Warning, contentDescription = null) }
-                        )
-                        NavigationDrawerItem(
-                            label = { Text(stringResource(R.string.nav_yoga)) },
-                            selected = currentViewMode == ViewMode.YOGAM,
-                            onClick = {
-                                if (currentViewMode == ViewMode.CUSTOM) {
-                                    showSwitchConfirm = ViewMode.YOGAM
-                                } else {
-                                    scope.launch {
-                                        repository.setSingleVisibleColumn("YOGAM")
-                                        backStack.clear()
-                                        backStack.add(NavRoute.Dashboard(ViewMode.YOGAM))
-                                        drawerState.close()
-                                    }
-                                }
-                            },
-                            icon = { Icon(Icons.Default.AutoAwesome, contentDescription = null) }
-                        )
-                        NavigationDrawerItem(
-                            label = { Text(stringResource(R.string.nav_thara_balam)) },
-                            selected = currentViewMode == ViewMode.THARA_BALAM,
-                            onClick = {
-                                if (currentViewMode == ViewMode.CUSTOM) {
-                                    showSwitchConfirm = ViewMode.THARA_BALAM
-                                } else {
-                                    scope.launch {
-                                        repository.setSingleVisibleColumn("THARA_BALAM")
-                                        backStack.clear()
-                                        backStack.add(NavRoute.Dashboard(ViewMode.THARA_BALAM))
-                                        drawerState.close()
-                                    }
-                                }
-                            },
-                            icon = { Icon(Icons.Default.Stars, contentDescription = null) }
-                        )
-
-                        if (hasCustomLayout) {
-                            NavigationDrawerItem(
-                                label = { Text(stringResource(R.string.nav_custom)) },
-                                selected = currentViewMode == ViewMode.CUSTOM,
-                                onClick = {
-                                    scope.launch {
-                                        repository.restoreCustomLayout()
-                                        repository.setDefaultLaunchView(ViewMode.CUSTOM)
-                                        backStack.clear()
-                                        backStack.add(NavRoute.Dashboard(ViewMode.CUSTOM))
-                                        drawerState.close()
-                                    }
-                                },
-                                icon = { Icon(Icons.Default.DashboardCustomize, contentDescription = null) }
-                            )
-                        }
-
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-
-                        NavigationDrawerItem(
-                            label = { Text(stringResource(R.string.nav_settings)) },
-                            selected = currentRoute is NavRoute.Settings,
-                            onClick = {
-                                if (currentRoute !is NavRoute.Settings) {
-                                    backStack.add(NavRoute.Settings)
-                                }
-                                scope.launch { drawerState.close() }
-                            },
-                            icon = { Icon(Icons.Default.Settings, contentDescription = null) }
-                        )
-
-                        NavigationDrawerItem(
-                            label = { Text(stringResource(R.string.nav_profile)) },
-                            selected = currentRoute is NavRoute.Profile,
-                            onClick = {
-                                if (currentRoute !is NavRoute.Profile) {
-                                    backStack.add(NavRoute.Profile)
-                                }
-                                scope.launch { drawerState.close() }
-                            },
-                            icon = { Icon(Icons.Default.Person, contentDescription = null) }
-                        )
-
-                        NavigationDrawerItem(
-                            label = { Text(stringResource(R.string.nav_search)) },
-                            selected = currentRoute is NavRoute.Search,
-                            onClick = {
-                                if (currentRoute !is NavRoute.Search) {
-                                    backStack.add(NavRoute.Search)
-                                }
-                                scope.launch { drawerState.close() }
-                            },
-                            icon = { Icon(Icons.Default.Search, contentDescription = null) }
-                        )
-                    }
+                    MainDrawerContent(
+                        backStack = backStack,
+                        drawerState = drawerState,
+                        scope = scope,
+                        repository = repository,
+                        hasCustomLayout = hasCustomLayout,
+                        showSwitchConfirm = showSwitchConfirm,
+                        onShowSwitchConfirmChange = { showSwitchConfirm = it }
+                    )
                 }
-            }
             ) {
-                NavDisplay(
+                MainNavGraph(
                     backStack = backStack,
-                    onBack = { 
-                        if (backStack.size > 1) {
-                            backStack.removeLastOrNull()
-                        } else {
-                            this@MainActivity.finish()
-                        }
-                    },
-                    entryProvider = { key ->
-                        when (key) {
-                            is NavRoute.Dashboard -> NavEntry(key) { 
-                                val targetDateStr = intent?.getStringExtra("target_date")
-                                val targetDate = remember {
-                                    targetDateStr?.let { 
-                                        try { java.time.LocalDate.parse(it) } catch (e: Exception) { null }
-                                    }
-                                }
-                                com.suresh.sacredtimeline.ui.dashboard.AdaptiveTimelineDashboard(
-                                    viewMode = key.mode,
-                                    initialTargetDate = targetDate,
-                                    onMenuClick = { scope.launch { drawerState.open() } },
-                                    onProfileClick = { backStack.add(NavRoute.Profile) },
-                                    onNavigateToScoringWeights = { backStack.add(NavRoute.ScoringWeightsSettings) },
-                                    onSearchClick = { backStack.add(NavRoute.Search) }
-                                ) 
-                            }
-                            NavRoute.Search -> NavEntry(key) {
-                                com.suresh.sacredtimeline.ui.search.SearchScreen(
-                                    onBack = { backStack.removeLastOrNull() },
-                                    onDateSelected = { date ->
-                                        intent?.putExtra("target_date", date.toString())
-                                        backStack.clear()
-                                        backStack.add(NavRoute.Dashboard(ViewMode.UNIVERSAL))
-                                    }
-                                )
-                            }
-                            NavRoute.Profile -> NavEntry(key) {
-                                com.suresh.sacredtimeline.ui.profile.ProfileScreen(
-                                    repository = com.suresh.sacredtimeline.data.BirthProfilesRepository(this),
-                                    onBack = { backStack.removeLastOrNull() }
-                                )
-                            }
-                            NavRoute.Settings -> NavEntry(key) { 
-                                SettingsScreen(
-                                    onBack = { 
-                                        backStack.removeLastOrNull()
-                                    },
-                                    onNavigateToTimelineDisplaySettings = {
-                                        backStack.add(NavRoute.CalendarSettings)
-                                    },
-                                    onNavigateToRemindersSettings = {
-                                        backStack.add(NavRoute.RemindersSettings)
-                                    },
-                                    onNavigateToScoringWeightsSettings = {
-                                        backStack.add(NavRoute.ScoringWeightsSettings)
-                                    }
-                                )
-                            }
-                            NavRoute.ScoringWeightsSettings -> NavEntry(key) {
-                                ScoringWeightsSettingsScreen(
-                                    onBack = {
-                                        backStack.removeLastOrNull()
-                                    }
-                                )
-                            }
-                            NavRoute.TithiSettings -> NavEntry(key) {
-                                TithiSettingsScreen(
-                                    onBack = {
-                                        backStack.removeLastOrNull()
-                                    }
-                                )
-                            }
-                            NavRoute.NakshatraSettings -> NavEntry(key) {
-                                NakshatraSettingsScreen(
-                                    onBack = {
-                                        backStack.removeLastOrNull()
-                                    }
-                                )
-                            }
-                            NavRoute.CalendarSettings -> NavEntry(key) {
-                                TimelineDisplaySettingsScreen(
-                                    onBack = {
-                                        backStack.removeLastOrNull()
-                                    },
-                                    onNavigateToTithiSettings = {
-                                        backStack.add(NavRoute.TithiSettings)
-                                    },
-                                    onNavigateToNakshatraSettings = {
-                                        backStack.add(NavRoute.NakshatraSettings)
-                                    },
-                                    onNavigateToChandrashtamamSettings = {
-                                        backStack.add(NavRoute.ChandrashtamamSettings)
-                                    }
-                                )
-                            }
-                            NavRoute.ChandrashtamamSettings -> NavEntry(key) {
-                                ChandrashtamamSettingsScreen(
-                                    onBack = {
-                                        backStack.removeLastOrNull()
-                                    }
-                                )
-                            }
-                            NavRoute.RemindersSettings -> NavEntry(key) {
-                                com.suresh.sacredtimeline.ui.settings.RemindersScreen(
-                                    onBack = {
-                                        backStack.removeLastOrNull()
-                                    }
-                                )
-                            }
-                            else -> NavEntry(Unit) { Text(stringResource(R.string.unknown_route)) }
-                        }
-                    }
+                    intent = intent,
+                    onOpenDrawer = { scope.launch { drawerState.open() } },
+                    onFinish = { finish() }
                 )
             }
         }
