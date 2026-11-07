@@ -393,7 +393,9 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun clearCache() {
-        cacheManager.clearCache()
+        viewModelScope.launch {
+            cacheManager.clearCache()
+        }
     }
 
     fun updateEnabledTithi(tithi: String, enabled: Boolean) {

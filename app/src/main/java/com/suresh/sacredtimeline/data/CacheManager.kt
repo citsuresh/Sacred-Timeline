@@ -2,6 +2,8 @@ package com.suresh.sacredtimeline.data
 
 import android.content.Context
 import com.suresh.sacredtimeline.model.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -28,7 +30,7 @@ class CacheManager(private val context: Context) {
 
     private fun getFile(): File = File(context.cacheDir, fileName)
 
-    fun saveCache(latitude: Double, longitude: Double, data: Map<LocalDate, DayData>) {
+    suspend fun saveCache(latitude: Double, longitude: Double, data: Map<LocalDate, DayData>) = withContext(Dispatchers.IO) {
         try {
             val container = CacheContainer(
                 version = currentVersion,
@@ -51,20 +53,20 @@ class CacheManager(private val context: Context) {
         }
     }
 
-    fun loadCache(currentLat: Double, currentLng: Double): Map<LocalDate, DayData>? {
-        return try {
+    suspend fun loadCache(currentLat: Double, currentLng: Double): Map<LocalDate, DayData>? = withContext(Dispatchers.IO) {
+        try {
             val file = getFile()
-            if (!file.exists()) return null
+            if (!file.exists()) return@withContext null
             
             val jsonString = file.readText()
             val container = json.decodeFromString<CacheContainer>(jsonString)
             
             // 1. Check version
-            if (container.version != currentVersion) return null
+            if (container.version != currentVersion) return@withContext null
             
             // 2. Check location (max 1km difference approx)
             val dist = Math.abs(container.latitude - currentLat) + Math.abs(container.longitude - currentLng)
-            if (dist > 0.01) return null // Roughly 1km
+            if (dist > 0.01) return@withContext null // Roughly 1km
 
             container.data
         } catch (e: Exception) {
@@ -73,7 +75,7 @@ class CacheManager(private val context: Context) {
         }
     }
 
-    fun clearCache() {
+    suspend fun clearCache() = withContext(Dispatchers.IO) {
         try {
             val file = getFile()
             if (file.exists()) file.delete()
