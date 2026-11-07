@@ -192,30 +192,61 @@ class TimelineViewModel(application: Application) : AndroidViewModel(application
             }
         }
 
-        // Initial startup sequence: Load location first, then preload dashboard data
+        // Initial startup sequence: Use last known coordinates instantly for 0ms startup, then refresh GPS in background
+        @SuppressLint("MissingPermission")
         viewModelScope.launch {
             android.util.Log.d("SacredTimelineRefresh", "RELOAD TRIGGER: Initial startup sequence running")
             try {
                 _uiState.value = TimelineUiState.Loading(getApplication<Application>().getString(R.string.loading_location))
                 val mode = repository.locationMode.first()
+                val lat: Double
+                val lng: Double
                 if (mode == "MANUAL") {
                     val city = repository.manualCityName.first()
-                    val lat = repository.manualLatitude.first()
-                    val lng = repository.manualLongitude.first()
+                    lat = repository.manualLatitude.first()
+                    lng = repository.manualLongitude.first()
                     _locationName.value = city
                     _isLocationAuto.value = false
                     currentLocation = lat to lng
-                    val diskData = cacheManager.loadCache(lat, lng)
-                    if (diskData != null) {
-                        cacheMutex.withLock { cachedDays.putAll(diskData) }
-                        updateSuccessState()
+                } else {
+                    lat = repository.lastKnownLatitude.first()
+                    lng = repository.lastKnownLongitude.first()
+                    currentLocation = lat to lng
+                    _isLocationAuto.value = true
+
+                    // Fetch fresh GPS location in background without blocking startup
+                    viewModelScope.launch(Dispatchers.IO) {
+                        try {
+                            val location = fusedLocationClient.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, null).await()
+                            if (location != null) {
+                                val newCoords = location.latitude to location.longitude
+                                if (Math.abs(currentLocation.first - newCoords.first) + Math.abs(currentLocation.second - newCoords.second) > 0.001) {
+                                    currentLocation = newCoords
+                                    repository.updateLastKnownCoordinates(newCoords.first, newCoords.second)
+                                    val name = getAddressFromLocation(newCoords.first, newCoords.second)
+                                    _locationName.value = name
+                                    _isLocationAuto.value = name != "Unknown Location"
+
+                                    val diskData = cacheManager.loadCache(newCoords.first, newCoords.second)
+                                    cacheMutex.withLock {
+                                        cachedDays.clear()
+                                        if (diskData != null) cachedDays.putAll(diskData)
+                                    }
+                                    preloadData(selectedDate.value, repository.preloadDays.first())
+                                    triggerWidgetSync()
+                                }
+                            }
+                        } catch (_: Exception) {}
                     }
-                } else if (mode == "AUTO") {
-                    onLocationPermissionGranted()
+                }
+                val diskData = cacheManager.loadCache(currentLocation.first, currentLocation.second)
+                if (diskData != null) {
+                    cacheMutex.withLock { cachedDays.putAll(diskData) }
+                    updateSuccessState()
                 }
             } catch (_: Exception) {}
 
-            // Load dashboard data with the correctly resolved location
+            // Load dashboard data instantly using last known coordinates
             _uiState.value = TimelineUiState.Loading(getApplication<Application>().getString(R.string.calculating_panchangam))
             preloadData(selectedDate.value, repository.preloadDays.first())
         }
