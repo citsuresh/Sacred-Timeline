@@ -38,7 +38,18 @@ object ScoringEngine {
             1.0f
         }
 
-        // 3. Active Yogam at currentTime (Amirtha, Siddha vs Marana, Vadha)
+        // 3. Auspicious Time Boosters (Nalla Neram & Auspicious Gowri Neram)
+        val isNallaNeramActive = dayData.nallaNeram.any { it.isCurrent(currentTime) }
+        val activeGowri = dayData.gowriNeram.find { it.isCurrent(currentTime) }
+        val isAuspiciousGowri = activeGowri?.name?.uppercase() in listOf("AMRIDHA", "SUGAM", "LABAM", "DHANAM")
+
+        val auspiciousBoostMultiplier = when {
+            isNallaNeramActive -> 1.20f // 20% score boost during Nalla Neram
+            isAuspiciousGowri -> 1.10f  // 10% score boost during auspicious Gowri Neram
+            else -> 1.0f
+        }
+
+        // 4. Active Yogam at currentTime (Amirtha, Siddha vs Marana, Vadha)
         val activeYogam = dayData.yogam.find { it.isCurrent(currentTime) }
         val yogaScore = when {
             activeYogam?.name?.contains("Amirtha", true) == true -> 1.0f
@@ -48,7 +59,7 @@ object ScoringEngine {
             else -> 0.6f
         }
 
-        // 4. Active Hora at currentTime (Respecting user-selected Hora Scoring Mode)
+        // 5. Active Hora at currentTime (Respecting user-selected Hora Scoring Mode)
         val activeHora = dayData.hora.find { it.isCurrent(currentTime) }
         val horaScore = if (horaScoringMode == "NATAL") {
             when (activeHora?.natalCompatibility) {
@@ -60,7 +71,7 @@ object ScoringEngine {
             getGeneralHoraScore(activeHora)
         }
 
-        // 5. Thara Bala & Tithi
+        // 6. Thara Bala & Tithi
         val tharaScore = 0.80f
         val tithiScore = 0.80f
         val transitScore = 0.75f
@@ -73,7 +84,7 @@ object ScoringEngine {
                           (yogaScore * weights.yogaWeight) +
                           (tithiScore * weights.tithiWeight)
 
-        var finalScore = (weightedSum * 100f) * specialPenaltyMultiplier * chandrashtamamPenaltyMultiplier
+        var finalScore = (weightedSum * 100f) * specialPenaltyMultiplier * chandrashtamamPenaltyMultiplier * auspiciousBoostMultiplier
         finalScore = finalScore.coerceIn(0f, 100f)
 
         // Strictly one of the 5 standardized rating bands based on score percentage
