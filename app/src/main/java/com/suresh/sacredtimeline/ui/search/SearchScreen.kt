@@ -17,6 +17,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.suresh.sacredtimeline.R
 import com.suresh.sacredtimeline.data.VerifiedHolidays
+import com.suresh.sacredtimeline.logic.PanchangamCalculator
+import com.suresh.sacredtimeline.logic.SunriseSunsetProvider
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -45,6 +47,10 @@ fun SearchScreen(
         val start = LocalDate.of(2026, 1, 1)
         val end = LocalDate.of(2026, 12, 31)
         var curr = start
+        val defaultLat = 13.0827
+        val defaultLng = 80.2707
+        val sunProvider = SunriseSunsetProvider()
+
         while (!curr.isAfter(end)) {
             val holidayResIds = VerifiedHolidays.getHolidays(curr)
             holidayResIds.forEach { resId ->
@@ -54,6 +60,17 @@ fun SearchScreen(
             if (VerifiedHolidays.isSubhaMuhurtham(curr)) {
                 list.add(SearchResult(curr, subhaMuhurthamTitle, "Muhurthams", isMuhurtham = true))
             }
+
+            // Calculate Maitra Muhurthams
+            try {
+                val sunTimes = sunProvider.getSunTimes(defaultLat, defaultLng, curr)
+                val maitras = PanchangamCalculator.calculateMaitraMuhurtham(curr, defaultLat, defaultLng, sunTimes.sunrise)
+                maitras.forEach { maitra ->
+                    val timeStr = "${maitra.startTime.format(DateTimeFormatter.ofPattern("hh:mm a"))} - ${maitra.endTime.format(DateTimeFormatter.ofPattern("hh:mm a"))}"
+                    list.add(SearchResult(curr, "Maitra Muhurtham ($timeStr)", "Muhurthams", isMuhurtham = true))
+                }
+            } catch (_: Exception) {}
+
             curr = curr.plusDays(1)
         }
         list
@@ -64,7 +81,13 @@ fun SearchScreen(
     val filteredEvents = remember(searchQuery, selectedCategory, allEvents) {
         allEvents.filter { event ->
             val matchesCategory = selectedCategory == "All" || event.category == selectedCategory
-            val matchesQuery = searchQuery.isBlank() || event.title.contains(searchQuery, ignoreCase = true) || event.date.toString().contains(searchQuery)
+            val matchesQuery = if (searchQuery.isBlank()) {
+                // Default view: show current or future events (today onwards)
+                !event.date.isBefore(LocalDate.now())
+            } else {
+                // Search query entered: search across all dates in the year
+                event.title.contains(searchQuery, ignoreCase = true) || event.date.toString().contains(searchQuery)
+            }
             matchesCategory && matchesQuery
         }
     }
