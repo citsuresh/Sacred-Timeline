@@ -1023,4 +1023,5 @@
     <string name="category_custom_events">Custom Events</string>
     <string name="category_nakshatras">Nakshatras</string>
     <string name="category_tithis">Tithis</string>
+    <string name="category_chandrashtamams">Chandrashtamams</string>
 </resources>

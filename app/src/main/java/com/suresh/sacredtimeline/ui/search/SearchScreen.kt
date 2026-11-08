@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,7 +33,9 @@ import com.suresh.sacredtimeline.logic.LunarCalendarUtils
 import com.suresh.sacredtimeline.logic.PanchangamCalculator
 import com.suresh.sacredtimeline.logic.SunriseSunsetProvider
 import com.suresh.sacredtimeline.logic.TamilCalendarUtils
+import com.suresh.sacredtimeline.model.Metadata
 import com.suresh.sacredtimeline.ui.dashboard.components.MoonPhaseIcon
+import com.suresh.sacredtimeline.ui.theme.ChandrashtamamRed
 import com.suresh.sacredtimeline.ui.theme.HolidayPale
 import com.suresh.sacredtimeline.ui.theme.HolidayPurple
 import com.suresh.sacredtimeline.ui.theme.SubhaMuhurthamGold
@@ -51,6 +54,7 @@ data class SearchResult(
     val isCustom: Boolean = false,
     val isStar: Boolean = false,
     val isTithi: Boolean = false,
+    val isChandrashtamam: Boolean = false,
     val tithiValue: Int = 1
 )
 
@@ -81,6 +85,7 @@ fun SearchScreen(
             val settingsRepo = SettingsRepository(context)
             val enabledStars = settingsRepo.enabledNakshatras.first()
             val enabledTithis = settingsRepo.enabledTithis.first()
+            val enabledChandrashtamamStars = settingsRepo.enabledChandrashtamamStars.first()
 
             val nakshatraNamesList = listOf(
                 "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra", "Punarvasu", "Pushya", "Ashlesha",
@@ -88,13 +93,9 @@ fun SearchScreen(
                 "Mula", "Purva Ashadha", "Uttara Ashadha", "Shravana", "Dhanishta", "Shatabhisha", "Purva Bhadrapada", "Uttara Bhadrapada", "Revati"
             ).map { "$it Nakshatra" }
 
-            val tithiNamesList = listOf(
-                "Pratipada", "Dwitiya", "Tritiya", "Chaturthi", "Panchami", "Shashti", "Saptami", "Ashtami", "Navami", "Dashami",
-                "Ekadashi", "Dwadashi", "Trayodashi", "Chaturdashi", "Pournami", "Amavasai"
-            ).map { "$it Tithi" }
-
             var lastStarValue = -1
             var lastTithiValue = -1
+            val lastChandrashtamamDays = mutableMapOf<String, LocalDate>()
 
             while (!curr.isAfter(end)) {
                 val holidayResIds = VerifiedHolidays.getHolidays(curr)
@@ -116,14 +117,14 @@ fun SearchScreen(
                     }
                 } catch (_: Exception) {}
 
-                // Index user-selected Nakshatras and Tithis (Start of event occurrence only, strict Tithi ID matching)
+                // Index user-selected Nakshatras, Tithis, and Chandrashtamams (Start of event occurrence only)
                 try {
                     val lunarInfo = LunarCalendarUtils.getLunarDayInfo(curr, "AMANTA")
                     lunarInfo.nakshatras.forEach { interval ->
                         if (enabledStars.contains("STAR_${interval.value}")) {
                             if (interval.value != lastStarValue) {
                                 lastStarValue = interval.value
-                                val starName = try { context.getString(interval.resId) } catch (_: Exception) { "Nakshatra" }
+                                val starName = if (interval.value in 1..27) nakshatraNamesList[interval.value - 1] else "Nakshatra"
                                 list.add(SearchResult(curr, starName, "Nakshatras", isStar = true))
                             }
                         }
@@ -134,6 +135,27 @@ fun SearchScreen(
                                 lastTithiValue = interval.value
                                 val tithiName = try { context.getString(interval.resId) } catch (_: Exception) { "Tithi" }
                                 list.add(SearchResult(curr, tithiName, "Tithis", isTithi = true, tithiValue = interval.value))
+                            }
+                        }
+                    }
+
+                    if (enabledChandrashtamamStars.isNotEmpty()) {
+                        val rasiIntervals = LunarCalendarUtils.getMoonRasiInfo(curr)
+                        enabledChandrashtamamStars.forEach { starConfigId ->
+                            val birthRasi = LunarCalendarUtils.getBirthRasi(starConfigId)
+                            val targetRasi = ((birthRasi - 1 + 7) % 12) + 1
+                            if (rasiIntervals.any { it.value == targetRasi }) {
+                                val lastDate = lastChandrashtamamDays[starConfigId]
+                                // Require at least 4 days gap between entries for the same star to avoid multi-day transit spam
+                                if (lastDate == null || curr.isAfter(lastDate.plusDays(4))) {
+                                    lastChandrashtamamDays[starConfigId] = curr
+                                    val starName = try {
+                                        context.getString(Metadata.getStarResIdFromConfigId(starConfigId))
+                                    } catch (_: Exception) {
+                                        starConfigId
+                                    }
+                                    list.add(SearchResult(curr, "Chandrashtamam ($starName)", "Chandrashtamams", isChandrashtamam = true))
+                                }
                             }
                         }
                     }
@@ -163,7 +185,7 @@ fun SearchScreen(
         }
     }
 
-    val categories = listOf("All", "Holidays", "Muhurthams", "Custom Events", "Nakshatras", "Tithis")
+    val categories = listOf("All", "Holidays", "Muhurthams", "Custom Events", "Nakshatras", "Tithis", "Chandrashtamams")
 
     val filteredEvents = remember(searchQuery, selectedCategory, allEvents) {
         allEvents.filter { event ->
@@ -233,6 +255,7 @@ fun SearchScreen(
                                 "Custom Events" -> stringResource(R.string.category_custom_events)
                                 "Nakshatras" -> stringResource(R.string.category_nakshatras)
                                 "Tithis" -> stringResource(R.string.category_tithis)
+                                "Chandrashtamams" -> stringResource(R.string.category_chandrashtamams)
                                 else -> cat
                             }
                             Text(labelText)
@@ -273,6 +296,7 @@ fun SearchScreen(
                             "Custom Events" -> stringResource(R.string.category_custom_events)
                             "Nakshatras" -> stringResource(R.string.category_nakshatras)
                             "Tithis" -> stringResource(R.string.category_tithis)
+                            "Chandrashtamams" -> stringResource(R.string.category_chandrashtamams)
                             else -> event.category
                         }
                         val tamilDate = remember(event.date) { TamilCalendarUtils.getTamilDate(event.date) }
@@ -284,6 +308,7 @@ fun SearchScreen(
                             event.isCustom -> MaterialTheme.colorScheme.primary
                             event.isStar -> MaterialTheme.colorScheme.tertiary
                             event.isTithi -> MaterialTheme.colorScheme.secondary
+                            event.isChandrashtamam -> ChandrashtamamRed
                             else -> HolidayPurple
                         }
                         val cardBg = when {
@@ -291,6 +316,7 @@ fun SearchScreen(
                             event.isCustom -> MaterialTheme.colorScheme.surfaceVariant
                             event.isStar -> MaterialTheme.colorScheme.surfaceVariant
                             event.isTithi -> MaterialTheme.colorScheme.surfaceVariant
+                            event.isChandrashtamam -> MaterialTheme.colorScheme.surfaceVariant
                             else -> HolidayPale
                         }
                         val borderColor = when {
@@ -298,6 +324,7 @@ fun SearchScreen(
                             event.isCustom -> MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
                             event.isStar -> MaterialTheme.colorScheme.tertiary.copy(alpha = 0.4f)
                             event.isTithi -> MaterialTheme.colorScheme.secondary.copy(alpha = 0.4f)
+                            event.isChandrashtamam -> ChandrashtamamRed.copy(alpha = 0.4f)
                             else -> HolidayPurple.copy(alpha = 0.4f)
                         }
 
@@ -325,8 +352,8 @@ fun SearchScreen(
                                             MoonPhaseIcon(
                                                 tithi = event.tithiValue,
                                                 modifier = Modifier.size(28.dp),
-                                                lightColor = Color.White, // Pure white full moon
-                                                darkColor = Color(0xFF263238),   // Dark new moon
+                                                lightColor = Color.White,
+                                                darkColor = Color(0xFF263238),
                                                 strokeColor = iconTint
                                             )
                                         } else {
@@ -334,6 +361,7 @@ fun SearchScreen(
                                                 event.isMuhurtham -> Icons.Default.AutoAwesome
                                                 event.isCustom -> Icons.Default.Event
                                                 event.isStar -> Icons.Default.Star
+                                                event.isChandrashtamam -> Icons.Default.Warning
                                                 else -> Icons.Default.Celebration
                                             }
                                             Icon(
