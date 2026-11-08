@@ -117,13 +117,17 @@ class ReminderReceiver : BroadcastReceiver() {
         val repo = RemindersRepository(context)
         val reminder = repo.getAllReminders().find { it.id == reminderId }
         if (reminder != null && reminder.isRecurring) {
-            val daysToAdd = when (reminder.eventCategory.uppercase()) {
-                "NAKSHATRA" -> 27
-                "CHANDRASHTAMAM" -> 27
-                else -> 1
+            val (nextDate, nextTrigger) = if (reminder.eventCategory.uppercase() == "CUSTOM" || reminder.eventCategory.uppercase() == "TAMIL_FESTIVAL") {
+                val nextYrDate = reminder.eventDate.plusYears(1)
+                Pair(nextYrDate, reminder.triggerTime.plusSeconds(365 * 86400L))
+            } else {
+                val daysToAdd = when (reminder.eventCategory.uppercase()) {
+                    "NAKSHATRA" -> 27
+                    "CHANDRASHTAMAM" -> 27
+                    else -> 1
+                }
+                Pair(reminder.eventDate.plusDays(daysToAdd.toLong()), reminder.triggerTime.plusSeconds(daysToAdd.toLong() * 86400L))
             }
-            val nextDate = reminder.eventDate.plusDays(daysToAdd.toLong())
-            val nextTrigger = reminder.triggerTime.plusSeconds(daysToAdd.toLong() * 86400L)
             val nextReminder = reminder.copy(
                 eventDate = nextDate,
                 triggerTime = nextTrigger

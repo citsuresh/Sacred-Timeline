@@ -26,5 +26,8 @@ data class Reminder(
     val offsetMinutes: Int = 0,
     val isEnabled: Boolean = true,
     val isRecurring: Boolean = false,
-    val timeDisplay: String = ""
+    val timeDisplay: String = "",
+    val isTamilDate: Boolean = false,
+    val tamilMonth: String = "",
+    val tamilStarOrTithi: String = ""
 )

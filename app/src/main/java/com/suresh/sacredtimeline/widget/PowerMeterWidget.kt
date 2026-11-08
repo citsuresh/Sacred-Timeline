@@ -66,7 +66,16 @@ class PowerMeterWidget : GlanceAppWidget() {
         val dayData: DayData = if (cache?.containsKey(date) == true) {
             cache[date]!!
         } else {
-            DayDataProvider(context).fetchDayData(date, lat, lng, usePrimaryProfile = true)
+            com.suresh.sacredtimeline.worker.WidgetUpdateWorker.triggerImmediateUpdate(context)
+            DayData(
+                nallaNeram = emptyList(),
+                gowriNeram = emptyList(),
+                hora = emptyList(),
+                specialPeriods = emptyList(),
+                sunrise = LocalTime.of(6, 0),
+                sunset = LocalTime.of(18, 0),
+                isFallback = true
+            )
         }
 
         val primaryProfile = BirthProfilesRepository(context).getPrimaryProfile()

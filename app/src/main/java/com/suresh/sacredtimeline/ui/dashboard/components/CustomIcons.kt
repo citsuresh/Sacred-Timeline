@@ -43,6 +43,12 @@ fun MoonPhaseIcon(
 
         val t = tithi % 30
         if (t == 0) {
+            drawCircle(color = darkColor, radius = radius, center = center)
+            drawCircle(color = strokeColor, radius = radius, center = center, style = Stroke(width = 0.5.dp.toPx()))
+            return@Canvas
+        }
+        if (t == 15) {
+            drawCircle(color = lightColor, radius = radius, center = center)
             drawCircle(color = strokeColor, radius = radius, center = center, style = Stroke(width = 0.5.dp.toPx()))
             return@Canvas
         }

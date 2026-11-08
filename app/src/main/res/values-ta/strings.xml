@@ -968,4 +968,9 @@
     <string name="label_back">பின்செல்</string>
     <string name="label_clear">அழி</string>
     <string name="subha_muhurtham_title">சுப முகூர்த்தம்</string>
+    <string name="label_english_date">ஆங்கில தேதி</string>
+    <string name="label_tamil_date">தமிழ் நாட்காட்டி தேதி</string>
+    <string name="category_custom_events">தனிப்பயன் நிகழ்வுகள்</string>
+    <string name="category_nakshatras">நட்சத்திரங்கள்</string>
+    <string name="category_tithis">திதிகள்</string>
 </resources>

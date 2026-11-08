@@ -32,7 +32,7 @@ import java.util.UUID
 @Composable
 fun ReminderDialog(
     defaultTitle: String = "",
-    defaultCategory: String = "UNIVERSAL",
+    defaultCategory: String = "CUSTOM",
     defaultDate: LocalDate = LocalDate.now(),
     defaultStartTime: LocalTime = LocalTime.of(6, 0),
     defaultEndTime: LocalTime = LocalTime.of(18, 0),
@@ -54,7 +54,14 @@ fun ReminderDialog(
     }
 
     var eventTitle by remember { mutableStateOf(existingReminder?.eventTitle ?: defaultTitle) }
-    var selectedCategory by remember { mutableStateOf(existingReminder?.eventCategory ?: defaultCategory) }
+    var selectedCategory by remember { 
+        val rawCat = existingReminder?.eventCategory ?: defaultCategory
+        mutableStateOf(if (rawCat.uppercase() == "UNIVERSAL") "CUSTOM" else rawCat)
+    }
+    var isTamilDateSelection by remember { mutableStateOf(existingReminder?.isTamilDate ?: false) }
+    var customEnglishDateStr by remember { mutableStateOf(existingReminder?.eventDate?.toString() ?: LocalDate.now().toString()) }
+    var selectedTamilMonth by remember { mutableStateOf(existingReminder?.tamilMonth.takeIf { !it.isNullOrBlank() } ?: "Thai") }
+    var selectedTamilStarOrTithi by remember { mutableStateOf(existingReminder?.tamilStarOrTithi.takeIf { !it.isNullOrBlank() } ?: "Ashwini Nakshatra") }
     
     val nakshatraNames = listOf(
         "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra", "Punarvasu", "Pushya", "Ashlesha",
@@ -68,7 +75,10 @@ fun ReminderDialog(
     val gowriNames = listOf("Amridha", "Uthi", "Labam", "Dhanam", "Sugam", "Soram", "Visham", "Rogam").map { "$it Gowri Neram" }
     val tithiNames = listOf(
         "Pratipada", "Dwitiya", "Tritiya", "Chaturthi", "Panchami", "Shashti", "Saptami", "Ashtami", "Navami", "Dashami",
-        "Ekadashi", "Dwadashi", "Trayodashi", "Chaturdashi", "Pournami", "Amavasai"
+        "Ekadashi", "Dwadashi", "Trayodashi", "Chaturdashi", "Pournami",
+        "Pratipada (Krishna)", "Dwitiya (Krishna)", "Tritiya (Krishna)", "Chaturthi (Krishna)", "Panchami (Krishna)",
+        "Shashti (Krishna)", "Saptami (Krishna)", "Ashtami (Krishna)", "Navami (Krishna)", "Dashami (Krishna)",
+        "Ekadashi (Krishna)", "Dwadashi (Krishna)", "Trayodashi (Krishna)", "Chaturdashi (Krishna)", "Amavasai"
     ).map { "$it Tithi" }
     val chandrashtamamNames = listOf("Mesham", "Rishabham", "Midhunam", "Kadagam", "Simmam", "Kanni", "Thulam", "Viruchigam", "Dhanusu", "Magaram", "Kumbam", "Meenam").map { "Chandrashtamam ($it)" }
     val tamilFestivalNames = listOf(
@@ -104,6 +114,70 @@ fun ReminderDialog(
     fun calculateNextDate(cat: String, title: String): LocalDate {
         val today = LocalDate.now()
         when (cat.uppercase()) {
+            "CUSTOM" -> {
+                if (isTamilDateSelection) {
+                    val monthResId = when (selectedTamilMonth.lowercase()) {
+                        "chithirai" -> R.string.month_chithirai
+                        "vaikasi" -> R.string.month_vaikasi
+                        "aani" -> R.string.month_aani
+                        "aadi" -> R.string.month_aadi
+                        "avani" -> R.string.month_avani
+                        "purattasi" -> R.string.month_purattasi
+                        "aippasi" -> R.string.month_aippasi
+                        "karthigai" -> R.string.month_karthigai
+                        "margazhi" -> R.string.month_margazhi
+                        "thai" -> R.string.month_thai
+                        "maasi" -> R.string.month_maasi
+                        "panguni" -> R.string.month_panguni
+                        else -> R.string.month_thai
+                    }
+
+                    val isStar = selectedTamilStarOrTithi.contains("Nakshatra", true)
+                    val starIdx = if (isStar) nakshatraNames.indexOf(selectedTamilStarOrTithi) + 1 else -1
+                    val tithiIdx = if (!isStar) tithiNames.indexOf(selectedTamilStarOrTithi) + 1 else -1
+
+                    var foundDate: LocalDate? = null
+                    for (y in today.year..(today.year + 1)) {
+                        val start = LocalDate.of(y, 1, 1)
+                        val end = LocalDate.of(y, 12, 31)
+                        var curr = start
+                        while (!curr.isAfter(end)) {
+                            try {
+                                val tamilDate = TamilCalendarUtils.getTamilDate(curr)
+                                if (tamilDate.monthResId == monthResId) {
+                                    val info = LunarCalendarUtils.getLunarDayInfo(curr, "AMANTA")
+                                    val matches = if (isStar) {
+                                        info.nakshatras.any { it.value == starIdx }
+                                    } else {
+                                        info.tithis.any { it.value == tithiIdx }
+                                    }
+                                    if (matches) {
+                                        if (!curr.isBefore(today)) {
+                                            return curr
+                                        }
+                                        if (foundDate == null) {
+                                            foundDate = curr
+                                        }
+                                    }
+                                }
+                            } catch (_: Exception) {}
+                            curr = curr.plusDays(1)
+                        }
+                    }
+                    return foundDate ?: today
+                } else {
+                    try {
+                        val parsed = LocalDate.parse(customEnglishDateStr)
+                        var target = LocalDate.of(today.year, parsed.month, parsed.dayOfMonth)
+                        if (target.isBefore(today) || target == today) {
+                            target = target.plusYears(1)
+                        }
+                        return target
+                    } catch (_: Exception) {
+                        return today
+                    }
+                }
+            }
             "NAKSHATRA" -> {
                 val starIdx = nakshatraNames.indexOf(title) + 1
                 if (starIdx in 1..27) {
@@ -185,8 +259,12 @@ fun ReminderDialog(
     var selectedType by remember { mutableStateOf(existingReminder?.reminderType ?: ReminderType.START_RELATIVE) }
     var isRecurring by remember { mutableStateOf(existingReminder?.isRecurring ?: false) }
 
+    var expandedTamilMonth by remember { mutableStateOf(false) }
+    var expandedTamilStar by remember { mutableStateOf(false) }
+    val tamilMonths = listOf("Chithirai", "Vaikasi", "Aani", "Aadi", "Avani", "Purattasi", "Aippasi", "Karthigai", "Margazhi", "Thai", "Maasi", "Panguni")
+
     var expandedCategory by remember { mutableStateOf(false) }
-    val categories = listOf("NAKSHATRA", "TITHI", "CHANDRASHTAMAM", "YOGAM", "THARA_BALAM", "MUHURTHAM", "NERAM", "HORA", "GOWRI", "TAMIL_FESTIVAL", "SOLAR", "CUSTOM", "GENERAL")
+    val categories = listOf("NAKSHATRA", "TITHI", "CHANDRASHTAMAM", "YOGAM", "THARA_BALAM", "MUHURTHAM", "NERAM", "HORA", "GOWRI", "TAMIL_FESTIVAL", "SOLAR", "CUSTOM")
 
     var expandedItem by remember { mutableStateOf(false) }
 
@@ -237,7 +315,7 @@ fun ReminderDialog(
                     }
                 }
 
-                if (selectedCategory.uppercase() == "CUSTOM" || selectedCategory.uppercase() == "GENERAL") {
+                if (selectedCategory.uppercase() == "CUSTOM") {
                     OutlinedTextField(
                         value = eventTitle,
                         onValueChange = { eventTitle = it },
@@ -245,6 +323,78 @@ fun ReminderDialog(
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )
+
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text("Date Selection Mode", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        FilterChip(
+                            selected = !isTamilDateSelection,
+                            onClick = { isTamilDateSelection = false },
+                            label = { Text(stringResource(R.string.label_english_date)) }
+                        )
+                        FilterChip(
+                            selected = isTamilDateSelection,
+                            onClick = { isTamilDateSelection = true },
+                            label = { Text(stringResource(R.string.label_tamil_date)) }
+                        )
+                    }
+
+                    if (!isTamilDateSelection) {
+                        OutlinedTextField(
+                            value = customEnglishDateStr,
+                            onValueChange = { customEnglishDateStr = it },
+                            label = { Text("Event Date (YYYY-MM-DD)") },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    } else {
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            OutlinedButton(
+                                onClick = { expandedTamilMonth = true },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text("Tamil Month: $selectedTamilMonth")
+                            }
+                            DropdownMenu(
+                                expanded = expandedTamilMonth,
+                                onDismissRequest = { expandedTamilMonth = false }
+                            ) {
+                                tamilMonths.forEach { month ->
+                                    DropdownMenuItem(
+                                        text = { Text(month) },
+                                        onClick = {
+                                            selectedTamilMonth = month
+                                            expandedTamilMonth = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            OutlinedButton(
+                                onClick = { expandedTamilStar = true },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text("Star / Tithi: $selectedTamilStarOrTithi")
+                            }
+                            DropdownMenu(
+                                expanded = expandedTamilStar,
+                                onDismissRequest = { expandedTamilStar = false }
+                            ) {
+                                (nakshatraNames + tithiNames).forEach { item ->
+                                    DropdownMenuItem(
+                                        text = { Text(item) },
+                                        onClick = {
+                                            selectedTamilStarOrTithi = item
+                                            expandedTamilStar = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
                 } else {
                     Box(modifier = Modifier.fillMaxWidth()) {
                         OutlinedButton(
@@ -373,7 +523,12 @@ fun ReminderDialog(
                         targetDateForPreview.minusDays(pd.toLong()).atTime(ct)
                     }
                 }
-                val previewStr = "${stringResource(R.string.alert_fires)}: ${pTriggerDT.format(DateTimeFormatter.ofPattern("MMM dd, yyyy • hh:mm a"))}"
+                val previewStr = if (selectedCategory.uppercase() == "CUSTOM" && isRecurring) {
+                    val dateFormatted = targetDateForPreview.format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))
+                    "${stringResource(R.string.alert_fires)}: $dateFormatted • $customTimeStr (Repeats annually on same day every year)"
+                } else {
+                    "${stringResource(R.string.alert_fires)}: ${pTriggerDT.format(DateTimeFormatter.ofPattern("MMM dd, yyyy • hh:mm a"))}"
+                }
 
                 Surface(
                     color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
@@ -393,7 +548,7 @@ fun ReminderDialog(
         confirmButton = {
             TextButton(onClick = {
                 if (eventTitle.isBlank()) return@TextButton
-                val date = existingReminder?.eventDate ?: calculateNextDate(selectedCategory, eventTitle)
+                val date = calculateNextDate(selectedCategory, eventTitle)
                 val resolvedStartTime = calculateEventStartTime(selectedCategory, eventTitle, date)
                 val d = offsetDays.toIntOrNull() ?: 0
                 val h = offsetHours.toIntOrNull() ?: 0
@@ -422,11 +577,14 @@ fun ReminderDialog(
                     offsetHours = h,
                     offsetMinutes = m,
                     isEnabled = true,
-                    isRecurring = isRecurring,
+                    isRecurring = isRecurring || selectedCategory.uppercase() == "CUSTOM",
                     timeDisplay = when (selectedType) {
                         ReminderType.CUSTOM_ABSOLUTE -> customTimeStr
                         else -> resolvedStartTime.format(DateTimeFormatter.ofPattern("hh:mm a"))
-                    }
+                    },
+                    isTamilDate = isTamilDateSelection,
+                    tamilMonth = selectedTamilMonth,
+                    tamilStarOrTithi = selectedTamilStarOrTithi
                 )
 
                 val repo = RemindersRepository(context)

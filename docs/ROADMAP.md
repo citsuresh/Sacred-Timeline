@@ -25,6 +25,10 @@ Future and active development phases for the Sacred Timeline project.
 ### Phase 11: Astrological Compatibility Matching (Porutham)
 - **Overview**: Profile-to-profile comparison engine evaluating traditional 10 Poruthams (Dina, Gana, Mahendra, Stree Deergha, Yoni, Rasi, Rasi Athipathi, Vasya, Rajju, and Vedha) between any two saved birth profiles with detailed traditional score breakdowns and overall compatibility ratings.
 
+### Phase 12: Codebase Refactoring & Component Cleanup
+- **Overview**: Identify and refactor large monolithic files, clean up legacy structures, optimize code organization, and ensure robust maintainability across all domain modules.
+- **Duplication Audit**: Proactively scan for and eliminate cross-file code duplications (such as duplicated dialogs, helper utilities, or UI components) by enforcing single-source-of-truth shared components.
+
 ---
 
 ## Completed Milestones (Historical Archive)

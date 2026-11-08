@@ -1018,4 +1018,9 @@
     <string name="label_back">Back</string>
     <string name="label_clear">Clear</string>
     <string name="subha_muhurtham_title">Subha Muhurtham</string>
+    <string name="label_english_date">English Date</string>
+    <string name="label_tamil_date">Tamil Calendar Date</string>
+    <string name="category_custom_events">Custom Events</string>
+    <string name="category_nakshatras">Nakshatras</string>
+    <string name="category_tithis">Tithis</string>
 </resources>

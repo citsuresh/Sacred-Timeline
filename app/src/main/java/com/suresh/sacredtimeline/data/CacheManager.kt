@@ -43,8 +43,11 @@ class CacheManager(private val context: Context) {
             val file = getFile()
             val tempFile = File(context.cacheDir, "$fileName.tmp")
             
-            // Atomic save: write to tmp then rename
+            // Atomic save: write to tmp then delete existing file and rename tmp
             tempFile.writeText(jsonString)
+            if (file.exists()) {
+                file.delete()
+            }
             if (tempFile.exists()) {
                 tempFile.renameTo(file)
             }

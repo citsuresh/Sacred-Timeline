@@ -80,6 +80,9 @@ class BirthProfilesRepository(private val context: Context) {
             val file = getFile()
             val tempFile = File(context.filesDir, "$fileName.tmp")
             tempFile.writeText(content)
+            if (file.exists()) {
+                file.delete()
+            }
             if (tempFile.exists()) {
                 tempFile.renameTo(file)
             }

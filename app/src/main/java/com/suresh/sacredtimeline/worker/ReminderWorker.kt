@@ -146,8 +146,8 @@ class ReminderWorker(
         val repo = RemindersRepository(context)
         val reminder = repo.getAllReminders().find { it.id == reminderId }
         if (reminder != null && reminder.isRecurring) {
-            val (nextDate, nextTrigger) = if (reminder.eventCategory.uppercase() == "TAMIL_FESTIVAL") {
-                if (reminder.eventTitle.contains("1st of Every Tamil Month")) {
+            val (nextDate, nextTrigger) = if (reminder.eventCategory.uppercase() == "TAMIL_FESTIVAL" || reminder.eventCategory.uppercase() == "CUSTOM") {
+                if (reminder.eventCategory.uppercase() == "TAMIL_FESTIVAL" && reminder.eventTitle.contains("1st of Every Tamil Month")) {
                     var found = reminder.eventDate.plusDays(1)
                     for (i in 0..35) {
                         val testDate = reminder.eventDate.plusDays(1 + i.toLong())
