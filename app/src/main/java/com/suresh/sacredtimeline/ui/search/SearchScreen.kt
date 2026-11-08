@@ -426,7 +426,7 @@ fun SearchScreen(
                                 ) {
                                     Icon(Icons.Default.KeyboardArrowDown, contentDescription = null)
                                     Spacer(modifier = Modifier.width(4.dp))
-                                    Text("Load More")
+                                    Text(stringResource(R.string.label_load_more))
                                 }
                             }
                         }

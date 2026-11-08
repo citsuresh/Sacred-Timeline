@@ -1026,4 +1026,5 @@
     <string name="category_chandrashtamams">Chandrashtamams</string>
     <string name="header_upcoming_events">Upcoming Events</string>
     <string name="header_search_results">Search Results</string>
+    <string name="label_load_more">Load More</string>
 </resources>
