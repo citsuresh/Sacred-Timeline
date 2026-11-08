@@ -27,7 +27,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.suresh.sacredtimeline.R
 import com.suresh.sacredtimeline.data.RemindersRepository
-import com.suresh.sacredtimeline.data.SettingsRepository
 import com.suresh.sacredtimeline.data.VerifiedHolidays
 import com.suresh.sacredtimeline.logic.LunarCalendarUtils
 import com.suresh.sacredtimeline.logic.PanchangamCalculator
@@ -41,7 +40,6 @@ import com.suresh.sacredtimeline.ui.theme.HolidayPurple
 import com.suresh.sacredtimeline.ui.theme.SubhaMuhurthamGold
 import com.suresh.sacredtimeline.ui.theme.SubhaMuhurthamPale
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -55,7 +53,9 @@ data class SearchResult(
     val isStar: Boolean = false,
     val isTithi: Boolean = false,
     val isChandrashtamam: Boolean = false,
-    val tithiValue: Int = 1
+    val starValue: Int = 0,
+    val tithiValue: Int = 1,
+    val chandrashtamamStarConfigId: String = ""
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,10 +82,6 @@ fun SearchScreen(
             val defaultLat = 13.0827
             val defaultLng = 80.2707
             val sunProvider = SunriseSunsetProvider()
-            val settingsRepo = SettingsRepository(context)
-            val enabledStars = settingsRepo.enabledNakshatras.first()
-            val enabledTithis = settingsRepo.enabledTithis.first()
-            val enabledChandrashtamamStars = settingsRepo.enabledChandrashtamamStars.first()
 
             val nakshatraNamesList = listOf(
                 "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra", "Punarvasu", "Pushya", "Ashlesha",
@@ -93,9 +89,18 @@ fun SearchScreen(
                 "Mula", "Purva Ashadha", "Uttara Ashadha", "Shravana", "Dhanishta", "Shatabhisha", "Purva Bhadrapada", "Uttara Bhadrapada", "Revati"
             ).map { "$it Nakshatra" }
 
+            val tithiNamesList = listOf(
+                "Pratipada", "Dwitiya", "Tritiya", "Chaturthi", "Panchami", "Shashti", "Saptami", "Ashtami", "Navami", "Dashami",
+                "Ekadashi", "Dwadashi", "Trayodashi", "Chaturdashi", "Pournami", "Amavasai",
+                "Pratipada (Krishna)", "Dwitiya (Krishna)", "Tritiya (Krishna)", "Chaturthi (Krishna)", "Panchami (Krishna)",
+                "Shashti (Krishna)", "Saptami (Krishna)", "Ashtami (Krishna)", "Navami (Krishna)", "Dashami (Krishna)",
+                "Ekadashi (Krishna)", "Dwadashi (Krishna)", "Trayodashi (Krishna)", "Chaturdashi (Krishna)", "Amavasai"
+            ).map { "$it Tithi" }
+
             var lastStarValue = -1
             var lastTithiValue = -1
             val lastChandrashtamamDays = mutableMapOf<String, LocalDate>()
+            val allStarConfigs = (1..27).map { "STAR_$it" }
 
             while (!curr.isAfter(end)) {
                 val holidayResIds = VerifiedHolidays.getHolidays(curr)
@@ -117,45 +122,37 @@ fun SearchScreen(
                     }
                 } catch (_: Exception) {}
 
-                // Index user-selected Nakshatras, Tithis, and Chandrashtamams (Start of event occurrence only)
+                // Index ALL Nakshatras, Tithis, and Chandrashtamams for global search when typing
                 try {
                     val lunarInfo = LunarCalendarUtils.getLunarDayInfo(curr, "AMANTA")
                     lunarInfo.nakshatras.forEach { interval ->
-                        if (enabledStars.contains("STAR_${interval.value}")) {
-                            if (interval.value != lastStarValue) {
-                                lastStarValue = interval.value
-                                val starName = if (interval.value in 1..27) nakshatraNamesList[interval.value - 1] else "Nakshatra"
-                                list.add(SearchResult(curr, starName, "Nakshatras", isStar = true))
-                            }
+                        if (interval.value != lastStarValue) {
+                            lastStarValue = interval.value
+                            val starName = if (interval.value in 1..27) nakshatraNamesList[interval.value - 1] else "Nakshatra"
+                            list.add(SearchResult(curr, starName, "Nakshatras", isStar = true, starValue = interval.value))
                         }
                     }
                     lunarInfo.tithis.forEach { interval ->
-                        if (enabledTithis.contains("TITHI_${interval.value}")) {
-                            if (interval.value != lastTithiValue) {
-                                lastTithiValue = interval.value
-                                val tithiName = try { context.getString(interval.resId) } catch (_: Exception) { "Tithi" }
-                                list.add(SearchResult(curr, tithiName, "Tithis", isTithi = true, tithiValue = interval.value))
-                            }
+                        if (interval.value != lastTithiValue) {
+                            lastTithiValue = interval.value
+                            val tName = if (interval.value in 1..tithiNamesList.size) tithiNamesList[interval.value - 1] else "Tithi"
+                            list.add(SearchResult(curr, tName, "Tithis", isTithi = true, tithiValue = interval.value))
                         }
                     }
 
-                    if (enabledChandrashtamamStars.isNotEmpty()) {
-                        val rasiIntervals = LunarCalendarUtils.getMoonRasiInfo(curr)
-                        enabledChandrashtamamStars.forEach { starConfigId ->
-                            val birthRasi = LunarCalendarUtils.getBirthRasi(starConfigId)
-                            val targetRasi = ((birthRasi - 1 + 7) % 12) + 1
-                            if (rasiIntervals.any { it.value == targetRasi }) {
-                                val lastDate = lastChandrashtamamDays[starConfigId]
-                                // Require at least 4 days gap between entries for the same star to avoid multi-day transit spam
-                                if (lastDate == null || curr.isAfter(lastDate.plusDays(4))) {
-                                    lastChandrashtamamDays[starConfigId] = curr
-                                    val starName = try {
-                                        context.getString(Metadata.getStarResIdFromConfigId(starConfigId))
-                                    } catch (_: Exception) {
-                                        starConfigId
-                                    }
-                                    list.add(SearchResult(curr, "Chandrashtamam ($starName)", "Chandrashtamams", isChandrashtamam = true))
+                    allStarConfigs.forEach { starConfigId ->
+                        val birthRasi = LunarCalendarUtils.getBirthRasi(starConfigId)
+                        val targetRasi = ((birthRasi - 1 + 7) % 12) + 1
+                        if (rasiIntervalsAny(curr, targetRasi)) {
+                            val lastDate = lastChandrashtamamDays[starConfigId]
+                            if (lastDate == null || curr.isAfter(lastDate.plusDays(4))) {
+                                lastChandrashtamamDays[starConfigId] = curr
+                                val starName = try {
+                                    context.getString(Metadata.getStarResIdFromConfigId(starConfigId))
+                                } catch (_: Exception) {
+                                    starConfigId
                                 }
+                                list.add(SearchResult(curr, "Chandrashtamam ($starName)", "Chandrashtamams", isChandrashtamam = true, chandrashtamamStarConfigId = starConfigId))
                             }
                         }
                     }
@@ -191,10 +188,11 @@ fun SearchScreen(
         allEvents.filter { event ->
             val matchesCategory = selectedCategory == "All" || event.category == selectedCategory
             val matchesQuery = if (searchQuery.isBlank()) {
-                // Default view: show current or future events (today onwards)
-                !event.date.isBefore(LocalDate.now())
+                // Default view: Show ONLY Holidays, Muhurthams, and Custom Events (no pre-populated Nakshatras/Tithis/Chandrashtamams)
+                val isDefaultAllowed = event.category == "Holidays" || event.category == "Muhurthams" || event.category == "Custom Events"
+                !event.date.isBefore(LocalDate.now()) && isDefaultAllowed
             } else {
-                // Search query entered: search across all dates in the window
+                // Search query entered: Allow global search across ANY star, tithi, chandrashtamam, or event matching the typed query
                 event.title.contains(searchQuery, ignoreCase = true) || event.date.toString().contains(searchQuery)
             }
             matchesCategory && matchesQuery
@@ -265,6 +263,14 @@ fun SearchScreen(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = if (searchQuery.isBlank()) stringResource(R.string.header_upcoming_events) else stringResource(R.string.header_search_results),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.height(8.dp))
 
             if (isLoading) {
                 Box(
@@ -429,4 +435,9 @@ fun SearchScreen(
             }
         }
     }
+}
+
+private fun rasiIntervalsAny(curr: LocalDate, targetRasi: Int): Boolean {
+    val rasiIntervals = LunarCalendarUtils.getMoonRasiInfo(curr)
+    return rasiIntervals.any { it.value == targetRasi }
 }

@@ -1024,4 +1024,6 @@
     <string name="category_nakshatras">Nakshatras</string>
     <string name="category_tithis">Tithis</string>
     <string name="category_chandrashtamams">Chandrashtamams</string>
+    <string name="header_upcoming_events">Upcoming Events</string>
+    <string name="header_search_results">Search Results</string>
 </resources>
